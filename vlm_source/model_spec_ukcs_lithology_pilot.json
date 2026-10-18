@@ -1,0 +1,85 @@
+{
+  "name": "core-vlm-ukcs-lithology-pilot",
+  "date": "2026-10-11",
+  "status": "experimental_not_integrated",
+  "task": "photo crop classification into five Russian lithology names",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "adapter_path": "outputs/core_vlm_ukcs_lithology_pilot_lora/adapter_model.safetensors",
+  "adapter_sha256": "a88458351e1216eea9df2c4c163e2fccdf240a49a0146c64f9185456cc798282",
+  "source": {
+    "dataset": "UKCS Q204/Q205 Subsurface Data products for Machine Learning Study",
+    "doi": "10.6084/m9.figshare.14265689.v1",
+    "archive_path": "data/external_raw/ukcs_q204_q205_coremdlr/Q204_data.zip",
+    "archive_sha256": "2957abe45d046c7206b4c8c55d769fceb6aa26eedf20f8f29ceb8f28211ecf41",
+    "copyright": "Figshare record MIT; source core photographs BGS/UKRI under Open Government Licence with attribution",
+    "attribution": "Contains British Geological Survey materials © UKRI 2019 & 2020",
+    "source_inventory": "data/external_raw/ukcs_q204_q205_coremdlr/inventory.json",
+    "label_summary": "data/ukcs_q204_q205_inventory/label_summary.json",
+    "candidate_review": "data/ukcs_q204_q205_lithology_candidates/review.html"
+  },
+  "training": {
+    "manifest": "data/ukcs_q204_q205_lithology_candidates/train_pilot.jsonl",
+    "train_wells": 9,
+    "train_crops": 213,
+    "train_original_runs": 192,
+    "geologist_approved_rows": 0,
+    "epochs": 1,
+    "learning_rate": 0.00001,
+    "max_image_side_px": 448,
+    "training_loss": 0.17225711654733727,
+    "training_runtime_sec": 162.1198,
+    "metrics": "outputs/core_vlm_ukcs_lithology_pilot_lora/training_metrics.json"
+  },
+  "evaluation": {
+    "five_class_report": "outputs/ukcs_lithology_pilot_evaluation.json",
+    "holdout_wells": 3,
+    "holdout_crops": 118,
+    "holdout_original_runs": 109,
+    "five_class_crops": {
+      "base_correct": 27,
+      "adapter_correct": 45,
+      "majority_baseline_correct": 23,
+      "total": 118,
+      "base_macro_f1": 0.13905095213587235,
+      "adapter_macro_f1": 0.29166666666666663
+    },
+    "five_class_original_runs": {
+      "base_correct": 25,
+      "adapter_correct": 42,
+      "majority_baseline_correct": 23,
+      "total": 109
+    },
+    "five_class_missing_predictions": [
+      "глинистый песчаник",
+      "нефтенасыщенный песчаник"
+    ],
+    "posthoc_binary_grouping": {
+      "adapter_correct": 98,
+      "majority_baseline_correct": 71,
+      "total": 118,
+      "original_runs_adapter_correct": 89,
+      "original_runs_majority_baseline_correct": 66,
+      "original_runs_total": 109,
+      "interpretation": "Exploratory grouping after inspecting the five-class result; external transfer is mixed."
+    },
+    "external_transfer_report": "outputs/ukcs_lithology_binary_transfer_evaluation.json",
+    "external_r41_original_intervals_binary": {
+      "adapter_correct": 16,
+      "majority_baseline_correct": 16,
+      "total": 19
+    },
+    "external_cat_island_crops_binary": {
+      "adapter_correct": 7,
+      "majority_baseline_correct": 18,
+      "total": 25
+    },
+    "decision": "Do not connect this adapter to the geologist-facing full-description workflow. Five-class accuracy is 45/118 and two classes have zero recall."
+  },
+  "limitations": [
+    "The original labels are expert work but photo crops and Russian translations were selected automatically and have not been approved by a geologist.",
+    "All training and holdout wells are from the related UKCS Q204/Q205 collection; external depositional and photographic domains require separate checking.",
+    "The model was asked for one lithology only. Texture, structure, contacts, sedimentary facies, depositional environment and a complete Russian core report were not evaluated.",
+    "Source-level BGS/UKRI attribution must accompany any material reuse; source-specific rights should be reviewed before shipping derived artifacts."
+  ]
+}

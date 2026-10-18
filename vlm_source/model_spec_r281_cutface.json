@@ -1,0 +1,47 @@
+{
+  "name": "r281-cutface-lithology-experiment-2026-10-08",
+  "status": "research_failed_quality_gate_do_not_deploy",
+  "task": "one-image Russian cut-face rock-type classification, not facies or full description",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "adapter_path": "outputs/core_vlm_r281_cutface_lora/adapter_model.safetensors",
+  "adapter_sha256": "664dc82832fb81fec92f93c24050ec50054fb37c146db6db15091c9024b7f064",
+  "source": "E:\\Керн фото\\электронная копия для проверки (16).zip; eight DOCX core reports for well 281Р",
+  "data": {
+    "extracted_photo_description_pairs": 152,
+    "training_candidate_images": 114,
+    "training_cores": [3, 4, 5, 6, 7, 8],
+    "test_images": 38,
+    "test_cores": [2, 9],
+    "label_rule": "first named lithology or explicit interbedding in adjacent report text",
+    "label_status": "not visually verified by a geologist; all rows remain experimental candidates",
+    "image_limitation": "mostly about 291 x 163 pixels, blue-tinted cut faces; report includes properties not visible in the photo"
+  },
+  "training": {
+    "epochs": 2,
+    "learning_rate": 0.00001,
+    "optimizer_steps": 58,
+    "train_loss": 1.1806308401042018,
+    "train_runtime_seconds": 177.5279,
+    "note": "Train loss is not predictive accuracy."
+  },
+  "heldout_lithology_evaluation": {
+    "n": 38,
+    "baseline_majority_accuracy": 0.5526315789473685,
+    "base_model_accuracy": 0.07894736842105263,
+    "adapter_accuracy": 0.10526315789473684,
+    "base_model_macro_f1": 0.0625,
+    "adapter_macro_f1": 0.11794871794871796,
+    "evaluation_paths": ["outputs/r281_evaluation/base.summary.json", "outputs/r281_evaluation/cutface_lora.summary.json"]
+  },
+  "in_sample_canary": {
+    "training_examples": 8,
+    "epochs": 10,
+    "learning_rate": 0.0001,
+    "correct_same_examples": 3,
+    "evaluation_path": "outputs/r281_evaluation/canary_batch1.summary.json",
+    "interpretation": "Even a deliberate tiny overfit run did not learn all rock labels. The current photo/label/training setup is unsuitable for promotion."
+  },
+  "deployable": false,
+  "next_action": "Audit image/label visibility and VLM fine-tuning method, obtain high-resolution interval photos and geologist-verified labels, then re-evaluate by whole well."
+}

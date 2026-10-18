@@ -1,0 +1,62 @@
+{
+  "name": "core-vlm-theory-v4-russian-rocks",
+  "date": "2026-10-18",
+  "status": "three_local_lora_candidates_trained_but_rejected_after_heldout_review",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "training_data": {
+    "new_source_attributed_cards": 56,
+    "previous_source_attributed_cards_retained": 50,
+    "source_catalog": "data/knowledge/theory_cards_v4.json",
+    "full_training_manifest": "data/knowledge/theory_training_v4.jsonl",
+    "full_training_rows": 151,
+    "focused_training_manifest": "data/knowledge/theory_training_v4_focused.jsonl",
+    "focused_training_rows": 88,
+    "short_training_manifest": "data/knowledge/theory_training_v4_short.jsonl",
+    "short_training_rows": 88,
+    "heldout_manifest": "data/knowledge/theory_holdout_v4.jsonl",
+    "heldout_questions": 19,
+    "images_or_photo_labels_in_this_training": 0,
+    "geologist_reviewed_new_cards": 0,
+    "language": "ru"
+  },
+  "candidates": [
+    {
+      "adapter": "outputs/core_vlm_theory_v4_lora/adapter_model.safetensors",
+      "adapter_sha256": "bb2301c52dc9f0d43b7c3c795afdea7fcc92dfae10067740fc9ed6647726fdd5",
+      "epochs": 3,
+      "learning_rate": 0.00005,
+      "lora_targets": "attention projections",
+      "train_loss": 2.15352230741267,
+      "heldout_answers": "outputs/theory_v4_evaluation/adapter.json",
+      "decision": "rejected: reverses the grain-size relation for conglomerate and breccia; misses shale fissility; repeats phrases and invents geological details"
+    },
+    {
+      "adapter": "outputs/core_vlm_theory_v4b_focused_lora/adapter_model.safetensors",
+      "adapter_sha256": "3061e33ba9b73a9095168a9adf1b1d849ca72812c4db0ce0b6ec2fd2ca2bc330",
+      "epochs": 5,
+      "learning_rate": 0.0002,
+      "lora_targets": "attention and language MLP projections",
+      "train_loss": 1.09553623632951,
+      "heldout_answers": "outputs/theory_v4_evaluation/adapter_v4b.json",
+      "decision": "rejected: low teacher-forced loss but free answers confuse clast rounding, shale, carbonate terms and other diagnostic facts"
+    },
+    {
+      "adapter": "outputs/core_vlm_theory_v4c_short_lora/adapter_model.safetensors",
+      "adapter_sha256": "9c19bee5736e6bdcaef6779260771a698e23beee5b21926cc3e9891b202e2380",
+      "epochs": 6,
+      "learning_rate": 0.00015,
+      "lora_targets": "attention and language MLP projections",
+      "train_loss": 1.00066649281617,
+      "heldout_answers": "outputs/theory_v4_evaluation/adapter_v4c.json",
+      "decision": "rejected: fixed answer starts but still invents terms and misses key geological distinctions"
+    }
+  ],
+  "evaluation": {
+    "base_answers": "outputs/theory_v4_evaluation/base.json",
+    "method": "qualitative independent text questions; no image or facies performance claim",
+    "quantitative_accuracy": null,
+    "practical_conclusion": "None of the three LoRA adapters is reliable enough for geological use. Lower training loss did not imply factual improvement."
+  },
+  "app_use_decision": "Do not activate any theory adapter. Keep the Qwen base for open-ended chat and use local sourced theory cards for close geology questions. No external server is involved."
+}

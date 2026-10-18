@@ -1,0 +1,81 @@
+{
+  "name": "core-vlm-barnegat-binary-pilot",
+  "date": "2026-10-11",
+  "status": "experimental_not_integrated",
+  "task": "classify a cropped modern sediment core photo as sand-dominated or fine-grained",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "adapter_path": "outputs/core_vlm_barnegat_binary_pilot_lora/adapter_model.safetensors",
+  "adapter_sha256": "727e3cb52281d6500b621082fdc5daeb8277b54df6eca4d3c1fe06a882392587",
+  "source": {
+    "name": "USGS Data Series 985: Sediment Data Collected in 2014 from Barnegat Bay, New Jersey",
+    "doi": "10.3133/ds985",
+    "url": "https://pubs.usgs.gov/ds/0985/",
+    "raw_files": "data/external_raw/usgs_barnegat_bay_2014",
+    "staging_summary": "data/barnegat_binary_pilot/summary.json",
+    "review_sheet": "data/barnegat_binary_pilot/review.html",
+    "review_table": "data/barnegat_binary_pilot/review.csv"
+  },
+  "training": {
+    "train_manifest": "data/barnegat_binary_pilot/train_candidates.jsonl",
+    "holdout_manifest": "data/barnegat_binary_pilot/holdout_candidates.jsonl",
+    "training_wells": 13,
+    "heldout_wells": 5,
+    "training_tiles": 146,
+    "heldout_tiles": 60,
+    "heldout_original_intervals": 19,
+    "geologist_approved_rows": 0,
+    "epochs": 2,
+    "learning_rate": 0.00001,
+    "max_image_side_px": 448,
+    "training_loss": 0.11244095016170193,
+    "training_metrics": "outputs/core_vlm_barnegat_binary_pilot_lora/training_metrics.json"
+  },
+  "evaluation": {
+    "report": "outputs/barnegat_binary_pilot_evaluation.json",
+    "tile_level": {
+      "base_correct": 31,
+      "adapter_correct": 41,
+      "total": 60,
+      "majority_baseline_correct": 31,
+      "base_macro_f1": 0.34065934065934067,
+      "adapter_macro_f1": 0.6789636722050126
+    },
+    "original_interval_level": {
+      "base_correct": 12,
+      "adapter_correct": 12,
+      "total": 19,
+      "base_macro_f1": 0.3870967741935484,
+      "adapter_macro_f1": 0.5907692307692307
+    },
+    "external_transfer": {
+      "report": "outputs/barnegat_binary_transfer_evaluation.json",
+      "alternate_prompt_report": "outputs/barnegat_binary_transfer_alt_prompt.json",
+      "prompt": "same prompt as the adapter training manifest",
+      "r41_ancient_core_original_intervals": {
+        "adapter_correct": 7,
+        "base_correct": 3,
+        "majority_baseline_correct": 16,
+        "total": 19,
+        "sandstone_intervals": 16,
+        "siltstone_intervals": 3
+      },
+      "cat_island_modern_core_pure_lithology_crops": {
+        "adapter_correct": 13,
+        "base_correct": 18,
+        "majority_baseline_correct": 18,
+        "total": 25,
+        "source_wells": 7
+      }
+    },
+    "decision": "Do not connect this adapter to the geologist-facing app. Independent Barnegat intervals showed no exact accuracy gain, and both external transfer sets fell below their majority-class baseline."
+  },
+  "limitations": [
+    "Pixel-to-depth mapping uses a provisional one-percent end margin and was not verified per photo.",
+    "Binary target labels were mapped from the first lithology term in the English logs and were not checked against every crop by a geologist.",
+    "Tiles from one source interval are correlated; tile-level accuracy overstates the amount of independent evidence.",
+    "Training used only modern Barnegat Bay sediments. External ancient R-41 and modern Cat Island binary transfer checks both failed their majority baselines; their crop labels are automatic and not geologist-approved.",
+    "Full Russian descriptions and depositional environments were not evaluated for this adapter.",
+    "The commercial DeepCore product database was not included. No public export was found."
+  ]
+}

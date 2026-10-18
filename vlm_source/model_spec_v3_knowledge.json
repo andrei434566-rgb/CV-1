@@ -1,0 +1,101 @@
+{
+  "name": "core-description-vlm-v0.3-russian-knowledge-pilot",
+  "status": "trained_local_lora_pilot_visual_quality_check_failed",
+  "task": "image_to_structured_core_description_plus_russian_text_only_geology_qa",
+  "model_branch": "VLM_DESCRIPTION",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "base_model_local_path": "model_cache/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203",
+  "adapter_path": "outputs/core_vlm_v3_knowledge_lora/adapter_model.safetensors",
+  "adapter_sha256": "a1e5cf2624508992efb0e2a04ae2182a25fea349702e02d09dc66ad4e07f46ca",
+  "adapter_type": "LoRA",
+  "training_date": "2026-10-07",
+  "training_manifest": "data/qwen3_v3_knowledge_mixed.jsonl",
+  "training_data": {
+    "total_records": 69,
+    "text_only_knowledge_records": 65,
+    "user_confirmed_image_text_records": 4,
+    "visual_source_wells": ["Уренгойское Р-41"],
+    "external_unreviewed_photo_log_records_used": 0,
+    "usgs_russian_translations_pending_review_excluded": 16,
+    "source_manifest": "data/knowledge/knowledge_sources.json",
+    "curated_text_training_manifest": "data/knowledge/text_knowledge_training_v1.jsonl",
+    "full_book_page_index": {
+      "source_manifest": "data/knowledge/gazprom_facies_models_source.json",
+      "indexed_text_manifest": "data/knowledge/gazprom_facies_models_pages.jsonl",
+      "pdf_pages": 911,
+      "pages_with_extractable_text_ge_120_chars": 865,
+      "extracted_text_characters": 1819143,
+      "book_text_used_as_full_verbatim_training_targets": false,
+      "use": "Local page-indexed reference corpus; curated Russian paraphrases derived from selected concepts were used for SFT."
+    },
+    "independent_reference_sources": [
+      "user_gazprom_facies_models_2017_ru",
+      "msu_core_methods_2022",
+      "rosnedra_vims_core_documentation_2024",
+      "cyberleninka_facies_core_cuttings_2011",
+      "lithology_ru_sedimentary_textures",
+      "bigenc_sedimentary_bedding",
+      "geoschool_msu_alluvial_facies",
+      "neftegaz_core_macro_jurassic_2022",
+      "runeft_west_siberia_facies_models_2022",
+      "usgs_existing_public_core_datasets",
+      "well_R-41",
+      "user_approved_core_photodescriptions"
+    ],
+    "collection_scope_note": "Broad first-pass source scan, weighted toward Russian reference and case-study sources; not an exhaustive Internet crawl."
+  },
+  "training_parameters": {
+    "epochs": 1.0,
+    "optimizer_steps": 18,
+    "learning_rate": 0.000005,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "max_image_side_px": 448,
+    "per_device_batch_size": 1,
+    "gradient_accumulation_steps": 4,
+    "trainable_parameters": 3211264,
+    "total_parameters": 2130743296,
+    "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU, 8 GB VRAM"
+  },
+  "training_metrics": {
+    "train_loss": 2.603420363532172,
+    "train_runtime_seconds": 51.7212,
+    "train_samples_per_second": 1.334,
+    "validation_metrics": null,
+    "metrics_file": "outputs/core_vlm_v3_knowledge_lora/training_metrics.json"
+  },
+  "qualitative_inference_check": {
+    "status": "failed_in_sample",
+    "record_id": "urengoy_41_3182p96_3183p94_2070e8b0",
+    "image_seen_during_training": true,
+    "expected_segments": 3,
+    "predicted_segments_after_prompt_revision": 1,
+    "valid_json_after_prompt_revision": true,
+    "observations": [
+      "The first prompt produced unsupported references to nonexistent description numbers and fabricated several visual properties.",
+      "After revising the inference prompt, the second output stopped inventing source references but still described the core as homogeneous and slightly fibrous, which conflicts with the approved three-interval target.",
+      "This is an in-sample smoke check and not an independent accuracy estimate."
+    ],
+    "evaluation_file": "outputs/core_vlm_v3_knowledge_lora/qualitative_check_v3.json"
+  },
+  "limitations": [
+    "Only four approved image-description pairs were available for v3, all from one well; image-grounded performance is not reliable.",
+    "Text-only examples teach Russian terminology and response discipline, not image-to-pixel associations.",
+    "The 65 reference-based text answers are curated paraphrases and have not been reviewed by a geologist.",
+    "No independent validation/test split was available; train loss is not a quality metric.",
+    "The full book was indexed locally but not used as verbatim SFT targets. Some image-heavy pages were not text-extractable and the extraction index is not a visual/OCR dataset.",
+    "Sixteen USGS-derived Russian translation candidates remain pending Russian-language review and were excluded from training.",
+    "This adapter does not perform YOLO segmentation or validated depositional-environment/paleochannel classification."
+  ],
+  "files": {
+    "training_script": "train_qwen3vl.py",
+    "inference_script": "predict_core_vlm.py",
+    "source_manifest": "data/knowledge/knowledge_sources.json",
+    "mixed_training_manifest": "data/qwen3_v3_knowledge_mixed.jsonl",
+    "text_training_manifest": "data/knowledge/text_knowledge_training_v1.jsonl",
+    "book_page_index": "data/knowledge/gazprom_facies_models_pages.jsonl"
+  },
+  "reproduction_command": ".\\.venv\\Scripts\\python.exe .\\train_qwen3vl.py --model .\\model_cache\\hub\\models--Qwen--Qwen3-VL-2B-Instruct\\snapshots\\89644892e4d85e24eaac8bacfd4f463576704203 --manifest .\\data\\qwen3_v3_knowledge_mixed.jsonl --output-dir .\\outputs\\core_vlm_v3_knowledge_lora --epochs 1 --learning-rate 5e-6 --max-image-side 448"
+}

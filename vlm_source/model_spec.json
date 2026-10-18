@@ -1,0 +1,84 @@
+{
+  "name": "core-description-vlm-v0.1",
+  "status": "trained_experimental_lora_adapter",
+  "task": "image_to_structured_core_description",
+  "model_branch": "VLM_DESCRIPTION",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "base_model_downloaded": true,
+  "base_model_local_path": "model_cache/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203",
+  "base_model_sha256": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+  "adapter_path": "outputs/core_vlm_v1_lora/adapter_model.safetensors",
+  "adapter_sha256": "BD31A8686A660921C9F8B9789E0B06BAFEB52DA6D15A6A6B82D868215FDBD47E",
+  "adapter_type": "LoRA",
+  "training_status": "experimental_unreviewed_candidates",
+  "training_date": "2026-10-06",
+  "candidate_pairs": 149,
+  "training_approved_pairs": 0,
+  "independent_wells": 1,
+  "train_validation_test_split": null,
+  "training_parameters": {
+    "epochs": 2,
+    "optimizer_steps": 76,
+    "learning_rate": 0.00002,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "max_image_side_px": 448,
+    "per_device_batch_size": 1,
+    "gradient_accumulation_steps": 4,
+    "trainable_parameters": 3211264,
+    "total_parameters": 2130743296
+  },
+  "training_metrics": {
+    "train_loss": 1.5787461039267088,
+    "train_runtime_seconds": 418.7859,
+    "validation_metrics": null
+  },
+  "qualitative_inference_check": {
+    "status": "failed",
+    "image_record_id": "urengoy_41_3841p00_3841p98_f3011bc0",
+    "image_seen_during_training": true,
+    "valid_json": false,
+    "observations": [
+      "Repeated a boilerplate depth interval instead of the source lithology description.",
+      "Predicted base_m equal to top_m.",
+      "A second prompt variant hallucinated silicon/quartz inclusions and repeated phrases absent from the source text."
+    ]
+  },
+  "dataset_manifest": "data/candidate_pairs.jsonl",
+  "qwen_training_format_manifest": "data/qwen3_vl_candidates.jsonl",
+  "local_candidate_images": "data/images/",
+  "candidate_image_storage_bytes": 383844942,
+  "sources": {
+    "photos": "518431.zip; daylight core photos, well R-41",
+    "descriptions": "Прил.8 Описание керна_41.xlsx"
+  },
+  "label_policy": "Do not infer a depositional environment without direct source evidence; preserve source descriptions without claiming independent visual verification.",
+  "target_fields": {
+    "description_segments": [
+      "top_m",
+      "base_m",
+      "description"
+    ],
+    "depositional_environment": null
+  },
+  "limitations": [
+    "All pairs are automatically matched candidates and have not been approved by a geologist.",
+    "One well only; no independent validation or test set and no generalization metric.",
+    "Training loss is not an accuracy metric.",
+    "This adapter describes text from the source report; it does not produce YOLO segmentation, facies boundaries, or validated paleochannel interpretations.",
+    "The adapter requires the separate local base model weights for inference."
+  ],
+  "device_observed": {
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "vram_gb": 8,
+    "torch": "2.6.0+cu126",
+    "cuda_available": true
+  },
+  "training_script": "train_qwen3vl.py",
+  "inference_script": "predict_core_vlm.py",
+  "requirements": "requirements.txt",
+  "training_metrics_file": "outputs/core_vlm_v1_lora/training_metrics.json",
+  "training_log": "outputs/training.log"
+}

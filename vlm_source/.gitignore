@@ -1,0 +1,13 @@
+.venv/
+model_cache/
+outputs/
+data/
+vendor/
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.zip
+__pycache__/
+*.pyc

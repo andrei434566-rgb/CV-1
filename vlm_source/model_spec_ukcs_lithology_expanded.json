@@ -1,0 +1,275 @@
+{
+  "name": "core-vlm-ukcs-lithology-expanded",
+  "date": "2026-10-12",
+  "status": "experimental_validation_only_not_integrated",
+  "task": "Five source-aligned UKCS lithology classes on core image crops; Russian class name only",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "initial_adapter": "outputs/core_vlm_ukcs_lithology_pilot_lora/adapter_model.safetensors",
+  "adapter_path": "outputs/core_vlm_ukcs_lithology_expanded_lora/adapter_model.safetensors",
+  "adapter_sha256": "bffdab57eed6d0fdaae1d8c0d78d869f40e9a39d68fdb914b7cb6c5d9e994ac6",
+  "source": {
+    "data_url": "https://figshare.com/articles/dataset/UKCS_Q204_Q205_Subsurface_Data_products_for_Machine_Learning_Study/14265689",
+    "paper_url": "https://www.frontiersin.org/journals/earth-science/articles/10.3389/feart.2021.659611/full",
+    "bgs_terms": "https://www.bgs.ac.uk/information-hub/photos-and-images/",
+    "archive_sha256": "2957abe45d046c7206b4c8c55d769fceb6aa26eedf20f8f29ceb8f28211ecf41",
+    "class_mapping": {
+      "s": {
+        "english_paper": "sandstone",
+        "russian_editorial": "песчаник"
+      },
+      "is": {
+        "english_paper": "muddy sandstone",
+        "russian_editorial": "глинистый песчаник"
+      },
+      "ih": {
+        "english_paper": "sandy mudstone",
+        "russian_editorial": "песчанистая глинистая порода"
+      },
+      "os": {
+        "english_paper": "oil-stained sandstone",
+        "russian_editorial": "песчаник с нефтяными пятнами"
+      },
+      "sh": {
+        "english_paper": "mudstone",
+        "russian_editorial": "глинистая порода"
+      }
+    }
+  },
+  "training": {
+    "manifest": "data/ukcs_q204_q205_lithology_expanded/train_source_terminology.jsonl",
+    "crops": 463,
+    "wells": 9,
+    "geologist_approved_rows": 0,
+    "epochs": 2.0,
+    "train_loss": 0.15442487379086428,
+    "runtime_sec": 689.162,
+    "source_label_rows_verified": 737
+  },
+  "validation": {
+    "report": "outputs/ukcs_lithology_expanded_evaluation.json",
+    "fixed_holdout_crops": 118,
+    "wells": [
+      "204-19-7",
+      "204-20-3",
+      "204-24a-7"
+    ],
+    "tile_level": {
+      "count": 118,
+      "expected_by_source_code": {
+        "sh": 24,
+        "s": 23,
+        "ih": 23,
+        "is": 24,
+        "os": 24
+      },
+      "majority_code": "s",
+      "majority_correct": 23,
+      "pilot_correct": 28,
+      "pilot_predicted_by_source_code": {
+        "sh": 97,
+        "s": 19,
+        "os": 2
+      },
+      "pilot_macro_f1": 0.1236521054702873,
+      "pilot_recall_by_source_code": {
+        "s": 0.21739130434782608,
+        "is": 0.0,
+        "ih": 0.0,
+        "os": 0.0,
+        "sh": 0.9583333333333334
+      },
+      "expanded_correct": 40,
+      "expanded_predicted_by_source_code": {
+        "sh": 30,
+        "s": 66,
+        "os": 19,
+        "is": 2,
+        "ih": 1
+      },
+      "expanded_macro_f1": 0.2529720973410547,
+      "expanded_recall_by_source_code": {
+        "s": 0.9130434782608695,
+        "is": 0.08333333333333333,
+        "ih": 0.0,
+        "os": 0.041666666666666664,
+        "sh": 0.6666666666666666
+      }
+    },
+    "source_run_level": {
+      "count": 109,
+      "expected_by_source_code": {
+        "sh": 22,
+        "s": 23,
+        "ih": 21,
+        "is": 22,
+        "os": 21
+      },
+      "majority_code": "s",
+      "majority_correct": 23,
+      "pilot_correct": 26,
+      "pilot_predicted_by_source_code": {
+        "sh": 89,
+        "unparsed": 2,
+        "s": 16,
+        "os": 2
+      },
+      "pilot_macro_f1": 0.12695772695772695,
+      "pilot_recall_by_source_code": {
+        "s": 0.21739130434782608,
+        "is": 0.0,
+        "ih": 0.0,
+        "os": 0.0,
+        "sh": 0.9545454545454546
+      },
+      "expanded_correct": 39,
+      "expanded_predicted_by_source_code": {
+        "sh": 26,
+        "s": 59,
+        "os": 16,
+        "unparsed": 5,
+        "is": 2,
+        "ih": 1
+      },
+      "expanded_macro_f1": 0.271583168534388,
+      "expanded_recall_by_source_code": {
+        "s": 0.9130434782608695,
+        "is": 0.09090909090909091,
+        "ih": 0.0,
+        "os": 0.047619047619047616,
+        "sh": 0.6818181818181818
+      }
+    },
+    "per_well": {
+      "204-19-7": {
+        "count": 39,
+        "expected_by_source_code": {
+          "sh": 8,
+          "s": 7,
+          "ih": 8,
+          "is": 8,
+          "os": 8
+        },
+        "majority_code": "s",
+        "majority_correct": 7,
+        "pilot_correct": 9,
+        "pilot_predicted_by_source_code": {
+          "sh": 31,
+          "s": 8
+        },
+        "pilot_macro_f1": 0.12512820512820513,
+        "pilot_recall_by_source_code": {
+          "s": 0.2857142857142857,
+          "is": 0.0,
+          "ih": 0.0,
+          "os": 0.0,
+          "sh": 0.875
+        },
+        "expanded_correct": 14,
+        "expanded_predicted_by_source_code": {
+          "sh": 13,
+          "s": 20,
+          "os": 6
+        },
+        "expanded_macro_f1": 0.23703703703703702,
+        "expanded_recall_by_source_code": {
+          "s": 1.0,
+          "is": 0.0,
+          "ih": 0.0,
+          "os": 0.0,
+          "sh": 0.875
+        }
+      },
+      "204-20-3": {
+        "count": 39,
+        "expected_by_source_code": {
+          "is": 8,
+          "s": 8,
+          "os": 8,
+          "sh": 8,
+          "ih": 7
+        },
+        "majority_code": "s",
+        "majority_correct": 8,
+        "pilot_correct": 8,
+        "pilot_predicted_by_source_code": {
+          "sh": 32,
+          "os": 2,
+          "s": 5
+        },
+        "pilot_macro_f1": 0.08,
+        "pilot_recall_by_source_code": {
+          "s": 0.0,
+          "is": 0.0,
+          "ih": 0.0,
+          "os": 0.0,
+          "sh": 1.0
+        },
+        "expanded_correct": 13,
+        "expanded_predicted_by_source_code": {
+          "s": 24,
+          "is": 1,
+          "sh": 4,
+          "os": 9,
+          "ih": 1
+        },
+        "expanded_macro_f1": 0.2679738562091504,
+        "expanded_recall_by_source_code": {
+          "s": 1.0,
+          "is": 0.125,
+          "ih": 0.0,
+          "os": 0.125,
+          "sh": 0.375
+        }
+      },
+      "204-24a-7": {
+        "count": 40,
+        "expected_by_source_code": {
+          "os": 8,
+          "sh": 8,
+          "ih": 8,
+          "is": 8,
+          "s": 8
+        },
+        "majority_code": "s",
+        "majority_correct": 8,
+        "pilot_correct": 11,
+        "pilot_predicted_by_source_code": {
+          "sh": 34,
+          "s": 6
+        },
+        "pilot_macro_f1": 0.1619047619047619,
+        "pilot_recall_by_source_code": {
+          "s": 0.375,
+          "is": 0.0,
+          "ih": 0.0,
+          "os": 0.0,
+          "sh": 1.0
+        },
+        "expanded_correct": 13,
+        "expanded_predicted_by_source_code": {
+          "s": 22,
+          "sh": 13,
+          "os": 4,
+          "is": 1
+        },
+        "expanded_macro_f1": 0.23873015873015874,
+        "expanded_recall_by_source_code": {
+          "s": 0.75,
+          "is": 0.125,
+          "ih": 0.0,
+          "os": 0.0,
+          "sh": 0.75
+        }
+      }
+    },
+    "errors_csv": "outputs/ukcs_lithology_expanded_errors.csv",
+    "review_html": "outputs/ukcs_lithology_expanded_review.html"
+  },
+  "limitations": [
+    "Source label arrays and photos are public research data; crop labels have not been reviewed by a geologist.",
+    "Russian names are conservative editorial translations of source classes, not geological validation.",
+    "This is a fixed development holdout already evaluated in a previous pilot; not a new blind test.",
+    "Multiple tiles may share a source run, so source-run results are reported separately.",
+    "All wells come from a related UKCS area; external generalization remains unmeasured."
+  ]
+}

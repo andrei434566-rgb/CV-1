@@ -1,0 +1,48 @@
+{
+  "name": "core-vlm-theory-v3-russian-text-candidates",
+  "date": "2026-10-16",
+  "status": "trained_but_rejected_for_default_use_after_heldout_check",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "training_manifest": "data/knowledge/theory_training_v3.jsonl",
+  "holdout_manifest": "data/knowledge/theory_holdout_v3.jsonl",
+  "training_data": {
+    "text_only_questions": 63,
+    "new_source_attributed_cards": 50,
+    "new_cards_in_training": 43,
+    "new_cards_held_out": 7,
+    "prior_source_attributed_cards_in_training": 20,
+    "visual_training_pairs": 0,
+    "geologist_reviewed_cards": 0
+  },
+  "candidates": [
+    {
+      "adapter": "outputs/core_vlm_theory_v3_lora/adapter_model.safetensors",
+      "adapter_sha256": "422858adf61ce45b19dfaac487e0da8a7f2019ff8d9bc24751d210f22d184987",
+      "epochs": 3,
+      "learning_rate": 0.00001,
+      "train_loss": 2.792932093143463,
+      "evaluation_answers": "outputs/theory_v3_evaluation/adapter.json",
+      "decision": "rejected: nearly repeated base errors; wrong descriptions of conglomerate/breccia and bioturbation"
+    },
+    {
+      "adapter": "outputs/core_vlm_theory_v3b_lora/adapter_model.safetensors",
+      "adapter_sha256": "ea626724610c7616b7d3d77b8545cf3d2a6e264e1230b70b3c42646a903cd150",
+      "epochs": 6,
+      "learning_rate": 0.0001,
+      "train_loss": 2.11534968391061,
+      "evaluation_answers": "outputs/theory_v3_evaluation/adapter_v3b.json",
+      "decision": "rejected: confuses conglomerate and breccia by grain size rather than rounding; misses fissility of shale; gives false carbonate mudstone distinction; weak burrow/drilling criterion"
+    }
+  ],
+  "evaluation": {
+    "base_answers": "outputs/theory_v3_evaluation/base.json",
+    "questions": 7,
+    "method": "qualitative, text-only, same unseen prompts and generation settings for base and adapters",
+    "quantitative_accuracy": null,
+    "visual_accuracy": null,
+    "interpretation": "Neither adapter showed reliable geological improvement. Seven text questions are insufficient to estimate 90-95% real-world accuracy. No photo recognition claim follows from this text-only training."
+  },
+  "app_use_decision": "Do not activate either LoRA. Use source-attributed direct answers for close matches to curated theory cards and local retrieval for other geology questions; keep visual description adapter separate.",
+  "source_catalog": "data/knowledge/theory_cards_v3.json"
+}

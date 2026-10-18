@@ -35,3 +35,9 @@ third_party/
 *.log
 SOURCE_IMPORT_MANIFEST.json
 transfer/out/
+transfer/downloads/
+Kern_Analyzer.exe
+_internal/
+Kern Analyzer Data/
+.vscode/*
+!.vscode/tasks.json

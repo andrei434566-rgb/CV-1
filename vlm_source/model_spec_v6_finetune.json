@@ -1,0 +1,42 @@
+{
+  "name": "core-description-vlm-v0.6-finetune",
+  "status": "failed_qualitative_check_do_not_use_for_geological_descriptions",
+  "task": "image_to_structured_core_description",
+  "model_branch": "VLM_DESCRIPTION",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "adapter_path": "outputs/core_vlm_v6_finetune_lora/adapter_model.safetensors",
+  "adapter_sha256": "134b096a603c6fe89053ac08f75c351af650c39d0c80fe5125afb9be656afcab",
+  "adapter_type": "LoRA",
+  "training_date": "2026-10-08",
+  "initialized_from_adapter": "outputs/core_vlm_v5_interval_crops_lora",
+  "training_data": {
+    "manifest": "data/e_drive_interval_crops_v2/qwen3_vl_interval_crops.jsonl",
+    "total_records": 246,
+    "visual_crop_records": 181,
+    "text_only_knowledge_records": 65,
+    "visual_source_well": "R-41",
+    "new_training_records_vs_v5": 0
+  },
+  "training_parameters": {
+    "epochs": 2.0,
+    "optimizer_steps": 124,
+    "learning_rate": 2e-06,
+    "max_image_side_px": 448,
+    "per_device_batch_size": 1,
+    "gradient_accumulation_steps": 4
+  },
+  "training_metrics": {
+    "train_loss": 1.4214711535361506,
+    "train_runtime_seconds": 400.0574,
+    "validation_metrics": null
+  },
+  "independent_validation": null,
+  "qualitative_check": "outputs/core_vlm_v6_finetune_lora/qualitative_check.json",
+  "limitations": [
+    "The run continued training on the same 246 records and added no new labels.",
+    "Visual examples come from one well; no independent-well validation or test split is available.",
+    "The in-sample qualitative check failed with repeated text and unsupported details.",
+    "This adapter is not suitable for geologist-facing draft descriptions."
+  ]
+}

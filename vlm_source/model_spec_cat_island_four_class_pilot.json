@@ -1,0 +1,61 @@
+{
+  "name": "Cat Island forced four-class lithology diagnostic",
+  "date": "2026-10-11",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "adapter_path": "C:\\Users\\Я\\Desktop\\Синтетический керн\\vlm_core_v1\\outputs\\core_vlm_cat_island_four_class_pilot_lora",
+  "source": "USGS Data Series 834 (10.3133/ds834)",
+  "source_url": "https://pubs.usgs.gov/ds/0834/ds834_data.html",
+  "task": "Forced choice between four Russian lithology labels on an interval crop",
+  "classes": [
+    "глина",
+    "глинистый песок",
+    "ил",
+    "песок"
+  ],
+  "training": {
+    "train_images": 136,
+    "epochs": 2,
+    "learning_rate": 5e-06,
+    "train_loss": 0.3573988220270942,
+    "training_approved_rows_used": 0
+  },
+  "holdout": {
+    "heldout_images": 27,
+    "heldout_cores": [
+      "10BIM03_10CI10",
+      "10BIM03_10CI13",
+      "10BIM06_09",
+      "10BIM06_10",
+      "10BIM06_18",
+      "10BIM06_22",
+      "10BIM06_25"
+    ],
+    "seen_label_images": 27,
+    "base_correct": 2,
+    "adapter_correct": 2,
+    "train_majority_label": "песок",
+    "majority_baseline_correct": 7,
+    "base_correct_seen_labels": 2,
+    "adapter_correct_seen_labels": 2,
+    "expected_distribution": {
+      "песок": 7,
+      "ил": 3,
+      "глина": 15,
+      "глинистый песок": 2
+    },
+    "base_distribution": {
+      "глинистый песок": 27
+    },
+    "adapter_distribution": {
+      "глинистый песок": 27
+    },
+    "limitations": [
+      "Source lithology labels and automatically cropped images were not approved by a geologist.",
+      "Accuracy is exact Russian class match on automatically cropped core intervals, not full-description or facies accuracy.",
+      "Forced-choice results are diagnostic only and do not measure safe abstention."
+    ]
+  },
+  "review_status": "experimental_unreviewed_pdf_extraction_and_crop",
+  "deployment_status": "rejected_for_core_sedimentologist_app",
+  "reason": "Only 2/27 exact classes on held-out cores; adapter gives one class for every photo and does not beat base Qwen."
+}

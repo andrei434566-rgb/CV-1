@@ -1,0 +1,90 @@
+{
+  "name": "Cat Island Russian lithology pilot",
+  "date": "2026-10-11",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "adapter_path": "C:\\Users\\Я\\Desktop\\Синтетический керн\\vlm_core_v1\\outputs\\core_vlm_cat_island_lithology_pilot_lora",
+  "source": "USGS Data Series 834 (10.3133/ds834)",
+  "source_url": "https://pubs.usgs.gov/ds/0834/ds834_data.html",
+  "task": "Russian JSON lithology of a cropped sediment-core interval",
+  "scope": "sand, mud, clay, peat and related unconsolidated coastal sediments; not a full geological core description or depositional-setting model",
+  "training": {
+    "train_images": 142,
+    "train_cores": [
+      "10BIM03_10CI01",
+      "10BIM03_10CI04",
+      "10BIM03_10CI05",
+      "10BIM03_10CI06",
+      "10BIM03_10CI07",
+      "10BIM03_10CI12",
+      "10BIM06_01",
+      "10BIM06_03",
+      "10BIM06_04",
+      "10BIM06_05",
+      "10BIM06_06",
+      "10BIM06_07",
+      "10BIM06_08",
+      "10BIM06_11",
+      "10BIM06_12",
+      "10BIM06_13",
+      "10BIM06_14B",
+      "10BIM06_15",
+      "10BIM06_16",
+      "10BIM06_17",
+      "10BIM06_20",
+      "10BIM06_23",
+      "10BIM06_24B",
+      "10BIM06_26",
+      "10BIM06_27",
+      "10BIM06_28",
+      "10BIM06_29"
+    ],
+    "epochs": 2,
+    "learning_rate": 5e-06,
+    "train_loss": 1.3222574028703902,
+    "training_approved_rows_used": 0
+  },
+  "holdout": {
+    "heldout_images": 31,
+    "heldout_cores": [
+      "10BIM03_10CI10",
+      "10BIM03_10CI13",
+      "10BIM06_09",
+      "10BIM06_10",
+      "10BIM06_18",
+      "10BIM06_22",
+      "10BIM06_25"
+    ],
+    "seen_label_images": 29,
+    "base_correct": 0,
+    "adapter_correct": 0,
+    "base_correct_seen_labels": 0,
+    "adapter_correct_seen_labels": 0,
+    "expected_distribution": {
+      "песок": 7,
+      "алевритистая глина": 1,
+      "алевритистый ил": 2,
+      "ил": 3,
+      "глина": 15,
+      "глинистый песок": 2,
+      "песчанистая глина": 1
+    },
+    "base_distribution": {
+      "неопределено": 31
+    },
+    "adapter_distribution": {
+      "неопределено": 31
+    },
+    "limitations": [
+      "Source lithology labels and automatically cropped images were not approved by a geologist.",
+      "Accuracy is exact Russian class match on 31 crops from seven held-out cores, not full-description or facies accuracy."
+    ]
+  },
+  "review_status": "experimental_unreviewed_pdf_extraction_and_crop",
+  "deployment_status": "not_in_core_sedimentologist_app",
+  "limitations": [
+    "USGS descriptions were automatically parsed and depth-cropped, then lithology names were translated by a fixed dictionary.",
+    "The source labels and crops require geological review; some lithologies are visually ambiguous.",
+    "Exact-class accuracy on seven held-out cores is not accuracy of full descriptions or depositional environments.",
+    "The E: local drive was unavailable during this run; user core photos were not added to this pilot."
+  ]
+}

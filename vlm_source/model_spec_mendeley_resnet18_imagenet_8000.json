@@ -1,0 +1,203 @@
+{
+  "name": "core-cv-mendeley-resnet18-imagenet-8000",
+  "date": "2026-10-12",
+  "status": "experimental_small_crop_classifier_not_integrated",
+  "task": "Four Mendeley lithology/non-core folder classes on 2x2cm core photo crops",
+  "architecture": "torchvision.resnet18_imagenet1k_v1_finetuned",
+  "pretrained_weights_url": "https://download.pytorch.org/models/resnet18-f37072fd.pth",
+  "pretrained_weights_sha256": "f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec",
+  "checkpoint": "outputs/core_cv_mendeley_resnet18_imagenet_8000/model.pt",
+  "checkpoint_sha256": "8ff99e619a7ae2c395dbe8b6978c7cde8af8fa3fb0ee7aaba94131540197c057",
+  "source": {
+    "url": "https://data.mendeley.com/datasets/b6rj29mrss/1",
+    "doi": "10.17632/b6rj29mrss.1",
+    "license": "CC BY 4.0",
+    "class_mapping_ru": {
+      "sandstone": "песчаник",
+      "limestone": "известняк",
+      "shale": "глинистая порода",
+      "garbage": "не керн"
+    }
+  },
+  "training": {
+    "images": 8000,
+    "wells": 20,
+    "selected_epoch": 5,
+    "selection_metric": "validation_macro_f1",
+    "geologist_approved_images": 0,
+    "hyperparameters": {
+      "epochs": 16,
+      "patience": 5,
+      "batch_size": 32,
+      "learning_rate": 0.0001,
+      "workers": 0,
+      "pretrained_weights": "model_cache\\torchvision\\resnet18-f37072fd.pth",
+      "val_manifest": "data\\mendeley_lithology_pretrained_holdout\\val.jsonl",
+      "output_dir": "outputs\\core_cv_mendeley_resnet18_imagenet_8000",
+      "image_side": 224
+    },
+    "data_audit": {
+      "train_wells": [
+        "07PD01",
+        "AS10D04",
+        "BDH 2",
+        "CDP008",
+        "COD011",
+        "GHDD2",
+        "HODD1",
+        "IHAD1",
+        "IHAD3",
+        "LB04D005",
+        "MC07RD03",
+        "MURNAROO 1",
+        "OBD 06",
+        "OBD 7",
+        "OOLDEA 1",
+        "PLAYFORD 1",
+        "PRICES BORE 1",
+        "RL 1",
+        "SH 7",
+        "WDDD2"
+      ],
+      "val_wells": [
+        "COD013",
+        "IHAD2",
+        "MMDD1",
+        "WC05D001"
+      ],
+      "train_by_source_class": {
+        "sandstone": 2000,
+        "limestone": 2000,
+        "shale": 2000,
+        "garbage": 2000
+      },
+      "val_by_source_class": {
+        "sandstone": 100,
+        "limestone": 100,
+        "shale": 100,
+        "garbage": 100
+      },
+      "train_unique_hashes": 8000,
+      "val_unique_hashes": 400
+    }
+  },
+  "validation": {
+    "images": 400,
+    "wells": [
+      "COD013",
+      "IHAD2",
+      "MMDD1",
+      "WC05D001"
+    ],
+    "score": {
+      "count": 400,
+      "correct": 370,
+      "macro_f1": 0.9234486539878544,
+      "per_class": {
+        "sandstone": {
+          "correct": 96,
+          "total": 100,
+          "precision": 0.8571428571428571,
+          "recall": 0.96,
+          "f1": 0.9056603773584906
+        },
+        "limestone": {
+          "correct": 77,
+          "total": 100,
+          "precision": 0.9746835443037974,
+          "recall": 0.77,
+          "f1": 0.8603351955307262
+        },
+        "shale": {
+          "correct": 98,
+          "total": 100,
+          "precision": 0.8990825688073395,
+          "recall": 0.98,
+          "f1": 0.937799043062201
+        },
+        "garbage": {
+          "correct": 99,
+          "total": 100,
+          "precision": 0.99,
+          "recall": 0.99,
+          "f1": 0.99
+        }
+      },
+      "prediction_distribution": {
+        "sandstone": 112,
+        "shale": 109,
+        "limestone": 79,
+        "garbage": 100
+      }
+    },
+    "report": "outputs/core_cv_mendeley_resnet18_imagenet_8000/val_evaluation.json"
+  },
+  "test": {
+    "images": 400,
+    "wells": [
+      "08PD04c",
+      "COD012",
+      "HODD2",
+      "SAE 6"
+    ],
+    "score": {
+      "count": 400,
+      "correct": 369,
+      "macro_f1": 0.9221727173340077,
+      "per_class": {
+        "sandstone": {
+          "correct": 77,
+          "total": 100,
+          "precision": 0.9058823529411765,
+          "recall": 0.77,
+          "f1": 0.8324324324324325
+        },
+        "limestone": {
+          "correct": 94,
+          "total": 100,
+          "precision": 0.8034188034188035,
+          "recall": 0.94,
+          "f1": 0.8663594470046083
+        },
+        "shale": {
+          "correct": 100,
+          "total": 100,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "garbage": {
+          "correct": 98,
+          "total": 100,
+          "precision": 1.0,
+          "recall": 0.98,
+          "f1": 0.98989898989899
+        }
+      },
+      "prediction_distribution": {
+        "limestone": 117,
+        "sandstone": 85,
+        "shale": 100,
+        "garbage": 98
+      }
+    },
+    "accuracy_95pct_wilson_interval": [
+      0.892095045964364,
+      0.9448670653231555
+    ],
+    "scratch_same_images_correct": 349,
+    "qwen_same_images_correct": 324,
+    "report": "outputs/core_cv_mendeley_resnet18_imagenet_8000/test_evaluation.json",
+    "error_count": 31,
+    "errors_csv": "outputs/core_cv_mendeley_resnet18_imagenet_8000/test_errors.csv",
+    "error_review_html": "outputs/core_cv_mendeley_resnet18_imagenet_8000/test_error_review.html"
+  },
+  "limitations": [
+    "The 400 test images were unused, but the same four well identities appeared in previous research runs; no independent new-well claim.",
+    "Source folder labels are not individually checked by a geologist; any mislabeled crop affects the reported score.",
+    "The 95% Wilson interval treats image crops as independent and is optimistic if neighboring crops are correlated.",
+    "The model expects a small crop, not a full core box or raw well photo.",
+    "This is lithology/non-core classification, not full Russian description, facies or depositional environment.",
+    "The model is not integrated into the geologist application and has not been tested on ancient core or local E: material."
+  ]
+}

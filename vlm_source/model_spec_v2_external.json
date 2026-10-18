@@ -1,0 +1,95 @@
+{
+  "name": "core-description-vlm-v0.2-external",
+  "status": "trained_experimental_lora_adapter_unreviewed",
+  "task": "image_to_structured_core_description",
+  "model_branch": "VLM_DESCRIPTION",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "base_model_local_path": "model_cache/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203",
+  "adapter_path": "outputs/core_vlm_v2_external_lora/adapter_model.safetensors",
+  "adapter_sha256": "2fe3439e83e3358ab326222ba7279d8c7e0b9e8a9b1e0085339f5bc1e778800a",
+  "adapter_type": "LoRA",
+  "training_date": "2026-10-06",
+  "candidate_pairs_used": 238,
+  "source_candidate_pairs": 149,
+  "external_candidate_pairs": 89,
+  "training_approved_pairs": 0,
+  "independent_data_sources": 5,
+  "source_groups": [
+    "usgs_2021_308_central_florida",
+    "usgs_2021_312_fire_island",
+    "usgs_2023_309_st_andrew_bay",
+    "usgs_2024_330_midnight_pass",
+    "well_R-41"
+  ],
+  "independent_wells": null,
+  "train_validation_test_split": null,
+  "training_parameters": {
+    "epochs": 2.0,
+    "optimizer_steps": 120,
+    "learning_rate": 2e-05,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "max_image_side_px": 448,
+    "per_device_batch_size": 1,
+    "gradient_accumulation_steps": 4,
+    "trainable_parameters": 3211264,
+    "total_parameters": 2130743296
+  },
+  "training_metrics": {
+    "train_loss": 1.6480487863222757,
+    "train_runtime_seconds": 595.6562,
+    "train_samples_per_second": 0.799,
+    "validation_metrics": null
+  },
+  "external_corpus": {
+    "raw_corpus_manifest": "data/external_manifest.json",
+    "candidate_pair_manifest": "data/external_candidate_pairs.jsonl",
+    "transcription_manifest": "data/external_log_transcriptions.jsonl",
+    "qwen_candidate_manifest": "data/external_qwen3_vl_candidates.jsonl",
+    "external_candidate_summary": "data/external_training_candidate_summary.json",
+    "training_manifest": "data/qwen3_vl_v2_external_experiment.jsonl",
+    "external_qwen_candidates": 89,
+    "external_usgs_datasets_used": [
+      "usgs_2021_308_central_florida",
+      "usgs_2021_312_fire_island",
+      "usgs_2023_309_st_andrew_bay",
+      "usgs_2024_330_midnight_pass"
+    ],
+    "description_transcription": "Qwen3-VL-2B zero-shot OCR; not geologist-reviewed",
+    "legacy_2009_scanned_field_logs": "retained in raw corpus; not text-extracted into VLM targets"
+  },
+  "qualitative_inference_check": {
+    "status": "failed_in_sample",
+    "record_id": "usgs_2021_308_central_florida:AK2:2021-308-FA-AK2_0-200cm.jpg",
+    "image_seen_during_training": true,
+    "valid_json": false,
+    "observations": [
+      "The response repeated one generic Russian color phrase many times.",
+      "The JSON was truncated and could not be parsed.",
+      "The output did not reproduce the source log intervals or its lithologic descriptions."
+    ],
+    "independent_validation": false
+  },
+  "target_fields": {
+    "description_segments": [
+      "top_m",
+      "base_m",
+      "description"
+    ],
+    "depositional_environment": null
+  },
+  "limitations": [
+    "All 238 examples are unapproved candidates; no examples were geologist-approved before this exploratory run.",
+    "The 89 external targets were machine-transcribed from USGS visual core logs and may contain OCR errors.",
+    "No independent validation or test set was used; train loss is not an accuracy metric.",
+    "External datasets cover modern coastal, back-barrier, inlet, and bay settings; they are not labels for fluvial paleochannels.",
+    "This adapter describes lithologic intervals; it does not perform YOLO segmentation or validated depositional-environment classification.",
+    "The original v1 adapter remains available in outputs/core_vlm_v1_lora/."
+  ],
+  "dataset_manifest": "data/qwen3_vl_v2_external_experiment.jsonl",
+  "training_metrics_file": "outputs/core_vlm_v2_external_lora/training_metrics.json",
+  "training_script": "train_qwen3vl.py",
+  "inference_script": "predict_core_vlm.py"
+}

@@ -1,0 +1,84 @@
+{
+  "name": "core-vlm-mendeley-lithology-expanded",
+  "date": "2026-10-12",
+  "status": "experimental_validation_only_not_integrated",
+  "task": "Russian four-class lithology/non-core classification on 2x2 cm crops, not facies or description",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "initial_adapter": "outputs/core_vlm_mendeley_lithology_pilot_lora/adapter_model.safetensors",
+  "adapter_path": "outputs/core_vlm_mendeley_lithology_expanded_lora/adapter_model.safetensors",
+  "adapter_sha256": "4b52a5e1378060550449477b0be1eff30e915c0de7fdb22f12455376df0d0bbc",
+  "source": {
+    "url": "https://data.mendeley.com/datasets/b6rj29mrss/1",
+    "doi": "10.17632/b6rj29mrss.1",
+    "license": "CC BY 4.0",
+    "archive_sha256": "6db325de3c829dd2c0ada6a1528d94479e845f8c82e2703a6f65479a44e2f912"
+  },
+  "training": {
+    "manifest": "data/mendeley_lithology_expanded/train.jsonl",
+    "train_crops": 2000,
+    "train_wells": 20,
+    "train_wells_by_class": {
+      "sandstone": 13,
+      "limestone": 5,
+      "shale": 7,
+      "garbage": 20
+    },
+    "geologist_approved_rows": 0,
+    "epochs": 1.0,
+    "learning_rate": 5e-06,
+    "train_loss": 0.1561370049715042,
+    "training_status": "source_labeled_geology_not_reviewed"
+  },
+  "validation": {
+    "report": "outputs/mendeley_lithology_expanded_val_evaluation.json",
+    "wells": [
+      "COD013",
+      "IHAD2",
+      "MMDD1",
+      "WC05D001"
+    ],
+    "crops": 200,
+    "base_correct": 34,
+    "adapter_correct": 134,
+    "base_macro_f1": 0.13444327783610818,
+    "adapter_macro_f1": 0.6541074341278702,
+    "adapter_recall_by_class": {
+      "песчаник": 0.62,
+      "известняк": 0.84,
+      "глинистая порода": 0.34,
+      "не керн": 0.88
+    },
+    "per_well": {
+      "COD013": {
+        "correct": 27,
+        "total": 37
+      },
+      "IHAD2": {
+        "correct": 28,
+        "total": 53
+      },
+      "MMDD1": {
+        "correct": 31,
+        "total": 55
+      },
+      "WC05D001": {
+        "correct": 48,
+        "total": 55
+      }
+    },
+    "error_review_csv": "outputs/mendeley_lithology_expanded_val_errors.csv",
+    "decision": "Validation is for development only; no claim of independent external accuracy or full geological-description capability.",
+    "pilot_adapter_correct_on_same_images": 72,
+    "pilot_adapter_macro_f1_on_same_images": 0.25140252454417955,
+    "pilot_comparison_report": "outputs/mendeley_lithology_pilot_on_expanded_val_evaluation.json"
+  },
+  "limitations": [
+    "Validation wells can guide development and are not a sealed final test.",
+    "The four formerly sealed test wells were already used for the previous pilot and were not used for this training or validation run.",
+    "Source-folder labels are not individually geologist reviewed.",
+    "Five independent training wells supply limestone crops; adjacent crops are correlated.",
+    "No facies, depositional environment or Russian free-text description labels exist in this dataset.",
+    "Ancient-core transfer and geologist review are required before integration."
+  ]
+}

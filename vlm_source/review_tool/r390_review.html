@@ -1,0 +1,33 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Скважина 390 — проверка фото и описаний</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef2ef;color:#18302f;font:14px/1.5 Segoe UI,Arial,sans-serif}header{background:#174b44;color:white;padding:22px 30px}header a{color:#d8e8df}h1{font-size:26px;margin:0 0 4px}h2{font-size:18px;margin:0 0 10px}
+.layout{display:grid;grid-template-columns:250px 1fr 370px;gap:15px;max-width:1600px;margin:auto;padding:15px}.panel{background:white;border:1px solid #d9e4dd;border-radius:12px;padding:16px;min-width:0}.list{max-height:calc(100vh - 180px);overflow:auto}
+.item{display:block;width:100%;text-align:left;background:#f5f8f6;border:1px solid #dbe6de;border-radius:8px;padding:9px;margin:5px 0;cursor:pointer;color:#18302f;font:inherit}.item:hover,.item.active{background:#dceae3;border-color:#7faa95}
+img{width:100%;max-height:75vh;object-fit:contain;background:#263431;border-radius:8px}label{display:block;font-weight:650;margin:12px 0 5px}input,textarea{width:100%;font:inherit;border:1px solid #b9cbc0;border-radius:8px;padding:9px}textarea{min-height:110px;resize:vertical}.depths{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button.save{background:#1d6656;color:white;border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}.source{max-height:25vh;overflow:auto;white-space:pre-wrap;background:#f3f6f3;padding:10px;border-radius:7px;font-size:12px}.notice{background:#fff3db;border:1px solid #e7ce9d;border-radius:8px;padding:10px;font-size:12px;color:#69512b;margin:12px 0}.status{font-size:12px;color:#426558;margin-top:8px}.error{color:#b42e2e}
+@media(max-width:1150px){.layout{grid-template-columns:210px 1fr}.form{grid-column:1/-1}}@media(max-width:650px){.layout{display:block}.panel{margin-bottom:12px}.list{max-height:200px}}
+</style></head><body>
+<header><h1>Скважина 390 · сверка фото и описаний</h1><div>38 снимков · глубины считаны с подписей · 35 связей с текстом на уровне рейса · <a href="/">к ИИ-седиментологу</a></div></header>
+<div class="layout"><aside class="panel"><h2>Фотографии</h2><div id="list" class="list">Загрузка…</div></aside>
+<main class="panel"><h2 id="title">Выберите фотографию</h2><img id="image" alt="Фото керна скважины 390" style="display:none"><div id="info"></div></main>
+<section class="panel form"><h2>Проверка геолога</h2><div class="notice">Описание из отчёта относится ко всему рейсу, а фото может показывать только его часть. Укажите фактическую глубину кадра и исправленное описание видимых пород. Запись сохраняется для подготовки обучения; перед обучением нужно отдельно обрезать и привязать конкретный участок изображения.</div>
+<label>Кровля и подошва участка фото, м</label><div class="depths"><input id="top" type="number" step="0.01" placeholder="Кровля"><input id="base" type="number" step="0.01" placeholder="Подошва"></div>
+<label for="source">Исходное описание рейса из отчёта</label><div id="source" class="source">Выберите фото</div>
+<label for="observation">Исправленное описание видимых признаков</label><textarea id="observation" placeholder="Опишите только признаки, различимые на выбранном фото"></textarea>
+<label for="interpretation">Интерпретация и основания, если установлены</label><textarea id="interpretation" placeholder="Можно оставить пустым"></textarea>
+<label for="reviewer">Геолог</label><input id="reviewer" placeholder="Фамилия и инициалы"><div style="height:14px"></div><button id="save" class="save">Подтвердить связку и сохранить</button><div id="status" class="status"></div>
+</section></div>
+<script>
+const $=id=>document.getElementById(id);let rows=[],current=null;
+const escapeText=x=>String(x??'');
+async function load(){try{const r=await fetch('/api/r390_candidates');const d=await r.json();rows=d.records;$('list').textContent='';for(const row of rows){const btn=document.createElement('button');btn.className='item';btn.textContent=row.record_id.replace('r390_','Рис. ')+(row.image_depth_interval_m?' · '+row.image_depth_interval_m.join('–')+' м':' · без глубины');btn.onclick=()=>select(row,btn);$('list').append(btn)}}catch(e){$('list').textContent=e.message}}
+function select(row,button){current=row;for(const el of document.querySelectorAll('.item'))el.classList.remove('active');button.classList.add('active');$('title').textContent='Фото '+row.record_id.replace('r390_','#');$('image').src='/api/r390_image/'+row.record_id;$('image').style.display='block';
+  $('info').textContent=row.pairing_status==='unmatched'?'Точного совпадения с рейсом в тексте нет; установите интервал вручную.':'Связь по подписи рейса найдена. Нужно проверить участок внутри рейса.';
+  $('source').textContent=row.source_description||'Для этой подписи не найдено точного интервала в извлечённом отчёте.';
+  $('top').value=row.image_depth_interval_m?.[0]??'';$('base').value=row.image_depth_interval_m?.[1]??'';$('observation').value='';$('interpretation').value='';$('status').textContent='';}
+$('save').onclick=async()=>{if(!current){$('status').textContent='Сначала выберите фото.';return}const payload={record_id:current.record_id,top_m:Number($('top').value),base_m:Number($('base').value),observation:$('observation').value,interpretation:$('interpretation').value,reviewer:$('reviewer').value};
+  if(!$('top').value||!$('base').value||!payload.observation.trim()||!payload.reviewer.trim()){$('status').textContent='Заполните интервал, описание и имя геолога.';$('status').className='status error';return}
+  $('save').disabled=true;$('status').textContent='Сохранение…';try{const r=await fetch('/api/r390_review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error);$('status').textContent='Ревью сохранено для последующей разметки участка. ID: '+d.review_id;$('status').className='status'}catch(e){$('status').textContent=e.message;$('status').className='status error'}finally{$('save').disabled=false}};
+load();
+</script></body></html>

@@ -1,0 +1,112 @@
+{
+  "name": "core-vlm-mendeley-lithology-4000",
+  "date": "2026-10-12",
+  "status": "experimental_validation_only_not_integrated",
+  "task": "Four-class lithology/non-core recognition on small core photo patches, Russian class name only",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "initial_adapter": "outputs/core_vlm_mendeley_lithology_expanded_lora/adapter_model.safetensors",
+  "adapter_path": "outputs/core_vlm_mendeley_lithology_4000_lora/adapter_model.safetensors",
+  "adapter_sha256": "266672d024762718fe73148702240c234ec3573d55f8296d175e65be971d8193",
+  "source": {
+    "url": "https://data.mendeley.com/datasets/b6rj29mrss/1",
+    "doi": "10.17632/b6rj29mrss.1",
+    "license": "CC BY 4.0",
+    "archive_sha256": "6db325de3c829dd2c0ada6a1528d94479e845f8c82e2703a6f65479a44e2f912"
+  },
+  "training": {
+    "manifest": "data/mendeley_lithology_4000/train.jsonl",
+    "train_crops": 4000,
+    "train_wells": 20,
+    "by_source_class": {
+      "sandstone": 1000,
+      "limestone": 1000,
+      "shale": 1000,
+      "garbage": 1000
+    },
+    "geologist_approved_rows": 0,
+    "epochs": 1.0,
+    "learning_rate": 3e-06,
+    "train_loss": 0.09742647738754749,
+    "runtime_sec": 2965.7497
+  },
+  "validation": {
+    "report": "outputs/mendeley_lithology_4000_val_evaluation.json",
+    "wells": [
+      "COD013",
+      "IHAD2",
+      "MMDD1",
+      "WC05D001"
+    ],
+    "crops": 200,
+    "prior_correct": 134,
+    "new_correct": 157,
+    "prior_macro_f1": 0.6541074341278702,
+    "new_macro_f1": 0.7834422203688258,
+    "new_recall_by_class": {
+      "песчаник": 0.8,
+      "известняк": 0.74,
+      "глинистая порода": 0.7,
+      "не керн": 0.9
+    },
+    "new_confusion_by_expected_class": {
+      "песчаник": {
+        "песчаник": 40,
+        "известняк": 4,
+        "не керн": 1,
+        "глинистая порода": 5
+      },
+      "известняк": {
+        "известняк": 37,
+        "песчаник": 7,
+        "не керн": 2,
+        "глинистая порода": 4
+      },
+      "глинистая порода": {
+        "глинистая порода": 35,
+        "не керн": 11,
+        "песчаник": 1,
+        "известняк": 3
+      },
+      "не керн": {
+        "не керн": 45,
+        "песчаник": 1,
+        "глинистая порода": 2,
+        "известняк": 2
+      }
+    },
+    "per_well": {
+      "COD013": {
+        "correct": 27,
+        "total": 37
+      },
+      "IHAD2": {
+        "correct": 40,
+        "total": 53
+      },
+      "MMDD1": {
+        "correct": 45,
+        "total": 55
+      },
+      "WC05D001": {
+        "correct": 45,
+        "total": 55
+      }
+    },
+    "errors_csv": "outputs/mendeley_lithology_4000_val_errors.csv",
+    "comparison_review_html": "outputs/mendeley_lithology_4000_val_review.html",
+    "transition_counts": {
+      "stable-correct": 128,
+      "stable-error": 37,
+      "fixed": 29,
+      "regressed": 6
+    }
+  },
+  "limitations": [
+    "The same validation set guided the previous continuation; this is development performance, not independent test accuracy.",
+    "The former test wells were used once for the pilot and were not used here.",
+    "Source folder labels are not individually reviewed by a geologist.",
+    "Mendeley has no complete descriptions, facies, depositional environments or interval contacts.",
+    "A larger number of correlated patches from the same 20 wells does not add independent wells."
+  ]
+}

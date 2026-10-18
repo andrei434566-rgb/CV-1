@@ -1,0 +1,77 @@
+{
+  "name": "core-vlm-multidomain-binary-pilot",
+  "date": "2026-10-11",
+  "status": "experimental_not_integrated",
+  "task": "classify a cropped core photo as sand-dominated or fine-grained in Russian",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "adapter_path": "outputs/core_vlm_multidomain_binary_pilot_lora/adapter_model.safetensors",
+  "adapter_sha256": "7597c2f3f7094bc0ef2ad08b48fe14686ef973d5d6da66659444a928733fec2b",
+  "sources": [
+    "USGS Data Series 985 Barnegat Bay core photos and logs",
+    "Figshare UKCS Q204/Q205 depth-registered core images and original lithology labels"
+  ],
+  "source_access_record": "data/source_access_20261011.json",
+  "training": {
+    "manifest": "data/multidomain_binary_pilot/train_candidates.jsonl",
+    "summary": "data/multidomain_binary_pilot/summary.json",
+    "train_crops": 359,
+    "train_wells": 22,
+    "ukcs_crops": 213,
+    "barnegat_crops": 146,
+    "sand_crops": 186,
+    "fine_crops": 173,
+    "geologist_approved_rows": 0,
+    "epochs": 1,
+    "learning_rate": 0.00001,
+    "max_image_side_px": 448,
+    "train_loss": 0.10308708349863688,
+    "train_runtime_sec": 266.0842,
+    "metrics": "outputs/core_vlm_multidomain_binary_pilot_lora/training_metrics.json"
+  },
+  "evaluation": {
+    "report": "outputs/multidomain_binary_pilot_evaluation.json",
+    "heldout_wells": 8,
+    "heldout_crops": 178,
+    "heldout_original_intervals_or_runs": 128,
+    "all_original_units": {
+      "adapter_correct": 100,
+      "base_correct": 56,
+      "majority_baseline_correct": 73,
+      "total": 128
+    },
+    "ukcs_original_runs": {
+      "adapter_correct": 87,
+      "base_correct": 44,
+      "majority_baseline_correct": 66,
+      "total": 109
+    },
+    "barnegat_original_intervals": {
+      "adapter_correct": 13,
+      "base_correct": 12,
+      "majority_baseline_correct": 12,
+      "total": 19
+    },
+    "external_r41_original_intervals": {
+      "adapter_correct": 3,
+      "base_correct": 3,
+      "majority_baseline_correct": 16,
+      "total": 19,
+      "failure_mode": "Adapter predicted fine-grained for all 19 source intervals, 16 of which start with sandstone."
+    },
+    "external_cat_island_crops": {
+      "adapter_correct": 21,
+      "base_correct": 18,
+      "majority_baseline_correct": 18,
+      "total": 25
+    },
+    "decision": "Do not connect this adapter to the geologist-facing app. The primary ancient-core transfer target R-41 failed at 3/19 despite gains on modern coastal cores."
+  },
+  "limitations": [
+    "Automatically cropped and mapped public-source labels have not been confirmed by a geologist.",
+    "R-41 is a single ancient well and its label distribution is strongly imbalanced; this failure is a diagnostic, not a full population estimate.",
+    "Cat Island labels and crop-to-depth alignment are provisional.",
+    "A binary material class is not a geological description, sedimentary facies, depositional environment or report.",
+    "Combining domains in one LoRA adapter did not remove a domain-specific failure; further repeated training on these same labels is not a substitute for reviewed ancient-core examples."
+  ]
+}

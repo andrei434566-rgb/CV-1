@@ -1,0 +1,81 @@
+{
+  "name": "core-vlm-mendeley-lithology-pilot",
+  "date": "2026-10-12",
+  "status": "experimental_not_integrated",
+  "task": "Russian four-class lithology/non-core classification of 2x2 cm image crops; no facies or description",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "adapter_path": "outputs/core_vlm_mendeley_lithology_pilot_lora/adapter_model.safetensors",
+  "adapter_sha256": "dd75b08855f6481eac990c0f995fddec6854e2aef8a2462555ab05a5774ca4aa",
+  "source": {
+    "url": "https://data.mendeley.com/datasets/b6rj29mrss/1",
+    "doi": "10.17632/b6rj29mrss.1",
+    "license": "CC BY 4.0",
+    "archive_sha256": "6db325de3c829dd2c0ada6a1528d94479e845f8c82e2703a6f65479a44e2f912"
+  },
+  "training": {
+    "manifest": "data/mendeley_lithology_pilot/train.jsonl",
+    "train_crops": 480,
+    "train_wells": 20,
+    "train_wells_by_class": {
+      "sandstone": 13,
+      "limestone": 5,
+      "shale": 7,
+      "garbage": 20
+    },
+    "geologist_approved_rows": 0,
+    "epochs": 1.0,
+    "train_loss": 0.319893117249012,
+    "training_status": "source_labeled_geology_not_reviewed"
+  },
+  "evaluation": {
+    "report": "outputs/mendeley_lithology_pilot_test_evaluation.json",
+    "split": "sealed_whole_well_test_first_use",
+    "test_wells": [
+      "08PD04c",
+      "COD012",
+      "HODD2",
+      "SAE 6"
+    ],
+    "test_crops": 200,
+    "base_correct": 42,
+    "adapter_correct": 80,
+    "majority_baseline_correct": 50,
+    "base_macro_f1": 0.16315111903347196,
+    "adapter_macro_f1": 0.2860095684160596,
+    "adapter_recall_by_class": {
+      "песчаник": 0.92,
+      "известняк": 0.0,
+      "глинистая порода": 0.04,
+      "не керн": 0.64
+    },
+    "per_well": {
+      "08PD04c": {
+        "correct": 24,
+        "total": 79
+      },
+      "COD012": {
+        "correct": 6,
+        "total": 38
+      },
+      "HODD2": {
+        "correct": 28,
+        "total": 55
+      },
+      "SAE 6": {
+        "correct": 22,
+        "total": 28
+      }
+    },
+    "error_review_csv": "outputs/mendeley_lithology_pilot_error_review.csv",
+    "error_review_html": "outputs/mendeley_lithology_pilot_error_review.html",
+    "decision": "Do not integrate: 0/50 limestone and 2/50 shale despite 80/200 overall."
+  },
+  "limitations": [
+    "Folder labels are source-direct but individual crops were not geologist reviewed.",
+    "The four-class source is limited to 2x2 cm crops and cannot train facies, depositional environment or full descriptions.",
+    "The original source splits share all 28 wells; this experiment uses separate whole wells.",
+    "Only five training wells contain limestone crops in the pilot; each class has fewer independent wells than image crops.",
+    "Further model selection against these same four test wells would invalidate the sealed-test interpretation.",
+    "A practical model needs expert-reviewed ancient-core examples and independent external wells."
+  ]
+}

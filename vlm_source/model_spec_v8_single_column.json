@@ -1,0 +1,54 @@
+{
+  "name": "core-description-vlm-v0.8-single-column",
+  "status": "experimental_heldout_check_not_geologist_validated",
+  "task": "image_to_russian_core_description_draft",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "adapter_path": "outputs/core_vlm_v8_single_column_lora/adapter_model.safetensors",
+  "adapter_sha256": "71a203041274c04c511ca4dde908dbd047ca28382775ef229f6d35a30671c6a5",
+  "training_data": {
+    "manifest": "data/v8_single_column/train_visual.jsonl",
+    "well": "R-41",
+    "train_source_description_rows": 55,
+    "train_crops": 174,
+    "train_source_photos": 38,
+    "heldout_source_description_rows": 19,
+    "heldout_crops": 80,
+    "heldout_source_photos": 17,
+    "train_heldout_photo_overlap": 0,
+    "excluded_multi_column_candidate_photos": 45,
+    "source_pair_approval": "The user approved the original photo-description pairs for training.",
+    "crop_review_status": "Automatically produced depth crops and repeated first-sentence tile labels have not been checked by a geologist. Their manifest training_approved flag is false; the v8 run was an explicitly authorized experimental candidate run."
+  },
+  "training_parameters": {
+    "initialized_from": "base_model",
+    "epochs": 2,
+    "optimizer_steps": 88,
+    "learning_rate": 0.00001,
+    "max_image_side_px": 448
+  },
+  "training_metrics": {
+    "train_loss": 1.0270779728889465,
+    "train_runtime_seconds": 299.8872,
+    "note": "Training loss is not geological accuracy."
+  },
+  "heldout_evaluation": {
+    "rows": 19,
+    "manifest": "data/v8_single_column/test_shared_v7_rows.jsonl",
+    "reports": "outputs/v8_evaluation/",
+    "method": "One representative tile per held-out source row, same prompt and deterministic decoding for base, v7, and v8. Russian rock/color keyword overlap with source first sentence; not expert accuracy.",
+    "base": {"valid_json": 18, "rock_f1": 0.1481481481, "color_f1": 0.6229508197},
+    "v7_old_crops": {"valid_json": 19, "rock_f1": 0.3448275862, "color_f1": 0.6756756757},
+    "v8_corrected": {"valid_json": 18, "rock_f1": 0.45, "color_f1": 0.5230769231},
+    "v5_seen_rows": {"valid_json": 19, "rock_f1": 0.3333333333, "color_f1": 0.6571428571, "in_sample": true}
+  },
+  "limitations": [
+    "Only one well; the held-out blocks do not measure generalization to other wells or depositional environments.",
+    "The 19 held-out descriptions are dominated by sandstone, so class balance is poor.",
+    "Some full-layer labels may not describe every narrow photo tile; linear depth alignment also requires visual confirmation.",
+    "Visible color can differ from the report because of lighting and photo processing.",
+    "Some outputs include invented lithology, structures, and depth. Manual review is required.",
+    "No validated facies classification or YOLO segmentation is supplied by this adapter."
+  ],
+  "geologist_review_file": "outputs/v8_evaluation/review_19.html"
+}

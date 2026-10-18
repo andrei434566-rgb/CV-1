@@ -1,0 +1,50 @@
+{
+  "name": "core-description-vlm-v0.5-interval-crops",
+  "status": "experimental_candidate_qualitative_check_failed",
+  "task": "image_to_structured_core_description",
+  "model_branch": "VLM_DESCRIPTION",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "base_model_local_path": "model_cache/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/89644892e4d85e24eaac8bacfd4f463576704203",
+  "adapter_path": "outputs/core_vlm_v5_interval_crops_lora/adapter_model.safetensors",
+  "adapter_sha256": "46bfb65259c58f064ea414e38a7bfbae2346401ba6a4de6cdaf825ba17291a99",
+  "adapter_type": "LoRA",
+  "training_date": "2026-10-08",
+  "initialized_from_adapter": "outputs/core_vlm_v4_e_drive_lora",
+  "training_data": {
+    "manifest": "data/e_drive_interval_crops_v2/qwen3_vl_interval_crops.jsonl",
+    "visual_crop_records": 181,
+    "unique_source_description_rows": 74,
+    "source_photos": 57,
+    "text_only_knowledge_records": 65,
+    "total_records": 246,
+    "visual_source_well": "R-41",
+    "user_approved_original_image_pairs_in_parent_v4": 149,
+    "visual_target_scope": "First sentence of the source interval description; full wording retained in record metadata."
+  },
+  "training_parameters": {
+    "epochs": 1.0,
+    "optimizer_steps": 62,
+    "learning_rate": 5e-06,
+    "max_image_side_px": 448,
+    "per_device_batch_size": 1,
+    "gradient_accumulation_steps": 4,
+    "trainable_parameters": 3211264,
+    "total_parameters": 2130743296
+  },
+  "training_metrics": {
+    "train_loss": 1.4952224262299076,
+    "train_runtime_seconds": 192.3213,
+    "validation_metrics": null
+  },
+  "independent_validation": null,
+  "qualitative_smoke_check": "outputs/core_vlm_v5_interval_crops_lora/qualitative_smoke_check.json",
+  "limitations": [
+    "Visual targets come from one well (R-41); no independent-well validation or test split was available.",
+    "Repeated crops from one source interval share the same first-sentence target.",
+    "The qualitative check was in-sample and failed to reproduce key reference details.",
+    "A lower training loss is not a measure of geological accuracy.",
+    "The adapter does not perform YOLO segmentation or validated depositional-environment classification."
+  ],
+  "geologist_review_batch_summary": "outputs/core_vlm_v5_interval_crops_lora/geologist_review_batch_summary.json"
+}

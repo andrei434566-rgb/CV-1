@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Диалог с локальной VLM</title>
+  <style>
+    :root{font-family:Segoe UI,Arial,sans-serif;color:#1b2d2b;background:#eef2ef}*{box-sizing:border-box}
+    body{margin:0}.shell{max-width:980px;margin:auto;padding:22px 16px 40px}
+    header{display:flex;align-items:start;justify-content:space-between;gap:15px;margin-bottom:14px}
+    h1{font-size:27px;margin:4px 0}p{line-height:1.45;color:#536660;margin:8px 0}
+    a{color:#1b6557}.panel{background:#fff;border:1px solid #dbe4df;border-radius:16px;box-shadow:0 7px 25px #1431270c}
+    .toolbar{padding:14px 18px;border-bottom:1px solid #e4ebe7;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    select,textarea,input[type=file]{font:inherit;color:#1b2d2b;border:1px solid #bfcfca;border-radius:8px;padding:9px;background:white}
+    button{font:inherit;font-weight:600;border:0;border-radius:8px;padding:10px 14px;cursor:pointer;background:#1f6258;color:white}
+    button:disabled{opacity:.55;cursor:wait}.secondary{background:#e5efea;color:#235448}
+    .messages{min-height:300px;max-height:60vh;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+    .bubble{max-width:85%;padding:12px 15px;border-radius:13px;white-space:pre-wrap;line-height:1.5;overflow-wrap:anywhere}
+    .user{align-self:flex-end;background:#dceee6}.assistant{align-self:flex-start;background:#f0f3f1}
+    .label{font-size:11px;font-weight:700;color:#4c7165;margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em}
+    .composer{border-top:1px solid #e4ebe7;padding:15px 18px}
+    textarea{width:100%;min-height:90px;resize:vertical;line-height:1.45}
+    .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+    .status{font-size:13px;color:#556964}.error{color:#a52828}.hint{font-size:12px;color:#61736d}
+    @media(max-width:600px){header{display:block}.bubble{max-width:98%}}
+  </style>
+</head>
+<body><div class="shell">
+  <header><div><a href="/">← Анализ фото и отчёт</a><h1>Диалог с локальной VLM</h1>
+    <p>Задайте вопрос о керне или приложите фото. Ответы модели — черновик для проверки геологом.</p></div></header>
+  <main class="panel">
+    <div class="toolbar"><label for="mode">Модель</label>
+      <select id="mode"><option value="base">Qwen3-VL-2B — базовая</option><option value="v8">LoRA v8 — экспериментальная</option><option value="v5">LoRA v5 — архивная</option></select>
+      <label for="answerStyle">Ответ</label><select id="answerStyle"><option value="fast">Быстро</option><option value="detailed">Подробно</option></select>
+      <button id="clear" class="secondary">Новый диалог</button>
+      <span class="hint">Работает на этом компьютере</span>
+    </div>
+    <div id="messages" class="messages" aria-live="polite"><div class="bubble assistant"><div class="label">Помощник</div>Здравствуйте. Можете спросить о текстурах, породах и фациях или показать фрагмент керна. Для выводов по фото укажите масштаб и контекст интервала, если они известны.</div></div>
+    <div class="composer"><label for="question">Ваш вопрос</label>
+      <textarea id="question" placeholder="Например: какие видимые признаки могут указывать на косую слоистость?"></textarea>
+      <div class="row"><input id="photo" type="file" accept="image/jpeg,image/png,image/webp"><button id="send">Отправить</button><span id="status" class="status"></span></div>
+      <p class="hint">JPEG, PNG или WebP до 20 МБ. В быстром режиме фото уменьшается до 640 пикселей и ответ короче; для тонких текстур выберите «Подробно». Фото передаётся модели с текущим вопросом; в следующих сообщениях можно обсудить её ответ. Первый ответ включает загрузку весов.</p>
+    </div>
+  </main>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+let history=[];
+function add(role,content,photoName=''){
+  const bubble=document.createElement('div');bubble.className='bubble '+role;
+  const label=document.createElement('div');label.className='label';label.textContent=role==='user'?'Вы':'Помощник';
+  bubble.append(label,document.createTextNode(content+(photoName?'\n📷 '+photoName:'')));
+  $('messages').append(bubble);$('messages').scrollTop=$('messages').scrollHeight;
+}
+function status(message,error=false){$('status').textContent=message;$('status').className='status'+(error?' error':'');}
+function dataUrl(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)})}
+$('send').addEventListener('click',async()=>{
+  const message=$('question').value.trim(),file=$('photo').files[0];
+  if(!message){status('Введите вопрос.',true);return}
+  if(file&&file.size>20*1024*1024){status('Фото превышает 20 МБ.',true);return}
+  $('send').disabled=true;status('Модель отвечает…');
+  try{
+    const image=file?await dataUrl(file):null;
+    const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,image,history,model_mode:$('mode').value,answer_style:$('answerStyle').value})});
+    const result=await response.json();if(!response.ok)throw new Error(result.error||'Ошибка запроса');
+    add('user',message,file?.name);add('assistant',result.answer||'Пустой ответ модели');
+    history.push({role:'user',content:message},{role:'assistant',content:result.answer||''});
+    if(history.length>16)history=history.slice(-16);
+    $('question').value='';$('photo').value='';status('Готово');
+  }catch(error){status(error.message,true)}finally{$('send').disabled=false}
+});
+$('question').addEventListener('keydown',event=>{if(event.key==='Enter'&&(event.ctrlKey||event.metaKey)){$('send').click()}});
+$('clear').addEventListener('click',()=>{history=[];$('messages').innerHTML='';status('Новый диалог');});
+</script></body></html>

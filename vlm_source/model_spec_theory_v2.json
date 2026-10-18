@@ -1,0 +1,35 @@
+{
+  "name": "core-vlm-theory-v2-russian-text-pilot",
+  "date": "2026-10-12",
+  "status": "trained_but_rejected_for_use_after_heldout_check",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "adapter": "outputs/core_vlm_theory_v2_lora/adapter_model.safetensors",
+  "adapter_sha256": "74bc94fd4b18c2fdad523a1b5e0e8c6c1af247b201ce15377661bc8073810a75",
+  "training_manifest": "data/knowledge/theory_training_v2.jsonl",
+  "training_data": {
+    "source_checked_original_russian_paraphrases": 20,
+    "held_out_text_questions": 4,
+    "visual_training_pairs": 0,
+    "geologist_reviewed_cards": 0,
+    "source_ids": ["iodp301_methods", "iodp329_methods", "iodp403_methods", "ru_core_cuttings_facies_2011", "ru_integrated_facies_2024"]
+  },
+  "training": {
+    "epochs": 3,
+    "optimizer_steps": 15,
+    "learning_rate": 0.00001,
+    "train_loss": 2.902116902669271,
+    "runtime_seconds": 41.1859,
+    "metrics": "outputs/core_vlm_theory_v2_lora/training_metrics.json"
+  },
+  "evaluation": {
+    "base_answers": "outputs/theory_v2_evaluation/base.json",
+    "adapter_answers": "outputs/theory_v2_evaluation/adapter.json",
+    "interpretation": "On the three held-out questions with valid wording, the adapter repeated the base model's serious domain errors, including treating lithotypes as people and facies as project-management phases. No validated gain in text QA or image description.",
+    "excluded_question": "v2_induration: the initial Russian wording mistranslated induration as compaction. The source card and future holdout manifest were corrected after this comparison; the stored evaluation retains the initial wording for audit.",
+    "quantitative_accuracy": null,
+    "visual_accuracy": null
+  },
+  "use_decision": "Keep as an experiment. Do not activate as the app's photo-description model or as the theory-chat default. Use source-cited local retrieval over the user-provided book and curated cards for theory questions.",
+  "reproduction_command": ".\\.venv\\Scripts\\python.exe .\\train_qwen3vl.py --model .\\model_cache\\hub\\models--Qwen--Qwen3-VL-2B-Instruct\\snapshots\\89644892e4d85e24eaac8bacfd4f463576704203 --manifest .\\data\\knowledge\\theory_training_v2.jsonl --output-dir .\\outputs\\core_vlm_theory_v2_lora --epochs 3 --learning-rate 1e-5 --max-image-side 448"
+}
