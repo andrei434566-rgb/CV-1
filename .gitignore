@@ -34,3 +34,4 @@ third_party/
 **/.env.*
 *.log
 SOURCE_IMPORT_MANIFEST.json
+transfer/out/
