@@ -1,0 +1,1 @@
+"""Kern Analyzer desktop application."""
