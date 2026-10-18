@@ -57,6 +57,7 @@ if ($needDownload) {
 
 $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
 if ($manifest.schema -ne 'cv1_runtime_v1') { throw 'Неизвестный формат пакета модели.' }
+if (-not $manifest.app_archive) { throw 'В пакете отсутствует описание проверенного EXE.' }
 function Confirm-Checksum {
     param([string]$Name, [string]$Expected, [long]$ExpectedBytes)
     $path = Join-Path $AssetsDirectory $Name
@@ -66,6 +67,7 @@ function Confirm-Checksum {
     if ($actual -ne $Expected.ToLowerInvariant()) { throw "Неверная контрольная сумма $Name" }
 }
 Confirm-Checksum -Name $manifest.runtime_archive.name -Expected $manifest.runtime_archive.sha256 -ExpectedBytes $manifest.runtime_archive.bytes
+Confirm-Checksum -Name $manifest.app_archive.name -Expected $manifest.app_archive.sha256 -ExpectedBytes $manifest.app_archive.bytes
 foreach ($part in $manifest.parts) {
     Confirm-Checksum -Name $part.name -Expected $part.sha256 -ExpectedBytes $part.bytes
 }

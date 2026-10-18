@@ -113,6 +113,9 @@ def main() -> None:
         "included_yolo_weights": [p.relative_to(WORKSPACE).as_posix() for p in files if p.suffix == ".pt"],
         "excluded": ["source photos", "training datasets", "downloaded external archives", "virtual environments", "build caches"],
     }
+    app_zip = OUT / "Kern_Analyzer-Windows.zip"
+    if app_zip.is_file():
+        manifest["app_archive"] = {"name": app_zip.name, "bytes": app_zip.stat().st_size, "sha256": checksum(app_zip)}
     path = OUT / "cv1-runtime-manifest.json"
     path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Manifest: {path}", flush=True)

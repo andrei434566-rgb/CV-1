@@ -30,6 +30,8 @@ def main() -> None:
     manifest = json.loads((OUT / "cv1-runtime-manifest.json").read_text(encoding="utf-8"))
     names = ["cv1-runtime-manifest.json", manifest["runtime_archive"]["name"]]
     names.extend(part["name"] for part in manifest["parts"])
+    if "app_archive" in manifest:
+        names.append(manifest["app_archive"]["name"])
     session = requests.Session()
     session.headers.update({
         "Authorization": f"Bearer {github_token()}",
