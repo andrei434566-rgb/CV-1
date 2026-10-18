@@ -59,7 +59,7 @@ from app.infrastructure.project_storage import MANIFEST_NAME, load_project, save
 from app.infrastructure.training_dataset import MIN_TRAINING_SAMPLES, automatic_samples_count, export_training_dataset, unlabeled_manual_samples_count, verified_samples_count
 from app.infrastructure.training_quality import review_queue, training_quality
 from app.infrastructure.training_recommendation import TrainingRecommendation, recommend_training
-from app.runtime_paths import bundled_root, source_root, user_data_root
+from app.runtime_paths import application_root, bundled_root, user_data_root
 from app.ui.dialogs.depth_range_dialog import DepthRangeDialog
 from app.ui.dialogs.excel_report_inputs_dialog import ExcelReportInputsDialog
 from app.ui.dialogs.core_columns_dialog import CoreColumnsDialog
@@ -799,7 +799,7 @@ class MainWindow(QMainWindow):
         )
 
     def _local_vlm_config(self) -> dict:
-        root = source_root().parent / "vlm_core_v1"
+        root = application_root().parent / "vlm_core_v1"
         snapshot_root = root / "model_cache" / "hub" / "models--Qwen--Qwen3-VL-2B-Instruct" / "snapshots"
         snapshots = sorted(path for path in snapshot_root.glob("*") if (path / "config.json").is_file())
         defaults = {
@@ -845,7 +845,7 @@ class MainWindow(QMainWindow):
                 add(Path("E:/Керн фото"))
         else:
             add(bundled_root() / "app" / "resources" / "theory")
-            add(source_root().parent / "vlm_core_v1" / "data" / "knowledge")
+            add(application_root().parent / "vlm_core_v1" / "data" / "knowledge")
         if self._chat_document_path is not None:
             add(self._chat_document_path.parent)
         add(self._project_folder)
@@ -856,7 +856,7 @@ class MainWindow(QMainWindow):
         for folder in self._local_vlm_config()["folders"]:
             add(folder)
         add(bundled_root() / "app" / "resources" / "theory")
-        add(source_root().parent / "vlm_core_v1" / "data" / "knowledge")
+        add(application_root().parent / "vlm_core_v1" / "data" / "knowledge")
         return folders[:12]
 
     def configure_local_vlm(self) -> None:

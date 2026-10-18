@@ -119,7 +119,7 @@ if (-not $SkipPythonInstall) {
     & $uv venv (Join-Path $VlmRoot '.venv') --python 3.11
     if ($LASTEXITCODE -ne 0) { throw 'Не удалось создать Python-окружение.' }
     $vlmPython = Join-Path $VlmRoot '.venv\Scripts\python.exe'
-    & $uv pip install --python $vlmPython -r (Join-Path $VlmRoot 'requirements.txt')
+    & $uv pip install --python $vlmPython -r (Join-Path $VlmRoot 'requirements.txt') 'openpyxl>=3.1.0'
     if ($LASTEXITCODE -ne 0) { throw 'Не удалось установить зависимости локальной VLM.' }
 }
 
