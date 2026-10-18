@@ -55,6 +55,8 @@ def main() -> None:
         path = OUT / name
         size = path.stat().st_size
         if name in existing:
+            if existing[name].get("state") != "uploaded":
+                raise RuntimeError(f"Incomplete release asset needs inspection before retry: {name}")
             if existing[name]["size"] != size:
                 raise RuntimeError(f"Existing asset has a different size: {name}")
             print(f"Already uploaded: {name} ({size} bytes)", flush=True)
