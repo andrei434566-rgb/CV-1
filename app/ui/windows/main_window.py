@@ -652,6 +652,11 @@ class MainWindow(QMainWindow):
         self._save_indicator = QLabel("●  Локальный проект")
         self._save_indicator.setObjectName("shellSaveIndicator")
         header.addWidget(self._save_indicator)
+        upload = QPushButton("＋ Загрузить фото")
+        upload.setObjectName("shellUploadPhoto")
+        upload.setToolTip("Загрузить фотографии керна или PDF (Ctrl+O)")
+        upload.clicked.connect(self.open_images)
+        header.addWidget(upload)
         save = QPushButton("Сохранить")
         save.setObjectName("shellSave")
         save.clicked.connect(self.save_project)
@@ -727,6 +732,8 @@ class MainWindow(QMainWindow):
             QLabel#shellBreadcrumb { color: #103d81; font-weight: 600; }
             QComboBox#shellWell { color: #103d81; background: transparent; border: none; min-width: 120px; font-weight: 700; }
             QLabel#shellSaveIndicator { color: #04bc69; }
+            QPushButton#shellUploadPhoto { background: #087ce8; color: white; border: none; border-radius: 10px; padding: 9px 16px; font-weight: 700; }
+            QPushButton#shellUploadPhoto:hover { background: #0668c4; }
             QPushButton#shellSave { background: #e5f4ff; color: #0878df; border: 1px solid #1397f7; border-radius: 10px; padding: 9px 16px; font-weight: 700; }
             QToolButton#shellTools { color: #0b3b85; background: transparent; border: none; font-size: 19px; padding: 4px 9px; }
             QDockWidget#projectSidebar, QDockWidget#assistantDock { background: #f7fbff; border: none; }
