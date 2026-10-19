@@ -53,6 +53,7 @@ def needs_local_knowledge(message: str) -> bool:
         r"\b(?:керн\w*|фаци\w*|литолог\w*|пород\w*|осадк\w*|разрез\w*|слоист\w*|"
         r"текстур\w*|зернист\w*|песчан\w*|глин\w*|извест\w*|карбонат\w*|русел\w*|"
         r"диаген\w*|биотурб\w*|биоген\w*|ихно\w*|литотип\w*|контакт\w*|"
+        r"буров\w*|окислен\w*|ламинац\w*|псевдопросло\w*|"
         r"алеврол\w*|аргилл\w*|долом\w*|"
         r"мергел\w*|конглом\w*|брекч\w*|псамм\w*|алеврит\w*|пелит\w*|"
         r"ангидр\w*|гипс\w*|кремнист\w*|глинист\w*|"
@@ -61,7 +62,7 @@ def needs_local_knowledge(message: str) -> bool:
         r"сортиров\w*|окатан\w*|матриц\w*|цемент\w*|"
         r"справоч\w*|скваж\w*|месторожд\w*|"
         r"shale|mudstone|limestone|sandstone|siltstone|"
-        r"conglomerate|breccia|bioturbation|ichnofabric|"
+        r"conglomerate|breccia|bioturbation|ichnofabric|biscuiting|fall|soupy|"
         r"источник\w*|документ\w*|файл\w*|папк\w*)\b",
         phrase,
     ))

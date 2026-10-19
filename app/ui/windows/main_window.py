@@ -1275,7 +1275,7 @@ class MainWindow(QMainWindow):
         )
         immediate = expert_answer or quick_reply(question, has_history=bool(self._vlm_history))
         if immediate is None and not photo_request:
-            cards = bundled_root() / "app" / "resources" / "theory" / "theory_cards_v4.json"
+            cards = bundled_root() / "app" / "resources" / "theory" / "theory_cards_v5.json"
             immediate = lookup_theory_answer(question, cards, include_sources=wants_sources(question))
             if immediate is None and wants_sources(question) and len(question.split()) <= 5:
                 previous_question = next((turn["content"] for turn in reversed(self._vlm_history) if turn["role"] == "user"), "")

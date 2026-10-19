@@ -1,0 +1,44 @@
+{
+  "name": "core-vlm-theory-v5-russian-sedimentology",
+  "date": "2026-10-20",
+  "status": "trained_evaluated_rejected_for_application",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_model_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "purpose": "Russian text-only sedimentology knowledge; no image labels or facies ground truth",
+  "data": {
+    "new_source_attributed_cards": 21,
+    "new_training_cards": 16,
+    "new_heldout_cards": 5,
+    "total_training_rows": 183,
+    "total_heldout_questions": 24,
+    "geologist_reviewed_new_cards": 0,
+    "training_manifest": "data/knowledge/theory_training_v5.jsonl",
+    "holdout_manifest": "data/knowledge/theory_holdout_v5.jsonl"
+  },
+  "candidate": {
+    "adapter": "outputs/core_vlm_theory_v5_lora_retry/adapter_model.safetensors",
+    "adapter_sha256": "a29647a9b900e39981120915cbad3a8cec00e4399bdb5366eb4ded3769634b4f",
+    "epochs": 1,
+    "learning_rate": 0.00001,
+    "lora_rank": 4,
+    "train_loss": 2.945393282434215,
+    "training_status": "source_checked_text_theory_not_geologist_reviewed",
+    "note": "Initial rank-8 run failed before first optimizer step because CUDA memory allocation failed. Rank-4 retry completed."
+  },
+  "evaluation": {
+    "adapter_answers": "outputs/theory_v5_evaluation/adapter.json",
+    "base_answers_on_new_questions": "outputs/theory_v5_evaluation/base_new5.json",
+    "base_answers_on_previous_questions": "outputs/theory_v4_evaluation/base.json",
+    "method": "Manual qualitative review of 24 held-out Russian text questions; no claim of numeric accuracy or photographic performance",
+    "observed_failures": [
+      "Conglomerate versus breccia answer omits dominant clast roundness and invents 'deep minerals' as a diagnostic feature.",
+      "Shale versus mudstone answer misses fissility and invents a primarily compositional contrast.",
+      "Carbonate mudstone answer invents high acidity, temperature and oxygen conditions.",
+      "Coal versus carbonaceous mudrock answer invents 'coal minerals' such as coal silicon and coal magnesium.",
+      "The 0.055 mm grain-size question fails to identify 0.05 versus 0.063 mm classification boundaries.",
+      "Several answers reach the generation limit without completing the diagnostic explanation."
+    ],
+    "conclusion": "The new LoRA does not materially correct the base model's factual failures. Training loss is not an accuracy measure."
+  },
+  "application_decision": "Do not activate this theory adapter. Keep visual adapter for photo work; answer close theory questions from local source-attributed v5 cards, and use retrieval for broader questions."
+}
