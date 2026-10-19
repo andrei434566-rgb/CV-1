@@ -22,6 +22,31 @@ class LocalVlmSettingsDialog(QDialog):
         self.adapter = self._path_row(form, "Адаптер LoRA:", str(config.get("adapter") or ""))
         self.theory_adapter = self._path_row(form, "Текстовый LoRA для чата:", str(config.get("theory_adapter") or ""))
         layout.addLayout(form)
+        resources = QLabel(
+            '<b>Ссылки для установки и тестирования VLM</b><br>'
+            'Базовая модель: <a href="https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct">'
+            'Qwen3-VL-2B-Instruct на Hugging Face</a><br>'
+            'Инструкция и примеры: <a href="https://github.com/QwenLM/Qwen3-VL">'
+            'официальный Qwen3-VL</a><br>'
+            'Свой LoRA-адаптер: укажите локальную папку с обученными весами в поле выше. '
+            'Ссылка на базовую модель не скачивает и не подключает адаптер автоматически.'
+        )
+        resources.setObjectName("vlmResources")
+        resources.setOpenExternalLinks(True)
+        resources.setWordWrap(True)
+        layout.addWidget(resources)
+        layout.setSpacing(12)
+        self.setStyleSheet(self.styleSheet() + """
+            QDialog { background: #f7fbff; color: #163d71; }
+            QLabel#vlmResources { background: #edf5ff; border: 1px solid #d1e6fb;
+                border-radius: 10px; padding: 12px; color: #163d71; }
+            QLabel#vlmResources a { color: #087ce8; }
+            QLineEdit, QListWidget { background: white; border: 1px solid #c7ddf2;
+                border-radius: 8px; padding: 7px; color: #163d71; }
+            QPushButton { background: #e6f3ff; border: 1px solid #b9dafa;
+                border-radius: 8px; padding: 7px 12px; color: #0b5ca8; }
+            QPushButton:hover { background: #d3eaff; }
+        """)
         layout.addWidget(QLabel("Папки для поиска ключевых слов:"))
         self.folders = QListWidget()
         for folder in config.get("folders") or []:
