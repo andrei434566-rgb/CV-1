@@ -684,7 +684,7 @@ class MainWindow(QMainWindow):
         tools_menu.addSeparator()
         self._assistant_visibility_action = tools_menu.addAction("Показать ИИ-ассистента")
         self._assistant_visibility_action.setCheckable(True)
-        self._assistant_visibility_action.setChecked(False)
+        self._assistant_visibility_action.setChecked(True)
         self._assistant_visibility_action.toggled.connect(self._set_assistant_visible)
         tools_menu.addAction("Настроить помощника и папки…", self.configure_local_vlm)
         header.addWidget(settings)
@@ -730,7 +730,6 @@ class MainWindow(QMainWindow):
         assistant_dock.setWidget(self.assistant_panel)
         assistant_dock.setMinimumWidth(310)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, assistant_dock)
-        assistant_dock.hide()
         self.resizeDocks([self._project_sidebar, assistant_dock], [190, 360], Qt.Orientation.Horizontal)
 
         self._vlm_client = LocalVlmClient(self)
