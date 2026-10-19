@@ -104,6 +104,14 @@ def normalize_columns(
         ):
             continue
         boxes.append(candidate)
+    # Vertical lanes: left-to-right. Horizontal lanes: top-to-bottom.
+    # Never mix these ordering rules within one photograph.
+    horizontal = sum((b["right"] - b["left"]) * (b["bottom"] - b["top"])
+                     for b in boxes if b["right"] - b["left"] > 1.3 * (b["bottom"] - b["top"]))
+    vertical = sum((b["right"] - b["left"]) * (b["bottom"] - b["top"])
+                   for b in boxes if b["bottom"] - b["top"] >= 1.3 * (b["right"] - b["left"]))
+    if horizontal > vertical:
+        return sorted(boxes, key=lambda item: (item["top"], item["left"]))
     return sorted(boxes, key=lambda item: (item["left"], item["top"]))
 
 
@@ -165,7 +173,14 @@ def assemble_core_tape(
     boxes = normalize_columns(columns, (width, height))
     if not boxes:
         raise ValueError("Нет столбиков керна для сборки единой колонки.")
-    widths = [max(1, round(item["right"] - item["left"])) for item in boxes]
+    horizontal = sum((b["right"] - b["left"]) * (b["bottom"] - b["top"])
+                     for b in boxes if b["right"] - b["left"] > 1.3 * (b["bottom"] - b["top"]))
+    vertical = sum((b["right"] - b["left"]) * (b["bottom"] - b["top"])
+                   for b in boxes if b["bottom"] - b["top"] >= 1.3 * (b["right"] - b["left"]))
+    is_horizontal = horizontal > vertical
+    if is_horizontal:
+        boxes.sort(key=lambda b: (b["top"], b["left"]))
+    widths = [max(1, round((item["bottom"] - item["top"]) if is_horizontal else (item["right"] - item["left"]))) for item in boxes]
     tape_width = max(1, int(target_width or round(float(np.median(widths)))))
     crops: list[np.ndarray] = []
     sections: list[CoreTapeSection] = []
@@ -178,6 +193,10 @@ def assemble_core_tape(
         crop = image[top:bottom, left:right]
         if crop.size == 0:
             continue
+        if is_horizontal:
+            # Left-to-right within each row; rotating clockwise makes the
+            # row read top-to-bottom in the assembled core tape.
+            crop = cv2.rotate(crop, cv2.ROTATE_90_CLOCKWISE)
         scaled_height = max(1, round(crop.shape[0] * tape_width / max(1, crop.shape[1])))
         interpolation = cv2.INTER_AREA if tape_width < crop.shape[1] else cv2.INTER_CUBIC
         normalized = cv2.resize(crop, (tape_width, scaled_height), interpolation=interpolation)
