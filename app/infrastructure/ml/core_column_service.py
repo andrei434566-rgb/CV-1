@@ -266,6 +266,39 @@ class CoreColumnRecognizer:
                     return bool(dark_fraction >= 0.45)
 
                 normalized = [box for box in normalized if is_core_or_substantial_fragment(box)]
+        # Suppress obvious false positives beside a set of consistent, full-length
+        # core lanes (rulers, paper labels and background objects).  Do not
+        # apply this to a single lane or to manually confirmed rectangles.
+        reference = [
+            box for box in normalized
+            if (box["bottom"] - box["top"]) >= source_height * 0.45
+            and (box["bottom"] - box["top"]) >= 1.7 * (box["right"] - box["left"])
+        ]
+        if len(reference) >= 2:
+            reference_heights = np.array([b["bottom"] - b["top"] for b in reference])
+            reference_widths = np.array([b["right"] - b["left"] for b in reference])
+            median_height = float(np.median(reference_heights))
+            median_width = float(np.median(reference_widths))
+            strong = [
+                b for b in reference
+                if b["bottom"] - b["top"] >= median_height * 0.65
+                and b["right"] - b["left"] >= median_width * 0.55
+            ]
+            if len(strong) >= 2:
+                left_edge = min(b["left"] for b in strong)
+                right_edge = max(b["right"] for b in strong)
+                filtered = []
+                for box in normalized:
+                    bw = box["right"] - box["left"]
+                    bh = box["bottom"] - box["top"]
+                    cx = (box["left"] + box["right"]) / 2
+                    outside = cx < left_edge - median_width * 0.35 or cx > right_edge + median_width * 0.35
+                    short = bh < median_height * 0.55
+                    thin = bw < median_width * 0.48
+                    if (outside and (short or thin)) or (thin and bh >= median_height * 0.7):
+                        continue
+                    filtered.append(box)
+                normalized = filtered
         if target_size is None:
             return normalized
         x_scale = target_size[0] / max(1, source_width)
