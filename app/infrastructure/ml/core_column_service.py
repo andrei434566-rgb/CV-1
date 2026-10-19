@@ -225,9 +225,56 @@ class CoreColumnRecognizer:
         )
         return trained[0] if trained else None
 
-    def recognize(self, image: np.ndarray, target_size: tuple[int, int] | None = None) -> list[dict[str, float]]:
+    def recognize(
+        self,
+        image: np.ndarray,
+        target_size: tuple[int, int] | None = None,
+        orientation: str = "auto",
+    ) -> list[dict[str, float]]:
+        """Detect vertical or horizontal trays and return ORIGINAL image coordinates.
+
+        Horizontal detection rotates the image for the existing column detector;
+        the returned boxes are mapped back before display and annotation.
+        """
         if image is None or image.size == 0:
             raise ValueError("Пустое изображение.")
+        if orientation not in {"auto", "vertical", "horizontal"}:
+            raise ValueError("orientation must be auto, vertical or horizontal")
+        height, width = image.shape[:2]
+        if orientation == "horizontal" or (orientation == "auto" and width > height * 1.30):
+            rotated = np.ascontiguousarray(np.rot90(image, k=1))
+            rotated_boxes = self.recognize(rotated, orientation="vertical")
+            horizontal = [
+                {
+                    "left": float(width) - box["bottom"],
+                    "top": box["left"],
+                    "right": float(width) - box["top"],
+                    "bottom": box["right"],
+                }
+                for box in rotated_boxes
+            ]
+            horizontal = [
+                box for box in horizontal
+                if box["right"] - box["left"] >= (box["bottom"] - box["top"]) * 1.3
+            ]
+            if orientation == "horizontal":
+                selected = horizontal
+            else:
+                vertical = self.recognize(image, orientation="vertical")
+                def coverage(items):
+                    return sum((b["right"] - b["left"]) * (b["bottom"] - b["top"]) for b in items)
+                selected = horizontal if horizontal and coverage(horizontal) > coverage(vertical) * 1.15 else vertical
+            if target_size is None:
+                return selected
+            return [
+                {
+                    "left": b["left"] * target_size[0] / width,
+                    "right": b["right"] * target_size[0] / width,
+                    "top": b["top"] * target_size[1] / height,
+                    "bottom": b["bottom"] * target_size[1] / height,
+                }
+                for b in selected
+            ]
         source_height, source_width = image.shape[:2]
         model_boxes = self._model_boxes(image) if self.model is not None else []
         heuristic_boxes = RuleBasedFaciesDetector._find_core_columns(image)
