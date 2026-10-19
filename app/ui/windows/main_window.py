@@ -840,7 +840,7 @@ class MainWindow(QMainWindow):
         defaults = {
             "python": root / ".venv" / "Scripts" / "python.exe",
             "base": str(snapshots[-1]) if snapshots else "",
-            "adapter": root / "outputs" / "core_vlm_v8_single_column_lora",
+            "adapter": str(root / "outputs" / "core_vlm_v8_single_column_lora") if (root / "outputs" / "core_vlm_v8_single_column_lora" / "adapter_model.safetensors").is_file() else "",
             "folders": [str(root / "data" / "knowledge")] if (root / "data" / "knowledge").is_dir() else [],
         }
         raw_folders = self._settings.value("vlm/knowledge_folders_json", "")
