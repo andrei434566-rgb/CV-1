@@ -618,6 +618,7 @@ class MainWindow(QMainWindow):
         old_toolbar = self.findChild(QToolBar, "mainToolbar")
         training_toolbar = self.findChild(QToolBar, "trainingToolbar")
         tools_menu = QMenu("Настройки", self)
+        tools_menu.setObjectName("shellSettingsMenu")
         contour_actions: list[QAction] = []
         if old_toolbar is not None:
             contour_actions = [
@@ -657,6 +658,11 @@ class MainWindow(QMainWindow):
         upload.setToolTip("Загрузить фотографии керна или PDF (Ctrl+O)")
         upload.clicked.connect(self.open_images)
         header.addWidget(upload)
+        model_button = QPushButton("◈ Модель сегментации")
+        model_button.setObjectName("shellLoadModel")
+        model_button.setToolTip("Подключить обученную YOLO-модель сегментации фаций (.pt)")
+        model_button.clicked.connect(self.select_detection_model)
+        header.addWidget(model_button)
         save = QPushButton("Сохранить")
         save.setObjectName("shellSave")
         save.clicked.connect(self.save_project)
@@ -668,6 +674,9 @@ class MainWindow(QMainWindow):
         settings.setMenu(tools_menu)
         tools_menu.addAction("Новый проект", self.new_project)
         tools_menu.addAction("Открыть проект…", self.open_project_dialog)
+        tools_menu.addAction("Загрузить фото/PDF…", self.open_images)
+        tools_menu.addAction("Выбрать модель сегментации…", self.select_detection_model)
+        tools_menu.addAction("Проверить границы керна…", self.configure_core_columns)
         tools_menu.addAction("Сохранить проект как…", self.save_project_as)
         if contour_actions:
             edit_menu = tools_menu.addMenu("Правка разметки")
@@ -734,6 +743,13 @@ class MainWindow(QMainWindow):
             QLabel#shellSaveIndicator { color: #04bc69; }
             QPushButton#shellUploadPhoto { background: #087ce8; color: white; border: none; border-radius: 10px; padding: 9px 16px; font-weight: 700; }
             QPushButton#shellUploadPhoto:hover { background: #0668c4; }
+            QPushButton#shellLoadModel { background: #edf5ff; color: #0a65bb; border: 1px solid #a6d3fb; border-radius: 10px; padding: 9px 13px; font-weight: 700; }
+            QPushButton#shellLoadModel:hover { background: #dcecff; border-color: #087ce8; }
+            QComboBox#shellWell { background: #ffffff; border: 1px solid #c8dff5; border-radius: 8px; padding: 7px 24px 7px 10px; min-width: 120px; color: #103d81; }
+            QComboBox#shellWell:hover, QComboBox#shellWell:focus { border-color: #087ce8; }
+            QMenu#shellSettingsMenu { background: #ffffff; color: #153e77; border: 1px solid #d4e5f6; border-radius: 9px; padding: 7px; }
+            QMenu#shellSettingsMenu::item { padding: 8px 22px; border-radius: 6px; }
+            QMenu#shellSettingsMenu::item:selected { background: #e6f3ff; color: #076bd0; }
             QPushButton#shellSave { background: #e5f4ff; color: #0878df; border: 1px solid #1397f7; border-radius: 10px; padding: 9px 16px; font-weight: 700; }
             QToolButton#shellTools { color: #0b3b85; background: transparent; border: none; font-size: 19px; padding: 4px 9px; }
             QDockWidget#projectSidebar, QDockWidget#assistantDock { background: #f7fbff; border: none; }
