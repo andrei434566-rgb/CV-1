@@ -82,7 +82,7 @@ class MainWindow(QMainWindow):
     TREE_KIND_ROLE = Qt.ItemDataRole.UserRole
     TREE_VALUE_ROLE = Qt.ItemDataRole.UserRole + 1
     TREE_INDEX_ROLE = Qt.ItemDataRole.UserRole + 2
-    PHOTO_LOAD_BATCH_SIZE = 24
+    PHOTO_LOAD_BATCH_SIZE = 6
 
     def __init__(self):
         super().__init__()
@@ -1984,7 +1984,7 @@ class MainWindow(QMainWindow):
                 f"интервалов для проверки: {unresolved_intervals} · модель фаций не подключена"
             )
             if self._pending_photo_imports:
-                QTimer.singleShot(0, self._load_next_photo_batch)
+                QTimer.singleShot(25, self._load_next_photo_batch)
             return
         self.statusBar().showMessage(
             f"Загружено {len(records)} фото · в очереди: {len(self._pending_photo_imports)} · запускаю сегментацию…"
