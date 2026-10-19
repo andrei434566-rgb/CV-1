@@ -682,6 +682,10 @@ class MainWindow(QMainWindow):
             edit_menu = tools_menu.addMenu("Правка разметки")
             edit_menu.addActions(contour_actions)
         tools_menu.addSeparator()
+        self._assistant_visibility_action = tools_menu.addAction("Показать ИИ-ассистента")
+        self._assistant_visibility_action.setCheckable(True)
+        self._assistant_visibility_action.setChecked(False)
+        self._assistant_visibility_action.toggled.connect(self._set_assistant_visible)
         tools_menu.addAction("Настроить помощника и папки…", self.configure_local_vlm)
         header.addWidget(settings)
 
@@ -726,8 +730,9 @@ class MainWindow(QMainWindow):
         assistant_dock.setWidget(self.assistant_panel)
         assistant_dock.setMinimumWidth(310)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, assistant_dock)
+        assistant_dock.hide()
         self.resizeDocks([self._project_sidebar, assistant_dock], [190, 360], Qt.Orientation.Horizontal)
-        QTimer.singleShot(0, lambda: self.resizeDocks([self._assistant_dock], [360], Qt.Orientation.Horizontal))
+
         self._vlm_client = LocalVlmClient(self)
         self._vlm_client.reply.connect(self._on_vlm_reply)
         self._vlm_client.state_changed.connect(self.assistant_panel.status.setText)
@@ -777,6 +782,14 @@ class MainWindow(QMainWindow):
         for title, button in self._nav_buttons.items():
             button.setChecked(title == name)
         handler()
+
+    def _set_assistant_visible(self, visible: bool) -> None:
+        self._assistant_dock.setVisible(visible)
+        self._assistant_visibility_action.setText(
+            "Скрыть ИИ-ассистента" if visible else "Показать ИИ-ассистента"
+        )
+        if visible:
+            self.resizeDocks([self._assistant_dock], [360], Qt.Orientation.Horizontal)
 
     def _toggle_assistant_width(self) -> None:
         target = min(760, max(520, self.width() * 55 // 100)) if self._assistant_dock.width() < 500 else 360
