@@ -41,11 +41,17 @@ def numeric(value):
 
 from geology_excel_parser import excel_intervals
 
-UV_RE = re.compile(r"(?i)(?:^|[^a-zа-яё0-9])(?:uv|уф|ультрафиолет|ultraviolet|fluorescen\w*)(?:$|[^a-zа-яё0-9])")
+# Filename rule is mandatory and takes precedence over image analysis.
+# Word-like abbreviations are delimited; Russian/English UV roots may be inflected.
+UV_RE = re.compile(
+    r"(?i)(?<![a-zа-яё0-9])(?:uv|u[._ -]?v|уф)(?![a-zа-яё0-9])"
+    r"|ультра[ _.-]?фиолет[а-яё]*"
+    r"|ultra[ _.-]?violet[a-z]*"
+    r"|fluorescen[a-z]*|флуоресцен[а-яё]*|люминесцен[а-яё]*"
+)
 
 def uv_filename(path: Path):
     return bool(UV_RE.search(path.stem))
-
 
 def likely_uv_visual(path: Path):
     """Conservative visual heuristic. Suspected UV photos require review, not deletion."""
