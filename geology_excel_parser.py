@@ -89,7 +89,26 @@ def excel_intervals(path):
             index_c=fields.get("facies_index")
             code_c=fields.get("facies_code")
             thick_c=fields.get("thickness")
-            if not any((desc_c,facies_c,lith_c)): continue
+            # Standard sedimentological form: numbered columns 14-15 are
+            # FACIES DRILLING depths, 19 thickness, 20 index, 21 name.
+            # Only apply when those exact numbered columns are present.
+            numbered={}
+            for rr in range(1,min(ws.max_row,40)+1):
+                mapping={}
+                for cc in range(1,max_col+1):
+                    v=ws.cell(rr,cc).value
+                    if isinstance(v,int) and not isinstance(v,bool) and 1<=v<=max_col:
+                        mapping[v]=cc
+                if all(n in mapping for n in (14,15,19,20,21)):
+                    numbered=mapping
+                    break
+            if numbered:
+                top_c,bottom_c=numbered[14],numbered[15]
+                thick_c,index_c,facies_c=(numbered[n] for n in (19,20,21))
+                fields.update(top=top_c,bottom=bottom_c,thickness=thick_c,
+                              facies_index=index_c,facies=facies_c)
+                if 22 in numbered: code_c=numbered[22]
+            if not any((desc_c,facies_c,lith_c,index_c)): continue
             for r in range(1,ws.max_row+1):
                 top=_num(ws.cell(r,top_c).value)
                 bottom=_num(ws.cell(r,bottom_c).value)
@@ -101,6 +120,7 @@ def excel_intervals(path):
                 facies_code=str(ws.cell(r,code_c).value or "").strip() if code_c else ""
                 thickness=_num(ws.cell(r,thick_c).value) if thick_c else None
                 if not (facies or facies_index or facies_code): continue
+                if facies_index.replace(".","",1).isdigit() and not facies: continue
                 results.append(dict(file=str(path),sheet=ws.title,row=r,top=top,bottom=bottom,
                                     description=description,facies=facies,lithology=lithology,
                                     facies_index=facies_index,facies_code=facies_code,
