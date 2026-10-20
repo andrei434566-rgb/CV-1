@@ -133,7 +133,11 @@ def scan(root: Path, output: Path):
         matches = []
         for row in by_well.get(photo["well"], []):
             overlap = max(0.0, min(span[1], row["bottom"]) - max(span[0], row["top"]))
-            if overlap > 0:
+            # Facies labels require drilling depths, index/name and a
+            # physically consistent layer thickness. Reject aggregate rows.
+            thickness = row.get("thickness")
+            depth_length = row["bottom"] - row["top"]
+            if overlap > 0 and row.get("facies_index") and thickness is not None and abs(float(thickness)-depth_length) <= max(0.05, depth_length*0.05):
                 matches.append(dict(excel=row["file"], sheet=row["sheet"], row=row["row"],
                                     top=row["top"], bottom=row["bottom"],
                                     overlap_fraction=round(overlap / (span[1] - span[0]), 4),
