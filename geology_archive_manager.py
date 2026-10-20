@@ -11,7 +11,7 @@ BASE=Path(__file__).resolve().parent
 class ArchiveManager(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("CV-1 — Геологическая база и обучение ИИ")
+        self.setWindowTitle("CV-1 — Геологическая база и обучение ИИ | диагностика v2")
         self.resize(850,500)
         self.root=None
         self.output_dir=BASE/"_cv1_local_indexes"
@@ -29,6 +29,7 @@ class ArchiveManager(QMainWindow):
             ("Выбрать базу",self.choose),
             ("Папка результатов",self.choose_output),
             ("Сканировать",self.scan),
+            ("Диагностика",self.diagnose),
             ("Проверить фото ↔ Excel",self.review),
             ("Экспорт для VLM",self.export),
             ("Привязка глубин",self.depth_mapping),
@@ -72,6 +73,17 @@ class ArchiveManager(QMainWindow):
             self.status.appendPlainText(json.dumps(result,ensure_ascii=False,indent=2))
         except Exception as exc:
             QMessageBox.critical(self,"Ошибка индексации",str(exc))
+
+    def diagnose(self):
+        if not self._ready(): return
+        from diagnose_geology import save_report
+        try:
+            dest, report = save_report(self.root, self.index_dir())
+            self.status.appendPlainText("Диагностика сохранена: " + str(dest))
+            self.status.appendPlainText(json.dumps(report, ensure_ascii=False, indent=2)[:10000])
+            QMessageBox.information(self, "Диагностика CV-1", "Отчёт сохранён:\\n" + str(dest))
+        except Exception as exc:
+            QMessageBox.critical(self, "Ошибка диагностики", str(exc))
 
     def review(self):
         if not self._ready(): return
