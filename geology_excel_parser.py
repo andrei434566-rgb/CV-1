@@ -44,19 +44,43 @@ def excel_intervals(path):
             max_col=min(ws.max_column,180)
             header_rows=min(ws.max_row,35)
             fields={}
+            header_labels={}
             for c in range(1,max_col+1):
                 parts=[_s(cell(r,c)) for r in range(1,header_rows+1) if cell(r,c) is not None]
-                # Prefer the most specific leaf heading over parent group labels.
+                header_labels[c]=parts
                 for label in reversed(parts):
                     kind=_classify(label)
-                    if kind and kind not in fields:
+                    if kind and kind not in ("top","bottom") and kind not in fields:
                         fields[kind]=c
                         break
-            # If two depths are in the same parent group, preserve their distinct columns.
-            if not all(k in fields for k in ("top","bottom")):
+            # Depth pairs must belong to the FACIES/LAYER interval group.
+            # Never fall back to the core recovery/collection interval.
+            candidates=[]
+            for c in range(1,max_col):
+                labels=header_labels[c]
+                if not any(_classify(v)=="top" for v in labels):
+                    continue
+                for d in range(c+1,min(c+5,max_col+1)):
+                    right=header_labels[d]
+                    if not any(_classify(v)=="bottom" for v in right):
+                        continue
+                    context=" ".join(labels+right)
+                    if any(word in context for word in ("отбора керна","выноса керна","интервал керна","core recovery")):
+                        continue
+                    score=0
+                    if any(word in context for word in ("фаци","слоя","слой","послой","литологическ")):
+                        score+=10
+                    if "гис" in context: score+=2
+                    if d==c+1: score+=2
+                    if any(word in context for word in ("отбора","ящик","короб")): score-=20
+                    candidates.append((score,c,d))
+            if not candidates:
                 continue
-            top_c,bottom_c=fields["top"],fields["bottom"]
-            if top_c==bottom_c: continue
+            score,top_c,bottom_c=max(candidates)
+            if score < 2:
+                continue
+            fields["top"]=top_c
+            fields["bottom"]=bottom_c
             desc_c=fields.get("description")
             facies_c=fields.get("facies")
             lith_c=fields.get("lithology")
@@ -74,11 +98,13 @@ def excel_intervals(path):
                 facies_index=str(ws.cell(r,index_c).value or "").strip() if index_c else ""
                 facies_code=str(ws.cell(r,code_c).value or "").strip() if code_c else ""
                 thickness=_num(ws.cell(r,thick_c).value) if thick_c else None
-                if not (description or facies or lithology or facies_index or facies_code): continue
+                if not (facies or facies_index or facies_code): continue
                 results.append(dict(file=str(path),sheet=ws.title,row=r,top=top,bottom=bottom,
                                     description=description,facies=facies,lithology=lithology,
                                     facies_index=facies_index,facies_code=facies_code,
                                     thickness=thickness if thickness is not None else round(bottom-top,3),
+                                    thickness_error_m=round((bottom-top)-thickness,4) if thickness is not None else None,
+                                    depth_basis="facies_layer_not_core_collection",
                                     source_columns={k:ws.cell(r,c).coordinate for k,c in fields.items()}))
         wb.close()
         return results,None
