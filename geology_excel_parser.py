@@ -60,7 +60,7 @@ def excel_intervals(path):
                 labels=header_labels[c]
                 if not any(_classify(v)=="top" for v in labels):
                     continue
-                for d in range(c+1,min(c+5,max_col+1)):
+                for d in range(c+1,min(c+4,max_col+1)):
                     right=header_labels[d]
                     if not any(_classify(v)=="bottom" for v in right):
                         continue
@@ -68,16 +68,18 @@ def excel_intervals(path):
                     if any(word in context for word in ("отбора керна","выноса керна","интервал керна","core recovery")):
                         continue
                     score=0
-                    if any(word in context for word in ("фаци","слоя","слой","послой","литологическ")):
+                    if "интервал фации по бурению" in context or ("фаци" in context and "бурению" in context):
+                        score+=100
+                    if "по гис" in context or "гис" in context:
+                        score-=50
+                    if any(word in context for word in ("фаци","слоя","слой","послой")):
                         score+=10
-                    if "гис" in context: score+=2
                     if d==c+1: score+=2
-                    if any(word in context for word in ("отбора","ящик","короб")): score-=20
                     candidates.append((score,c,d))
             if not candidates:
                 continue
             score,top_c,bottom_c=max(candidates)
-            if score < 2:
+            if score < 10:
                 continue
             fields["top"]=top_c
             fields["bottom"]=bottom_c
