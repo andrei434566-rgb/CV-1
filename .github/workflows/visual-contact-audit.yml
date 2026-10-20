@@ -1,0 +1,54 @@
+name: Visual contact audit tests
+
+on:
+  pull_request:
+    paths:
+      - "app/infrastructure/visual_contact_audit.py"
+      - "app/ui/dialogs/visual_contact_review_dialog.py"
+      - "app/ui/windows/main_window.py"
+      - "test_visual_contact_audit.py"
+      - "test_visual_contact_dialog.py"
+      - ".github/workflows/visual-contact-audit.yml"
+  push:
+    paths:
+      - "app/infrastructure/visual_contact_audit.py"
+      - "test_visual_contact_audit.py"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check Python syntax
+        run: |
+          python -m compileall -q app/infrastructure/visual_contact_audit.py app/ui/dialogs/visual_contact_review_dialog.py app/ui/windows/main_window.py
+      - name: Test contacts without GPU
+        run: |
+          python -m unittest -v test_visual_contact_audit.py
+      - name: Install Qt runtime libraries
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libegl1 libopengl0 libgl1 libxkbcommon-x11-0
+      - name: Install desktop UI smoke-test dependencies
+        run: |
+          python -m pip install PySide6 opencv-python-headless numpy
+      - name: Open contact preview in headless Qt
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          python - <<'PY'
+          from PySide6.QtWidgets import QApplication
+          from app.ui.dialogs.visual_contact_review_dialog import VisualContactReviewDialog
+          app = QApplication([])
+          dialog = VisualContactReviewDialog([], lambda record: (None, None))
+          assert not dialog.selector.isEnabled()
+          dialog.close()
+          app.quit()
+          PY
+      - name: Verify mask safety in contact dialog
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m unittest -v test_visual_contact_dialog.py

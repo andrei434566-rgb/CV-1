@@ -243,6 +243,7 @@ class MainWindow(QMainWindow):
                 "Столбики",
                 [
                     ("Проверить границы на фото…", self.configure_core_columns, "Исправить и подтвердить обучающую разметку столбиков"),
+                    ("Переходы между фациями…", self.review_visual_contacts, "Найти неровные визуальные контакты, проверить глубины и при желании создать черновики масок"),
                     ("Выбрать модель столбиков…", self.select_core_column_model, "Выбрать отдельную YOLO-модель класса core_column"),
                     ("Обучить модель столбиков…", self.start_core_column_training, "Обучить отдельный первый этап на подтверждённых границах"),
                 ],
@@ -2614,6 +2615,41 @@ class MainWindow(QMainWindow):
             self,
             "Автоинтервалы готовы",
             f"Создано интервалов: {created}.\nНазначьте фацию в карточке нужного интервала, чтобы добавить его в обучение.{detail}",
+        )
+
+    def review_visual_contacts(self) -> None:
+        """Read-only contact preview; only explicit confirmation replaces masks."""
+        if self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
+            QMessageBox.information(self, "Переходы фаций", "Дождитесь окончания текущей операции.")
+            return
+        if not self._records:
+            QMessageBox.information(self, "Переходы фаций", "Сначала загрузите фотографии керна.")
+            return
+        from app.ui.dialogs.visual_contact_review_dialog import VisualContactReviewDialog
+
+        current = self._vlm_target[0] if self._vlm_target is not None else None
+        dialog = VisualContactReviewDialog(
+            self._records, self._record_photo_interval, self, selected_record=current
+        )
+        dialog.apply_requested.connect(self._apply_visual_contact_drafts)
+        dialog.exec()
+
+    def _apply_visual_contact_drafts(self, record: PhotoRecord, drafts: list, segments: list) -> None:
+        """Install unverified contact polygons only after the dialog's warning."""
+        if not any(item is record for item in self._records):
+            return
+        for detection in drafts:
+            detection.training_ready = False
+        record.detections = drafts
+        record.depth_segments = segments
+        self.workspace.update_photo_detections(record)
+        self._show_stack()
+        self._refresh_project_tree()
+        self._refresh_training_bar()
+        if self._project_folder is not None:
+            self._save_current_project(self._project_folder)
+        self.statusBar().showMessage(
+            f"Черновые переходы: {len(drafts)} интервалов. Проверьте фации и границы вручную."
         )
 
     def _resolve_model_path(self) -> Path | None:
