@@ -33,6 +33,7 @@ class ReviewWindow(QMainWindow):
         self.photo = QLabel("Выберите фотографию")
         self.original_pixmap = QPixmap()
         self.core_boxes = []
+        self.recognizer = None
         self.photo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.photo.setMinimumSize(320, 260)
         self.photo.setStyleSheet("background: #171b25; color: #dde5f0;")
@@ -129,6 +130,8 @@ class ReviewWindow(QMainWindow):
             self.candidates.setCurrentIndex(selected)
         self.candidates.blockSignals(False)
         self.show_candidate()
+        if not pixmap.isNull():
+            self.detect_columns(silent=True)
 
     def show_candidate(self, *_):
         i = self.items.currentRow()
@@ -152,18 +155,22 @@ class ReviewWindow(QMainWindow):
             f"Фация: {m.get('facies','')}\nЛитология: {m.get('lithology','')}"
         )
 
-    def detect_columns(self):
+    def detect_columns(self, silent=False):
         i = self.items.currentRow()
         if not (0 <= i < len(self.pairs)):
             return
         try:
             from app.infrastructure.ml.core_column_service import CoreColumnRecognizer, read_bgr_image
             image = read_bgr_image(self.pairs[i]["photo"])
-            self.core_boxes = CoreColumnRecognizer().recognize(image, orientation="auto")
+            if self.recognizer is None:
+                self.recognizer = CoreColumnRecognizer()
+            self.core_boxes = self.recognizer.recognize(image, orientation="auto")
             self.render_photo()
-            self.details.append(f"\\nKern Analyzer: найдено {len(self.core_boxes)} столбиков/рядов. Проверьте контуры.")
+            self.details.append(f"\nKern Analyzer: найдено {len(self.core_boxes)} столбиков/рядов. Проверьте контуры.")
         except Exception as exc:
-            QMessageBox.warning(self, "Детектор керна", str(exc))
+            self.details.append(f"\nДетектор: {exc}")
+            if not silent:
+                QMessageBox.warning(self, "Детектор керна", str(exc))
 
     def render_photo(self):
         if self.original_pixmap.isNull():
@@ -176,10 +183,6 @@ class ReviewWindow(QMainWindow):
             self.photo.setPixmap(canvas)
             return
         pair = self.pairs[i]
-        depth = pair.get("photo_depth")
-        if not depth or depth[1] <= depth[0]:
-            self.photo.setPixmap(canvas)
-            return
         painter = QPainter(canvas)
         sx = canvas.width() / max(1,self.original_pixmap.width())
         sy = canvas.height() / max(1,self.original_pixmap.height())
