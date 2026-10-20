@@ -47,6 +47,35 @@ def uv_filename(path: Path):
     return bool(UV_RE.search(path.stem))
 
 
+def likely_uv_visual(path: Path):
+    """Conservative visual heuristic. Suspected UV photos require review, not deletion."""
+    try:
+        from PySide6.QtGui import QImageReader
+        from PySide6.QtCore import QSize
+        reader = QImageReader(str(path))
+        reader.setAutoTransform(True)
+        reader.setScaledSize(QSize(96, 96))
+        image = reader.read()
+        if image.isNull():
+            return False
+        count = image.width() * image.height()
+        if not count:
+            return False
+        colored = 0
+        dark = 0
+        for y in range(image.height()):
+            for x in range(image.width()):
+                c = image.pixelColor(x, y)
+                h, saturation, value, _ = c.getHsv()
+                if 185 <= h <= 305 and saturation >= 100 and value >= 65:
+                    colored += 1
+                if value <= 100:
+                    dark += 1
+        return colored / count > 0.48 and dark / count > 0.28
+    except Exception:
+        return False
+
+
 
 def scan(root: Path, output: Path):
     root = root.resolve()
@@ -55,6 +84,7 @@ def scan(root: Path, output: Path):
         raise NotADirectoryError(root)
     photos, intervals, documents, errors = [], [], [], []
     excluded_uv = []
+    suspected_uv = []
     wells = [p for p in root.iterdir() if p.is_dir() and p.resolve() != output
              and p.name.casefold() not in THEORY_NAMES and not p.name.startswith("_index_cv1")]
     for folder in sorted(wells):
@@ -65,6 +95,9 @@ def scan(root: Path, output: Path):
             if suffix in IMAGE_EXT:
                 if uv_filename(file):
                     excluded_uv.append(str(file))
+                    continue
+                if likely_uv_visual(file):
+                    suspected_uv.append(str(file))
                     continue
                 photos.append(dict(well=folder.name, file=str(file), interval=filename_interval(file.stem)))
             elif suffix in SHEET_EXT and not file.name.startswith("~$"):
@@ -106,7 +139,7 @@ def scan(root: Path, output: Path):
                           confidence="candidate" if matches else "none", matches=matches))
     output.mkdir(parents=True, exist_ok=True)
     data = dict(source=str(root), wells=[p.name for p in wells], photos=photos,
-                descriptions=intervals, theory=documents, pairs=pairs, errors=errors, excluded_uv=excluded_uv)
+                descriptions=intervals, theory=documents, pairs=pairs, errors=errors, excluded_uv=excluded_uv, suspected_uv=suspected_uv)
     (output / "archive_index.json").write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     with (output / "pair_review.csv").open("w", encoding="utf-8-sig", newline="") as stream:
         writer = csv.writer(stream, delimiter=";")
@@ -116,7 +149,7 @@ def scan(root: Path, output: Path):
             writer.writerow([item["well"], item["photo"], *span, item["status"], len(item["matches"])])
     return dict(wells=len(wells), photos=len(photos), descriptions=len(intervals),
                 documents=len(documents), candidate_photos=sum(bool(p["matches"]) for p in pairs),
-                errors=len(errors), excluded_uv=len(excluded_uv), output=str(output))
+                errors=len(errors), excluded_uv=len(excluded_uv), suspected_uv=len(suspected_uv), output=str(output))
 
 
 if __name__ == "__main__":
