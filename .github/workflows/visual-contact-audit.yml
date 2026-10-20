@@ -7,6 +7,7 @@ on:
       - "app/ui/dialogs/visual_contact_review_dialog.py"
       - "app/ui/windows/main_window.py"
       - "test_visual_contact_audit.py"
+      - "test_visual_contact_dialog.py"
       - ".github/workflows/visual-contact-audit.yml"
   push:
     paths:
@@ -47,3 +48,7 @@ jobs:
           dialog.close()
           app.quit()
           PY
+      - name: Verify mask safety in contact dialog
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m unittest -v test_visual_contact_dialog.py
