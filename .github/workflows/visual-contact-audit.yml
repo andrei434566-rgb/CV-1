@@ -27,3 +27,19 @@ jobs:
       - name: Test contacts without GPU
         run: |
           python -m unittest -v test_visual_contact_audit.py
+      - name: Install desktop UI smoke-test dependencies
+        run: |
+          python -m pip install PySide6 opencv-python-headless numpy
+      - name: Open contact preview in headless Qt
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          python - <<'PY'
+          from PySide6.QtWidgets import QApplication
+          from app.ui.dialogs.visual_contact_review_dialog import VisualContactReviewDialog
+          app = QApplication([])
+          dialog = VisualContactReviewDialog([], lambda record: (None, None))
+          assert not dialog.selector.isEnabled()
+          dialog.close()
+          app.quit()
+          PY
