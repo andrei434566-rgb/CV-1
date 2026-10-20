@@ -194,9 +194,42 @@ class ReviewWindow(QMainWindow):
             h=round((box["bottom"]-box["top"])*sy)
             painter.drawRect(x,y,w,h)
             painter.drawText(x+4,y+18,f"Керн {n}")
+        # Provisional mapping: lane lengths define relative photo depth.
+        # Never treat these bands as validated segmentation labels.
+        span = pair.get("photo_depth")
+        matches = pair.get("matches", [])
+        lanes = sorted(self.core_boxes, key=lambda b:(b["left"],b["top"]))
+        if span and len(span)==2 and span[1]>span[0] and lanes:
+            widths=[max(1,b["bottom"]-b["top"]) for b in lanes]
+            full=sum(widths)
+            cursor=float(span[0])
+            displayed=0
+            for box,length in zip(lanes,widths):
+                lane_end=cursor+(float(span[1])-float(span[0]))*length/full
+                for m in matches:
+                    try:
+                        top,bottom=float(m["top"]),float(m["bottom"])
+                    except (TypeError,ValueError,KeyError):
+                        continue
+                    if bottom-top >= float(span[1])-float(span[0])-0.01:
+                        continue
+                    lo,hi=max(cursor,top),min(lane_end,bottom)
+                    if hi<=lo: continue
+                    y1=round((box["top"]+(lo-cursor)/(lane_end-cursor)*(box["bottom"]-box["top"]))*sy)
+                    y2=round((box["top"]+(hi-cursor)/(lane_end-cursor)*(box["bottom"]-box["top"]))*sy)
+                    x1=round(box["left"]*sx)
+                    x2=round(box["right"]*sx)
+                    painter.fillRect(x1,y1,max(2,x2-x1),max(2,y2-y1),QColor(255,185,40,85))
+                    painter.setPen(QPen(QColor(255,190,40),2))
+                    painter.drawRect(x1,y1,max(2,x2-x1),max(2,y2-y1))
+                    painter.drawText(x1+2,y1+14,str(m.get("facies_index") or m.get("facies") or "фация")[:14])
+                    displayed+=1
+                cursor=lane_end
+            if displayed==0:
+                self.details.append("Нет отдельных фаций для подсветки: проверьте столбцы Excel и повторите сканирование.")
         painter.fillRect(0,0,canvas.width(),25,QColor(25,25,25,220))
         painter.setPen(QColor("white"))
-        painter.drawText(8,18,"КЕРН: ДЕТЕКТОР | ФАЦИИ: НУЖНА ПРИВЯЗКА ГЛУБИН")
+        painter.drawText(8,18,"ЗЕЛЁНЫЙ: КЕРН | ЖЁЛТЫЙ: ПРЕДВАРИТЕЛЬНЫЕ ФАЦИИ")
         painter.end()
         self.photo.setPixmap(canvas)
 
