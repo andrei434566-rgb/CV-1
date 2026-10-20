@@ -15,7 +15,7 @@ from pathlib import Path
 def is_uv_photo(path: str | Path) -> bool:
     """Exclude UV/ultraviolet captures from the ordinary visible-light workflow."""
     stem = Path(path).stem.casefold()
-    return bool(re.search(r"(?<![a-zа-яё0-9])uv(?![a-zа-яё0-9])|ультрафиолет", stem))
+    return bool(re.search(r"uv|ultra.?violet|ультрафиолет|(?<![а-яё])уф(?![а-яё])", stem))
 
 
 def _xy(point) -> tuple[float, float]:
