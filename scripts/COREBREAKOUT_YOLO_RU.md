@@ -1,43 +1,43 @@
 # CV-1: пилот YOLO для выделения столбиков керна (CoreBreakout)
 
 **Состояние:** подготовлен конвертер LabelMe → Ultralytics YOLO Segmentation,
-групповая проверка через \`GroupKFold\`, тесты и отдельный скрипт обучения.
+групповая проверка через `GroupKFold`, тесты и отдельный скрипт обучения.
 **Весов, обученных на CoreBreakout, в репозитории нет.** Запуск обучения
 выполняется на компьютере с доступом к архиву и CUDA-GPU.
 
 ## Назначение
 
-Обучаем отдельную **одноклассовую** модель \`core_column\` для сегментации
-целых столбиков на фотографии. Маски \`tray\` (подложка/ящик) в положительную
+Обучаем отдельную **одноклассовую** модель `core_column` для сегментации
+целых столбиков на фотографии. Маски `tray` (подложка/ящик) в положительную
 разметку НЕ входят. Это не классификатор пород и не 92 класса фаций CV-1.
 Обученную модель нельзя подставлять вместо весов распознавания фаций:
 дальнейшее подключение к первому этапу распознавания столбиков потребует
 отдельной проверки интеграции.
 
 Источник: https://github.com/rgmyr/corebreakout/releases/tag/v0.2
-Архив \`assets.zip\` содержит LabelMe JSON, фотографии и старые веса Mask R-CNN;
+Архив `assets.zip` содержит LabelMe JSON, фотографии и старые веса Mask R-CNN;
 старые веса Mask R-CNN не являются весами Ultralytics YOLO. Перед коммерческим
 использованием отдельно проверьте права на **фото и разметку BGS**:
 MIT-лицензия исходного ПО сама по себе не гарантирует права на датасет.
 
 ## Шаг 1. Подготовка
 
-Распакуйте \`assets.zip\`, найдите папку \`assets/data\`.
+Распакуйте `assets.zip`, найдите папку `assets/data`.
 Из корня CV-1 в PowerShell (установленные библиотеки могут уже иметься):
 
-\`\`\`powershell
+```powershell
 .\.venv\Scripts\python.exe -m pip install scikit-learn pillow ultralytics
-\`\`\`
+```
 
-Для корректного контроля качества подготовьте файл \`well_groups.csv\`:
+Для корректного контроля качества подготовьте файл `well_groups.csv`:
 
-\`\`\`csv
+```csv
 image,well_id
 photo_001.jpeg,well_A
 photo_002.jpeg,well_A
 photo_003.jpeg,well_B
 photo_004.jpeg,well_C
-\`\`\`
+```
 
 Сопоставление должно быть по настоящему идентификатору скважины, а не по
 произвольно назначенному номеру фотографии. Один идентификатор скважины —
@@ -46,42 +46,42 @@ photo_004.jpeg,well_C
 
 ## Шаг 2. YOLO-датасет с GroupKFold
 
-\`\`\`powershell
+```powershell
 .\.venv\Scripts\python.exe scripts\prepare_corebreakout_yolo.py --input "D:\CoreBreakout\assets\data" --output "D:\CV1\core_columns_dataset" --groups-csv "D:\CV1\well_groups.csv"
-\`\`\`
+```
 
-Создаются \`images/train\`, \`images/val\`, \`labels/train\`,
-\`labels/val\`, \`data.yaml\`, \`dataset_manifest.json\`. Выбран один
+Создаются `images/train`, `images/val`, `labels/train`,
+`labels/val`, `data.yaml`, `dataset_manifest.json`. Выбран один
 контрольный фолд, **а не выполнено многократное обучение**: каждый запуск
 пока тренирует одну модель. Количество фолдов — до пяти (или меньше,
 если скважин меньше). Дубликаты байтов исходных фото исключаются;
 совпадение фото с разными номерами скважин блокируется; UV по имени исключается.
 
 Когда достоверных номеров скважин нет, для **исследовательского** эксперимента
-можно заменить \`--groups-csv "…"\` на \`--photo-holdout\`. Полученные
+можно заменить `--groups-csv "…"` на `--photo-holdout`. Полученные
 метрики нельзя выдавать за точность на независимых скважинах.
 
 ## Шаг 3. Дообучение YOLO
 
-Нужны обучаемые веса сегментации (например, \`yolo11n-seg.pt\`), CUDA PyTorch
+Нужны обучаемые веса сегментации (например, `yolo11n-seg.pt`), CUDA PyTorch
 и видеокарта NVIDIA:
 
-\`\`\`powershell
+```powershell
 .\.venv\Scripts\python.exe scripts\train_core_columns_yolo.py --dataset "D:\CV1\core_columns_dataset" --model yolo11n-seg.pt --epochs 60 --imgsz 960 --batch 4 --device 0
-\`\`\`
+```
 
-Веса будут в \`runs/core_columns/core_columns/weights/best.pt\` (если путь
+Веса будут в `runs/core_columns/core_columns/weights/best.pt` (если путь
 не занят; при повторном запуске скрипт создаёт отдельную папку с результатом
 либо Ultralytics добавляет индекс к её имени). Скрипт проверяет файлы,
 источники и скважины в обеих выборках и никогда не заменяет основной
-файл модели фаций в CV-1. Можно вручную задать \`--device cpu\`, но это
+файл модели фаций в CV-1. Можно вручную задать `--device cpu`, но это
 очень медленно.
 
 ## Проверка конвертера (без GPU)
 
-\`\`\`powershell
+```powershell
 .\.venv\Scripts\python.exe -m unittest -v test_corebreakout_yolo.py
-\`\`\`
+```
 
 ## Следующие наборы
 
