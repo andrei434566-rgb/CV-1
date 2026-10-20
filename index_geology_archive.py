@@ -39,42 +39,10 @@ def numeric(value):
     return None
 
 
-def excel_intervals(path: Path):
-    try:
-        from openpyxl import load_workbook
-    except ImportError as exc:
-        raise RuntimeError("Install openpyxl: python -m pip install openpyxl") from exc
-    result = []
-    try:
-        workbook = load_workbook(path, read_only=True, data_only=True)
-        for sheet in workbook:
-            iterator = sheet.iter_rows(values_only=True)
-            for row_index, header in enumerate(iterator, start=1):
-                labels = [str(v or "").strip().casefold() for v in header]
-                top_cols = [i for i, h in enumerate(labels) if any(t in h for t in TOP_HINTS)]
-                base_cols = [i for i, h in enumerate(labels) if any(t in h for t in BASE_HINTS)]
-                desc_cols = [i for i, h in enumerate(labels) if any(t in h for t in TEXT_HINTS)]
-                if not (top_cols and base_cols and desc_cols):
-                    if row_index >= 35:
-                        break
-                    continue
-                ti, bi, di = top_cols[0], base_cols[0], desc_cols[0]
-                for number, row in enumerate(iterator, start=row_index + 1):
-                    top = numeric(row[ti]) if len(row) > ti else None
-                    base = numeric(row[bi]) if len(row) > bi else None
-                    description = str(row[di] or "").strip() if len(row) > di else ""
-                    if top is None or base is None or not (top < base) or not description:
-                        continue
-                    result.append(dict(file=str(path), sheet=sheet.title, row=number,
-                                       top=top, bottom=base, description=description))
-                break
-        workbook.close()
-    except Exception as exc:
-        return [], str(exc)
-    return result, None
+from geology_excel_parser import excel_intervals
 
 
-from geology_excel_parser import excel_intervals as excel_intervals\n\n\ndef scan(root: Path, output: Path):
+def scan(root: Path, output: Path):
     root = root.resolve()
     output = output.resolve()
     if not root.is_dir():
@@ -120,7 +88,7 @@ from geology_excel_parser import excel_intervals as excel_intervals\n\n\ndef sca
                 matches.append(dict(excel=row["file"], sheet=row["sheet"], row=row["row"],
                                     top=row["top"], bottom=row["bottom"],
                                     overlap_fraction=round(overlap / (span[1] - span[0]), 4),
-                                    description=row["description"]))
+                                    description=row["description"], facies=row.get("facies", ""), lithology=row.get("lithology", "")))
         pairs.append(dict(well=photo["well"], photo=photo["file"], photo_depth=span,
                           status="review_required" if matches else "no_matching_description",
                           confidence="candidate" if matches else "none", matches=matches))
