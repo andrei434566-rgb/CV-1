@@ -41,6 +41,12 @@ def numeric(value):
 
 from geology_excel_parser import excel_intervals
 
+UV_RE = re.compile(r"(?i)(?:^|[^a-zа-яё0-9])(?:uv|уф|ультрафиолет|ultraviolet|fluorescen\w*)(?:$|[^a-zа-яё0-9])")
+
+def uv_filename(path: Path):
+    return bool(UV_RE.search(path.stem))
+
+
 
 def scan(root: Path, output: Path):
     root = root.resolve()
@@ -48,6 +54,7 @@ def scan(root: Path, output: Path):
     if not root.is_dir():
         raise NotADirectoryError(root)
     photos, intervals, documents, errors = [], [], [], []
+    excluded_uv = []
     wells = [p for p in root.iterdir() if p.is_dir() and p.resolve() != output
              and p.name.casefold() not in THEORY_NAMES and not p.name.startswith("_index_cv1")]
     for folder in sorted(wells):
@@ -56,6 +63,9 @@ def scan(root: Path, output: Path):
                 continue
             suffix = file.suffix.casefold()
             if suffix in IMAGE_EXT:
+                if uv_filename(file):
+                    excluded_uv.append(str(file))
+                    continue
                 photos.append(dict(well=folder.name, file=str(file), interval=filename_interval(file.stem)))
             elif suffix in SHEET_EXT and not file.name.startswith("~$"):
                 rows, error = excel_intervals(file)
@@ -88,13 +98,15 @@ def scan(root: Path, output: Path):
                 matches.append(dict(excel=row["file"], sheet=row["sheet"], row=row["row"],
                                     top=row["top"], bottom=row["bottom"],
                                     overlap_fraction=round(overlap / (span[1] - span[0]), 4),
-                                    description=row["description"], facies=row.get("facies", ""), lithology=row.get("lithology", "")))
+                                    description=row["description"], facies=row.get("facies", ""), lithology=row.get("lithology", ""),
+                                    facies_index=row.get("facies_index", ""), facies_code=row.get("facies_code", ""),
+                                    thickness=row.get("thickness")) )
         pairs.append(dict(well=photo["well"], photo=photo["file"], photo_depth=span,
                           status="review_required" if matches else "no_matching_description",
                           confidence="candidate" if matches else "none", matches=matches))
     output.mkdir(parents=True, exist_ok=True)
     data = dict(source=str(root), wells=[p.name for p in wells], photos=photos,
-                descriptions=intervals, theory=documents, pairs=pairs, errors=errors)
+                descriptions=intervals, theory=documents, pairs=pairs, errors=errors, excluded_uv=excluded_uv)
     (output / "archive_index.json").write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     with (output / "pair_review.csv").open("w", encoding="utf-8-sig", newline="") as stream:
         writer = csv.writer(stream, delimiter=";")
@@ -104,7 +116,7 @@ def scan(root: Path, output: Path):
             writer.writerow([item["well"], item["photo"], *span, item["status"], len(item["matches"])])
     return dict(wells=len(wells), photos=len(photos), descriptions=len(intervals),
                 documents=len(documents), candidate_photos=sum(bool(p["matches"]) for p in pairs),
-                errors=len(errors), output=str(output))
+                errors=len(errors), excluded_uv=len(excluded_uv), output=str(output))
 
 
 if __name__ == "__main__":
