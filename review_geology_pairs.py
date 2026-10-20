@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QPainter, QColor, QPen
 from PySide6.QtWidgets import (QApplication, QComboBox, QFileDialog, QHBoxLayout,
     QLabel, QListWidget, QMainWindow, QMessageBox, QPushButton, QScrollArea,
     QSplitter, QTextEdit, QVBoxLayout, QWidget)
@@ -31,6 +31,7 @@ class ReviewWindow(QMainWindow):
         self.items = QListWidget()
         self.items.currentRowChanged.connect(self.show_pair)
         self.photo = QLabel("Выберите фотографию")
+        self.original_pixmap = QPixmap()
         self.photo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.photo.setMinimumSize(320, 260)
         self.photo.setStyleSheet("background: #171b25; color: #dde5f0;")
@@ -102,11 +103,11 @@ class ReviewWindow(QMainWindow):
         pair = self.pairs[index]
         path = Path(pair["photo"])
         pixmap = QPixmap(str(path))
+        self.original_pixmap = pixmap
         if pixmap.isNull():
             self.photo.setText("Не удалось открыть фотографию:\n" + str(path))
         else:
-            self.photo.setPixmap(pixmap.scaled(850, 620, Qt.AspectRatioMode.KeepAspectRatio,
-                                               Qt.TransformationMode.SmoothTransformation))
+            self.render_photo()
         self.details.setPlainText(
             f"Скважина: {pair.get('well')}\nФото: {path}\n"
             f"Глубина: {pair.get('photo_depth', 'не определена')}\n"
@@ -135,12 +136,52 @@ class ReviewWindow(QMainWindow):
                 "Нет автоматических кандидатов. Проверьте имя фото и глубины в Excel.")
             return
         m = matches[j]
+        self.render_photo()
         self.candidate_details.setPlainText(
             f"Excel: {m.get('excel')}\nЛист: {m.get('sheet')}\n"
             f"Строка: {m.get('row')}\nПерекрытие: {m.get('overlap_fraction')}\n\n"
             f"Описание:\n{m.get('description','')}\n\n"
+            f"Индекс: {m.get('facies_index','')} | Код: {m.get('facies_code','')}\n"
+            f"Толщина: {m.get('thickness','')} м\n"
+            f"Кровля: {m.get('top')} | Подошва: {m.get('bottom')}\n"
             f"Фация: {m.get('facies','')}\nЛитология: {m.get('lithology','')}"
         )
+
+    def render_photo(self):
+        if self.original_pixmap.isNull():
+            return
+        canvas = self.original_pixmap.scaled(
+            850, 620, Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)
+        i = self.items.currentRow()
+        if not (0 <= i < len(self.pairs)):
+            self.photo.setPixmap(canvas)
+            return
+        pair = self.pairs[i]
+        depth = pair.get("photo_depth")
+        if not depth or depth[1] <= depth[0]:
+            self.photo.setPixmap(canvas)
+            return
+        painter = QPainter(canvas)
+        for k, match in enumerate(pair.get("matches", [])):
+            top = max(depth[0], float(match["top"]))
+            bottom = min(depth[1], float(match["bottom"]))
+            if bottom <= top:
+                continue
+            y1 = round((top-depth[0])/(depth[1]-depth[0])*canvas.height())
+            y2 = round((bottom-depth[0])/(depth[1]-depth[0])*canvas.height())
+            selected = k == self.candidates.currentIndex()
+            color = QColor(255, 194, 57) if selected else QColor(60, 190, 245)
+            painter.fillRect(0, y1, canvas.width(), max(2,y2-y1),
+                             QColor(color.red(),color.green(),color.blue(),75 if selected else 28))
+            painter.setPen(QPen(color, 3 if selected else 1))
+            painter.drawRect(1, y1, canvas.width()-3, max(2,y2-y1))
+            painter.drawText(8, max(18,y1+16), str(match.get("facies_index") or match.get("facies") or "фация")[:30])
+        painter.fillRect(0,0,canvas.width(),25,QColor(25,25,25,220))
+        painter.setPen(QColor("white"))
+        painter.drawText(8,18,"ПРЕДВАРИТЕЛЬНАЯ СХЕМА ПО ГЛУБИНАМ — НЕ МАСКА КЕРНА")
+        painter.end()
+        self.photo.setPixmap(canvas)
 
     def _save(self, decision, candidate_index=None):
         i = self.items.currentRow()
