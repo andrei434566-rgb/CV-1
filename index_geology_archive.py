@@ -51,7 +51,7 @@ UV_RE = re.compile(
 )
 
 def uv_filename(path: Path):
-    return bool(UV_RE.search(path.stem))
+    return bool(UV_RE.search(path.stem)) or any(UV_RE.search(parent.name) for parent in list(path.parents)[:2])
 
 def likely_uv_visual(path: Path):
     """Conservative visual heuristic. Suspected UV photos require review, not deletion."""
@@ -69,6 +69,7 @@ def likely_uv_visual(path: Path):
             return False
         colored = 0
         dark = 0
+        neon_blue = 0
         for y in range(image.height()):
             for x in range(image.width()):
                 c = image.pixelColor(x, y)
@@ -77,7 +78,10 @@ def likely_uv_visual(path: Path):
                     colored += 1
                 if value <= 100:
                     dark += 1
-        return colored / count > 0.48 and dark / count > 0.28
+                if 175 <= h <= 265 and saturation >= 95 and value >= 45:
+                    neon_blue += 1
+        return ((colored / count > 0.25 and dark / count > 0.25)
+                or (neon_blue / count > 0.08 and dark / count > 0.40))
     except Exception:
         return False
 
