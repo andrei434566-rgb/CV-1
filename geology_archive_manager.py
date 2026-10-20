@@ -27,7 +27,7 @@ class ArchiveManager(QMainWindow):
             ("Выбрать базу",self.choose),
             ("Сканировать",self.scan),
             ("Проверить фото ↔ Excel",self.review),
-            ("Экспорт для VLM",self.export),
+            ("Экспорт для VLM",self.export),\n            ("Привязка глубин",self.depth_mapping),
         ]:
             button=QPushButton(title)
             button.clicked.connect(fn)
@@ -68,7 +68,7 @@ class ArchiveManager(QMainWindow):
         self.review_window=ReviewWindow(path)
         self.review_window.show()
 
-    def export(self):
+    def depth_mapping(self):\n        if not self._ready(): return\n        from geology_depth_mapping import generate\n        try:\n            result=generate(self.root/"_index_cv1")\n            self.status.appendPlainText(json.dumps(result,ensure_ascii=False,indent=2))\n            if result.get("status")=="template_created":\n                QMessageBox.information(self,"Привязка глубин",\n                    "Создан lane_annotations.json. Укажите координаты рядов и их интервалы; повторное нажатие построит карту глубин.")\n        except Exception as exc:\n            QMessageBox.critical(self,"Ошибка привязки глубин",str(exc))\n\n    def export(self):
         if not self._ready(): return
         from export_geology_vlm import export
         try:
