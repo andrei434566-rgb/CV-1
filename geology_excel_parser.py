@@ -16,6 +16,9 @@ def _num(v):
 def _classify(label):
     s=_s(label)
     if any(t in s for t in ("литологическое описание", "описание керна", "геологическое описание")): return "description"
+    if any(t in s for t in ("индекс фации", "индекс фац.")): return "facies_index"
+    if any(t in s for t in ("код фации", "код фац.")): return "facies_code"
+    if any(t in s for t in ("толщина слоя", "мощность слоя", "толщина фации")): return "thickness"
     if any(t in s for t in ("название фации", "наименование фации")): return "facies"
     if any(t in s for t in ("название литологии", "литология", "название породы")): return "lithology"
     if any(t in s for t in ("кровля", "начало интервала", "глубина от", "интервал от")): return "top"
@@ -57,6 +60,9 @@ def excel_intervals(path):
             desc_c=fields.get("description")
             facies_c=fields.get("facies")
             lith_c=fields.get("lithology")
+            index_c=fields.get("facies_index")
+            code_c=fields.get("facies_code")
+            thick_c=fields.get("thickness")
             if not any((desc_c,facies_c,lith_c)): continue
             for r in range(1,ws.max_row+1):
                 top=_num(ws.cell(r,top_c).value)
@@ -65,9 +71,14 @@ def excel_intervals(path):
                 description=str(ws.cell(r,desc_c).value or "").strip() if desc_c else ""
                 facies=str(ws.cell(r,facies_c).value or "").strip() if facies_c else ""
                 lithology=str(ws.cell(r,lith_c).value or "").strip() if lith_c else ""
-                if not (description or facies or lithology): continue
+                facies_index=str(ws.cell(r,index_c).value or "").strip() if index_c else ""
+                facies_code=str(ws.cell(r,code_c).value or "").strip() if code_c else ""
+                thickness=_num(ws.cell(r,thick_c).value) if thick_c else None
+                if not (description or facies or lithology or facies_index or facies_code): continue
                 results.append(dict(file=str(path),sheet=ws.title,row=r,top=top,bottom=bottom,
                                     description=description,facies=facies,lithology=lithology,
+                                    facies_index=facies_index,facies_code=facies_code,
+                                    thickness=thickness if thickness is not None else round(bottom-top,3),
                                     source_columns={k:ws.cell(r,c).coordinate for k,c in fields.items()}))
         wb.close()
         return results,None
