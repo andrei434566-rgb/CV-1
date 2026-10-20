@@ -1,7 +1,6 @@
 """One-window entry point for local geological archive preparation."""
 from __future__ import annotations
 import json
-import subprocess
 import sys
 from pathlib import Path
 from PySide6.QtWidgets import (QApplication,QFileDialog,QHBoxLayout,QLabel,
@@ -15,6 +14,7 @@ class ArchiveManager(QMainWindow):
         self.setWindowTitle("CV-1 — Геологическая база и обучение ИИ")
         self.resize(850,500)
         self.root=None
+        self.output_dir=BASE/"_cv1_local_indexes"
         self.path_label=QLabel("Папка не выбрана")
         self.status=QPlainTextEdit()
         self.status.setReadOnly(True)
@@ -22,9 +22,12 @@ class ArchiveManager(QMainWindow):
         layout=QVBoxLayout(body)
         layout.addWidget(QLabel("Импорт скважин, фотографий, Excel и теоретических материалов"))
         layout.addWidget(self.path_label)
+        self.output_label=QLabel("Результаты: "+str(self.output_dir))
+        layout.addWidget(self.output_label)
         row=QHBoxLayout()
         for title,fn in [
             ("Выбрать базу",self.choose),
+            ("Папка результатов",self.choose_output),
             ("Сканировать",self.scan),
             ("Проверить фото ↔ Excel",self.review),
             ("Экспорт для VLM",self.export),
@@ -44,6 +47,17 @@ class ArchiveManager(QMainWindow):
             self.path_label.setText(str(self.root))
             self.status.appendPlainText("Выбрана база: "+str(self.root))
 
+    def choose_output(self):
+        directory=QFileDialog.getExistingDirectory(self,"Выбрать локальную папку результатов",str(BASE))
+        if directory:
+            self.output_dir=Path(directory)
+            self.output_label.setText("Результаты: "+str(self.output_dir))
+
+    def index_dir(self):
+        import hashlib
+        key=hashlib.sha256(str(self.root).casefold().encode("utf-8")).hexdigest()[:12]
+        return self.output_dir/("archive_"+key)
+
     def _ready(self):
         if self.root is None:
             QMessageBox.information(self,"Нет папки","Сначала выберите корневую папку.")
@@ -54,14 +68,14 @@ class ArchiveManager(QMainWindow):
         if not self._ready(): return
         from index_geology_archive import scan
         try:
-            result=scan(self.root,self.root/"_index_cv1")
+            result=scan(self.root,self.index_dir())
             self.status.appendPlainText(json.dumps(result,ensure_ascii=False,indent=2))
         except Exception as exc:
             QMessageBox.critical(self,"Ошибка индексации",str(exc))
 
     def review(self):
         if not self._ready(): return
-        path=self.root/"_index_cv1"/"archive_index.json"
+        path=self.index_dir()/"archive_index.json"
         if not path.exists():
             QMessageBox.information(self,"Нет индекса","Сначала нажмите «Сканировать».")
             return
@@ -73,7 +87,7 @@ class ArchiveManager(QMainWindow):
         if not self._ready(): return
         from geology_depth_mapping import generate
         try:
-            result=generate(self.root/"_index_cv1")
+            result=generate(self.index_dir())
             self.status.appendPlainText(json.dumps(result,ensure_ascii=False,indent=2))
             if result.get("status")=="template_created":
                 QMessageBox.information(self,"Привязка глубин",
@@ -85,7 +99,7 @@ class ArchiveManager(QMainWindow):
         if not self._ready(): return
         from export_geology_vlm import export
         try:
-            result=export(self.root/"_index_cv1")
+            result=export(self.index_dir())
             self.status.appendPlainText(json.dumps(result,ensure_ascii=False,indent=2))
         except Exception as exc:
             QMessageBox.critical(self,"Ошибка экспорта",str(exc))
