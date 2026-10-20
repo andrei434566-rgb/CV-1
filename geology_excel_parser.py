@@ -76,11 +76,7 @@ def excel_intervals(path):
                         score+=10
                     if d==c+1: score+=2
                     candidates.append((score,c,d))
-            if not candidates:
-                continue
-            score,top_c,bottom_c=max(candidates)
-            if score < 10:
-                continue
+            score,top_c,bottom_c=max(candidates) if candidates else (-999,None,None)
             fields["top"]=top_c
             fields["bottom"]=bottom_c
             desc_c=fields.get("description")
@@ -93,12 +89,16 @@ def excel_intervals(path):
             # FACIES DRILLING depths, 19 thickness, 20 index, 21 name.
             # Only apply when those exact numbered columns are present.
             numbered={}
-            for rr in range(1,min(ws.max_row,40)+1):
+            for rr in range(1,min(ws.max_row,80)+1):
                 mapping={}
                 for cc in range(1,max_col+1):
                     v=ws.cell(rr,cc).value
-                    if isinstance(v,int) and not isinstance(v,bool) and 1<=v<=max_col:
-                        mapping[v]=cc
+                    try:
+                        number=int(str(v).strip())
+                    except (TypeError,ValueError):
+                        continue
+                    if str(v).strip() in (str(number),str(number)+".0") and 1<=number<=max_col:
+                        mapping[number]=cc
                 if all(n in mapping for n in (14,15,19,20,21)):
                     numbered=mapping
                     break
@@ -108,7 +108,7 @@ def excel_intervals(path):
                 fields.update(top=top_c,bottom=bottom_c,thickness=thick_c,
                               facies_index=index_c,facies=facies_c)
                 if 22 in numbered: code_c=numbered[22]
-            if not any((desc_c,facies_c,lith_c,index_c)): continue
+            if top_c is None or bottom_c is None or not any((desc_c,facies_c,lith_c,index_c)): continue
             for r in range(1,ws.max_row+1):
                 top=_num(ws.cell(r,top_c).value)
                 bottom=_num(ws.cell(r,bottom_c).value)
