@@ -9,6 +9,7 @@ import argparse
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from index_geology_archive import uv_filename, likely_uv_visual
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QPainter, QColor, QPen
@@ -22,7 +23,14 @@ class ReviewWindow(QMainWindow):
         super().__init__()
         self.index_file = index_file.resolve()
         self.data = json.loads(self.index_file.read_text(encoding="utf-8"))
-        self.pairs = self.data.get("pairs", [])
+        excluded = set(self.data.get("excluded_uv", [])) | set(self.data.get("suspected_uv", []))
+        self.pairs = [
+            p for p in self.data.get("pairs", [])
+            if p.get("photo") and p["photo"] not in excluded
+            and not uv_filename(Path(p["photo"]))
+            and not likely_uv_visual(Path(p["photo"]))
+        ]
+        self.hidden_uv_count = len(self.data.get("pairs", [])) - len(self.pairs)
         self.review_file = self.index_file.with_name("pair_decisions.json")
         self.decisions = self._load_decisions()
         self.setWindowTitle("CV-1 — Проверка соответствия фото и Excel")
@@ -41,7 +49,7 @@ class ReviewWindow(QMainWindow):
         self.photo_scroll.setWidgetResizable(True)
         self.photo_scroll.setWidget(self.photo)
         self.detect_button = QPushButton("Найти столбики — Kern Analyzer")
-        self.detect_button.clicked.connect(self.detect_columns)
+        self.detect_button.clicked.connect(lambda: self.detect_columns(silent=False))
         self.details = QTextEdit()
         self.details.setReadOnly(True)
         self.candidates = QComboBox()
@@ -53,6 +61,7 @@ class ReviewWindow(QMainWindow):
         left = QWidget()
         left_layout = QVBoxLayout(left)
         left_layout.addWidget(QLabel("Фотографии по скважинам"))
+        left_layout.addWidget(QLabel(f"UV-фотографий скрыто: {self.hidden_uv_count}"))
         left_layout.addWidget(self.items)
         right = QWidget()
         right_layout = QVBoxLayout(right)
