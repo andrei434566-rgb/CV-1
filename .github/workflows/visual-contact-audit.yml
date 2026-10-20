@@ -1,0 +1,29 @@
+name: Visual contact audit tests
+
+on:
+  pull_request:
+    paths:
+      - "app/infrastructure/visual_contact_audit.py"
+      - "app/ui/dialogs/visual_contact_review_dialog.py"
+      - "app/ui/windows/main_window.py"
+      - "test_visual_contact_audit.py"
+      - ".github/workflows/visual-contact-audit.yml"
+  push:
+    paths:
+      - "app/infrastructure/visual_contact_audit.py"
+      - "test_visual_contact_audit.py"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check Python syntax
+        run: |
+          python -m compileall -q app/infrastructure/visual_contact_audit.py app/ui/dialogs/visual_contact_review_dialog.py app/ui/windows/main_window.py
+      - name: Test contacts without GPU
+        run: |
+          python -m unittest -v test_visual_contact_audit.py
