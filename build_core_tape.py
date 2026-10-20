@@ -545,7 +545,18 @@ def main() -> int:
                 (round(item["left"]), round(item["top"]), round(item["right"]), round(item["bottom"]))
                 for item in detector.recognize(image)
             ]
-            columns = sorted(columns, key=lambda item: item[0], reverse=args.right_to_left)
+            # Preserve the physical reading order of each photograph.
+            # Vertical lanes: left-to-right (or explicit right-to-left).
+            # Horizontal rows: top-to-bottom, reading left-to-right per row.
+            horizontal_area = sum((right-left)*(bottom-top) for left,top,right,bottom in columns
+                                  if right-left > 1.3*(bottom-top))
+            vertical_area = sum((right-left)*(bottom-top) for left,top,right,bottom in columns
+                                if bottom-top >= 1.3*(right-left))
+            horizontal_photo = horizontal_area > vertical_area
+            if horizontal_photo:
+                columns = sorted(columns, key=lambda item: (item[1], item[0]))
+            else:
+                columns = sorted(columns, key=lambda item: item[0], reverse=args.right_to_left)
             overlay_file = Path("overlays") / f"{prefix}_overlay.png"
             mask_file = Path("masks") / f"{prefix}_columns_mask.png"
             write_image(output_dir / overlay_file, draw_overlay(image, columns, photo_number))
@@ -563,6 +574,8 @@ def main() -> int:
             })
             for column_number, (left, top, right, bottom) in enumerate(columns, start=1):
                 source_crop = image[top:bottom, left:right]
+                if horizontal_photo:
+                    source_crop = cv2.rotate(source_crop, cv2.ROTATE_90_CLOCKWISE)
                 normalized_crop = resize_column(source_crop, tape_width)
                 sequence_number += 1
                 crop_file = Path("crops") / f"{prefix}_c{column_number:02d}.png"
