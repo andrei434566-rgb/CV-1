@@ -27,7 +27,8 @@ class ArchiveManager(QMainWindow):
             ("Выбрать базу",self.choose),
             ("Сканировать",self.scan),
             ("Проверить фото ↔ Excel",self.review),
-            ("Экспорт для VLM",self.export),\n            ("Привязка глубин",self.depth_mapping),
+            ("Экспорт для VLM",self.export),
+            ("Привязка глубин",self.depth_mapping),
         ]:
             button=QPushButton(title)
             button.clicked.connect(fn)
