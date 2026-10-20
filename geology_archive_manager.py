@@ -11,7 +11,7 @@ BASE=Path(__file__).resolve().parent
 class ArchiveManager(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("CV-1 — Геологическая база и обучение ИИ | диагностика v2")
+        self.setWindowTitle("CV-1 — Геологическая база и обучение ИИ | диагностика v3")
         self.resize(850,500)
         self.root=None
         self.output_dir=BASE/"_cv1_local_indexes"
@@ -79,9 +79,34 @@ class ArchiveManager(QMainWindow):
         from diagnose_geology import save_report
         try:
             dest, report = save_report(self.root, self.index_dir())
-            self.status.appendPlainText("Диагностика сохранена: " + str(dest))
-            self.status.appendPlainText(json.dumps(report, ensure_ascii=False, indent=2)[:10000])
-            QMessageBox.information(self, "Диагностика CV-1", "Отчёт сохранён:\\n" + str(dest))
+            idx=report.get("index",{})
+            sheets=report.get("excel",[])
+            total=sum(x.get("facies_rows",0) for x in sheets)
+            empty=[x for x in sheets if x.get("facies_rows",0)==0]
+            uv=idx.get("uv_named_still_in_index","нет индекса")
+            lines=[
+                "=== CV-1 | ПРОВЕРКА НА ЭКРАНЕ ===",
+                "Версия диагностики: v3 / 20.10.2026",
+                "Индекс: "+str(idx.get("path","не найден")),
+                "Фото в индексе: "+str(idx.get("pairs","?")),
+                "UV по названию в индексе: "+str(uv),
+                "Проверено Excel: "+str(len(sheets)),
+                "Прочитано строк фаций: "+str(total),
+                "Excel без распознанных фаций: "+str(len(empty)),
+                "",
+                "ПРИМЕРЫ EXCEL:",
+            ]
+            for sheet in sheets[:8]:
+                lines.append(Path(sheet["file"]).name+" | фаций: "+str(sheet.get("facies_rows",0)))
+                if sheet.get("error"): lines.append("ОШИБКА: "+str(sheet["error"]))
+                for row in sheet.get("examples",[])[:2]:
+                    lines.append("  "+str(row.get("top"))+"–"+str(row.get("bottom"))+
+                        " | "+str(row.get("facies_index"))+" | "+str(row.get("facies")))
+            lines.extend(["","ПУТИ ИСПОЛНЯЕМОГО КОДА:"])
+            lines.extend(str(k)+": "+str(v) for k,v in report.get("runtime",{}).items())
+            lines.append("=== КОНЕЦ ПРОВЕРКИ ===")
+            self.status.setPlainText("\\n".join(lines))
+            self.status.verticalScrollBar().setValue(0)
         except Exception as exc:
             QMessageBox.critical(self, "Ошибка диагностики", str(exc))
 
