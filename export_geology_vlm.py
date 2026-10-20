@@ -11,6 +11,9 @@ def export(index_dir: Path):
     index_dir=Path(index_dir)
     archive=json.loads((index_dir/"archive_index.json").read_text(encoding="utf-8"))
     decisions=json.loads((index_dir/"pair_decisions.json").read_text(encoding="utf-8"))["decisions"]
+    from index_geology_archive import uv_filename
+    excluded_uv=set(archive.get("excluded_uv",[]))
+    suspected_uv=set(archive.get("suspected_uv",[]))
     destination=index_dir/"vlm_dataset"
     destination.mkdir(parents=True,exist_ok=True)
     output=destination/"reviewed_examples.jsonl"
@@ -18,6 +21,9 @@ def export(index_dir: Path):
     skipped=0
     for pair in archive.get("pairs",[]):
         photo=pair.get("photo")
+        if not photo or uv_filename(Path(photo)) or photo in excluded_uv or photo in suspected_uv:
+            skipped+=1
+            continue
         decision=decisions.get(photo,{})
         if decision.get("decision") not in ("confirmed","corrected_candidate"):
             skipped+=1
