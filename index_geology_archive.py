@@ -74,7 +74,7 @@ def excel_intervals(path: Path):
     return result, None
 
 
-def scan(root: Path, output: Path):
+from geology_excel_parser import excel_intervals as excel_intervals\n\n\ndef scan(root: Path, output: Path):
     root = root.resolve()
     output = output.resolve()
     if not root.is_dir():
