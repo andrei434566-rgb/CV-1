@@ -1,0 +1,29 @@
+name: CoreBreakout YOLO data checks
+
+on:
+  pull_request:
+    paths:
+      - "scripts/prepare_corebreakout_yolo.py"
+      - "scripts/train_core_columns_yolo.py"
+      - "test_corebreakout_yolo.py"
+      - ".github/workflows/corebreakout-yolo-tests.yml"
+  push:
+    paths:
+      - "scripts/prepare_corebreakout_yolo.py"
+      - "scripts/train_core_columns_yolo.py"
+      - "test_corebreakout_yolo.py"
+
+jobs:
+  check-dataset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test dependencies
+        run: python -m pip install pillow scikit-learn
+      - name: Python syntax
+        run: python -m compileall -q scripts/prepare_corebreakout_yolo.py scripts/train_core_columns_yolo.py
+      - name: Check grouped YOLO dataset preparation
+        run: python -m unittest -v test_corebreakout_yolo.py
