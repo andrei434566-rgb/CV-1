@@ -32,12 +32,15 @@ class ReviewWindow(QMainWindow):
         self.items.currentRowChanged.connect(self.show_pair)
         self.photo = QLabel("Выберите фотографию")
         self.original_pixmap = QPixmap()
+        self.core_boxes = []
         self.photo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.photo.setMinimumSize(320, 260)
         self.photo.setStyleSheet("background: #171b25; color: #dde5f0;")
         self.photo_scroll = QScrollArea()
         self.photo_scroll.setWidgetResizable(True)
         self.photo_scroll.setWidget(self.photo)
+        self.detect_button = QPushButton("Найти столбики — Kern Analyzer")
+        self.detect_button.clicked.connect(self.detect_columns)
         self.details = QTextEdit()
         self.details.setReadOnly(True)
         self.candidates = QComboBox()
@@ -54,6 +57,7 @@ class ReviewWindow(QMainWindow):
         right_layout = QVBoxLayout(right)
         right_layout.addWidget(QLabel("Фото керна"))
         right_layout.addWidget(self.photo_scroll, 5)
+        right_layout.addWidget(self.detect_button)
         right_layout.addWidget(QLabel("Интервал фотографии / статус"))
         right_layout.addWidget(self.details, 1)
         right_layout.addWidget(QLabel("Кандидат из Excel (выбери соответствующий интервал)"))
@@ -104,6 +108,7 @@ class ReviewWindow(QMainWindow):
         path = Path(pair["photo"])
         pixmap = QPixmap(str(path))
         self.original_pixmap = pixmap
+        self.core_boxes = []
         if pixmap.isNull():
             self.photo.setText("Не удалось открыть фотографию:\n" + str(path))
         else:
@@ -147,6 +152,19 @@ class ReviewWindow(QMainWindow):
             f"Фация: {m.get('facies','')}\nЛитология: {m.get('lithology','')}"
         )
 
+    def detect_columns(self):
+        i = self.items.currentRow()
+        if not (0 <= i < len(self.pairs)):
+            return
+        try:
+            from app.infrastructure.ml.core_column_service import CoreColumnRecognizer, read_bgr_image
+            image = read_bgr_image(self.pairs[i]["photo"])
+            self.core_boxes = CoreColumnRecognizer().recognize(image, orientation="auto")
+            self.render_photo()
+            self.details.append(f"\\nKern Analyzer: найдено {len(self.core_boxes)} столбиков/рядов. Проверьте контуры.")
+        except Exception as exc:
+            QMessageBox.warning(self, "Детектор керна", str(exc))
+
     def render_photo(self):
         if self.original_pixmap.isNull():
             return
@@ -163,23 +181,19 @@ class ReviewWindow(QMainWindow):
             self.photo.setPixmap(canvas)
             return
         painter = QPainter(canvas)
-        for k, match in enumerate(pair.get("matches", [])):
-            top = max(depth[0], float(match["top"]))
-            bottom = min(depth[1], float(match["bottom"]))
-            if bottom <= top:
-                continue
-            y1 = round((top-depth[0])/(depth[1]-depth[0])*canvas.height())
-            y2 = round((bottom-depth[0])/(depth[1]-depth[0])*canvas.height())
-            selected = k == self.candidates.currentIndex()
-            color = QColor(255, 194, 57) if selected else QColor(60, 190, 245)
-            painter.fillRect(0, y1, canvas.width(), max(2,y2-y1),
-                             QColor(color.red(),color.green(),color.blue(),75 if selected else 28))
-            painter.setPen(QPen(color, 3 if selected else 1))
-            painter.drawRect(1, y1, canvas.width()-3, max(2,y2-y1))
-            painter.drawText(8, max(18,y1+16), str(match.get("facies_index") or match.get("facies") or "фация")[:30])
+        sx = canvas.width() / max(1,self.original_pixmap.width())
+        sy = canvas.height() / max(1,self.original_pixmap.height())
+        painter.setPen(QPen(QColor(90,245,140),2))
+        for n,box in enumerate(self.core_boxes,1):
+            x=round(box["left"]*sx)
+            y=round(box["top"]*sy)
+            w=round((box["right"]-box["left"])*sx)
+            h=round((box["bottom"]-box["top"])*sy)
+            painter.drawRect(x,y,w,h)
+            painter.drawText(x+4,y+18,f"Керн {n}")
         painter.fillRect(0,0,canvas.width(),25,QColor(25,25,25,220))
         painter.setPen(QColor("white"))
-        painter.drawText(8,18,"ПРЕДВАРИТЕЛЬНАЯ СХЕМА ПО ГЛУБИНАМ — НЕ МАСКА КЕРНА")
+        painter.drawText(8,18,"КЕРН: ДЕТЕКТОР | ФАЦИИ: НУЖНА ПРИВЯЗКА ГЛУБИН")
         painter.end()
         self.photo.setPixmap(canvas)
 
