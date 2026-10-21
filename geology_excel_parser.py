@@ -108,6 +108,46 @@ def excel_intervals(path):
                 fields.update(top=top_c,bottom=bottom_c,thickness=thick_c,
                               facies_index=index_c,facies=facies_c)
                 if 22 in numbered: code_c=numbered[22]
+
+            # Some workbooks lack a machine-readable numbered header.
+            # Discover the facies-drilling pair by DATA, not by a merged
+            # group header which may describe the entire core run.
+            # Restrict candidate pairs to 14/15 and their numbered mapping,
+            # plus explicitly classified depth pairs. Do not silently use
+            # the core-recovery interval as a substitute.
+            depth_pairs=[]
+            if top_c and bottom_c:
+                depth_pairs.append((top_c,bottom_c,"header"))
+            if max_col >= 15:
+                depth_pairs.append((14,15,"physical_14_15"))
+            if numbered:
+                depth_pairs.insert(0,(numbered[14],numbered[15],"numbered_14_15"))
+            for _,a,b in sorted(candidates,reverse=True)[:5]:
+                depth_pairs.append((a,b,"facies_header"))
+            unique_pairs=list(dict.fromkeys((a,b) for a,b,_ in depth_pairs))
+            # Look for plausible short layers rather than long photo/core
+            # intervals. Candidate count alone is not sufficient.
+            def pair_quality(a,b):
+                good=[]
+                for rr in range(1,ws.max_row+1):
+                    x=_num(ws.cell(rr,a).value)
+                    y=_num(ws.cell(rr,b).value)
+                    if x is not None and y is not None and 0 < y-x <= 30:
+                        good.append((x,y))
+                short=sum((y-x)<3 for x,y in good)
+                distinct=len(set(good))
+                # Prefer genuinely subdivided layers; reject repeating
+                # identical aggregate intervals with no short layers.
+                return (short*3+distinct,short,distinct),good
+            if unique_pairs:
+                rated=[(pair_quality(a,b)[0],a,b) for a,b in unique_pairs]
+                best,a,b=max(rated)
+                if best[1] > 0 or not (top_c and bottom_c):
+                    top_c,bottom_c=a,b
+                    fields.update(top=top_c,bottom=bottom_c)
+            # Fallback field locations are ONLY used when their numbered
+            # column headers have been positively identified.
+            # A wrong field is worse than a missing one.
             if top_c is None or bottom_c is None or not any((desc_c,facies_c,lith_c,index_c)): continue
             for r in range(1,ws.max_row+1):
                 top=_num(ws.cell(r,top_c).value)
