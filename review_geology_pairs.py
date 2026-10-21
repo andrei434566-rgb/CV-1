@@ -14,7 +14,7 @@ from index_geology_archive import uv_filename, likely_uv_visual
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap, QPainter, QColor, QPen
 from PySide6.QtWidgets import (QApplication, QComboBox, QFileDialog, QHBoxLayout,
-    QLabel, QListWidget, QMainWindow, QMessageBox, QPushButton, QScrollArea,
+    QLabel, QListWidget, QLineEdit, QMainWindow, QMessageBox, QPushButton, QScrollArea,
     QSplitter, QTextEdit, QVBoxLayout, QWidget)
 
 
@@ -33,6 +33,11 @@ class ReviewWindow(QMainWindow):
         self.hidden_uv_count = len(self.data.get("pairs", [])) - len(self.pairs)
         self.review_file = self.index_file.with_name("pair_decisions.json")
         self.decisions = self._load_decisions()
+        self.box_depth_file = self.index_file.with_name('verified_box_depths.json')
+        try:
+            self.box_depths = json.loads(self.box_depth_file.read_text(encoding='utf-8')).get('photos', {})
+        except (OSError, ValueError):
+            self.box_depths = {}
         self.setWindowTitle("CV-1 — Проверка соответствия фото и Excel")
         self.resize(1300, 780)
 
@@ -68,6 +73,19 @@ class ReviewWindow(QMainWindow):
         right_layout.addWidget(QLabel("Фото керна"))
         right_layout.addWidget(self.photo_scroll, 5)
         right_layout.addWidget(self.detect_button)
+        depths = QHBoxLayout()
+        depths.addWidget(QLabel('Паспорт ящика: от'))
+        self.box_top = QLineEdit()
+        self.box_top.setMaximumWidth(110)
+        depths.addWidget(self.box_top)
+        depths.addWidget(QLabel('до'))
+        self.box_bottom = QLineEdit()
+        self.box_bottom.setMaximumWidth(110)
+        depths.addWidget(self.box_bottom)
+        save_depth = QPushButton('Подтвердить глубины ящика')
+        save_depth.clicked.connect(self.save_box_depth)
+        depths.addWidget(save_depth)
+        right_layout.addLayout(depths)
         right_layout.addWidget(QLabel("Интервал фотографии / статус"))
         right_layout.addWidget(self.details, 1)
         right_layout.addWidget(QLabel("Кандидат из Excel (выбери соответствующий интервал)"))
@@ -103,6 +121,67 @@ class ReviewWindow(QMainWindow):
         except (OSError, ValueError):
             return {}
 
+    def _box_span(self, pair):
+        entry = self.box_depths.get(pair['photo'])
+        if entry and entry.get('confirmed'):
+            return [float(entry['top']), float(entry['bottom'])]
+        return None
+
+    def _box_matches(self, pair):
+        span = self._box_span(pair)
+        if not span:
+            return []
+        rows = []
+        for d in self.data.get('descriptions', []):
+            if d.get('well') != pair.get('well'):
+                continue
+            try:
+                a, b = float(d['top']), float(d['bottom'])
+                if a >= b or min(span[1], b) <= max(span[0], a):
+                    continue
+                if b-a >= span[1]-span[0]-0.01:
+                    continue
+                if not (d.get('facies_index') or d.get('facies')):
+                    continue
+                thickness = d.get('thickness')
+                if thickness is not None and abs(float(thickness)-(b-a)) > max(0.05,(b-a)*0.05):
+                    continue
+                rows.append(d)
+            except (TypeError, ValueError, KeyError):
+                continue
+        result = []
+        for d in sorted(rows, key=lambda x:float(x['bottom'])-float(x['top'])):
+            a,b=float(d['top']),float(d['bottom'])
+            if not any(min(b,float(v['bottom']))-max(a,float(v['top']))>0.02 for v in result):
+                result.append(d)
+        return sorted(result, key=lambda x:float(x['top']))
+
+    def save_box_depth(self):
+        i=self.items.currentRow()
+        if i < 0 or i >= len(self.pairs):
+            return
+        pair=self.pairs[i]
+        try:
+            a=float(self.box_top.text().replace(',','.').strip())
+            b=float(self.box_bottom.text().replace(',','.').strip())
+        except ValueError:
+            QMessageBox.warning(self,'Глубины','Введите две числовые глубины с таблички.')
+            return
+        drilling=pair.get('photo_depth')
+        if not a < b or b-a > 30:
+            QMessageBox.warning(self,'Глубины','Неверный интервал ящика.')
+            return
+        if drilling and (a < float(drilling[0])-0.1 or b > float(drilling[1])+0.1):
+            QMessageBox.warning(self,'Глубины','Интервал ящика выходит за пределы долбления.')
+            return
+        self.box_depths[pair['photo']]={'top':a,'bottom':b,'confirmed':True,
+            'source':'manual_from_printed_box_label',
+            'confirmed_at':datetime.now(timezone.utc).isoformat()}
+        tmp=self.box_depth_file.with_suffix('.tmp')
+        tmp.write_text(json.dumps({'photos':self.box_depths},ensure_ascii=False,indent=2),encoding='utf-8')
+        tmp.replace(self.box_depth_file)
+        self.show_pair(i)
+
     def _label(self, i, pair):
         name = Path(pair.get("photo", "")).name
         status = self.decisions.get(pair.get("photo", ""), {}).get("decision", "не проверено")
@@ -119,17 +198,21 @@ class ReviewWindow(QMainWindow):
         pixmap = QPixmap(str(path))
         self.original_pixmap = pixmap
         self.core_boxes = []
+        verified=self._box_span(pair)
+        self.box_top.setText(str(verified[0]) if verified else '')
+        self.box_bottom.setText(str(verified[1]) if verified else '')
         if pixmap.isNull():
             self.photo.setText("Не удалось открыть фотографию:\n" + str(path))
         else:
             self.render_photo()
         self.details.setPlainText(
             f"Скважина: {pair.get('well')}\nФото: {path}\n"
-            f"Глубина: {pair.get('photo_depth', 'не определена')}\n"
+            f"Долбление из имени: {pair.get('photo_depth', 'не определено')}\n"
+            f"Глубины ящика: {verified if verified else 'НЕ ПОДТВЕРЖДЕНЫ'}\n"
             f"Автоматический статус: {pair.get('status')}\n"
             "Совпадение глубин не означает подтверждённую геологическую разметку."
         )
-        span = pair.get("photo_depth")
+        span = self._box_span(pair)
         all_rows = self.data.get("descriptions", [])
         overlapping = []
         if span and len(span) == 2:
@@ -157,7 +240,7 @@ class ReviewWindow(QMainWindow):
             )
         if len(overlapping) > 12:
             self.details.append(f"  ...ещё {len(overlapping)-12} строк")
-        for j, match in enumerate(pair.get("matches", [])):
+        for j, match in enumerate(self._box_matches(pair)):
             label = (f"{j+1}. {match.get('top')}–{match.get('bottom')} м "
                      f"| {Path(match.get('excel','')).name} | строка {match.get('row')}")
             self.candidates.addItem(label, j)
@@ -174,7 +257,7 @@ class ReviewWindow(QMainWindow):
         i = self.items.currentRow()
         if i < 0 or i >= len(self.pairs):
             return
-        matches = self.pairs[i].get("matches", [])
+        matches = self._box_matches(self.pairs[i])
         j = self.candidates.currentIndex()
         if not (0 <= j < len(matches)):
             self.candidate_details.setPlainText(
@@ -265,8 +348,8 @@ class ReviewWindow(QMainWindow):
             painter.drawText(x+4,y+18,f"Керн {n}")
         # Provisional mapping: lane lengths define relative photo depth.
         # Never treat these bands as validated segmentation labels.
-        span = pair.get("photo_depth")
-        matches = pair.get("matches", [])
+        span = self._box_span(pair)
+        matches = self._box_matches(pair)
         # Multiple Excel rows can represent the same layer or overlap because
         # of aggregate records. Never paint overlapping facies as independent
         # ground truth; choose the narrowest interval and flag uncertainty.
@@ -311,7 +394,7 @@ class ReviewWindow(QMainWindow):
             # Rendering must not mutate the diagnostic text panel.
         painter.fillRect(0,0,canvas.width(),25,QColor(25,25,25,220))
         painter.setPen(QColor("white"))
-        painter.drawText(8,18,"ЗЕЛЁНЫЙ: КЕРН | ЖЁЛТЫЙ: ПРЕДВАРИТЕЛЬНЫЕ ФАЦИИ")
+        painter.drawText(8,18,"ЗЕЛЁНЫЙ: КЕРН | ЖЁЛТЫЙ: ПРОЕКЦИЯ ПО ПАСПОРТУ" if span else "ГЛУБИНЫ ЯЩИКА НЕ ПОДТВЕРЖДЕНЫ")
         painter.end()
         self.photo.setPixmap(canvas)
 
@@ -320,11 +403,16 @@ class ReviewWindow(QMainWindow):
         if not (0 <= i < len(self.pairs)):
             return
         pair = self.pairs[i]
+        if decision in ("confirmed","corrected_candidate") and not self._box_span(pair):
+            QMessageBox.warning(self,"Глубины","Сначала подтвердите глубины с паспорта ящика.")
+            return
         self.decisions[pair["photo"]] = {
             "decision": decision,
             "candidate_index": candidate_index,
             "reviewed_at": datetime.now(timezone.utc).isoformat(),
             "well": pair.get("well"),
+            "box_depth": self._box_span(pair),
+            "geometry_status": "provisional_projection",
         }
         payload = {"source_index": str(self.index_file), "decisions": self.decisions}
         temporary = self.review_file.with_suffix(".tmp")
