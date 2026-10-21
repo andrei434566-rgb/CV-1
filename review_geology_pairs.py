@@ -129,6 +129,34 @@ class ReviewWindow(QMainWindow):
             f"Автоматический статус: {pair.get('status')}\n"
             "Совпадение глубин не означает подтверждённую геологическую разметку."
         )
+        span = pair.get("photo_depth")
+        all_rows = self.data.get("descriptions", [])
+        overlapping = []
+        if span and len(span) == 2:
+            for row in all_rows:
+                if row.get("well") != pair.get("well"): continue
+                try:
+                    top, bottom = float(row["top"]), float(row["bottom"])
+                    if min(float(span[1]), bottom) > max(float(span[0]), top):
+                        overlapping.append(row)
+                except (KeyError, ValueError, TypeError):
+                    pass
+        sublayers = [r for r in overlapping
+                     if float(r["bottom"]) - float(r["top"]) < float(span[1]) - float(span[0]) - 0.01] if span else []
+        self.details.append(
+            f"\nДИАГНОСТИКА ФАЦИЙ: в Excel пересекаются с фото {len(overlapping)} строк; "
+            f"отдельных интервалов {len(sublayers)}; "
+            f"прошли фильтр сопоставления {len(pair.get('matches', []))}."
+        )
+        for row in overlapping[:12]:
+            self.details.append(
+                f"  Excel строка {row.get('row')}: {row.get('top')}–{row.get('bottom')} м "
+                f"| индекс={row.get('facies_index') or 'ПУСТО'} "
+                f"| мощность={row.get('thickness')} "
+                f"| {str(row.get('facies') or '')[:45]}"
+            )
+        if len(overlapping) > 12:
+            self.details.append(f"  ...ещё {len(overlapping)-12} строк")
         for j, match in enumerate(pair.get("matches", [])):
             label = (f"{j+1}. {match.get('top')}–{match.get('bottom')} м "
                      f"| {Path(match.get('excel','')).name} | строка {match.get('row')}")
