@@ -15,18 +15,36 @@ IMAGE_EXT = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp"}
 SHEET_EXT = {".xlsx", ".xlsm"}
 DOC_EXT = {".pdf", ".docx", ".doc", ".txt", ".md"}
 THEORY_NAMES = {"теория", "theory", "knowledge", "литература", "методички"}
-DEPTH_RE = re.compile(r"(?<!\d)(\d{2,5}[.,]\d{1,3})\s*[-–—_]\s*(\d{2,5}[.,]\d{1,3})(?!\d)")
+DEPTH_RE = re.compile(r"(?<!\d)(\d{3,5}(?:[.,]\d{1,3})?)\s*[-–—_]\s*(\d{3,5}(?:[.,]\d{1,3})?)(?!\d)")
 TOP_HINTS = ("от", "верх", "начал", "top", "from", "глубина от")
 BASE_HINTS = ("до", "низ", "конец", "bottom", "to", "глубина до")
 TEXT_HINTS = ("описан", "литолог", "фаци", "пород", "характер", "description")
 
 
+MAX_BOX_INTERVAL = 5.0
+
 def filename_interval(name: str):
-    match = DEPTH_RE.search(name)
-    if match:
-        a, b = (float(v.replace(",", ".")) for v in match.groups())
-        return [a, b] if a < b else None
-    return None
+    """Select a plausible core interval <=5m, not the first drilling-run span."""
+    valid = []
+    for match in DEPTH_RE.finditer(name):
+        top, bottom = (float(v.replace(",", ".")) for v in match.groups())
+        if 0 < bottom-top <= MAX_BOX_INTERVAL + 1e-7:
+            valid.append([top, bottom])
+    return valid[0] if len(valid) == 1 else None
+
+
+def filename_interval_status(name: str):
+    matches = list(DEPTH_RE.finditer(name))
+    valid = []
+    for m in matches:
+        a,b=(float(v.replace(",", ".")) for v in m.groups())
+        if 0 < b-a <= MAX_BOX_INTERVAL + 1e-7:
+            valid.append([a,b])
+    if len(valid) == 1:
+        return "filename_short_interval"
+    if len(valid) > 1:
+        return "ambiguous_filename_intervals"
+    return "requires_photo_depth_reading" if matches else "no_filename_interval"
 
 
 def numeric(value):
@@ -109,7 +127,7 @@ def scan(root: Path, output: Path):
                 if likely_uv_visual(file):
                     suspected_uv.append(str(file))
                     continue
-                photos.append(dict(well=folder.name, file=str(file), interval=filename_interval(file.stem)))
+                photos.append(dict(well=folder.name, file=str(file), interval=filename_interval(file.stem), depth_status=filename_interval_status(file.stem)))
             elif suffix in SHEET_EXT and not file.name.startswith("~$"):
                 rows, error = excel_intervals(file)
                 if error:
@@ -131,7 +149,7 @@ def scan(root: Path, output: Path):
     for photo in photos:
         span = photo["interval"]
         if not span:
-            pairs.append(dict(well=photo["well"], photo=photo["file"], status="missing_photo_depth",
+            pairs.append(dict(well=photo["well"], photo=photo["file"], status=photo["depth_status"],
                               confidence="none", matches=[]))
             continue
         matches = []
@@ -155,7 +173,7 @@ def scan(root: Path, output: Path):
                                     description=row["description"], facies=row.get("facies", ""), lithology=row.get("lithology", ""),
                                     facies_index=row.get("facies_index", ""), facies_code=row.get("facies_code", ""),
                                     thickness=row.get("thickness")) )
-        pairs.append(dict(well=photo["well"], photo=photo["file"], photo_depth=span,
+        pairs.append(dict(well=photo["well"], photo=photo["file"], photo_depth=span, depth_source="filename_short_interval",
                           status="review_required" if matches else "no_matching_description",
                           confidence="candidate" if matches else "none", matches=matches))
     output.mkdir(parents=True, exist_ok=True)
