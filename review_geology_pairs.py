@@ -125,6 +125,9 @@ class ReviewWindow(QMainWindow):
         entry = self.box_depths.get(pair['photo'])
         if entry and entry.get('confirmed'):
             return [float(entry['top']), float(entry['bottom'])]
+        span = pair.get('photo_depth')
+        if pair.get('depth_source') == 'filename_short_interval' and span and 0 < float(span[1])-float(span[0]) <= 5.0:
+            return [float(span[0]),float(span[1])]
         return None
 
     def _box_matches(self, pair):
@@ -167,8 +170,8 @@ class ReviewWindow(QMainWindow):
         except ValueError:
             QMessageBox.warning(self,'Глубины','Введите две числовые глубины с таблички.')
             return
-        drilling=pair.get('photo_depth')
-        if not a < b or b-a > 30:
+        drilling=pair.get('photo_depth') if pair.get('depth_source') != 'filename_short_interval' else None
+        if not a < b or b-a > 5.0:
             QMessageBox.warning(self,'Глубины','Неверный интервал ящика.')
             return
         if drilling and (a < float(drilling[0])-0.1 or b > float(drilling[1])+0.1):
@@ -229,7 +232,7 @@ class ReviewWindow(QMainWindow):
         self.details.append(
             f"\nДИАГНОСТИКА ФАЦИЙ: в Excel пересекаются с фото {len(overlapping)} строк; "
             f"отдельных интервалов {len(sublayers)}; "
-            f"прошли фильтр сопоставления {len(pair.get('matches', []))}."
+            f"прошли фильтр сопоставления {len(self._box_matches(pair))}."
         )
         for row in overlapping[:12]:
             self.details.append(
