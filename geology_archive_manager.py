@@ -11,7 +11,7 @@ BASE=Path(__file__).resolve().parent
 class ArchiveManager(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("CV-1 — Геологическая база и обучение ИИ | диагностика v3")
+        self.setWindowTitle("CV-1 — Геологическая база и обучение ИИ | диагностика v4")
         self.resize(850,500)
         self.root=None
         self.output_dir=BASE/"_cv1_local_indexes"
@@ -86,7 +86,7 @@ class ArchiveManager(QMainWindow):
             uv=idx.get("uv_named_still_in_index","нет индекса")
             lines=[
                 "=== CV-1 | ПРОВЕРКА НА ЭКРАНЕ ===",
-                "Версия диагностики: v3 / 20.10.2026",
+                "Версия диагностики: v4 / 21.10.2026",
                 "Индекс: "+str(idx.get("path","не найден")),
                 "Фото в индексе: "+str(idx.get("pairs","?")),
                 "UV по названию в индексе: "+str(uv),
@@ -102,10 +102,13 @@ class ArchiveManager(QMainWindow):
                 for row in sheet.get("examples",[])[:2]:
                     lines.append("  "+str(row.get("top"))+"–"+str(row.get("bottom"))+
                         " | "+str(row.get("facies_index"))+" | "+str(row.get("facies")))
+            lines.extend(["", "ПРИМЕРЫ UV В ИНДЕКСЕ:"])
+            lines.extend(Path(p).name for p in idx.get("uv_examples", [])[:8])
+            lines.append("ПРОВЕРКА UV-ФИЛЬТРА: "+str(report.get("filename_uv_checks",{})))
             lines.extend(["","ПУТИ ИСПОЛНЯЕМОГО КОДА:"])
             lines.extend(str(k)+": "+str(v) for k,v in report.get("runtime",{}).items())
             lines.append("=== КОНЕЦ ПРОВЕРКИ ===")
-            self.status.setPlainText("\\n".join(lines))
+            self.status.setPlainText("\n".join(lines))
             self.status.verticalScrollBar().setValue(0)
         except Exception as exc:
             QMessageBox.critical(self, "Ошибка диагностики", str(exc))
