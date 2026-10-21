@@ -3,10 +3,31 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
+from PySide6.QtCore import QObject, QThread, Signal, Slot
 from PySide6.QtWidgets import (QApplication,QFileDialog,QHBoxLayout,QLabel,
     QMainWindow,QMessageBox,QPlainTextEdit,QPushButton,QVBoxLayout,QWidget)
 
 BASE=Path(__file__).resolve().parent
+
+class ScanWorker(QObject):
+    finished = Signal(dict)
+    failed = Signal(str)
+    done = Signal()
+
+    def __init__(self, root, destination):
+        super().__init__()
+        self.root, self.destination = root, destination
+
+    @Slot()
+    def run(self):
+        try:
+            from index_geology_archive import scan
+            self.finished.emit(scan(self.root, self.destination))
+        except Exception as exc:
+            self.failed.emit(str(exc))
+        finally:
+            self.done.emit()
+
 
 class ArchiveManager(QMainWindow):
     def __init__(self):
@@ -14,6 +35,9 @@ class ArchiveManager(QMainWindow):
         self.setWindowTitle("CV-1 — Геологическая база и обучение ИИ | диагностика v5")
         self.resize(850,500)
         self.root=None
+        self.scan_thread=None
+        self.open_review_after_scan=False
+        self.action_buttons=[]
         self.output_dir=BASE/"_cv1_local_indexes"
         self.path_label=QLabel("Папка не выбрана")
         self.status=QPlainTextEdit()
@@ -37,6 +61,8 @@ class ArchiveManager(QMainWindow):
             button=QPushButton(title)
             button.clicked.connect(fn)
             row.addWidget(button)
+            if title in ("Сканировать","Проверить фото ↔ Excel"):
+                self.action_buttons.append(button)
         layout.addLayout(row)
         layout.addWidget(self.status)
         self.setCentralWidget(body)
@@ -65,14 +91,57 @@ class ArchiveManager(QMainWindow):
             return False
         return True
 
-    def scan(self):
-        if not self._ready(): return
-        from index_geology_archive import scan
-        try:
-            result=scan(self.root,self.index_dir())
-            self.status.appendPlainText(json.dumps(result,ensure_ascii=False,indent=2))
-        except Exception as exc:
-            QMessageBox.critical(self,"Ошибка индексации",str(exc))
+    def scan(self, open_review=False):
+        if not self._ready():
+            return
+        if self.scan_thread is not None:
+            self.status.appendPlainText("Индексация уже выполняется. Дождитесь завершения.")
+            return
+        self.open_review_after_scan = open_review
+        self.status.appendPlainText("Сканирование запущено в фоновом потоке. Окно остаётся доступным.")
+        for button in self.action_buttons:
+            button.setEnabled(False)
+        self.scan_thread=QThread(self)
+        self.scan_worker=ScanWorker(self.root,self.index_dir())
+        self.scan_worker.moveToThread(self.scan_thread)
+        self.scan_thread.started.connect(self.scan_worker.run)
+        self.scan_worker.finished.connect(self._scan_complete)
+        self.scan_worker.failed.connect(self._scan_failed)
+        self.scan_worker.done.connect(self.scan_thread.quit)
+        self.scan_worker.done.connect(self.scan_worker.deleteLater)
+        self.scan_thread.finished.connect(self._scan_cleanup)
+        self.scan_thread.start()
+
+    @Slot(dict)
+    def _scan_complete(self, result):
+        self.status.appendPlainText("Индексация завершена:\\n"+json.dumps(result,ensure_ascii=False,indent=2))
+        if self.open_review_after_scan:
+            self._show_review()
+
+    @Slot(str)
+    def _scan_failed(self, message):
+        self.status.appendPlainText("Ошибка индексации: "+message)
+        QMessageBox.critical(self,"Ошибка индексации",message)
+
+    @Slot()
+    def _scan_cleanup(self):
+        thread=self.scan_thread
+        self.scan_thread=None
+        self.scan_worker=None
+        self.open_review_after_scan=False
+        for button in self.action_buttons:
+            button.setEnabled(True)
+        if thread is not None:
+            thread.deleteLater()
+
+    def _show_review(self):
+        path=self.index_dir()/"archive_index.json"
+        if not path.exists():
+            QMessageBox.warning(self,"Нет индекса","Сначала выполните сканирование.")
+            return
+        from review_geology_pairs import ReviewWindow
+        self.review_window=ReviewWindow(path)
+        self.review_window.show()
 
     def diagnose(self):
         if not self._ready(): return
@@ -114,21 +183,7 @@ class ArchiveManager(QMainWindow):
             QMessageBox.critical(self, "Ошибка диагностики", str(exc))
 
     def review(self):
-        if not self._ready(): return
-        # Never open a stale index after updating the parser/filter.
-        from index_geology_archive import scan
-        try:
-            summary = scan(self.root, self.index_dir())
-            self.status.appendPlainText(
-                "Индекс пересобран перед проверкой: " +
-                json.dumps(summary, ensure_ascii=False))
-        except Exception as exc:
-            QMessageBox.critical(self, "Ошибка обновления индекса", str(exc))
-            return
-        path=self.index_dir()/"archive_index.json"
-        from review_geology_pairs import ReviewWindow
-        self.review_window=ReviewWindow(path)
-        self.review_window.show()
+        self.scan(open_review=True)
 
     def depth_mapping(self):
         if not self._ready(): return
