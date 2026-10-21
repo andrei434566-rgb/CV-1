@@ -201,13 +201,45 @@ class ReviewWindow(QMainWindow):
             image = read_bgr_image(self.pairs[i]["photo"])
             if self.recognizer is None:
                 self.recognizer = CoreColumnRecognizer()
-            self.core_boxes = self.recognizer.recognize(image, orientation="auto")
+            self.core_boxes = self._select_lanes(self.recognizer.recognize(image, orientation="auto"))
             self.render_photo()
             self.details.append(f"\nKern Analyzer: найдено {len(self.core_boxes)} столбиков/рядов. Проверьте контуры.")
         except Exception as exc:
             self.details.append(f"\nДетектор: {exc}")
             if not silent:
                 QMessageBox.warning(self, "Детектор керна", str(exc))
+
+    @staticmethod
+    def _select_lanes(boxes):
+        """Keep coherent long core lanes; reject ruler fragments and nested detections."""
+        valid=[]
+        for b in boxes:
+            w=float(b["right"])-float(b["left"])
+            h=float(b["bottom"])-float(b["top"])
+            if w>0 and h>0 and h/w>=2.2:
+                valid.append(b)
+        if not valid:
+            return []
+        # Select the dominant lane-height group, not arbitrary tiny boxes.
+        peak=max(float(b["bottom"])-float(b["top"]) for b in valid)
+        valid=[b for b in valid if float(b["bottom"])-float(b["top"])>=0.65*peak]
+        valid.sort(key=lambda b: (b["left"],b["top"]))
+        selected=[]
+        for b in valid:
+            x1,x2=float(b["left"]),float(b["right"])
+            y1,y2=float(b["top"]),float(b["bottom"])
+            duplicate=False
+            for a in selected:
+                ax1,ax2=float(a["left"]),float(a["right"])
+                ay1,ay2=float(a["top"]),float(a["bottom"])
+                ix=max(0,min(x2,ax2)-max(x1,ax1))
+                iy=max(0,min(y2,ay2)-max(y1,ay1))
+                if ix*iy>0.6*min((x2-x1)*(y2-y1),(ax2-ax1)*(ay2-ay1)):
+                    duplicate=True
+                    break
+            if not duplicate:
+                selected.append(b)
+        return selected
 
     def render_photo(self):
         if self.original_pixmap.isNull():
@@ -235,6 +267,20 @@ class ReviewWindow(QMainWindow):
         # Never treat these bands as validated segmentation labels.
         span = pair.get("photo_depth")
         matches = pair.get("matches", [])
+        # Multiple Excel rows can represent the same layer or overlap because
+        # of aggregate records. Never paint overlapping facies as independent
+        # ground truth; choose the narrowest interval and flag uncertainty.
+        filtered=[]
+        for m in sorted(matches, key=lambda v: (float(v["bottom"])-float(v["top"]), -float(v.get("overlap_fraction") or 0))):
+            try:
+                a,b=float(m["top"]),float(m["bottom"])
+            except (TypeError,ValueError,KeyError):
+                continue
+            if b<=a: continue
+            if any(min(b,float(n["bottom"]))-max(a,float(n["top"])) > 0.02 for n in filtered):
+                continue
+            filtered.append(m)
+        matches=sorted(filtered,key=lambda v:float(v["top"]))
         lanes = sorted(self.core_boxes, key=lambda b:(b["left"],b["top"]))
         if span and len(span)==2 and span[1]>span[0] and lanes:
             widths=[max(1,b["bottom"]-b["top"]) for b in lanes]
@@ -262,8 +308,7 @@ class ReviewWindow(QMainWindow):
                     painter.drawText(x1+2,y1+14,str(m.get("facies_index") or m.get("facies") or "фация")[:14])
                     displayed+=1
                 cursor=lane_end
-            if displayed==0:
-                self.details.append("Нет отдельных фаций для подсветки: проверьте столбцы Excel и повторите сканирование.")
+            # Rendering must not mutate the diagnostic text panel.
         painter.fillRect(0,0,canvas.width(),25,QColor(25,25,25,220))
         painter.setPen(QColor("white"))
         painter.drawText(8,18,"ЗЕЛЁНЫЙ: КЕРН | ЖЁЛТЫЙ: ПРЕДВАРИТЕЛЬНЫЕ ФАЦИИ")
