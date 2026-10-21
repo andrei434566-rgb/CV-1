@@ -11,7 +11,7 @@ BASE=Path(__file__).resolve().parent
 class ArchiveManager(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("CV-1 — Геологическая база и обучение ИИ | диагностика v4")
+        self.setWindowTitle("CV-1 — Геологическая база и обучение ИИ | диагностика v5")
         self.resize(850,500)
         self.root=None
         self.output_dir=BASE/"_cv1_local_indexes"
@@ -115,10 +115,17 @@ class ArchiveManager(QMainWindow):
 
     def review(self):
         if not self._ready(): return
-        path=self.index_dir()/"archive_index.json"
-        if not path.exists():
-            QMessageBox.information(self,"Нет индекса","Сначала нажмите «Сканировать».")
+        # Never open a stale index after updating the parser/filter.
+        from index_geology_archive import scan
+        try:
+            summary = scan(self.root, self.index_dir())
+            self.status.appendPlainText(
+                "Индекс пересобран перед проверкой: " +
+                json.dumps(summary, ensure_ascii=False))
+        except Exception as exc:
+            QMessageBox.critical(self, "Ошибка обновления индекса", str(exc))
             return
+        path=self.index_dir()/"archive_index.json"
         from review_geology_pairs import ReviewWindow
         self.review_window=ReviewWindow(path)
         self.review_window.show()
