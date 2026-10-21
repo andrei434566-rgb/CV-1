@@ -141,7 +141,14 @@ def scan(root: Path, output: Path):
             # physically consistent layer thickness. Reject aggregate rows.
             thickness = row.get("thickness")
             depth_length = row["bottom"] - row["top"]
-            if overlap > 0 and row.get("facies_index") and thickness is not None and abs(float(thickness)-depth_length) <= max(0.05, depth_length*0.05):
+            # A whole-photo interval is an aggregate, not a separately mapped facies.
+            # Facies names can exist even when the index is blank; do not discard them.
+            is_sublayer = depth_length < (span[1] - span[0]) - 0.01
+            has_label = bool(str(row.get("facies_index") or "").strip() or
+                             str(row.get("facies") or "").strip())
+            consistent = (thickness is None or
+                          abs(float(thickness) - depth_length) <= max(0.05, depth_length * 0.05))
+            if overlap > 0 and is_sublayer and has_label and consistent:
                 matches.append(dict(excel=row["file"], sheet=row["sheet"], row=row["row"],
                                     top=row["top"], bottom=row["bottom"],
                                     overlap_fraction=round(overlap / (span[1] - span[0]), 4),
