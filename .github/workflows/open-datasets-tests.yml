@@ -10,6 +10,10 @@ on:
       - "app/ui/dialogs/open_dataset*"
       - "test_open_dataset*"
       - "test_cv_training_runtime.py"
+      - "scripts/prepare_qwen_source_pilot.py"
+      - "scripts/train_qwen_source_pilot.py"
+      - "test_qwen_source_pilot.py"
+      - "test_qwen_pilot_runner.py"
       - ".github/workflows/open-datasets-tests.yml"
   push:
     paths:
@@ -19,6 +23,10 @@ on:
       - "app/ui/dialogs/open_dataset*"
       - "test_open_dataset*"
       - "test_cv_training_runtime.py"
+      - "scripts/prepare_qwen_source_pilot.py"
+      - "scripts/train_qwen_source_pilot.py"
+      - "test_qwen_source_pilot.py"
+      - "test_qwen_pilot_runner.py"
       - ".github/workflows/open-datasets-tests.yml"
 
 jobs:
@@ -42,3 +50,4 @@ jobs:
           python -m unittest -v test_open_dataset_sources test_open_dataset_import
           test_open_dataset_intervals test_open_dataset_library test_open_dataset_review
           test_cv_training_runtime
+          test_qwen_source_pilot test_qwen_pilot_runner
