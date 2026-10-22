@@ -113,6 +113,7 @@ def scan(root: Path, output: Path):
     photos, intervals, documents, errors = [], [], [], []
     excluded_uv = []
     suspected_uv = []
+    photo_warnings = []
     wells = [p for p in root.iterdir() if p.is_dir() and p.resolve() != output
              and p.name.casefold() not in THEORY_NAMES and not p.name.startswith("_index_cv1")]
     for folder in sorted(wells):
@@ -126,7 +127,7 @@ def scan(root: Path, output: Path):
                     continue
                 if likely_uv_visual(file):
                     suspected_uv.append(str(file))
-                    continue
+                    # Visual UV detection is uncertain: retain the image for review.
                 photos.append(dict(well=folder.name, file=str(file), interval=filename_interval(file.stem), depth_status=filename_interval_status(file.stem)))
             elif suffix in SHEET_EXT and not file.name.startswith("~$"):
                 rows, error = excel_intervals(file)
@@ -135,7 +136,15 @@ def scan(root: Path, output: Path):
                 intervals.extend(dict(well=folder.name, **row) for row in rows)
             elif suffix in DOC_EXT:
                 documents.append(dict(well=folder.name, file=str(file), type="well_document"))
+    # Also support archives where photos are placed directly at root.
     for file in root.iterdir():
+        if file.is_file() and file.suffix.casefold() in IMAGE_EXT:
+            if uv_filename(file):
+                excluded_uv.append(str(file))
+            else:
+                if likely_uv_visual(file):
+                    suspected_uv.append(str(file))
+                photos.append(dict(well=root.name, file=str(file), interval=filename_interval(file.stem), depth_status=filename_interval_status(file.stem)))
         if file.is_file() and file.suffix.casefold() in DOC_EXT | SHEET_EXT:
             documents.append(dict(well=None, file=str(file), type="root_theory"))
         elif file.is_dir() and file.name.casefold() in THEORY_NAMES:
