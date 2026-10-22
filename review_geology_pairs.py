@@ -7,6 +7,7 @@ Requires PySide6. Never changes source photos or spreadsheets.
 from __future__ import annotations
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from index_geology_archive import uv_filename, likely_uv_visual
@@ -86,6 +87,9 @@ class ReviewWindow(QMainWindow):
         save_depth.clicked.connect(self.save_box_depth)
         depths.addWidget(save_depth)
         right_layout.addLayout(depths)
+        ocr_button = QPushButton("Распознать паспорт (OCR) — проверить результат")
+        ocr_button.clicked.connect(self.read_box_label)
+        right_layout.addWidget(ocr_button)
         right_layout.addWidget(QLabel("Интервал фотографии / статус"))
         right_layout.addWidget(self.details, 1)
         right_layout.addWidget(QLabel("Кандидат из Excel (выбери соответствующий интервал)"))
@@ -157,6 +161,61 @@ class ReviewWindow(QMainWindow):
             if not any(min(b,float(v['bottom']))-max(a,float(v['top']))>0.02 for v in result):
                 result.append(d)
         return sorted(result, key=lambda x:float(x['top']))
+
+    def read_box_label(self):
+        """Offer OCR suggestions only; never confirm or export them automatically."""
+        i = self.items.currentRow()
+        if not (0 <= i < len(self.pairs)):
+            return
+        try:
+            import cv2
+            import pytesseract
+            from app.infrastructure.ml.core_column_service import read_bgr_image
+            image = read_bgr_image(self.pairs[i]["photo"])
+            if image is None or image.size == 0:
+                raise ValueError("Не удалось прочитать изображение.")
+            height, width = image.shape[:2]
+            # Printed placards are usually above the tray or beside its first
+            # lane. Search both the original orientation and a rotated copy.
+            regions = [
+                image[:max(1, int(height * 0.28)), :],
+                image[:, :max(1, int(width * 0.27))],
+            ]
+            found = []
+            for region in regions:
+                for candidate in (region, cv2.rotate(region, cv2.ROTATE_90_CLOCKWISE)):
+                    gray = cv2.cvtColor(candidate, cv2.COLOR_BGR2GRAY)
+                    gray = cv2.resize(gray, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+                    gray = cv2.GaussianBlur(gray, (3, 3), 0)
+                    for psm in (6, 11):
+                        raw = pytesseract.image_to_string(
+                            gray, config=f"--psm {psm}")
+                        for match in re.finditer(
+                            r"(?<!\\d)(\\d{2,5}[.,]\\d{1,3})\\s*[-–—]\\s*(\\d{2,5}[.,]\\d{1,3})(?!\\d)",
+                            raw,
+                        ):
+                            a, b = (float(v.replace(",", ".")) for v in match.groups())
+                            if a < b and b - a <= 5.0:
+                                found.append((a, b))
+            suggestions = sorted(set(found))
+            if suggestions:
+                self.box_top.setText(str(suggestions[0][0]))
+                self.box_bottom.setText(str(suggestions[0][1]))
+                self.details.append(
+                    "\\nOCR: предварительные интервалы " + str(suggestions[:8])
+                    + ". Сверьте цифры с паспортом и нажмите «Подтвердить» вручную."
+                )
+            else:
+                self.details.append(
+                    "\\nOCR не нашёл надёжно читаемую пару глубин. "
+                    "Введите глубины с паспорта вручную."
+                )
+        except ImportError:
+            QMessageBox.warning(self, "OCR", "Установите pytesseract и Tesseract OCR. "
+                                "Без них можно ввести глубины вручную.")
+        except Exception as exc:
+            QMessageBox.warning(self, "OCR", "Не удалось прочитать паспорт: " + str(exc)
+                                + "\\nГлубины можно ввести вручную.")
 
     def save_box_depth(self):
         i=self.items.currentRow()
