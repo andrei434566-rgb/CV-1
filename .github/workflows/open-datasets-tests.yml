@@ -32,7 +32,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -m pip install PySide6 numpy Pillow PyYAML openpyxl python-docx pypdf
+      - run: python -m pip install PySide6 numpy Pillow PyYAML openpyxl python-docx pypdf opencv-python-headless
       - name: Synthetic fixtures only; no GPU or public archives
         run: >-
           python -m unittest -v test_open_dataset_sources test_open_dataset_import
