@@ -47,6 +47,9 @@ class TrainingCenterDialog(QDialog):
         )
         intro.setWordWrap(True)
         content_layout.addWidget(intro)
+        open_sources = QPushButton("Учебные материалы из открытых источников…")
+        open_sources.clicked.connect(self._open_sources)
+        content_layout.addWidget(open_sources)
 
         catalog_box = QGroupBox("Основной справочник фаций для YOLO")
         catalog_layout = QVBoxLayout(catalog_box)
@@ -171,6 +174,10 @@ class TrainingCenterDialog(QDialog):
 
     def _import_pairs(self) -> None:
         self.main.import_excel_photo_batch()
+        self.refresh()
+
+    def _open_sources(self) -> None:
+        self.main.show_open_datasets()
         self.refresh()
 
     def _import_selected_photos(self) -> None:

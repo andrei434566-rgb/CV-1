@@ -35,7 +35,7 @@ from app.infrastructure.expert_corrections import exact_correction, reassign_pro
 from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES, has_complete_core_column_coverage, postprocess_detections
 from app.infrastructure.image_loading import load_working_pixmap
 from app.infrastructure.lithology_attribute_service import LithologyAttributeService
-from app.infrastructure.local_chat_intents import hide_unsolicited_sources, needs_local_knowledge, needs_selected_image, quick_reply, wants_folder_search, wants_photo_file, wants_sources
+from app.infrastructure.local_chat_intents import hide_unsolicited_sources, needs_local_knowledge, needs_selected_image, quick_reply, wants_folder_search, wants_open_datasets, wants_photo_file, wants_sources
 from app.infrastructure.local_search_worker import LocalSearchWorker
 from app.infrastructure.local_theory_lookup import lookup_theory_answer
 from app.infrastructure.local_vlm_client import LocalVlmClient
@@ -69,6 +69,7 @@ from app.ui.dialogs.log_editor_dialog import LogEditorDialog
 from app.ui.dialogs.lithology_palette_dialog import FaciesPaletteDialog, LithologyPaletteDialog
 from app.ui.dialogs.local_vlm_settings_dialog import LocalVlmSettingsDialog
 from app.ui.dialogs.training_center_dialog import TrainingCenterDialog
+from app.ui.dialogs.open_datasets_dialog import OpenDatasetsDialog
 from app.ui.dialogs.photo_interval_dialog import PhotoIntervalDialog
 from app.ui.dialogs.photo_interval_mapping_dialog import PhotoIntervalMappingDialog
 from app.ui.dialogs.well_depth_dialog import WellDepthDialog
@@ -688,6 +689,7 @@ class MainWindow(QMainWindow):
         self._assistant_visibility_action.setChecked(True)
         self._assistant_visibility_action.toggled.connect(self._set_assistant_visible)
         tools_menu.addAction("Настроить помощника и папки…", self.configure_local_vlm)
+        tools_menu.addAction("Учебные материалы из открытых источников…", self.show_open_datasets)
         header.addWidget(settings)
 
         nav_layout = self._sidebar_layout
@@ -889,6 +891,9 @@ class MainWindow(QMainWindow):
             add(Path(self._vlm_target[0].path).parent)
         if self._chat_photo_path is not None:
             add(self._chat_photo_path.parent)
+        from app.infrastructure.open_dataset_library import prepared_knowledge_folders
+        for folder in prepared_knowledge_folders(user_data_root() / "open_datasets"):
+            add(folder)
         for folder in self._local_vlm_config()["folders"]:
             add(folder)
         add(bundled_root() / "app" / "resources" / "theory")
@@ -912,6 +917,50 @@ class MainWindow(QMainWindow):
     def show_training_center(self) -> None:
         dialog = TrainingCenterDialog(self)
         dialog.exec()
+
+    def show_open_datasets(self, *, source_id: str | None = None, files: list[Path] | None = None) -> None:
+        dialog = OpenDatasetsDialog(self, source_id=source_id, files=files)
+        dialog.materials_ready.connect(self._open_dataset_prepared)
+        dialog.exec()
+
+    def _open_dataset_prepared(self, result: dict) -> None:
+        if result.get("operation") == "reviewed_pairs":
+            self.assistant_panel.append_message(
+                "system", f"Подключены проверенные описания: {result['counts']['train']} для обучения, "
+                f"{result['counts']['holdout']} оставлены для контроля по другим скважинам."
+            )
+            return
+        knowledge = Path(str(result.get("knowledge_dir") or "__missing__"))
+        if knowledge.is_dir():
+            folders = list(self._local_vlm_config()["folders"])
+            if str(knowledge) not in folders:
+                folders.append(str(knowledge))
+                self._settings.setValue("vlm/knowledge_folders_json", json.dumps(folders, ensure_ascii=False))
+                self._settings.sync()
+        self.assistant_panel.append_message(
+            "system", "Учебные материалы подготовлены. Исходные классы и описания сохранены; "
+            "проверьте их перед обучением. Документы источника доступны для локального поиска."
+            if knowledge.is_dir() else
+            "Учебные материалы подготовлены по классам источника. Результат и обучение доступны в окне учебных материалов."
+        )
+
+    def _attach_dataset_archives(self, paths: list[Path]) -> None:
+        from app.infrastructure.open_dataset_library import identify_archive
+        from app.infrastructure.open_dataset_sources import list_sources
+        grouped: dict[str | None, list[Path]] = {}
+        for path in paths:
+            grouped.setdefault(identify_archive(path), []).append(path)
+        for identifier, archives in grouped.items():
+            if identifier is None:
+                sources = list_sources()
+                value, accepted = QInputDialog.getItem(
+                    self, "Учебный архив", "Выберите источник добавленного архива:",
+                    [source.name_ru for source in sources], 0, False,
+                )
+                if not accepted:
+                    continue
+                identifier = next(source.id for source in sources if source.name_ru == value)
+            self.show_open_datasets(source_id=identifier, files=archives)
 
     def _load_global_primary_catalog(self) -> dict | None:
         path = str(self._settings.value("facies/primary_catalog_snapshot", "") or "")
@@ -1017,7 +1066,7 @@ class MainWindow(QMainWindow):
         start = str(self._chat_photo_path.parent) if self._chat_photo_path else ""
         filenames, _ = QFileDialog.getOpenFileNames(
             self, "Добавить материалы в чат", start,
-            "Фото, Excel и документы (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.webp *.xlsx *.xlsm *.xls *.csv *.tsv *.txt *.md *.pdf *.docx *.json *.jsonl);;Все файлы (*)",
+            "Фото, Excel, документы и учебные архивы (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.webp *.xlsx *.xlsm *.xls *.csv *.tsv *.txt *.md *.pdf *.docx *.json *.jsonl *.zip);;Все файлы (*)",
         )
         if not filenames:
             return
@@ -1034,12 +1083,15 @@ class MainWindow(QMainWindow):
         images = [path for path in paths if path.suffix.casefold() in image_suffixes]
         excels = [path for path in paths if path.suffix.casefold() in excel_suffixes]
         documents = [path for path in paths if path.suffix.casefold() in document_suffixes]
+        archives = [path for path in paths if path.suffix.casefold() == ".zip"]
+        if archives:
+            self._attach_dataset_archives(archives)
         for path in documents + excels:
             self._add_chat_document(path)
         if len(excels) > 1:
             self.assistant_panel.append_message("system", f"Таблиц добавлено: {len(excels)}. Для сопоставления с фото использую «{excels[0].name}»; остальные доступны для вопросов в чате.")
         for path in paths:
-            if path not in images + excels + documents:
+            if path not in images + excels + documents + archives:
                 self.assistant_panel.append_message("system", f"Тип файла «{path.name}» пока не поддерживается.")
         if images:
             try:
@@ -1266,6 +1318,9 @@ class MainWindow(QMainWindow):
 
     def _send_vlm_chat(self, question: str) -> None:
         self.assistant_panel.append_message("user", question)
+        if wants_open_datasets(question):
+            self.show_open_datasets()
+            return
         if wants_photo_file(question):
             self._search_local_folders(question, display_question=False)
             return

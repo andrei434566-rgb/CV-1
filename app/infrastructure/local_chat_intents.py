@@ -78,6 +78,12 @@ def wants_sources(message: str) -> bool:
     ))
 
 
+def wants_open_datasets(message: str) -> bool:
+    phrase = _normalize(message)
+    return bool(re.search(r"\b(?:открой|покажи|добавь|загрузи|скачай)\b", phrase)
+                and re.search(r"\b(?:датасет\w*|учебн\w* материал\w*|открыты\w* набор\w*)\b", phrase))
+
+
 def wants_folder_search(message: str) -> bool:
     """Send explicit file-search requests to the local index, not to the VLM."""
     phrase = _normalize(message)

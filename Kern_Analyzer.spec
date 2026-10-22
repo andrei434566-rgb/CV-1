@@ -7,6 +7,8 @@ from pathlib import Path
 datas = [
     ('app', 'app'),
     ('MODEL_GUIDE.md', '.'),
+    ('README_OPEN_DATASETS_RU.md', '.'),
+    ('requirements.txt', '.'),
     ('README_EXCEL_JPG_IMPORT.md', '.'),
     ('PORTABLE_README.txt', '.'),
     ('model_blueprint', 'model_blueprint'),

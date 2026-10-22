@@ -1,0 +1,40 @@
+name: Open dataset library checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "app/infrastructure/open_dataset*"
+      - "app/infrastructure/cv_training_runtime.py"
+      - "app/infrastructure/ml/open_dataset_train.py"
+      - "app/ui/dialogs/open_dataset*"
+      - "test_open_dataset*"
+      - "test_cv_training_runtime.py"
+      - ".github/workflows/open-datasets-tests.yml"
+  push:
+    paths:
+      - "app/infrastructure/open_dataset*"
+      - "app/infrastructure/cv_training_runtime.py"
+      - "app/infrastructure/ml/open_dataset_train.py"
+      - "app/ui/dialogs/open_dataset*"
+      - "test_open_dataset*"
+      - "test_cv_training_runtime.py"
+      - ".github/workflows/open-datasets-tests.yml"
+
+jobs:
+  offline-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install PySide6 numpy Pillow PyYAML openpyxl python-docx pypdf
+      - name: Synthetic fixtures only; no GPU or public archives
+        run: >-
+          python -m unittest -v test_open_dataset_sources test_open_dataset_import
+          test_open_dataset_intervals test_open_dataset_library test_open_dataset_review
+          test_cv_training_runtime

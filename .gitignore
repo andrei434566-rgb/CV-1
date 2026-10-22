@@ -10,6 +10,7 @@ dist/
 !Kern_Analyzer.spec
 !excel_photo_model_studio/Excel_Photo_Model_Studio.spec
 outputs/
+open_datasets/
 projects/
 runs/
 spreadsheet_work/

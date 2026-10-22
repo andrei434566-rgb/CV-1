@@ -60,9 +60,14 @@ def main() -> int:
         from PySide6.QtWidgets import QApplication
         from app.domain.facies_catalog import FACIES_MODEL_CLASSES
         from app.ui.windows.main_window import MainWindow
+        from app.ui.dialogs.open_datasets_dialog import OpenDatasetsDialog
 
         app = QApplication.instance() or QApplication([])
         window = MainWindow()
+        datasets = OpenDatasetsDialog(window)
+        if datasets.table.rowCount() != 6:
+            raise RuntimeError("Portable open dataset catalog is incomplete")
+        datasets.close()
         window.close()
         app.quit()
         if len(FACIES_MODEL_CLASSES) != 92:
