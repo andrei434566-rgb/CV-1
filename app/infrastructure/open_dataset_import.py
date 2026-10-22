@@ -16,6 +16,7 @@ export; tiny components omitted from that export are counted in the manifest.
 from __future__ import annotations
 
 import base64
+import csv
 import hashlib
 import io
 import json
@@ -405,13 +406,29 @@ def _is_uv(name: str) -> bool:
     return bool(re.search(r"(?<![a-z0-9])uv(?![a-z0-9])|ультрафиолет", name.casefold()))
 
 
-def _prepare_corebreakout(inputs, stage, progress, cancel):
-    from scripts.prepare_corebreakout_yolo import load_groups
+def _load_column_groups(path: Path) -> dict[str, str]:
+    """Read the image,well_id contract without importing a training CLI."""
+    result = {}
+    with path.open(encoding="utf-8-sig", newline="") as stream:
+        reader = csv.DictReader(stream)
+        if not {"image", "well_id"}.issubset(reader.fieldnames or []):
+            raise ValueError("CSV должен содержать столбцы image,well_id")
+        for row in reader:
+            name = PurePosixPath((row.get("image") or "").strip().replace("\\", "/")).name.casefold()
+            well = (row.get("well_id") or "").strip().casefold()
+            if not name or not well or (name in result and result[name] != well):
+                raise ValueError(f"Пустая или противоречивая группа скважины для {name}")
+            result[name] = well
+    if not result:
+        raise ValueError("CSV соответствий скважинам пуст")
+    return result
 
+
+def _prepare_corebreakout(inputs, stage, progress, cancel):
     mapping = {}
     for entry in inputs.entries:
         if entry.disk and entry.source == entry.disk and entry.disk.suffix.casefold() == ".csv":
-            for key, value in load_groups(entry.disk).items():
+            for key, value in _load_column_groups(entry.disk).items():
                 if key in mapping and mapping[key] != value:
                     raise ValueError(f"Противоречивые скважины для {key}")
                 mapping[key] = value

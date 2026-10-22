@@ -142,6 +142,35 @@ class OpenDatasetImportTests(unittest.TestCase):
                 self.assertEqual(z.read(row["source"]["member"]), (Path(result["output_dir"]) / row["image"]).read_bytes())
         self.assertFalse(list(Path(result["output_dir"]).rglob("*.pkl")))
 
+    def test_corebreakout_csv_requires_complete_consistent_well_groups(self):
+        archive = self.root / "columns.zip"
+        with zipfile.ZipFile(archive, "w") as z:
+            for n in range(3):
+                name = f"photo{n}.png"
+                z.writestr(f"data/{name}", png((20 + n * 30, 40, 60)))
+                obj = {"imageWidth": 32, "imageHeight": 40, "imagePath": name, "shapes": [
+                    {"label": "col1", "points": [[4, 2], [12, 2], [12, 38], [4, 38]]},
+                ]}
+                z.writestr(f"data/photo{n}.json", json.dumps(obj))
+        groups = self.root / "wells.csv"
+        for text, pattern in (
+            ("image,well_id\nphoto0.png,A\n", "Нет группы скважины"),
+            ("image,well_id\nphoto0.png,A\nphoto0.png,B\n", "противоречивая"),
+        ):
+            groups.write_text(text, encoding="utf-8")
+            target = self.root / "invalid_groups"
+            with self.assertRaisesRegex(ValueError, pattern):
+                prepare_dataset("corebreakout", [archive, groups], target)
+            self.assert_no_destination(target)
+        groups.write_text("image,well_id\nfolder/PHOTO0.png,A\nphoto1.png,A\nphoto2.png,B\n", encoding="utf-8")
+        result = prepare_dataset("corebreakout", [archive, groups], self.root / "grouped_columns")
+        self.assertEqual("whole_well", result["split_notes"]["strategy"])
+        assignments = {}
+        for row in self.manifest(result):
+            assignments.setdefault(row["well_group"], set()).add(row["split"])
+        self.assertEqual({"a", "b"}, set(assignments))
+        self.assertTrue(all(len(s) == 1 for s in assignments.values()))
+
     def test_different_encodings_still_use_pixel_duplicate_detection(self):
         archive = self.root / "different_png_encoding.zip"
         first, second = io.BytesIO(), io.BytesIO()
