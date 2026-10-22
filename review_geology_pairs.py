@@ -125,9 +125,8 @@ class ReviewWindow(QMainWindow):
         entry = self.box_depths.get(pair['photo'])
         if entry and entry.get('confirmed'):
             return [float(entry['top']), float(entry['bottom'])]
-        span = pair.get('photo_depth')
-        if pair.get('depth_source') == 'filename_short_interval' and span and 0 < float(span[1])-float(span[0]) <= 5.0:
-            return [float(span[0]),float(span[1])]
+        # Filename intervals are drilling metadata or unverified candidates.
+        # Only a manually confirmed printed box label authorizes depth mapping.
         return None
 
     def _box_matches(self, pair):
@@ -297,31 +296,62 @@ class ReviewWindow(QMainWindow):
 
     @staticmethod
     def _select_lanes(boxes):
-        """Keep coherent long core lanes; reject ruler fragments and nested detections."""
-        valid=[]
+        """Choose complete parallel core rows, not transverse strips or foreground objects.
+
+        The detector can return either vertical columns or horizontal rows.
+        Require a dominant orientation, similar long-axis lengths, and
+        non-overlapping parallel lanes. An outlier (e.g. shoes below the tray)
+        is not automatically accepted as another core row.
+        """
+        candidates = []
         for b in boxes:
-            w=float(b["right"])-float(b["left"])
-            h=float(b["bottom"])-float(b["top"])
-            if w>0 and h>0 and h/w>=2.2:
-                valid.append(b)
-        if not valid:
+            try:
+                w = float(b["right"]) - float(b["left"])
+                h = float(b["bottom"]) - float(b["top"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            if min(w, h) <= 0:
+                continue
+            ratio = max(w, h) / min(w, h)
+            if ratio < 2.4:
+                continue
+            orientation = "horizontal" if w > h else "vertical"
+            candidates.append((b, orientation, max(w, h), min(w, h)))
+        if not candidates:
             return []
-        # Select the dominant lane-height group, not arbitrary tiny boxes.
-        peak=max(float(b["bottom"])-float(b["top"]) for b in valid)
-        valid=[b for b in valid if float(b["bottom"])-float(b["top"])>=0.65*peak]
-        valid.sort(key=lambda b: (b["left"],b["top"]))
-        selected=[]
-        for b in valid:
-            x1,x2=float(b["left"]),float(b["right"])
-            y1,y2=float(b["top"]),float(b["bottom"])
-            duplicate=False
+        # Majority by coherent total long-axis support, not the widest
+        # isolated rectangle, which may be the ruler or the tray itself.
+        scores = {}
+        for _, orient, length, _ in candidates:
+            scores[orient] = scores.get(orient, 0) + length
+        dominant = max(scores, key=scores.get)
+        group = [c for c in candidates if c[1] == dominant]
+        lengths = sorted(c[2] for c in group)
+        median = lengths[len(lengths) // 2]
+        group = [c for c in group if 0.65 * median <= c[2] <= 1.45 * median]
+        if not group:
+            return []
+        # Prefer boxes with consistent transverse width, rejecting spurious
+        # skinny dividers and oversized regions.
+        thicknesses = sorted(c[3] for c in group)
+        thickness = thicknesses[len(thicknesses) // 2]
+        group = [c for c in group if 0.45 * thickness <= c[3] <= 1.8 * thickness]
+        group.sort(key=lambda c: (c[0]["top"], c[0]["left"]) if dominant == "horizontal"
+                   else (c[0]["left"], c[0]["top"]))
+        selected = []
+        for b, _, _, _ in group:
+            x1, x2 = float(b["left"]), float(b["right"])
+            y1, y2 = float(b["top"]), float(b["bottom"])
+            area = (x2 - x1) * (y2 - y1)
+            duplicate = False
             for a in selected:
-                ax1,ax2=float(a["left"]),float(a["right"])
-                ay1,ay2=float(a["top"]),float(a["bottom"])
-                ix=max(0,min(x2,ax2)-max(x1,ax1))
-                iy=max(0,min(y2,ay2)-max(y1,ay1))
-                if ix*iy>0.6*min((x2-x1)*(y2-y1),(ax2-ax1)*(ay2-ay1)):
-                    duplicate=True
+                ax1, ax2 = float(a["left"]), float(a["right"])
+                ay1, ay2 = float(a["top"]), float(a["bottom"])
+                overlap = max(0, min(x2, ax2) - max(x1, ax1)) * max(
+                    0, min(y2, ay2) - max(y1, ay1))
+                other_area = (ax2 - ax1) * (ay2 - ay1)
+                if overlap > 0.45 * min(area, other_area):
+                    duplicate = True
                     break
             if not duplicate:
                 selected.append(b)
@@ -349,7 +379,7 @@ class ReviewWindow(QMainWindow):
             h=round((box["bottom"]-box["top"])*sy)
             painter.drawRect(x,y,w,h)
             painter.drawText(x+4,y+18,f"Керн {n}")
-        # Provisional mapping: lane lengths define relative photo depth.
+        # Provisional mapping after explicit confirmation of printed box depths.
         # Never treat these bands as validated segmentation labels.
         span = self._box_span(pair)
         matches = self._box_matches(pair)
@@ -367,9 +397,11 @@ class ReviewWindow(QMainWindow):
                 continue
             filtered.append(m)
         matches=sorted(filtered,key=lambda v:float(v["top"]))
-        lanes = sorted(self.core_boxes, key=lambda b:(b["left"],b["top"]))
+        # Depth runs along each row's long axis; row order follows tray layout.
+        horizontal = sum((b["right"]-b["left"]) > (b["bottom"]-b["top"]) for b in self.core_boxes) > len(self.core_boxes)/2
+        lanes = sorted(self.core_boxes, key=(lambda b:(b["top"],b["left"])) if horizontal else (lambda b:(b["left"],b["top"])))
         if span and len(span)==2 and span[1]>span[0] and lanes:
-            widths=[max(1,b["bottom"]-b["top"]) for b in lanes]
+            widths=[max(1,(b["right"]-b["left"]) if horizontal else (b["bottom"]-b["top"])) for b in lanes]
             full=sum(widths)
             cursor=float(span[0])
             displayed=0
@@ -384,10 +416,16 @@ class ReviewWindow(QMainWindow):
                         continue
                     lo,hi=max(cursor,top),min(lane_end,bottom)
                     if hi<=lo: continue
-                    y1=round((box["top"]+(lo-cursor)/(lane_end-cursor)*(box["bottom"]-box["top"]))*sy)
-                    y2=round((box["top"]+(hi-cursor)/(lane_end-cursor)*(box["bottom"]-box["top"]))*sy)
-                    x1=round(box["left"]*sx)
-                    x2=round(box["right"]*sx)
+                    if horizontal:
+                        x1=round((box["left"]+(lo-cursor)/(lane_end-cursor)*(box["right"]-box["left"]))*sx)
+                        x2=round((box["left"]+(hi-cursor)/(lane_end-cursor)*(box["right"]-box["left"]))*sx)
+                        y1=round(box["top"]*sy)
+                        y2=round(box["bottom"]*sy)
+                    else:
+                        y1=round((box["top"]+(lo-cursor)/(lane_end-cursor)*(box["bottom"]-box["top"]))*sy)
+                        y2=round((box["top"]+(hi-cursor)/(lane_end-cursor)*(box["bottom"]-box["top"]))*sy)
+                        x1=round(box["left"]*sx)
+                        x2=round(box["right"]*sx)
                     painter.fillRect(x1,y1,max(2,x2-x1),max(2,y2-y1),QColor(255,185,40,85))
                     painter.setPen(QPen(QColor(255,190,40),2))
                     painter.drawRect(x1,y1,max(2,x2-x1),max(2,y2-y1))
