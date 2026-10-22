@@ -191,7 +191,7 @@ class ReviewWindow(QMainWindow):
                         raw = pytesseract.image_to_string(
                             gray, config=f"--psm {psm}")
                         for match in re.finditer(
-                            r"(?<!\\d)(\\d{2,5}[.,]\\d{1,3})\\s*[-–—]\\s*(\\d{2,5}[.,]\\d{1,3})(?!\\d)",
+                            r"(?<!\d)(\d{2,5}[.,]\d{1,3})\s*[-–—]\s*(\d{2,5}[.,]\d{1,3})(?!\d)",
                             raw,
                         ):
                             a, b = (float(v.replace(",", ".")) for v in match.groups())
@@ -202,12 +202,12 @@ class ReviewWindow(QMainWindow):
                 self.box_top.setText(str(suggestions[0][0]))
                 self.box_bottom.setText(str(suggestions[0][1]))
                 self.details.append(
-                    "\\nOCR: предварительные интервалы " + str(suggestions[:8])
+                    "\nOCR: предварительные интервалы " + str(suggestions[:8])
                     + ". Сверьте цифры с паспортом и нажмите «Подтвердить» вручную."
                 )
             else:
                 self.details.append(
-                    "\\nOCR не нашёл надёжно читаемую пару глубин. "
+                    "\nOCR не нашёл надёжно читаемую пару глубин. "
                     "Введите глубины с паспорта вручную."
                 )
         except ImportError:
