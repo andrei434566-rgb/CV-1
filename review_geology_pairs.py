@@ -24,14 +24,14 @@ class ReviewWindow(QMainWindow):
         super().__init__()
         self.index_file = index_file.resolve()
         self.data = json.loads(self.index_file.read_text(encoding="utf-8"))
-        excluded = set(self.data.get("excluded_uv", [])) | set(self.data.get("suspected_uv", []))
+        excluded = set(self.data.get("excluded_uv", []))
         self.pairs = [
             p for p in self.data.get("pairs", [])
             if p.get("photo") and p["photo"] not in excluded
             and not uv_filename(Path(p["photo"]))
-            and not likely_uv_visual(Path(p["photo"]))
         ]
         self.hidden_uv_count = len(self.data.get("pairs", [])) - len(self.pairs)
+        self.suspected_uv = set(self.data.get("suspected_uv", []))
         self.review_file = self.index_file.with_name("pair_decisions.json")
         self.decisions = self._load_decisions()
         self.box_depth_file = self.index_file.with_name('verified_box_depths.json')
@@ -246,7 +246,8 @@ class ReviewWindow(QMainWindow):
     def _label(self, i, pair):
         name = Path(pair.get("photo", "")).name
         status = self.decisions.get(pair.get("photo", ""), {}).get("decision", "не проверено")
-        return f"{i+1}. {pair.get('well', '?')} / {name} [{status}]"
+        uv_note = " [УФ?]" if pair.get("photo") in self.suspected_uv else ""
+        return f"{i+1}. {pair.get('well', '?')} / {name} [{status}]{uv_note}"
 
     def show_pair(self, index):
         self.candidates.blockSignals(True)
@@ -442,6 +443,26 @@ class ReviewWindow(QMainWindow):
         # Never treat these bands as validated segmentation labels.
         span = self._box_span(pair)
         matches = self._box_matches(pair)
+        preliminary = False
+        if not span:
+            # Display unverified filename overlap as a visual hint only.
+            # It is NEVER a confirmed depth assignment or training label.
+            proposed = pair.get("photo_depth")
+            if (isinstance(proposed, list) and len(proposed) == 2
+                    and pair.get("depth_source") == "filename_short_interval"):
+                try:
+                    a, b = float(proposed[0]), float(proposed[1])
+                    if a < b:
+                        span = [a, b]
+                        preliminary = True
+                        matches = [d for d in self.data.get("descriptions", [])
+                                   if d.get("well") == pair.get("well")
+                                   and d.get("top") is not None and d.get("bottom") is not None
+                                   and float(d["top"]) < b and float(d["bottom"]) > a
+                                   and (d.get("facies_index") or d.get("facies"))]
+                except (TypeError, ValueError):
+                    span = None
+                    matches = []
         # Multiple Excel rows can represent the same layer or overlap because
         # of aggregate records. Never paint overlapping facies as independent
         # ground truth; choose the narrowest interval and flag uncertainty.
@@ -494,7 +515,7 @@ class ReviewWindow(QMainWindow):
             # Rendering must not mutate the diagnostic text panel.
         painter.fillRect(0,0,canvas.width(),25,QColor(25,25,25,220))
         painter.setPen(QColor("white"))
-        painter.drawText(8,18,"ЗЕЛЁНЫЙ: КЕРН | ЖЁЛТЫЙ: ПРОЕКЦИЯ ПО ПАСПОРТУ" if span else "ГЛУБИНЫ ЯЩИКА НЕ ПОДТВЕРЖДЕНЫ")
+        painter.drawText(8,18,("ЖЁЛТЫЙ: ПРЕДВАРИТЕЛЬНО ПО ИМЕНИ, НЕ ДЛЯ ОБУЧЕНИЯ" if preliminary else "ЗЕЛЁНЫЙ: КЕРН | ЖЁЛТЫЙ: ПРОЕКЦИЯ ПО ПАСПОРТУ") if span else "ГЛУБИНЫ ЯЩИКА НЕ ПОДТВЕРЖДЕНЫ")
         painter.end()
         self.photo.setPixmap(canvas)
 
