@@ -1,0 +1,36 @@
+{
+  "v4_mottled_a": {
+    "answer": "Нет. Пятнистость может быть биогенной или диагенетической. Геометрия ходов и нарушение первичной слоистости поддерживают диагноз, но отдельные ходы не обязательны при полной переработке. Если доказательств нет, запишите наблюдаемую пятнистость и неопределённый генезис.",
+    "reason": "source_checked_removal_of_false_necessary_condition",
+    "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+    "geology_approved": false,
+    "sources": [
+      {
+        "source_id": "iodp_tn5_2023",
+        "title": "Marsaglia and Milliken (2023), IODP Technical Note 5: Practical guide for description and analysis of sedimentary cores",
+        "url": "https://iodp.tamu.edu/publications/TN/TNote_5.pdf",
+        "locator": "Section 4.1.4.3, PDF pages 43 and 45; color mottling, PDF page 52",
+        "accessed_date": "2026-10-25",
+        "license": "CC BY 4.0 except where otherwise noted, per PDF page 2",
+        "pdf_sha256": "ae7ecccf76831fec562735f41647dfa7cfdbac611f0bd18274d7a0ad6be4fc76"
+      }
+    ]
+  },
+  "v4_mottled_b": {
+    "answer": "Когда биогенное происхождение пятен не подтверждено. Запишите пятнистость без установленного генезиса и проверьте признаки диагенеза. Отсутствие отдельных ходов само по себе не исключает полного биотурбационного перемешивания; при необходимости помогают рентгенограммы керна.",
+    "reason": "source_checked_removal_of_false_necessary_condition",
+    "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+    "geology_approved": false,
+    "sources": [
+      {
+        "source_id": "iodp_tn5_2023",
+        "title": "Marsaglia and Milliken (2023), IODP Technical Note 5: Practical guide for description and analysis of sedimentary cores",
+        "url": "https://iodp.tamu.edu/publications/TN/TNote_5.pdf",
+        "locator": "Section 4.1.4.3, PDF pages 43 and 45; color mottling, PDF page 52",
+        "accessed_date": "2026-10-25",
+        "license": "CC BY 4.0 except where otherwise noted, per PDF page 2",
+        "pdf_sha256": "ae7ecccf76831fec562735f41647dfa7cfdbac611f0bd18274d7a0ad6be4fc76"
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "train_rows": 3,
+  "holdout_rows": 1,
+  "photo_candidates": 12,
+  "image_training_pairs": 0,
+  "question_answer_and_inventory_words": 139,
+  "license": "CC BY-NC 4.0 per journal policy",
+  "unchanged_original_block_sha256": {
+    "train.jsonl": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+    "holdout.jsonl": "6d20ec682b2f55b8a942e71b41590dbc14580acab7762b693ad02c9ebbe54dd3"
+  }
+}

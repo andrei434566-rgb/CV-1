@@ -1,0 +1,29 @@
+{
+  "tpu_yamal_nedolivko_perevertaylo_2025": {
+    "source_id": "tpu_yamal_nedolivko_perevertaylo_2025",
+    "title": "Недоливко Н.М., Перевертайло Т.Г. (2025). Особенности осадконакопления терригенных отложений в позднем апте – раннем альбе на севере Ямала",
+    "journal": "Известия Томского политехнического университета. Инжиниринг георесурсов",
+    "volume": 336,
+    "issue": 3,
+    "pages": "170–182",
+    "doi": "10.18799/24131830/2025/3/4976",
+    "url": "https://izvestiya.tpu.ru/archive/article/download/4976/3406/20807",
+    "landing_url": "https://izvestiya.tpu.ru/archive/article/view/4976",
+    "accessed_date": "2026-10-25",
+    "pdf_file": "tpu_yamal_2025_4976.pdf",
+    "pdf_sha256": "ae5fc6def7153e9df30f67b91de149f699ffbaced406349d6424375c76d76d0f",
+    "access": "Read public full article and inspected rendered original Figure 5 on printed page 177/PDF page 8.",
+    "license": "CC BY-NC 4.0, stated in the journal editorial policy, not in an article-specific notice in the PDF.",
+    "license_basis_url": "https://izvestiya.tpu.ru/archive/editorial-policy",
+    "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "license_verification": "Read official journal policy and followed its CC BY-NC link to version 4.0. No PDF-specific license notice found.",
+    "use_scope": "Noncommercial research with author/source attribution and indication of paraphrasing; no commercial permission inferred.",
+    "geology_approved": false,
+    "limitations": [
+      "Case-specific author observations and interpretation; no universal facies label.",
+      "Figure panels have no verified crop/depth assignment for training.",
+      "Panel D image annotation and caption disagree; English wording for E is unreliable.",
+      "The case-study holdout shares its article and concepts with training; not independent knowledge accuracy."
+    ]
+  }
+}

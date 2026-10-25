@@ -1,0 +1,110 @@
+{
+  "bgs_rcs": {
+    "title": "British Geological Survey: The BGS Rock Classification Scheme",
+    "url": "https://www.bgs.ac.uk/technologies/bgs-rock-classification-scheme/",
+    "locator": "Principles; Volume 3, classification of sediments and sedimentary rocks",
+    "supports": "Описательная основа названий, корневые термины и уточнения, различие названия породы и предположения о происхождении.",
+    "access": "Read full public HTML principles, not the linked pay/download material.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "iodp402_methods": {
+    "title": "IODP Expedition 402 methods",
+    "url": "https://publications.iodp.org/proceedings/402/102/402_102.html",
+    "locator": "Sections 2.4–2.6, smear slides, thin sections, X-ray diffraction",
+    "supports": "Назначение микроскопических препаратов и рентгенодифракции; положение образца и относительные оценки состава.",
+    "access": "Read full public HTML relevant sections.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "odp202_sedimentology": {
+    "title": "ODP Leg 202: Sedimentology",
+    "url": "https://iodp.tamu.edu/publications/202_IR/chap_02/c2_3.htm",
+    "locator": "Preparation of Surfaces of Core Halves; Sediment Disturbance; Color; Bioturbation",
+    "supports": "Размазывание поверхности, нарушения бурением, окисление окраски и ограничения распознавания ходов в однородном осадке.",
+    "access": "Read complete public HTML chapter.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "iodp398_methods": {
+    "title": "IODP Expedition 398 methods",
+    "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+    "locator": "Section 2.5.4, Bioturbation; Section 2.8, Smear slides",
+    "supports": "Биотурбационный индекс измеряет нарушение первичной ткани; ходы могут перекрываться и плохо различаться; шкалы экспедиционно обусловлены.",
+    "access": "Read public HTML sections 2.5.3–2.8.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "odp106_classification": {
+    "title": "Ocean Drilling Program: Geology 106 Laboratory — Sedimentary rocks and sedimentary rock classification",
+    "url": "https://www-odp.tamu.edu/curation/gcr/geol106lab/classifications.htm",
+    "locator": "Final paragraphs, Primary and Secondary sedimentary structures",
+    "supports": "Нагрузочные текстуры, внедрение песка в мягкий ил, конволюции при движении флюидов или оползании.",
+    "access": "Read complete public HTML teaching page. Simplified historical classification not adopted wholesale.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "noaa_reef": {
+    "title": "NOAA National Ocean Service: What is a coral reef made of?",
+    "url": "https://oceanservice.noaa.gov/facts/coralmadeof.html",
+    "locator": "Calcium-carbonate skeletons and successive colonies; updated 2026-09-23",
+    "supports": "Карбонатный скелет полипов, накопление колоний и органическое построение рифа.",
+    "access": "Read complete public HTML fact page.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "iodp361_summary": {
+    "title": "Hall et al. (2017), IODP Expedition 361 summary",
+    "url": "https://publications.iodp.org/proceedings/361/101/361_101.html",
+    "locator": "Sites U1475 and U1476, Sedimentology",
+    "supports": "Конкретные наблюдения пиритизированных ходов и зелёных диагенетических слоёв, содержащих пирит и глауконит.",
+    "access": "Read public HTML site sedimentology sections. Case study, not universal diagnostic rule.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "tpu_nedolivko_2018": {
+    "title": "Н. М. Недоливко, ТПУ (2018). Индивидуальное домашнее задание №1: построение литологической колонки",
+    "url": "https://portal.tpu.ru/SHARED/n/NEDOLIVKO/disc1/Tab2/IDZ_1.pdf",
+    "locator": "PDF pages 3 and 6–9; definitions of пр. and в.к.; interval descriptions",
+    "supports": "Российский пример раздельной записи проходки, выноса, особенностей слоистости и растительных остатков; легенда колонки.",
+    "access": "Read public PDF text, including definitions and examples. No images extracted or paired.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "heald_1955_abstract": {
+    "title": "Milton T. Heald (1955). Stylolites in Sandstones. The Journal of Geology 63(2):101–114",
+    "url": "https://www.journals.uchicago.edu/doi/abs/10.1086/626237",
+    "locator": "Public abstract only; doi:10.1086/626237",
+    "supports": "Растворение под давлением, швы и сутурные контакты, неодинаковая ориентировка стилолитов и отсутствие простой связи с количеством цемента.",
+    "access": "Read public abstract. Paywalled full article was not accessed or downloaded.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "kgs_concretion": {
+    "title": "Kansas Geological Survey / GeoKansas: Concretion",
+    "url": "https://geokansas.ku.edu/concretion",
+    "locator": "Concretion; Septarian Concretions",
+    "supports": "Диагенетические минеральные стяжения, разнообразие формы и времени образования; заполненные трещины септарий.",
+    "access": "Read complete public HTML geology-survey page.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "kgs_flint_hills": {
+    "title": "Kansas Geological Survey / GeoKansas: Rocks and Minerals of the Flint Hills",
+    "url": "https://geokansas.ku.edu/rocks-and-minerals-flint-hills",
+    "locator": "Chert; Limestone; Geodes",
+    "supports": "Микрокристаллический кварц в кремне, раковистый излом, конкреции и пласты в известняке; различие карбоната и кремнезёма.",
+    "access": "Read complete public HTML geology-survey page.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  },
+  "psu_reading_sedimentary": {
+    "title": "Pennsylvania State University, GEOSC 10: Reading Sedimentary Rocks",
+    "url": "https://courses.ems.psu.edu/geosc10/node/2100",
+    "locator": "Mud Cracks — Capitol Reef National Park; text and transcript",
+    "supports": "Высыхание и заполнение трещин; их сужение вниз как признак направления стратиграфического верха.",
+    "access": "Read public HTML lesson and transcript. Broad simplified environment claims not adopted.",
+    "accessed_date": "2026-10-25",
+    "geology_approved": false
+  }
+}

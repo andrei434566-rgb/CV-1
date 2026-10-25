@@ -1,0 +1,50 @@
+{
+  "schema": "theory_sources_20261025_v1",
+  "train_rows": 48,
+  "holdout_rows": 12,
+  "topics": 12,
+  "read_sources": 12,
+  "exact_old_train_question_overlap": 0,
+  "old_train_manifest_found": true,
+  "source_question_answer_words": {
+    "bgs_rcs": 120,
+    "iodp402_methods": 131,
+    "odp202_sedimentology": 137,
+    "iodp398_methods": 132,
+    "odp106_classification": 126,
+    "noaa_reef": 117,
+    "iodp361_summary": 118,
+    "tpu_nedolivko_2018": 132,
+    "heald_1955_abstract": 121,
+    "kgs_concretion": 121,
+    "kgs_flint_hills": 124,
+    "psu_reading_sedimentary": 138
+  },
+  "geology_approved": false,
+  "holdout_scope": "New phrasings of related source concepts, not topic-independent or expert-scored knowledge accuracy.",
+  "limitations": [
+    "No photo pairs or new facies labels.",
+    "Short source-checked assistant paraphrases, not geologist approval.",
+    "Several concepts overlap earlier theory; holdout is a regression/paraphrase check.",
+    "Heald 1955 uses public abstract only; no paywall access.",
+    "USGS and GIN RAN URLs that failed direct reading were excluded.",
+    "No blanket download or training permission inferred from a public webpage."
+  ],
+  "sha256": {
+    "train.jsonl": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+    "holdout.jsonl": "6d20ec682b2f55b8a942e71b41590dbc14580acab7762b693ad02c9ebbe54dd3",
+    "sources.json": "c31baa6964c28f2449b4a4eca4d3f2d4f80e94493e61807c0fada054a82d50d0",
+    "overrides.json": "9d94e3192e02a5d1ecaf16dc529b7b028047901a7e0bc53c673848ed6d8dab7b",
+    "overrides_sources.json": "fb1cb8504c755bb5df50927142e0f4b4c6e858b1229bd941bddf98c344dc4823"
+  },
+  "correction_overrides": {
+    "rows": 2,
+    "record_ids": [
+      "v4_mottled_a",
+      "v4_mottled_b"
+    ],
+    "additional_read_sources": 2,
+    "original_training_unchanged": true,
+    "note": "TN5 source checked locally; supplementary IODP303306 HTML read. Separate from the 48 new train rows."
+  }
+}

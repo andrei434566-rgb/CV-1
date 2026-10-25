@@ -1,0 +1,25 @@
+{
+  "iodp_tn5_2023": {
+    "source_id": "iodp_tn5_2023",
+    "title": "Marsaglia, K. M., and Milliken, K. L. (2023). Technical Note 5: Practical guide for description and analysis of sedimentary cores: practices developed aboard the JOIDES Resolution during ODP and IODP",
+    "url": "https://iodp.tamu.edu/publications/TN/TNote_5.pdf",
+    "doi": "https://doi.org/10.14379/iodp.tn.5.2023",
+    "locator": "Section 4.1.4.3, PDF pages 43 and 45; color mottling, PDF page 52; copyright, PDF page 2",
+    "accessed_date": "2026-10-25",
+    "access": "Downloaded public PDF and read pages 1, 2, 43, 44, 45, 52 locally with pypdf. The PDF has 83 pages.",
+    "pdf_sha256": "ae7ecccf76831fec562735f41647dfa7cfdbac611f0bd18274d7a0ad6be4fc76",
+    "license": "CC BY 4.0, except where otherwise noted, explicitly stated on PDF page 2. Preserve authors and source attribution; no blanket permission for separately credited figures is inferred.",
+    "supports": "Очень интенсивная биотурбация может гомогенизировать осадок; отсутствие распознаваемых структур не исключает полной переработки. Пятнистая окраска бывает связана с биотурбацией или диагенезом. Рентгенография иногда выявляет скрытое биотурбационное перемешивание.",
+    "geology_approved": false
+  },
+  "iodp303306_methods_supporting": {
+    "source_id": "iodp303306_methods_supporting",
+    "title": "IODP Expeditions 303/306: Site U1312–U1315 methods",
+    "url": "https://publications.iodp.org/proceedings/303_306/110/110_2.htm",
+    "locator": "Visual core description — Bioturbation",
+    "accessed_date": "2026-10-25",
+    "access": "Read full public HTML section. Supporting evidence only, not a separate new training block.",
+    "supports": "В однородном бесцветовом интервале степень биотурбации может быть неопределима в диапазоне от отсутствующей до полной.",
+    "geology_approved": false
+  }
+}

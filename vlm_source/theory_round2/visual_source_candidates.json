@@ -1,0 +1,109 @@
+{
+  "schema": "kern_future_visual_sources_v1",
+  "checked_date": "2026-10-25",
+  "integrated_into_library": false,
+  "sources": [
+    {
+      "id": "mendeley_rock_texture_7g7zpy9vcb_v1",
+      "title": "Rock Image Datasets",
+      "landing_url": "https://data.mendeley.com/datasets/7g7zpy9vcb/1",
+      "metadata_url": "https://data.mendeley.com/public-api/datasets/7g7zpy9vcb",
+      "files_metadata_url": "https://data.mendeley.com/public-api/datasets/7g7zpy9vcb/files?folder_id=root&version=1",
+      "versions_url": "https://data.mendeley.com/public-api/datasets/7g7zpy9vcb/versions",
+      "doi": "10.17632/7g7zpy9vcb.1",
+      "version": 1,
+      "published_date": "2020-06-29",
+      "contributors": ["Alexis Pascual"],
+      "attribution": "Pascual, Alexis (2020), Rock Image Datasets, Mendeley Data, V1, doi:10.17632/7g7zpy9vcb.1",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": ["Mendeley dataset landing page", "metadata.data_licence.short_name and url"],
+      "downloaded": true,
+      "artifacts": [
+        {
+          "filename": "rock_texture.mat",
+          "file_id": "6dd583b8-ac08-4751-a777-3d639289e29f",
+          "url": "https://data.mendeley.com/public-files/datasets/7g7zpy9vcb/files/6dd583b8-ac08-4751-a777-3d639289e29f/file_downloaded",
+          "bytes": 47831061,
+          "sha256": "aa5c2fe2c4a7843573b02774a345ec09000a1a1099b0ee5264781673f5d8fde7",
+          "verified_bytes_and_sha256": true,
+          "local_relative_path": "rock_texture.mat"
+        }
+      ],
+      "verified_content": {
+        "images": 711,
+        "image_array": "textural_image",
+        "array_shape": [128, 128, 3, 711],
+        "loaded_dtype": "float32",
+        "pixel_range": [0.0, 1.0],
+        "label_array": "labels",
+        "label_shape": [711, 1],
+        "counts_by_numeric_label": {"1": 78, "2": 69, "3": 82, "4": 86, "5": 87, "6": 83, "7": 70, "8": 83, "9": 73},
+        "semantic_mapping": null,
+        "source_split": null,
+        "physical_sample_ids": null,
+        "well_ids": null,
+        "unique_float_images": 711,
+        "unique_rendered_rgb_images": 711
+      },
+      "related_primary_research": [
+        {
+          "title": "Towards Natural Scene Rock Image Classification with Convolutional Neural Networks",
+          "doi": "10.1109/CCECE.2019.8861885",
+          "url": "https://doi.org/10.1109/CCECE.2019.8861885",
+          "author_uploaded_full_text": "https://www.researchgate.net/publication/336436541_Towards_Natural_Scene_Rock_Image_Classification_with_Convolutional_Neural_Networks",
+          "evidence": "Figure caption identifies a nine-class rock set, but does not establish MAT numeric ID ordering.",
+          "reported_class_set_only_not_numeric_mapping": ["Andesite", "Dolostone", "Granite", "Limestone", "Oolitic Limestone", "Peridotite", "Red Granite", "Rhyolite", "Volcanic Breccia"]
+        },
+        {
+          "title": "Automatic Image Classification for Planetary Exploration",
+          "author": "Lei Shu",
+          "url": "https://ir.lib.uwo.ca/etd/5705/",
+          "access_note": "Old thesis URL currently redirects to a repository migration notice; original full thesis not read in this audit."
+        }
+      ],
+      "status": "downloaded_quarantined_numeric_mapping_missing",
+      "training_approved": false,
+      "geology_approved": false,
+      "blockers": ["Need source-grounded numeric ID to geological class mapping", "Need physical sample or acquisition grouping before independent split", "No facies, depths, full descriptions, core boxes or segmentation labels supplied"],
+      "modifications": ["Original MAT retained unchanged", "Created numeric-ID-only contact sheet by rounding float RGB to 8-bit", "Computed hashes and inventory; no semantic labels inferred"],
+      "do_not_infer": ["Alphabetical numeric class order", "Geology class from appearance alone", "Full sedimentological description from class ID", "Independent wells or samples from 711 image count"]
+    },
+    {
+      "id": "mendeley_oxia_analogue_crpfdjb4z4_v1",
+      "title": "Original Image Dataset – Close-up Images of Martian Analogue Rocks",
+      "landing_url": "https://data.mendeley.com/datasets/crpfdjb4z4/1",
+      "doi": "10.17632/crpfdjb4z4.1",
+      "published_date": "2025-08-12",
+      "contributors": ["Gabriela Ligeza", "Tomaso R.R. Bontognali", "Nikolaus Kuhn"],
+      "attribution": "Ligeza, Gabriela; Bontognali, Tomaso R.R.; Kuhn, Nikolaus (2025), Original Image Dataset – Close-up Images of Martian Analogue Rocks, Mendeley Data, V1, doi:10.17632/crpfdjb4z4.1",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": ["Mendeley dataset landing page"],
+      "related_paper_url": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2025.1530408/full",
+      "downloaded": false,
+      "status": "metadata_only_lab_analogue_candidate",
+      "training_approved": false,
+      "geology_approved": false,
+      "blockers": ["Need Samples Summary and exact image-ID to sample-ID mapping", "Group all lighting and angle variants of one sample before splitting", "Laboratory analogue domain rather than continuous core", "Archive sizes not inspected"]
+    },
+    {
+      "id": "kigam_aihub_71753",
+      "title": "AI-based Dataset for Rock Type Classification and Joint Detection Using Bedrock Drill Core Images",
+      "landing_url": "https://data.kigam.re.kr/data/PA-45",
+      "download_page": "https://www.aihub.or.kr/aihubdata/data/view.do?currMenu=115&topMenu=100&dataSetSn=71753",
+      "doi": "10.22747/paper_data.20250731.33",
+      "contributors": ["Sooyeon Han"],
+      "attribution": "Han, Sooyeon (2025), AI-based Dataset for Rock Type Classification and Joint Detection Using Bedrock Drill Core Images, KIGAM, doi:10.22747/paper_data.20250731.33",
+      "license": "CC BY-NC reported in article appendix; exact version and AI Hub access conditions not verified",
+      "license_url": null,
+      "license_evidence": ["https://www.e-sciencecentral.org/articles/SC000056691 appendix", "KIGAM landing page license field is empty"],
+      "related_paper_doi": "10.22761/GD.2025.0028",
+      "downloaded": false,
+      "status": "metadata_only_access_and_license_review_required",
+      "training_approved": false,
+      "geology_approved": false,
+      "blockers": ["Confirm AI Hub access and license conditions before download", "Reported very large corpus; no large download authorized here", "Three broad rock types are not project sedimentary facies"]
+    }
+  ]
+}
