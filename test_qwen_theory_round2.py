@@ -344,6 +344,32 @@ class TheoryRound2Tests(unittest.TestCase):
         self.assertEqual({edit["excluded_id"] for edit in summary["training_question_exclusions"]},
                          {"v4_sand_vs_silt_a", "v4_carbonate_wacke_pack_a"})
 
+    def test_predefined_rubric_matches_all_theory_validation_pairs(self):
+        source = preparer.CONVERSATION_ROOT
+        exports, _ = preparer.build_plan(
+            preparer.THEORY_ROOT / "theory_training_v5.jsonl",
+            preparer.THEORY_ROOT / "theory_holdout_v5.jsonl",
+            source / "train.jsonl", source / "holdout.jsonl",
+            source / "conversation_train.jsonl", source / "conversation_holdout.jsonl",
+            answer_overrides=source / "overrides.json",
+            additional_theory_train=[source / "case_study_russia_train.jsonl"],
+            additional_theory_holdout=[source / "case_study_russia_holdout.jsonl"],
+        )
+        rubric = json.loads((source / "evaluation_rubric.json").read_text(encoding="utf-8"))
+        expected = {preparer.record_id(row): row for row in exports["holdout_theory"]}
+        self.assertEqual(rubric["record_count"], 37)
+        self.assertEqual(len(rubric["records"]), 37)
+        self.assertEqual({row["record_id"] for row in rubric["records"]}, set(expected))
+        self.assertIsNone(rubric["geology_accuracy"])
+        self.assertIs(rubric["geologist_approved"], False)
+        self.assertIs(rubric["precommitment"]["current_candidate_outputs_read"], False)
+        for item in rubric["records"]:
+            pair = expected[item["record_id"]]["conversations"]
+            self.assertEqual(item["question"], pair[0]["value"])
+            for key, value in [("question_sha256", pair[0]["value"]),
+                               ("reference_sha256", pair[1]["value"])]:
+                self.assertEqual(item[key], preparer.hashlib.sha256(value.encode("utf-8")).hexdigest())
+
 
 if __name__ == "__main__":
     unittest.main()
