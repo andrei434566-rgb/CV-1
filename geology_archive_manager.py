@@ -57,6 +57,7 @@ class ArchiveManager(QMainWindow):
             ("Проверить фото ↔ Excel",self.review),
             ("Экспорт для VLM",self.export),
             ("База знаний Excel",self.export_knowledge),
+            ("Проверить CVAT YOLO",self.inspect_cvat),
             ("Импорт CVAT YOLO",self.import_cvat),
             ("Привязка глубин",self.depth_mapping),
         ]:
@@ -216,6 +217,23 @@ class ArchiveManager(QMainWindow):
             self.status.appendPlainText("Проверка CVAT:\\n" + json.dumps(result, ensure_ascii=False, indent=2))
         except Exception as exc:
             QMessageBox.critical(self, "Ошибка CVAT", str(exc))
+
+    def inspect_cvat(self):
+        source, _ = QFileDialog.getOpenFileName(
+            self, "Выберите экспорт CVAT YOLO Segmentation 1.1", str(BASE),
+            "CVAT ZIP (*.zip)")
+        if not source:
+            source = QFileDialog.getExistingDirectory(
+                self, "Или выберите распакованную папку CVAT")
+        if not source:
+            return
+        try:
+            from inspect_cvat_yolo import inspect
+            result = inspect(source)
+            self.status.appendPlainText("=== CVAT YOLO Segmentation ===\\n" +
+                json.dumps(result, ensure_ascii=False, indent=2))
+        except Exception as exc:
+            QMessageBox.critical(self, "Ошибка проверки CVAT", str(exc))
 
     def export_knowledge(self):
         if not self._ready(): return
