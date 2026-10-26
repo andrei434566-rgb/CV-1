@@ -42,7 +42,10 @@ def analyze(photo: str | Path, model_path: str | Path, output: str | Path,
     output.mkdir(parents=True, exist_ok=True)
     with Image.open(photo) as im:
         original = im.convert("RGB")
-    result = YOLO(str(model_path)).predict(source=str(photo), conf=confidence, verbose=False)[0]
+    # Ultralytics expects three image channels; TIFF/PNG may be RGBA or grayscale.
+    import numpy as np
+    rgb_array = np.asarray(original, dtype=np.uint8)
+    result = YOLO(str(model_path)).predict(source=rgb_array, conf=confidence, verbose=False)[0]
     if result.masks is None or result.boxes is None:
         polygons = []
     else:
