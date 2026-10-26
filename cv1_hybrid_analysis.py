@@ -44,8 +44,26 @@ def analyze(photo: str | Path, model_path: str | Path, output: str | Path,
         original = im.convert("RGB")
     # Ultralytics expects three image channels; TIFF/PNG may be RGBA or grayscale.
     import numpy as np
-    rgb_array = np.asarray(original, dtype=np.uint8)
-    result = YOLO(str(model_path)).predict(source=rgb_array, conf=confidence, verbose=False)[0]
+    rgb_array = np.ascontiguousarray(np.asarray(original, dtype=np.uint8))
+    if rgb_array.ndim != 3 or rgb_array.shape[2] != 3:
+        raise ValueError(f"RGB conversion failed: shape={rgb_array.shape}")
+    # A CHW float tensor bypasses image loaders that may add an alpha channel.
+    import torch
+    tensor = torch.from_numpy(rgb_array).permute(2, 0, 1).unsqueeze(0).float().div_(255.0).contiguous()
+    if tensor.shape[1] != 3:
+        raise ValueError(f"YOLO input must have 3 channels, got {tuple(tensor.shape)}")
+    yolo = YOLO(str(model_path))
+    try:
+        result = yolo.predict(source=tensor, conf=confidence, verbose=False)[0]
+    except RuntimeError as exc:
+        if "channels" in str(exc) or "groups=" in str(exc):
+            raise RuntimeError(
+                f"YOLO channel mismatch despite verified RGB tensor {tuple(tensor.shape)}. "
+                "The selected best.pt may contain an incompatible model architecture "
+                "or an internal 4-channel layer. Check that it is a segmentation checkpoint "
+                "trained with 3-channel RGB images. Original error: " + str(exc)
+            ) from exc
+        raise
     if result.masks is None or result.boxes is None:
         polygons = []
     else:
