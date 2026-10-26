@@ -248,16 +248,22 @@ class ArchiveManager(QMainWindow):
         self.hybrid_worker = HybridWorker(photo, model, destination, vlm.strip())
         self.hybrid_worker.moveToThread(self.hybrid_thread)
         self.hybrid_thread.started.connect(self.hybrid_worker.run)
-        self.hybrid_worker.finished.connect(
-            lambda result: self.status.appendPlainText(
-                "=== YOLO + VLM ===\\n" + json.dumps(result, ensure_ascii=False, indent=2)))
-        self.hybrid_worker.failed.connect(
-            lambda error: QMessageBox.critical(self, "Ошибка YOLO + VLM", error))
+        self.hybrid_worker.finished.connect(self._hybrid_complete)
+        self.hybrid_worker.failed.connect(self._hybrid_failed)
         self.hybrid_worker.done.connect(self.hybrid_thread.quit)
         self.hybrid_worker.done.connect(self.hybrid_worker.deleteLater)
         self.hybrid_thread.finished.connect(self._hybrid_cleanup)
         self.status.appendPlainText("Анализ фотографии запущен...")
         self.hybrid_thread.start()
+
+    @Slot(dict)
+    def _hybrid_complete(self, result):
+        self.status.appendPlainText("=== YOLO + VLM ===\\n" + json.dumps(result, ensure_ascii=False, indent=2))
+
+    @Slot(str)
+    def _hybrid_failed(self, error):
+        self.status.appendPlainText("Ошибка YOLO + VLM: " + error)
+        QMessageBox.critical(self, "Ошибка YOLO + VLM", error)
 
     @Slot()
     def _hybrid_cleanup(self):
