@@ -41,7 +41,8 @@ from app.infrastructure.local_theory_lookup import lookup_theory_answer
 from app.infrastructure.local_vlm_client import LocalVlmClient
 from app.infrastructure.vlm_training_data import expert_description_digest, expert_description_is_confirmed
 from app.infrastructure.cv1_analysis import (
-    PIPELINE_MODE, IntervalJob, apply_interval_description, mark_interval_failure, write_interval_crop,
+    PIPELINE_MODE, IntervalJob, apply_interval_description, create_core_column_description_detections,
+    mark_interval_failure, write_interval_crop,
 )
 from app.infrastructure.ml.fine_tune_worker import FineTuneWorker
 from app.infrastructure.ml.core_column_service import (
@@ -936,6 +937,16 @@ class MainWindow(QMainWindow):
         self._settings.sync()
         self._vlm_client.stop()
         self.assistant_panel.append_message("system", "Локальные настройки сохранены. Папок знаний: " + str(len(config["folders"])))
+        for record in self._records:
+            for detection in record.detections:
+                if (
+                    detection.attributes.get("__core_column_description") == "1"
+                    and detection.attributes.get("__interpretation_status") == "error"
+                ):
+                    detection.attributes["__interpretation_status"] = "waiting"
+                    detection.attributes["Статус интерпретации"] = "ожидает описания столбика локальной VLM"
+        if self._has_waiting_cv1_descriptions():
+            QTimer.singleShot(0, self._start_cv1_descriptions)
 
     def show_training_center(self) -> None:
         dialog = TrainingCenterDialog(self)
@@ -1783,7 +1794,15 @@ class MainWindow(QMainWindow):
                     top = "?" if detection.depth_from is None else f"{detection.depth_from:g}"
                     base = "?" if detection.depth_to is None else f"{detection.depth_to:g}"
                     interval = f" · {top}–{base} м"
-                layer = QTreeWidgetItem([f"Слой {display_index}: {detection.label}{interval}"])
+                if detection.attributes.get("__core_column_description") == "1":
+                    try:
+                        column_index = int(detection.attributes.get("__core_column_index", str(display_index - 1))) + 1
+                    except (TypeError, ValueError):
+                        column_index = display_index
+                    item_title = f"Столбик {column_index}: {detection.label}{interval}"
+                else:
+                    item_title = f"Слой {display_index}: {detection.label}{interval}"
+                layer = QTreeWidgetItem([item_title])
                 layer.setData(0, self.TREE_KIND_ROLE, "layer")
                 layer.setData(0, self.TREE_VALUE_ROLE, record.identifier)
                 layer.setData(0, self.TREE_INDEX_ROLE, source_index)
@@ -1972,6 +1991,9 @@ class MainWindow(QMainWindow):
         self.assistant_panel.clear_photo()
         for record in records:
             if record.analysis_mode == PIPELINE_MODE:
+                if record.core_columns:
+                    self._update_depth_segments_for_columns(record)
+                    self._ensure_core_column_description_rows(record)
                 continue
             for detection in record.detections:
                 resolved = self._resolve_training_class(
@@ -2047,6 +2069,8 @@ class MainWindow(QMainWindow):
         if missing:
             message += f" · не найдены: {len(missing)}"
         self.statusBar().showMessage(message)
+        if self._has_waiting_cv1_descriptions():
+            QTimer.singleShot(0, self._start_cv1_descriptions)
 
     def save_project(self) -> None:
         if self._project_folder is None:
@@ -2171,10 +2195,14 @@ class MainWindow(QMainWindow):
         self._refresh_project_tree()
         self._refresh_training_bar()
         if self._resolve_model_path() is None:
-            columns_found = unresolved_intervals = 0
+            columns_found = unresolved_intervals = column_rows_created = 0
             for record in records:
                 record.core_columns = self._suggest_core_columns(record)
-                self._fill_unclassified_columns(record)
+                self._update_depth_segments_for_columns(record)
+                if record.analysis_mode == PIPELINE_MODE:
+                    column_rows_created += self._ensure_core_column_description_rows(record)
+                else:
+                    self._fill_unclassified_columns(record)
                 columns_found += len(record.core_columns)
                 unresolved_intervals += sum(item.label == UNRECOGNIZED_FACIES for item in record.detections)
                 self.workspace.update_photo_detections(record)
@@ -2184,10 +2212,13 @@ class MainWindow(QMainWindow):
             self._refresh_training_bar()
             self.statusBar().showMessage(
                 f"Загружено {len(records)} фото · столбиков: {columns_found} · "
-                f"интервалов для проверки: {unresolved_intervals} · добавьте best.pt для выделения границ"
+                f"интервалов для проверки: {unresolved_intervals} · "
+                f"VLM опишет целые столбики без масок: {column_rows_created}"
             )
             if self._pending_photo_imports:
                 QTimer.singleShot(25, self._load_next_photo_batch)
+            elif self._has_waiting_cv1_descriptions():
+                self._start_cv1_descriptions()
             return
         self.statusBar().showMessage(
             f"Загружено {len(records)} фото · в очереди: {len(self._pending_photo_imports)} · запускаю сегментацию…"
@@ -2716,10 +2747,13 @@ class MainWindow(QMainWindow):
         model_path = self._resolve_model_path()
         if model_path is None:
             self._show_remembered_model_status()
+            column_rows_created = 0
             for record in records:
                 record.analysis_mode = PIPELINE_MODE
                 if not record.core_columns_verified:
                     record.core_columns = self._suggest_core_columns(record)
+                self._update_depth_segments_for_columns(record)
+                column_rows_created += self._ensure_core_column_description_rows(record)
                 self.workspace.update_photo_detections(record)
             self._show_stack()
             self._refresh_project_tree()
@@ -2728,8 +2762,11 @@ class MainWindow(QMainWindow):
                 self._save_current_project(self._project_folder)
             missing = sum(not record.core_columns for record in records)
             self.statusBar().showMessage(
-                f"Фото подготовлены · без столбиков: {missing}. Добавьте best.pt, чтобы выделить реальные границы интервалов."
+                f"Фото подготовлены · без найденных столбиков: {missing} · "
+                f"локальная VLM опишет целые столбики без масок: {column_rows_created}"
             )
+            if self._has_waiting_cv1_descriptions():
+                self._start_cv1_descriptions()
             return
 
         # Sequential GPU stages avoid keeping Qwen and YOLO resident together.
@@ -3282,6 +3319,23 @@ class MainWindow(QMainWindow):
             )
         except (ImportError, OSError, ValueError):
             return []
+
+    def _ensure_core_column_description_rows(self, record: PhotoRecord) -> int:
+        """Represent detected physical columns when no facies masks exist."""
+        if record.analysis_mode != PIPELINE_MODE or not record.core_columns:
+            return 0
+        new_rows = create_core_column_description_detections(record, record.detections)
+        record.detections.extend(new_rows)
+        return len(new_rows)
+
+    def _has_waiting_cv1_descriptions(self) -> bool:
+        return any(
+            record.analysis_mode == PIPELINE_MODE
+            and detection.attributes.get("__geometry_only") == "1"
+            and detection.attributes.get("__interpretation_status", "waiting") == "waiting"
+            and not detection.training_ready
+            for record in self._records for detection in record.detections
+        )
 
     def _fill_unclassified_columns(self, record: PhotoRecord) -> None:
         """Build a complete editable facies tape even before a model is loaded."""
@@ -4779,6 +4833,7 @@ class MainWindow(QMainWindow):
             if item.training_ready or item.attributes.get("__manual_contour") == "1"
         ]
         record.detections = postprocess_detections(record, [*preserved, *detections])
+        self._ensure_core_column_description_rows(record)
         for detection in detections:
             self._sync_depth_range_from_polygon(record, detection)
         self.workspace.update_photo_detections(record)
@@ -4818,7 +4873,7 @@ class MainWindow(QMainWindow):
                 if missing < len(self._records) else "столбики не найдены, проверьте границы керна"
             )
             self.statusBar().showMessage(
-                f"Сегментация завершена · интервалов: {count}, требуют уточнения: {unresolved}, "
+                f"Сегментация завершена · объектов для описания: {count}, требуют уточнения: {unresolved}, "
                 f"фото без столбиков: {missing} · {assembly}"
             )
             self._start_cv1_descriptions()
@@ -4877,17 +4932,29 @@ class MainWindow(QMainWindow):
                 config = self._local_vlm_config()
                 if not Path(config["python"]).is_file() or not (Path(config["base"]) / "config.json").is_file():
                     raise RuntimeError("Укажите локальную базовую Qwen и Python в настройках ИИ. Интернет для анализа не используется.")
-                context = f"Скважина: {record.well_name}. Показан один полигон YOLO; белый фон вне породы игнорируй. "
+                whole_column = job.detection.attributes.get("__core_column_description") == "1"
+                if whole_column:
+                    column_number = int(job.detection.attributes.get("__core_column_index", "0")) + 1
+                    context = (
+                        f"Скважина: {record.well_name}. Показан целый предварительно найденный столбик керна №{column_number}, "
+                        "а не отдельный слой или фациальный полигон. Опиши видимые признаки по всей его длине; "
+                        "если породы меняются, укажи эту изменчивость в кратком описании. "
+                        "Не считай рамку столбика границей фации и не придумывай недостающие слои. "
+                    )
+                else:
+                    context = f"Скважина: {record.well_name}. Показан один полигон YOLO; белый фон вне породы игнорируй. "
                 if job.detection.depth_from is not None and job.detection.depth_to is not None:
                     context += f"Заданный интервал: {job.detection.depth_from:g}–{job.detection.depth_to:g} м. "
                 request_id = self._vlm_client.send(config["python"], {
                     "operation": "describe", "image": str(crop), "context": context,
+                    "whole_column": whole_column,
                     "base": config["base"], "adapter": config["adapter"],
                     "theory_adapter": config["theory_adapter"], "model_mode": config["model_mode"],
                     "folders": [], "use_knowledge": False,
                 })
                 self._analysis_pending = (request_id, job, crop)
-                label = f"Описываю интервал {self._analysis_done + 1}/{self._analysis_total} · {Path(record.path).name}"
+                subject = "столбик" if whole_column else "интервал"
+                label = f"Описываю {subject} {self._analysis_done + 1}/{self._analysis_total} · {Path(record.path).name}"
                 self.assistant_panel.status.setText("●  " + label)
                 self._update_activity(label, self._analysis_done, self._analysis_total)
                 return
@@ -4941,10 +5008,18 @@ class MainWindow(QMainWindow):
         self._refresh_training_bar()
         if self._project_folder is not None:
             self._save_current_project(self._project_folder)
-        message = (
-            f"Анализ завершён. Описано интервалов: {self._analysis_success} из {self._analysis_total}. "
-            "Контуры получены от YOLO; описания и фации — черновики локальной VLM. Проверьте их в карточках слоёв."
+        whole_columns = sum(
+            detection.attributes.get("__core_column_description") == "1"
+            and detection.attributes.get("__interpretation_status") == "draft"
+            for record in self._records for detection in record.detections
         )
+        message = (
+            f"Анализ завершён. Описано объектов: {self._analysis_success} из {self._analysis_total}. "
+            "Геометрия взята из масок YOLO или рамок найденных столбиков; описания и фации — черновики локальной VLM. "
+            "Проверьте их в карточках."
+        )
+        if whole_columns:
+            message += f" Целиком описано столбиков без фациальных масок: {whole_columns}."
         if self._analysis_geometry_issues:
             message += f" Замечаний к покрытию и пересечениям: {len(self._analysis_geometry_issues)}. Пропуски не заполнены выдуманными фациями."
             message += "\n" + "\n".join(f"{issue['photo']}: {issue.get('message', '')}" for issue in self._analysis_geometry_issues[:3])

@@ -39,6 +39,9 @@ class FaciesDialog(QDialog):
         self.setMinimumWidth(345)
         self.resize(510, 740)
         attributes = dict(attributes or {})
+        is_whole_column = attributes.get("__core_column_description") == "1"
+        if is_whole_column:
+            self.setWindowTitle("Описание столбика керна")
         requested_index = str(attributes.get("Индекс фации") or "").strip()
         if current_facies and current_facies != "Новый контур":
             # Imported project values remain authoritative over catalogue
@@ -58,8 +61,16 @@ class FaciesDialog(QDialog):
         self.attribute_combos: dict[str, QComboBox] = {}
 
         layout = QVBoxLayout(self)
-        confidence_title = "Оценка геометрии YOLO" if attributes.get("__geometry_only") == "1" else "Оценка модели"
-        confidence_label = QLabel(f"{confidence_title}: {confidence:.0%} (не вероятность правильности фации)")
+        confidence_title = (
+            "Границы найденного столбика" if is_whole_column
+            else "Оценка геометрии YOLO" if attributes.get("__geometry_only") == "1"
+            else "Оценка модели"
+        )
+        confidence_text = (
+            "Рамка целого столбика предварительная — проверьте по исходному фото."
+            if is_whole_column else f"{confidence_title}: {confidence:.0%} (не вероятность правильности фации)"
+        )
+        confidence_label = QLabel(confidence_text)
         confidence_label.setStyleSheet("color: #687087;")
         layout.addWidget(confidence_label)
 
@@ -157,11 +168,12 @@ class FaciesDialog(QDialog):
         self.training_confirmed = QCheckBox("Фация и границы проверены — использовать в обучении")
         self.training_confirmed.setChecked(training_ready)
         self.training_confirmed.setToolTip("Отметьте после проверки класса и контура. Сохранить черновик можно без этой отметки.")
+        self.training_confirmed.setVisible(not is_whole_column)
         layout.addWidget(self.training_confirmed)
         self.description_confirmed = QCheckBox("Описание проверено — использовать при обучении ИИ")
         self.description_confirmed.setChecked(description_confirmed)
         self.description_confirmed.setToolTip("Подтвердите текст отдельно от класса и границ. Непроверенные ответы ИИ в обучение не попадут.")
-        self.description_confirmed.setVisible(attributes.get("__geometry_only") == "1")
+        self.description_confirmed.setVisible(attributes.get("__geometry_only") == "1" and not is_whole_column)
         layout.addWidget(self.description_confirmed)
         try:
             suggestions = json.loads(str(attributes.get("__attribute_suggestions") or "{}"))

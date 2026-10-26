@@ -1,4 +1,4 @@
-"""CV-1 contract: YOLO owns geometry; the local VLM supplies draft text only."""
+"""CV-1 contract: detectors own geometry; the local VLM supplies draft text only."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+from PySide6.QtCore import QPointF
 
 from app.domain.models import FaciesDetection, PhotoRecord
 from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES
@@ -68,6 +69,87 @@ class IntervalJob:
         )
 
 
+def create_core_column_description_detections(
+    record: PhotoRecord,
+    existing_detections: list[FaciesDetection] | None = None,
+) -> list[FaciesDetection]:
+    """Create neutral rows for detected columns with no facies polygons.
+
+    These rectangles are useful for assembling and describing core photos, but
+    they are explicitly marked as column-level geometry rather than facies
+    masks so they cannot be mistaken for YOLO boundaries or training labels.
+    """
+    if record.pixmap.isNull() or not record.core_columns:
+        return []
+    from app.infrastructure.ml.core_column_service import normalize_columns
+
+    columns = normalize_columns(
+        record.core_columns,
+        (record.pixmap.width(), record.pixmap.height()),
+    )
+    rows: list[FaciesDetection] = []
+    existing = list(existing_detections or record.detections)
+    represented_indices: set[int] = set()
+    for detection in existing:
+        if detection.attributes.get("__core_column_description") != "1":
+            continue
+        try:
+            represented_indices.add(int(detection.attributes.get("__core_column_index", "")))
+        except (TypeError, ValueError):
+            continue
+    for index, column in enumerate(columns):
+        if index in represented_indices:
+            continue
+        column_width = max(1.0, column["right"] - column["left"])
+        column_height = max(1.0, column["bottom"] - column["top"])
+        already_has_mask = False
+        for detection in existing:
+            if detection.attributes.get("__core_column_description") == "1" or len(detection.polygon) < 3:
+                continue
+            xs = [point.x() for point in detection.polygon]
+            ys = [point.y() for point in detection.polygon]
+            overlap_x = max(0.0, min(max(xs), column["right"]) - max(min(xs), column["left"]))
+            overlap_y = max(0.0, min(max(ys), column["bottom"]) - max(min(ys), column["top"]))
+            if overlap_x >= column_width * 0.2 and overlap_y >= column_height * 0.08:
+                already_has_mask = True
+                break
+        if already_has_mask:
+            continue
+        polygon = [
+            QPointF(column["left"], column["top"]),
+            QPointF(column["right"], column["top"]),
+            QPointF(column["right"], column["bottom"]),
+            QPointF(column["left"], column["bottom"]),
+        ]
+        segment = record.depth_segments[index] if index < len(record.depth_segments) else {}
+        def optional_depth(key: str) -> float | None:
+            try:
+                value = float(segment[key])
+            except (KeyError, TypeError, ValueError):
+                return None
+            return value if math.isfinite(value) else None
+
+        rows.append(FaciesDetection(
+            label=UNRECOGNIZED_FACIES,
+            confidence=0.0,
+            polygon=polygon,
+            attributes={
+                "__geometry_only": "1",
+                "__geometry_id": f"core-column:{record.identifier}:{index + 1}",
+                "__geometry_provider": "core_column_detector",
+                "__core_column_description": "1",
+                "__core_column_index": str(index),
+                "__interpretation_status": "waiting",
+                "Источник геометрии": "Детектор столбиков керна: рамка целого столбика",
+                "Статус интерпретации": "ожидает описания столбика локальной VLM",
+            },
+            depth_from=optional_depth("depth_from"),
+            depth_to=optional_depth("depth_to"),
+            training_ready=False,
+        ))
+    return rows
+
+
 def write_interval_crop(record: PhotoRecord, job: IntervalJob, destination: Path) -> Path:
     """Map display coordinates to original pixels and hide everything outside the mask."""
     if not job.is_current(record):
@@ -99,7 +181,7 @@ def write_interval_crop(record: PhotoRecord, job: IntervalJob, destination: Path
 
 
 def apply_interval_description(record: PhotoRecord, job: IntervalJob, response: dict) -> None:
-    """Apply validated strings, keeping YOLO pixels, depths and confidence intact."""
+    """Apply validated strings while keeping detected geometry and depths intact."""
     if not job.is_current(record):
         raise ValueError("Интервал изменён во время ответа; результат VLM не применён.")
     fields = response.get("fields")
@@ -124,12 +206,16 @@ def apply_interval_description(record: PhotoRecord, job: IntervalJob, response: 
     for key, names in TEXT_FIELDS.items():
         for name in names:
             attributes[name] = values[key]
+    is_core_column = attributes.get("__core_column_description") == "1"
     attributes.update({
         "__geometry_only": "1",
         "__geometry_sha256": job.geometry_sha256,
         "__geometry_record": record.identifier,
         "__interpretation_status": "draft",
-        "Источник геометрии": "YOLO: полигон сегментации",
+        "Источник геометрии": (
+            "Детектор столбиков керна: рамка целого столбика"
+            if is_core_column else "YOLO masks.xy"
+        ),
         "Источник описания": "локальная VLM; черновик",
         "Статус интерпретации": "черновик VLM, требуется проверка геолога",
     })

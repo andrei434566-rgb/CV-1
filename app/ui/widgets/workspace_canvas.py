@@ -713,6 +713,11 @@ class FaciesOverlayItem(QGraphicsObject):
     def paint(self, painter: QPainter, option, widget=None) -> None:
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         for index, detection in enumerate(self.detections):
+            if detection.attributes.get("__core_column_description") == "1":
+                # The physical-column rectangle is a framing aid, not a facies
+                # mask. Keep the source pixels visible; the cyan detector
+                # outline already shows this box on the photo card.
+                continue
             path = self._visible_paths[index] if index < len(self._visible_paths) else QPainterPath()
             if path.isEmpty():
                 continue
@@ -2243,7 +2248,8 @@ class FaciesConfidencePopup(QFrame):
             item = self.layout.takeAt(0)
             if item.widget() is not None:
                 item.widget().deleteLater()
-        title = QLabel("Описание слоя керна", self)
+        is_core_column = detection.attributes.get("__core_column_description") == "1"
+        title = QLabel("Описание столбика керна" if is_core_column else "Описание слоя керна", self)
         title.setObjectName("confidenceTitle")
         self.layout.addWidget(title)
         attributes = detection.attributes or {}
@@ -2275,7 +2281,11 @@ class FaciesConfidencePopup(QFrame):
             source_label.setMaximumWidth(420)
             self.layout.addWidget(source_label)
         if not detection.training_ready:
-            review = QLabel("Границы и фацию нужно проверить перед обучением.", self)
+            review_text = (
+                "Рамка охватывает целый найденный столбик; описание VLM проверьте по исходному фото."
+                if is_core_column else "Границы и фацию нужно проверить перед обучением."
+            )
+            review = QLabel(review_text, self)
             review.setObjectName("confidenceSubtle")
             review.setWordWrap(True)
             self.layout.addWidget(review)

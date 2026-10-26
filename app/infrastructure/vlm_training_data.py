@@ -61,6 +61,8 @@ def expert_description_is_confirmed(detection) -> bool:
 def _pair_provenance(detection) -> tuple[str, str]:
     """Keep legacy direct-Excel targets and explicitly confirmed CV-1 targets."""
     attrs = detection.attributes or {}
+    if attrs.get("__core_column_description") == "1":
+        return "", "Описание относится ко всему столбику, а не к отдельной фации"
     if not _description(detection):
         return "", "Нет непустого описания породы"
     if len(detection.polygon) < 3:

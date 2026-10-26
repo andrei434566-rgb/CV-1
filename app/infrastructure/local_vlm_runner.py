@@ -85,9 +85,11 @@ class LocalModel:
             str(request.get("theory_adapter") or ""),
             str(request.get("model_mode") or ""),
         )
+        whole_column = operation == "describe" and bool(request.get("whole_column"))
         if operation == "describe":
+            subject = "целый столбик керна" if whole_column else "фрагмент керна"
             question = (
-                "Опиши только показанный фрагмент керна на русском языке. Верни строго JSON "
+                f"Опиши только показанный {subject} на русском языке. Верни строго JSON "
                 'со строковыми ключами "facies_name", "lithology", "texture", '
                 '"facies_association", "depositional_environment", "description". '
                 "Описание должно содержать только видимые цвет, зернистость, текстуру, "
@@ -98,6 +100,12 @@ class LocalModel:
                 "Не придумывай глубину, минералогию и скрытые признаки. "
                 + str(request.get("context") or "")[:1800]
             )
+            if whole_column:
+                question += (
+                    " Это целый физический столбик, в котором могут последовательно меняться породы: "
+                    "не называй всю длину одной фацией без достаточных признаков; перечисли видимую "
+                    "вертикальную изменчивость в кратком описании."
+                )
         else:
             question = str(request.get("question") or "")[:3000]
             if operation == "photo_chat":
@@ -141,6 +149,20 @@ class LocalModel:
                                              (448 - part.height) // 2))
                     image = montage
                     question += "\nИзображение длинного керна показано тремя соседними фрагментами: слева верх, в центре середина, справа низ. Это части одного исходного фото, а не три физических столбика."
+                elif whole_column and image.height > image.width * 1.6:
+                    strip = image
+                    montage = Image.new("RGB", (448, 448), "white")
+                    for index in range(3):
+                        part = strip.crop((
+                            0,
+                            round(index * strip.height / 3),
+                            strip.width,
+                            round((index + 1) * strip.height / 3),
+                        ))
+                        part.thumbnail((148, 448))
+                        montage.paste(part, (index * 149 + (148 - part.width) // 2, (448 - part.height) // 2))
+                    image = montage
+                    question += "\nДлинный столбик показан тремя соседними частями: слева верх, в центре середина, справа низ. Это один столбик, а не три отдельных керна."
                 else:
                     image.thumbnail((448, 448))
             content[-1]["text"] = question
