@@ -2,6 +2,8 @@
 from __future__ import annotations
 import json
 import sys
+import traceback
+from datetime import datetime
 from pathlib import Path
 from PySide6.QtCore import QObject, QThread, Signal, Slot
 from PySide6.QtWidgets import (QApplication,QFileDialog,QHBoxLayout,QLabel,
@@ -44,7 +46,7 @@ class HybridWorker(QObject):
             from cv1_hybrid_analysis import analyze
             self.finished.emit(analyze(self.photo, self.model, self.output, self.vlm_model))
         except Exception as exc:
-            self.failed.emit(str(exc))
+            self.failed.emit("".join(traceback.format_exception(type(exc), exc, exc.__traceback__)))
         finally:
             self.done.emit()
 
@@ -262,8 +264,13 @@ class ArchiveManager(QMainWindow):
 
     @Slot(str)
     def _hybrid_failed(self, error):
-        self.status.appendPlainText("Ошибка YOLO + VLM: " + error)
-        QMessageBox.critical(self, "Ошибка YOLO + VLM", error)
+        log_dir = self.output_dir / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_file = log_dir / ("hybrid_error_" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".txt")
+        details = error.strip() or "Ошибка без текста. Проверьте консоль Python."
+        log_file.write_text(details, encoding="utf-8")
+        self.status.appendPlainText("Ошибка YOLO + VLM:\\n" + details + "\\nЛог: " + str(log_file))
+        QMessageBox.critical(self, "Ошибка YOLO + VLM", details[-2500:] + "\\n\\nПолный лог: " + str(log_file))
 
     @Slot()
     def _hybrid_cleanup(self):
