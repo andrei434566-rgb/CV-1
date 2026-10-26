@@ -29,6 +29,26 @@ class ScanWorker(QObject):
             self.done.emit()
 
 
+class HybridWorker(QObject):
+    finished = Signal(dict)
+    failed = Signal(str)
+    done = Signal()
+
+    def __init__(self, photo, model, output, vlm_model):
+        super().__init__()
+        self.photo, self.model, self.output, self.vlm_model = photo, model, output, vlm_model
+
+    @Slot()
+    def run(self):
+        try:
+            from cv1_hybrid_analysis import analyze
+            self.finished.emit(analyze(self.photo, self.model, self.output, self.vlm_model))
+        except Exception as exc:
+            self.failed.emit(str(exc))
+        finally:
+            self.done.emit()
+
+
 class ArchiveManager(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -36,6 +56,7 @@ class ArchiveManager(QMainWindow):
         self.resize(850,500)
         self.root=None
         self.scan_thread=None
+        self.hybrid_thread=None
         self.open_review_after_scan=False
         self.action_buttons=[]
         self.output_dir=BASE/"_cv1_local_indexes"
@@ -59,6 +80,7 @@ class ArchiveManager(QMainWindow):
             ("База знаний Excel",self.export_knowledge),
             ("Проверить CVAT YOLO",self.inspect_cvat),
             ("Импорт CVAT YOLO",self.import_cvat),
+            ("YOLO + VLM: фото",self.hybrid_photo),
             ("Привязка глубин",self.depth_mapping),
         ]:
             button=QPushButton(title)
@@ -199,6 +221,51 @@ class ArchiveManager(QMainWindow):
                     "Создан lane_annotations.json. Укажите координаты рядов и их интервалы; повторное нажатие построит карту глубин.")
         except Exception as exc:
             QMessageBox.critical(self,"Ошибка привязки глубин",str(exc))
+
+    def hybrid_photo(self):
+        if self.hybrid_thread is not None:
+            QMessageBox.information(self, "Анализ", "Дождитесь окончания текущего анализа.")
+            return
+        photo, _ = QFileDialog.getOpenFileName(
+            self, "Фотография керна", str(BASE),
+            "Изображения (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.webp)")
+        if not photo:
+            return
+        model, _ = QFileDialog.getOpenFileName(
+            self, "Модель сегментации best.pt", str(BASE), "Модель YOLO (*.pt)")
+        if not model:
+            return
+        from PySide6.QtWidgets import QInputDialog
+        vlm, ok = QInputDialog.getText(
+            self, "Локальная VLM", "Имя модели в Ollama (пусто = только YOLO):",
+            text="")
+        if not ok:
+            return
+        import hashlib
+        key = hashlib.sha256(str(Path(photo).resolve()).encode("utf-8")).hexdigest()[:12]
+        destination = self.output_dir / "hybrid" / key
+        self.hybrid_thread = QThread(self)
+        self.hybrid_worker = HybridWorker(photo, model, destination, vlm.strip())
+        self.hybrid_worker.moveToThread(self.hybrid_thread)
+        self.hybrid_thread.started.connect(self.hybrid_worker.run)
+        self.hybrid_worker.finished.connect(
+            lambda result: self.status.appendPlainText(
+                "=== YOLO + VLM ===\\n" + json.dumps(result, ensure_ascii=False, indent=2)))
+        self.hybrid_worker.failed.connect(
+            lambda error: QMessageBox.critical(self, "Ошибка YOLO + VLM", error))
+        self.hybrid_worker.done.connect(self.hybrid_thread.quit)
+        self.hybrid_worker.done.connect(self.hybrid_worker.deleteLater)
+        self.hybrid_thread.finished.connect(self._hybrid_cleanup)
+        self.status.appendPlainText("Анализ фотографии запущен...")
+        self.hybrid_thread.start()
+
+    @Slot()
+    def _hybrid_cleanup(self):
+        thread = self.hybrid_thread
+        self.hybrid_thread = None
+        self.hybrid_worker = None
+        if thread is not None:
+            thread.deleteLater()
 
     def import_cvat(self):
         path, _ = QFileDialog.getOpenFileName(
