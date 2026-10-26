@@ -57,6 +57,7 @@ class ArchiveManager(QMainWindow):
             ("Проверить фото ↔ Excel",self.review),
             ("Экспорт для VLM",self.export),
             ("База знаний Excel",self.export_knowledge),
+            ("Импорт CVAT YOLO",self.import_cvat),
             ("Привязка глубин",self.depth_mapping),
         ]:
             button=QPushButton(title)
@@ -197,6 +198,24 @@ class ArchiveManager(QMainWindow):
                     "Создан lane_annotations.json. Укажите координаты рядов и их интервалы; повторное нажатие построит карту глубин.")
         except Exception as exc:
             QMessageBox.critical(self,"Ошибка привязки глубин",str(exc))
+
+    def import_cvat(self):
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Выбрать экспорт CVAT YOLO Segmentation 1.1", str(BASE),
+            "CVAT ZIP (*.zip);;Все файлы (*)")
+        if not path:
+            directory = QFileDialog.getExistingDirectory(
+                self, "Или выбрать распакованную папку CVAT", str(BASE))
+            if not directory:
+                return
+            path = directory
+        from cvat_yolo_segmentation_import import audit
+        try:
+            destination = self.output_dir / "cvat_audit"
+            result = audit(path, destination)
+            self.status.appendPlainText("Проверка CVAT:\\n" + json.dumps(result, ensure_ascii=False, indent=2))
+        except Exception as exc:
+            QMessageBox.critical(self, "Ошибка CVAT", str(exc))
 
     def export_knowledge(self):
         if not self._ready(): return
