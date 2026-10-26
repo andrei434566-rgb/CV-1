@@ -56,6 +56,7 @@ class ArchiveManager(QMainWindow):
             ("Диагностика",self.diagnose),
             ("Проверить фото ↔ Excel",self.review),
             ("Экспорт для VLM",self.export),
+            ("База знаний Excel",self.export_knowledge),
             ("Привязка глубин",self.depth_mapping),
         ]:
             button=QPushButton(title)
@@ -196,6 +197,15 @@ class ArchiveManager(QMainWindow):
                     "Создан lane_annotations.json. Укажите координаты рядов и их интервалы; повторное нажатие построит карту глубин.")
         except Exception as exc:
             QMessageBox.critical(self,"Ошибка привязки глубин",str(exc))
+
+    def export_knowledge(self):
+        if not self._ready(): return
+        from export_geology_vlm import export_text_knowledge
+        try:
+            result=export_text_knowledge(self.index_dir())
+            self.status.appendPlainText(json.dumps(result,ensure_ascii=False,indent=2))
+        except Exception as exc:
+            QMessageBox.critical(self,"Ошибка экспорта знаний",str(exc))
 
     def export(self):
         if not self._ready(): return
