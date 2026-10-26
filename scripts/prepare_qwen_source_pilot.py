@@ -3,7 +3,9 @@
 Only the clean DCID-512-7 variant and Mendeley's four source classes are
 eligible. Source labels are translated, never expanded into descriptions.
 Existing whole-well Mendeley partitions and DCID validation partitions stay
-unchanged. Test images are not decoded, selected, or exported.
+unchanged. Prepared project test records are not decoded, selected, or exported.
+Original Mendeley folder splits are provenance and were regrouped by well into
+project partitions.
 """
 
 from __future__ import annotations
@@ -270,6 +272,7 @@ def build_plan(
     selected_pixels = defaultdict(set)
     selected_labels = defaultdict(set)
     selected_counts = Counter()
+    selected_original_source_split_counts = Counter()
     selected_wells = defaultdict(set)
     for source_id, labels in LABELS.items():
         for class_index, source_label in enumerate(sorted(labels)):
@@ -320,6 +323,9 @@ def build_plan(
                         "metadata": meta,
                     })
                     selected_counts[f"{source_id}/{split}/{source_label}"] += 1
+                    original_split = row.get("source_split")
+                    original_split = str(original_split).strip() if original_split is not None else ""
+                    selected_original_source_split_counts[f"{source_id}/{split}/{original_split or 'unknown'}"] += 1
                     if row.get("well_group"):
                         selected_wells[f"{source_id}/{split}"].add(row["well_group"])
     pixel_overlaps = sum(len(splits) > 1 for splits in selected_pixels.values())
@@ -341,6 +347,20 @@ def build_plan(
         "val_per_class": val_per_class,
         "counts": {key: len(rows) for key, rows in exports.items()},
         "selected_counts": dict(sorted(selected_counts.items())),
+        "selected_original_source_split_counts": dict(sorted(selected_original_source_split_counts.items())),
+        "split_definition": {
+            "project_partition_field": "prepared manifest split; exported metadata.partition",
+            "original_source_split_field": "prepared manifest source_split; exported metadata.source_split",
+            "selection_policy": "Select only prepared project train/val records; exclude prepared project test records.",
+            "cross_split_guards_apply_to": "prepared project partitions, not original source folder names",
+            "mendeley": (
+                "Original source train/val/test folders were regrouped by filename-derived well identity into "
+                "disjoint prepared project/well partitions. Original-source test records may occur in project train/val."
+            ),
+            "dcid": "Prepared project partitions are image-level; verified well identities are unavailable.",
+            "unknown_original_split": "Original source_split was absent; it is not inferred from the project partition.",
+            "selected_original_source_split_count_key": "source_id/project_partition/original_source_split",
+        },
         "selected_wells": {key: sorted(values) for key, values in selected_wells.items()},
         "global_source_pixel_cross_split_duplicates": source_overlaps,
         "global_source_pixel_label_conflicts": label_conflicts,
@@ -361,11 +381,12 @@ def build_plan(
             "holdout_sha256": file_hash(theory_holdout),
             "geologist_reviewed": False,
         },
-        "excluded": ["DCID-512-35", "noise-512-35", "noise-512-7", "UKCS", "IODP", "UniBo", "R-41 replay", "all test images"],
+        "excluded": ["DCID-512-35", "noise-512-35", "noise-512-7", "UKCS", "IODP", "UniBo", "R-41 replay", "all prepared project/well test records"],
         "recommended_initialization": "fresh Qwen/Qwen3-VL-2B-Instruct base; do not inherit rejected theory or narrow previous adapters",
         "limitations": [
             "No new weights, activation, or performance claim is produced by preparation.",
             "Mendeley wells are disjoint across splits, but validation/test wells were evaluated in prior experiments.",
+            "Original Mendeley folder splits were regrouped by well; excluding project test does not exclude original-source test folders.",
             "DCID has no verified well identities; its image validation is not independent-well validation.",
             "Shale and mudstone labels remain source-specific and imply no unobserved diagnostic properties.",
             "Source classifications do not supply expert full descriptions or map to the 92-facies application catalogue.",

@@ -82,6 +82,13 @@ class SourcePilotTests(unittest.TestCase):
             "holdout_theory": 1, "train_conversation": 12, "holdout_conversation": 4,
         })
         self.assertEqual(summary["selected_unique_actual_pixel_hashes"], 22)
+        self.assertEqual(summary["selected_original_source_split_counts"], {
+            "dcid/train/train": 7, "dcid/val/val": 7,
+            "mendeley/train/train": 4, "mendeley/val/val": 4,
+        })
+        self.assertIn("all prepared project/well test records", summary["excluded"])
+        self.assertNotIn("all test images", summary["excluded"])
+        self.assertIn("prepared project partitions", summary["split_definition"]["cross_split_guards_apply_to"])
         for split in ("train", "val"):
             for row in exports[f"{split}_visual"]:
                 self.assertEqual(row["metadata"]["training_approved"], split == "train")
@@ -98,6 +105,39 @@ class SourcePilotTests(unittest.TestCase):
             self.build()
 
     def test_whole_well_leakage_is_rejected(self):
+        self.source_rows["mendeley"][1]["well_group"] = "well_train"
+        self.rewrite_source("mendeley")
+        with self.assertRaisesRegex(ValueError, "well appears"):
+            self.build()
+
+    def test_original_source_test_records_can_belong_to_disjoint_project_train(self):
+        before, _summary = self.build()
+        for row in self.source_rows["mendeley"]:
+            if row["split"] == "train":
+                row["source_split"] = "test"
+                row["source"] = {"member": f"original/test/{row['image']}"}
+            elif row["split"] == "val":
+                row["source_split"] = "train"
+        self.rewrite_source("mendeley")
+        exports, summary = self.build()
+        self.assertEqual(summary["selected_original_source_split_counts"]["mendeley/train/test"], 4)
+        self.assertEqual(summary["selected_original_source_split_counts"]["mendeley/val/train"], 4)
+        self.assertIn("Original-source test records may occur", summary["split_definition"]["mendeley"])
+        project_train = [row for row in exports["train_visual"] if row["metadata"]["dataset"] == "mendeley"]
+        self.assertTrue(all(row["metadata"]["partition"] == "train" and row["metadata"]["source_split"] == "test"
+                            and row["metadata"]["training_approved"] for row in project_train))
+        train_wells = {row["metadata"]["well_id"] for row in project_train}
+        val_wells = {row["metadata"]["well_id"] for row in exports["val_visual"]
+                     if row["metadata"]["dataset"] == "mendeley"}
+        self.assertFalse(train_wells & val_wells)
+        key = lambda row: (row["metadata"]["record_id"], row["image"], row["conversations"])
+        self.assertEqual([key(row) for row in before["train_visual"]], [key(row) for row in exports["train_visual"]])
+        self.assertEqual([key(row) for row in before["val_visual"]], [key(row) for row in exports["val_visual"]])
+
+    def test_original_source_test_label_never_relaxes_project_whole_well_guard(self):
+        for row in self.source_rows["mendeley"]:
+            if row["split"] == "train":
+                row["source_split"] = "test"
         self.source_rows["mendeley"][1]["well_group"] = "well_train"
         self.rewrite_source("mendeley")
         with self.assertRaisesRegex(ValueError, "well appears"):

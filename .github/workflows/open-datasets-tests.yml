@@ -6,6 +6,8 @@ on:
     paths:
       - "app/infrastructure/open_dataset*"
       - "app/infrastructure/cv_training_runtime.py"
+      - "app/infrastructure/local_theory_lookup.py"
+      - "app/resources/theory/**"
       - "app/infrastructure/ml/open_dataset_train.py"
       - "app/ui/dialogs/open_dataset*"
       - "test_open_dataset*"
@@ -16,12 +18,15 @@ on:
       - "test_qwen_pilot_runner.py"
       - "scripts/prepare_qwen_theory_round2.py"
       - "test_qwen_theory_round2.py"
+      - "test_local_theory_round2.py"
       - "vlm_source/theory_round2/**"
       - ".github/workflows/open-datasets-tests.yml"
   push:
     paths:
       - "app/infrastructure/open_dataset*"
       - "app/infrastructure/cv_training_runtime.py"
+      - "app/infrastructure/local_theory_lookup.py"
+      - "app/resources/theory/**"
       - "app/infrastructure/ml/open_dataset_train.py"
       - "app/ui/dialogs/open_dataset*"
       - "test_open_dataset*"
@@ -32,6 +37,7 @@ on:
       - "test_qwen_pilot_runner.py"
       - "scripts/prepare_qwen_theory_round2.py"
       - "test_qwen_theory_round2.py"
+      - "test_local_theory_round2.py"
       - "vlm_source/theory_round2/**"
       - ".github/workflows/open-datasets-tests.yml"
 
@@ -57,3 +63,4 @@ jobs:
           test_open_dataset_intervals test_open_dataset_library test_open_dataset_review
           test_cv_training_runtime
           test_qwen_source_pilot test_qwen_pilot_runner test_qwen_theory_round2
+          test_local_theory_round2

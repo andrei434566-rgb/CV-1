@@ -1,0 +1,1695 @@
+{
+  "schema": "kern_source_checked_reference_supplement_v1",
+  "delivery": "offline_reference_answers_not_model_weight_training",
+  "source_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+  "counts": {
+    "cards": 48,
+    "sources": 12,
+    "new_holdout_included": 0,
+    "case_study_included": 0
+  },
+  "sources": {
+    "bgs_rcs": {
+      "title": "British Geological Survey: The BGS Rock Classification Scheme",
+      "url": "https://www.bgs.ac.uk/technologies/bgs-rock-classification-scheme/",
+      "locator": "Principles; Volume 3, classification of sediments and sedimentary rocks",
+      "access": "Read full public HTML principles, not the linked pay/download material.",
+      "source_id": "bgs_rcs",
+      "accessed_date": "2026-10-25"
+    },
+    "iodp402_methods": {
+      "title": "IODP Expedition 402 methods",
+      "url": "https://publications.iodp.org/proceedings/402/102/402_102.html",
+      "locator": "Sections 2.4–2.6, smear slides, thin sections, X-ray diffraction",
+      "access": "Read full public HTML relevant sections.",
+      "source_id": "iodp402_methods",
+      "accessed_date": "2026-10-25"
+    },
+    "odp202_sedimentology": {
+      "title": "ODP Leg 202: Sedimentology",
+      "url": "https://iodp.tamu.edu/publications/202_IR/chap_02/c2_3.htm",
+      "locator": "Preparation of Surfaces of Core Halves; Sediment Disturbance; Color; Bioturbation",
+      "access": "Read complete public HTML chapter.",
+      "source_id": "odp202_sedimentology",
+      "accessed_date": "2026-10-25"
+    },
+    "iodp398_methods": {
+      "title": "IODP Expedition 398 methods",
+      "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+      "locator": "Section 2.5.4, Bioturbation; Section 2.8, Smear slides",
+      "access": "Read public HTML sections 2.5.3–2.8.",
+      "source_id": "iodp398_methods",
+      "accessed_date": "2026-10-25"
+    },
+    "odp106_classification": {
+      "title": "Ocean Drilling Program: Geology 106 Laboratory — Sedimentary rocks and sedimentary rock classification",
+      "url": "https://www-odp.tamu.edu/curation/gcr/geol106lab/classifications.htm",
+      "locator": "Final paragraphs, Primary and Secondary sedimentary structures",
+      "access": "Read complete public HTML teaching page. Simplified historical classification not adopted wholesale.",
+      "source_id": "odp106_classification",
+      "accessed_date": "2026-10-25"
+    },
+    "noaa_reef": {
+      "title": "NOAA National Ocean Service: What is a coral reef made of?",
+      "url": "https://oceanservice.noaa.gov/facts/coralmadeof.html",
+      "locator": "Calcium-carbonate skeletons and successive colonies; updated 2026-09-23",
+      "access": "Read complete public HTML fact page.",
+      "source_id": "noaa_reef",
+      "accessed_date": "2026-10-25"
+    },
+    "iodp361_summary": {
+      "title": "Hall et al. (2017), IODP Expedition 361 summary",
+      "url": "https://publications.iodp.org/proceedings/361/101/361_101.html",
+      "locator": "Sites U1475 and U1476, Sedimentology",
+      "access": "Read public HTML site sedimentology sections. Case study, not universal diagnostic rule.",
+      "source_id": "iodp361_summary",
+      "accessed_date": "2026-10-25"
+    },
+    "tpu_nedolivko_2018": {
+      "title": "Н. М. Недоливко, ТПУ (2018). Индивидуальное домашнее задание №1: построение литологической колонки",
+      "url": "https://portal.tpu.ru/SHARED/n/NEDOLIVKO/disc1/Tab2/IDZ_1.pdf",
+      "locator": "PDF pages 3 and 6–9; definitions of пр. and в.к.; interval descriptions",
+      "access": "Read public PDF text, including definitions and examples. No images extracted or paired.",
+      "source_id": "tpu_nedolivko_2018",
+      "accessed_date": "2026-10-25"
+    },
+    "heald_1955_abstract": {
+      "title": "Milton T. Heald (1955). Stylolites in Sandstones. The Journal of Geology 63(2):101–114",
+      "url": "https://www.journals.uchicago.edu/doi/abs/10.1086/626237",
+      "locator": "Public abstract only; doi:10.1086/626237",
+      "access": "Read public abstract. Paywalled full article was not accessed or downloaded.",
+      "source_id": "heald_1955_abstract",
+      "accessed_date": "2026-10-25"
+    },
+    "kgs_concretion": {
+      "title": "Kansas Geological Survey / GeoKansas: Concretion",
+      "url": "https://geokansas.ku.edu/concretion",
+      "locator": "Concretion; Septarian Concretions",
+      "access": "Read complete public HTML geology-survey page.",
+      "source_id": "kgs_concretion",
+      "accessed_date": "2026-10-25"
+    },
+    "kgs_flint_hills": {
+      "title": "Kansas Geological Survey / GeoKansas: Rocks and Minerals of the Flint Hills",
+      "url": "https://geokansas.ku.edu/rocks-and-minerals-flint-hills",
+      "locator": "Chert; Limestone; Geodes",
+      "access": "Read complete public HTML geology-survey page.",
+      "source_id": "kgs_flint_hills",
+      "accessed_date": "2026-10-25"
+    },
+    "psu_reading_sedimentary": {
+      "title": "Pennsylvania State University, GEOSC 10: Reading Sedimentary Rocks",
+      "url": "https://courses.ems.psu.edu/geosc10/node/2100",
+      "locator": "Mud Cracks — Capitol Reef National Park; text and transcript",
+      "access": "Read public HTML lesson and transcript. Broad simplified environment claims not adopted.",
+      "source_id": "psu_reading_sedimentary",
+      "accessed_date": "2026-10-25"
+    }
+  },
+  "cards": [
+    {
+      "id": "theory20261025_rock_naming_train_01",
+      "topic": "rock_naming",
+      "question": "Можно ли заменить литологическое название словом «русловой»?",
+      "answer": "Нет. «Русловой» обозначает предполагаемое происхождение. Литологическое название выбирают по наблюдаемым составу и строению, а обстановку записывают отдельно.",
+      "sources": [
+        "bgs_rcs"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_rock_naming_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "British Geological Survey: The BGS Rock Classification Scheme",
+            "url": "https://www.bgs.ac.uk/technologies/bgs-rock-classification-scheme/",
+            "locator": "Principles; Volume 3, classification of sediments and sedimentary rocks",
+            "access": "Read full public HTML principles, not the linked pay/download material.",
+            "source_id": "bgs_rcs",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_rock_naming_train_02",
+      "topic": "rock_naming",
+      "question": "Зачем к корневому названию породы добавлять уточнения?",
+      "answer": "Корневое название задаёт основной тип породы. Уточнения сообщают дополнительные наблюдаемые признаки, не подменяя основную классификацию.",
+      "sources": [
+        "bgs_rcs"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_rock_naming_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "British Geological Survey: The BGS Rock Classification Scheme",
+            "url": "https://www.bgs.ac.uk/technologies/bgs-rock-classification-scheme/",
+            "locator": "Principles; Volume 3, classification of sediments and sedimentary rocks",
+            "access": "Read full public HTML principles, not the linked pay/download material.",
+            "source_id": "bgs_rcs",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_rock_naming_train_03",
+      "topic": "rock_naming",
+      "question": "Нужна ли известная обстановка, чтобы назвать осадочную породу?",
+      "answer": "Для описательного названия обычно достаточно признаков образца или шлифа. Предположение об обстановке не должно служить единственным основанием названия.",
+      "sources": [
+        "bgs_rcs"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_rock_naming_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "British Geological Survey: The BGS Rock Classification Scheme",
+            "url": "https://www.bgs.ac.uk/technologies/bgs-rock-classification-scheme/",
+            "locator": "Principles; Volume 3, classification of sediments and sedimentary rocks",
+            "access": "Read full public HTML principles, not the linked pay/download material.",
+            "source_id": "bgs_rcs",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_rock_naming_train_04",
+      "topic": "rock_naming",
+      "question": "Почему в базе керна нужен общий словарь названий?",
+      "answer": "Одинаковые названия должны иметь одинаковые определения. Иначе объединение описаний из разных скважин смешивает разные классы пород.",
+      "sources": [
+        "bgs_rcs"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_rock_naming_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "British Geological Survey: The BGS Rock Classification Scheme",
+            "url": "https://www.bgs.ac.uk/technologies/bgs-rock-classification-scheme/",
+            "locator": "Principles; Volume 3, classification of sediments and sedimentary rocks",
+            "access": "Read full public HTML principles, not the linked pay/download material.",
+            "source_id": "bgs_rcs",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_laboratory_evidence_train_01",
+      "topic": "laboratory_evidence",
+      "question": "Что добавляет мазковый препарат к описанию осадка?",
+      "answer": "Микроскопия помогает оценить размеры, состав и относительное содержание обломочных, биогенных и аутигенных компонентов, плохо различимых на общем фото.",
+      "sources": [
+        "iodp402_methods"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_laboratory_evidence_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "IODP Expedition 402 methods",
+            "url": "https://publications.iodp.org/proceedings/402/102/402_102.html",
+            "locator": "Sections 2.4–2.6, smear slides, thin sections, X-ray diffraction",
+            "access": "Read full public HTML relevant sections.",
+            "source_id": "iodp402_methods",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_laboratory_evidence_train_02",
+      "topic": "laboratory_evidence",
+      "question": "Зачем сохранять точное положение мазкового препарата в керне?",
+      "answer": "Микроскопический результат относится к конкретному отобранному образцу. Его положение нужно связать с описываемым интервалом, а не переносить на весь керн.",
+      "sources": [
+        "iodp402_methods"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_laboratory_evidence_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "IODP Expedition 402 methods",
+            "url": "https://publications.iodp.org/proceedings/402/102/402_102.html",
+            "locator": "Sections 2.4–2.6, smear slides, thin sections, X-ray diffraction",
+            "access": "Read full public HTML relevant sections.",
+            "source_id": "iodp402_methods",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_laboratory_evidence_train_03",
+      "topic": "laboratory_evidence",
+      "question": "Какой препарат используют для изучения сцементированной породы?",
+      "answer": "Описание сцементированной породы дополняют шлифом. Он позволяет рассматривать компоненты и структуру под петрографическим микроскопом.",
+      "sources": [
+        "iodp402_methods"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_laboratory_evidence_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "IODP Expedition 402 methods",
+            "url": "https://publications.iodp.org/proceedings/402/102/402_102.html",
+            "locator": "Sections 2.4–2.6, smear slides, thin sections, X-ray diffraction",
+            "access": "Read full public HTML relevant sections.",
+            "source_id": "iodp402_methods",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_laboratory_evidence_train_04",
+      "topic": "laboratory_evidence",
+      "question": "Как рентгенодифракция помогает при сомнительном минеральном составе?",
+      "answer": "Она проверяет минеральные фазы по дифракционным признакам. Это дополнительное аналитическое основание, а не название минерала, угаданное по цвету фотографии.",
+      "sources": [
+        "iodp402_methods"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_laboratory_evidence_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "IODP Expedition 402 methods",
+            "url": "https://publications.iodp.org/proceedings/402/102/402_102.html",
+            "locator": "Sections 2.4–2.6, smear slides, thin sections, X-ray diffraction",
+            "access": "Read full public HTML relevant sections.",
+            "source_id": "iodp402_methods",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_preparation_artifacts_train_01",
+      "topic": "preparation_artifacts",
+      "question": "Почему свежая продольная поверхность мягкого керна бывает смазанной?",
+      "answer": "Разделение проволокой может размазывать мягкий осадок и скрывать тонкие детали. Такой след подготовки не следует автоматически считать природной текстурой.",
+      "sources": [
+        "odp202_sedimentology"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_preparation_artifacts_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "ODP Leg 202: Sedimentology",
+            "url": "https://iodp.tamu.edu/publications/202_IR/chap_02/c2_3.htm",
+            "locator": "Preparation of Surfaces of Core Halves; Sediment Disturbance; Color; Bioturbation",
+            "access": "Read complete public HTML chapter.",
+            "source_id": "odp202_sedimentology",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_preparation_artifacts_train_02",
+      "topic": "preparation_artifacts",
+      "question": "Почему снимки одного свежераспиленного керна могут менять окраску со временем?",
+      "answer": "После контакта с воздухом идут поверхностные реакции окисления. Поэтому цвет спустя время может отличаться от цвета свежего осадка.",
+      "sources": [
+        "odp202_sedimentology"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_preparation_artifacts_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "ODP Leg 202: Sedimentology",
+            "url": "https://iodp.tamu.edu/publications/202_IR/chap_02/c2_3.htm",
+            "locator": "Preparation of Surfaces of Core Halves; Sediment Disturbance; Color; Bioturbation",
+            "access": "Read complete public HTML chapter.",
+            "source_id": "odp202_sedimentology",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_preparation_artifacts_train_03",
+      "topic": "preparation_artifacts",
+      "question": "Что означает описание drilling biscuits?",
+      "answer": "Это разделённые бурением куски сравнительно твёрдого керна, иногда окружённые буровой суспензией. Их границы не следует автоматически принимать за осадочные контакты.",
+      "sources": [
+        "odp202_sedimentology"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_preparation_artifacts_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "ODP Leg 202: Sedimentology",
+            "url": "https://iodp.tamu.edu/publications/202_IR/chap_02/c2_3.htm",
+            "locator": "Preparation of Surfaces of Core Halves; Sediment Disturbance; Color; Bioturbation",
+            "access": "Read complete public HTML chapter.",
+            "source_id": "odp202_sedimentology",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_preparation_artifacts_train_04",
+      "topic": "preparation_artifacts",
+      "question": "Почему незаметные ходы в однородном осадке не доказывают отсутствие биотурбации?",
+      "answer": "Распознавание ходов в однородных тёмных глинах и светлых илах ограничено. Надёжнее отметить отсутствие различимых следов, сохранив неопределённость причины однородности.",
+      "sources": [
+        "odp202_sedimentology"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_preparation_artifacts_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "ODP Leg 202: Sedimentology",
+            "url": "https://iodp.tamu.edu/publications/202_IR/chap_02/c2_3.htm",
+            "locator": "Preparation of Surfaces of Core Halves; Sediment Disturbance; Color; Bioturbation",
+            "access": "Read complete public HTML chapter.",
+            "source_id": "odp202_sedimentology",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_ichnofabric_train_01",
+      "topic": "ichnofabric",
+      "question": "Что оценивает ихнофабричный индекс: число ходов или нарушение осадка?",
+      "answer": "Прежде всего степень биогенного нарушения первичной ткани, например ламинации. Число видимых ходов само по себе не заменяет эту оценку.",
+      "sources": [
+        "iodp398_methods"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_ichnofabric_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "locator": "Section 2.5.4, Bioturbation; Section 2.8, Smear slides",
+            "access": "Read public HTML sections 2.5.3–2.8.",
+            "source_id": "iodp398_methods",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_ichnofabric_train_02",
+      "topic": "ichnofabric",
+      "question": "При биотурбации ходы обязательно изолированы друг от друга?",
+      "answer": "Нет. Они могут перекрываться и становиться плохо различимыми. Описывайте также сохранность первичной слоистости.",
+      "sources": [
+        "iodp398_methods"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_ichnofabric_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "locator": "Section 2.5.4, Bioturbation; Section 2.8, Smear slides",
+            "access": "Read public HTML sections 2.5.3–2.8.",
+            "source_id": "iodp398_methods",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_ichnofabric_train_03",
+      "topic": "ichnofabric",
+      "question": "Как записывать интенсивность биотурбации без смешения разных шкал?",
+      "answer": "Укажите использованную шкалу и её определение категорий. Одинаковые слова «слабая» или «умеренная» могут иметь разные пороги в разных методиках.",
+      "sources": [
+        "iodp398_methods"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_ichnofabric_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "locator": "Section 2.5.4, Bioturbation; Section 2.8, Smear slides",
+            "access": "Read public HTML sections 2.5.3–2.8.",
+            "source_id": "iodp398_methods",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_ichnofabric_train_04",
+      "topic": "ichnofabric",
+      "question": "Какой признак важен для высокой биотурбации в методике IODP 398?",
+      "answer": "Первичная слоистость полностью нарушена; местами ещё различимы ходы. Отдельно отмечайте наблюдаемые признаки, а не присваивайте категорию по одной пятнистой окраске.",
+      "sources": [
+        "iodp398_methods"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_ichnofabric_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "locator": "Section 2.5.4, Bioturbation; Section 2.8, Smear slides",
+            "access": "Read public HTML sections 2.5.3–2.8.",
+            "source_id": "iodp398_methods",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_soft_sediment_deformation_train_01",
+      "topic": "soft_sediment_deformation",
+      "question": "Как образуются нагрузочные выступы песка в глинистом осадке?",
+      "answer": "Более тяжёлый песок погружается в мягкий водонасыщенный нижележащий ил. Возникают направленные вниз выступы на контакте.",
+      "sources": [
+        "odp106_classification"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_soft_sediment_deformation_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Ocean Drilling Program: Geology 106 Laboratory — Sedimentary rocks and sedimentary rock classification",
+            "url": "https://www-odp.tamu.edu/curation/gcr/geol106lab/classifications.htm",
+            "locator": "Final paragraphs, Primary and Secondary sedimentary structures",
+            "access": "Read complete public HTML teaching page. Simplified historical classification not adopted wholesale.",
+            "source_id": "odp106_classification",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_soft_sediment_deformation_train_02",
+      "topic": "soft_sediment_deformation",
+      "question": "Что означает структура ball-and-pillow в осадке?",
+      "answer": "Это деформация, связанная с внедрением более тяжёлого осадка в мягкий нижележащий материал. Её рассматривают среди вторичных осадочных структур.",
+      "sources": [
+        "odp106_classification"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_soft_sediment_deformation_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Ocean Drilling Program: Geology 106 Laboratory — Sedimentary rocks and sedimentary rock classification",
+            "url": "https://www-odp.tamu.edu/curation/gcr/geol106lab/classifications.htm",
+            "locator": "Final paragraphs, Primary and Secondary sedimentary structures",
+            "access": "Read complete public HTML teaching page. Simplified historical classification not adopted wholesale.",
+            "source_id": "odp106_classification",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_soft_sediment_deformation_train_03",
+      "topic": "soft_sediment_deformation",
+      "question": "Какие процессы способны вызвать конволютную слоистость?",
+      "answer": "Изгибание слойков может сопровождать выход флюида вверх или оползание осадка. По одной форме складочек нельзя уверенно выбрать единственный процесс.",
+      "sources": [
+        "odp106_classification"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_soft_sediment_deformation_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Ocean Drilling Program: Geology 106 Laboratory — Sedimentary rocks and sedimentary rock classification",
+            "url": "https://www-odp.tamu.edu/curation/gcr/geol106lab/classifications.htm",
+            "locator": "Final paragraphs, Primary and Secondary sedimentary structures",
+            "access": "Read complete public HTML teaching page. Simplified historical classification not adopted wholesale.",
+            "source_id": "odp106_classification",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_soft_sediment_deformation_train_04",
+      "topic": "soft_sediment_deformation",
+      "question": "Почему смятый мягкий осадок не доказывает землетрясение?",
+      "answer": "Подобная деформация имеет несколько возможных причин, включая движение флюида и оползание. Сначала опишите геометрию, затем проверяйте причину.",
+      "sources": [
+        "odp106_classification"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_soft_sediment_deformation_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Ocean Drilling Program: Geology 106 Laboratory — Sedimentary rocks and sedimentary rock classification",
+            "url": "https://www-odp.tamu.edu/curation/gcr/geol106lab/classifications.htm",
+            "locator": "Final paragraphs, Primary and Secondary sedimentary structures",
+            "access": "Read complete public HTML teaching page. Simplified historical classification not adopted wholesale.",
+            "source_id": "odp106_classification",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_reef_framework_train_01",
+      "topic": "reef_framework",
+      "question": "Из какого вещества строят скелеты рифообразующие каменистые кораллы?",
+      "answer": "Они выделяют карбонат кальция. Накопление этих скелетов создаёт основу коралловой рифовой постройки.",
+      "sources": [
+        "noaa_reef"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_reef_framework_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "NOAA National Ocean Service: What is a coral reef made of?",
+            "url": "https://oceanservice.noaa.gov/facts/coralmadeof.html",
+            "locator": "Calcium-carbonate skeletons and successive colonies; updated 2026-09-23",
+            "access": "Read complete public HTML fact page.",
+            "source_id": "noaa_reef",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_reef_framework_train_02",
+      "topic": "reef_framework",
+      "question": "Коралловый риф строится поднимающимся мелким песком?",
+      "answer": "Нет. Каркас рифа нарастает за счёт карбонатных скелетов организмов; новые колонии растут на известковых остатках предыдущих.",
+      "sources": [
+        "noaa_reef"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_reef_framework_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "NOAA National Ocean Service: What is a coral reef made of?",
+            "url": "https://oceanservice.noaa.gov/facts/coralmadeof.html",
+            "locator": "Calcium-carbonate skeletons and successive colonies; updated 2026-09-23",
+            "access": "Read complete public HTML fact page.",
+            "source_id": "noaa_reef",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_reef_framework_train_03",
+      "topic": "reef_framework",
+      "question": "Что в коралловой колонии является живым, а что минеральным?",
+      "answer": "Полипы — живые организмы. Выделенный ими карбонатный скелет составляет минеральную основу колонии и рифовой постройки.",
+      "sources": [
+        "noaa_reef"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_reef_framework_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "NOAA National Ocean Service: What is a coral reef made of?",
+            "url": "https://oceanservice.noaa.gov/facts/coralmadeof.html",
+            "locator": "Calcium-carbonate skeletons and successive colonies; updated 2026-09-23",
+            "access": "Read complete public HTML fact page.",
+            "source_id": "noaa_reef",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_reef_framework_train_04",
+      "topic": "reef_framework",
+      "question": "Почему наличие карбонатного скелета не равно простому песчаному слою?",
+      "answer": "Скелет образуется организмом и может входить в растущую постройку. Песчаный слой описывает скопление частиц; это разные признаки.",
+      "sources": [
+        "noaa_reef"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_reef_framework_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "NOAA National Ocean Service: What is a coral reef made of?",
+            "url": "https://oceanservice.noaa.gov/facts/coralmadeof.html",
+            "locator": "Calcium-carbonate skeletons and successive colonies; updated 2026-09-23",
+            "access": "Read complete public HTML fact page.",
+            "source_id": "noaa_reef",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_diagenetic_overprint_train_01",
+      "topic": "diagenetic_overprint",
+      "question": "Могут ли минеральные изменения подчеркнуть биогенный ход?",
+      "answer": "Да. В керне IODP 361 описаны пиритизированные ходы. Форма хода и последующая минерализация должны учитываться раздельно.",
+      "sources": [
+        "iodp361_summary"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_diagenetic_overprint_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Hall et al. (2017), IODP Expedition 361 summary",
+            "url": "https://publications.iodp.org/proceedings/361/101/361_101.html",
+            "locator": "Sites U1475 and U1476, Sedimentology",
+            "access": "Read public HTML site sedimentology sections. Case study, not universal diagnostic rule.",
+            "source_id": "iodp361_summary",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_diagenetic_overprint_train_02",
+      "topic": "diagenetic_overprint",
+      "question": "Зелёная полоска в керне обязательно является первичным слоем?",
+      "answer": "Нет. В IODP 361 зелёные слои с пиритом и глауконитом интерпретированы как диагенетические изменения. Для другого керна это проверяемая возможность.",
+      "sources": [
+        "iodp361_summary"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_diagenetic_overprint_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Hall et al. (2017), IODP Expedition 361 summary",
+            "url": "https://publications.iodp.org/proceedings/361/101/361_101.html",
+            "locator": "Sites U1475 and U1476, Sedimentology",
+            "access": "Read public HTML site sedimentology sections. Case study, not universal diagnostic rule.",
+            "source_id": "iodp361_summary",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_diagenetic_overprint_train_03",
+      "topic": "diagenetic_overprint",
+      "question": "Можно ли считать пиритизацию и биотурбацию взаимоисключающими признаками?",
+      "answer": "Нет. Биогенные ходы могут позднее пиритизироваться. Минеральное заполнение не исключает биогенную геометрию структуры.",
+      "sources": [
+        "iodp361_summary"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_diagenetic_overprint_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Hall et al. (2017), IODP Expedition 361 summary",
+            "url": "https://publications.iodp.org/proceedings/361/101/361_101.html",
+            "locator": "Sites U1475 and U1476, Sedimentology",
+            "access": "Read public HTML site sedimentology sections. Case study, not universal diagnostic rule.",
+            "source_id": "iodp361_summary",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_diagenetic_overprint_train_04",
+      "topic": "diagenetic_overprint",
+      "question": "Как использовать опубликованный пример глауконитовой зелёной полосы?",
+      "answer": "Как аналог возможного диагенетического изменения. Он не подтверждает глауконит в новом образце без проверки состава.",
+      "sources": [
+        "iodp361_summary"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_diagenetic_overprint_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Hall et al. (2017), IODP Expedition 361 summary",
+            "url": "https://publications.iodp.org/proceedings/361/101/361_101.html",
+            "locator": "Sites U1475 and U1476, Sedimentology",
+            "access": "Read public HTML site sedimentology sections. Case study, not universal diagnostic rule.",
+            "source_id": "iodp361_summary",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_russian_core_log_train_01",
+      "topic": "russian_core_log",
+      "question": "Что означают «пр.» и «в.к.» в учебном описании керна ТПУ?",
+      "answer": "«Пр.» означает проходку, «в.к.» — вынос керна. Их записывают отдельно: длина извлечённого материала может быть меньше интервала проходки.",
+      "sources": [
+        "tpu_nedolivko_2018"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_russian_core_log_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Н. М. Недоливко, ТПУ (2018). Индивидуальное домашнее задание №1: построение литологической колонки",
+            "url": "https://portal.tpu.ru/SHARED/n/NEDOLIVKO/disc1/Tab2/IDZ_1.pdf",
+            "locator": "PDF pages 3 and 6–9; definitions of пр. and в.к.; interval descriptions",
+            "access": "Read public PDF text, including definitions and examples. No images extracted or paired.",
+            "source_id": "tpu_nedolivko_2018",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_russian_core_log_train_02",
+      "topic": "russian_core_log",
+      "question": "Зачем в российском описании указывать материал, подчёркивающий слоистость?",
+      "answer": "Это уточняет наблюдение: чередование может выделяться глинистыми, углистыми или сидеритовыми прослойками. Геометрию слоистости описывают отдельно.",
+      "sources": [
+        "tpu_nedolivko_2018"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_russian_core_log_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Н. М. Недоливко, ТПУ (2018). Индивидуальное домашнее задание №1: построение литологической колонки",
+            "url": "https://portal.tpu.ru/SHARED/n/NEDOLIVKO/disc1/Tab2/IDZ_1.pdf",
+            "locator": "PDF pages 3 and 6–9; definitions of пр. and в.к.; interval descriptions",
+            "access": "Read public PDF text, including definitions and examples. No images extracted or paired.",
+            "source_id": "tpu_nedolivko_2018",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_russian_core_log_train_03",
+      "topic": "russian_core_log",
+      "question": "Как включить растительные остатки в описание керна?",
+      "answer": "Отдельно отметьте растительный детрит, крупные фрагменты или корневые остатки и их расположение. Не сводите разные наблюдения к одному слову «органика».",
+      "sources": [
+        "tpu_nedolivko_2018"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_russian_core_log_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Н. М. Недоливко, ТПУ (2018). Индивидуальное домашнее задание №1: построение литологической колонки",
+            "url": "https://portal.tpu.ru/SHARED/n/NEDOLIVKO/disc1/Tab2/IDZ_1.pdf",
+            "locator": "PDF pages 3 and 6–9; definitions of пр. and в.к.; interval descriptions",
+            "access": "Read public PDF text, including definitions and examples. No images extracted or paired.",
+            "source_id": "tpu_nedolivko_2018",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_russian_core_log_train_04",
+      "topic": "russian_core_log",
+      "question": "Что нужно приложить к литологической колонке по учебному заданию ТПУ?",
+      "answer": "Заглавие и легенду с расшифровкой использованных условных знаков. Иначе графические обозначения пород и особенностей останутся неоднозначными.",
+      "sources": [
+        "tpu_nedolivko_2018"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_russian_core_log_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Н. М. Недоливко, ТПУ (2018). Индивидуальное домашнее задание №1: построение литологической колонки",
+            "url": "https://portal.tpu.ru/SHARED/n/NEDOLIVKO/disc1/Tab2/IDZ_1.pdf",
+            "locator": "PDF pages 3 and 6–9; definitions of пр. and в.к.; interval descriptions",
+            "access": "Read public PDF text, including definitions and examples. No images extracted or paired.",
+            "source_id": "tpu_nedolivko_2018",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_stylolites_train_01",
+      "topic": "stylolites",
+      "question": "Бывают ли стилолиты в песчаниках?",
+      "answer": "Да. В песчаниках описаны стилолитовые швы и тонкие сутурные контакты между зёрнами, связанные с растворением под давлением.",
+      "sources": [
+        "heald_1955_abstract"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_stylolites_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Milton T. Heald (1955). Stylolites in Sandstones. The Journal of Geology 63(2):101–114",
+            "url": "https://www.journals.uchicago.edu/doi/abs/10.1086/626237",
+            "locator": "Public abstract only; doi:10.1086/626237",
+            "access": "Read public abstract. Paywalled full article was not accessed or downloaded.",
+            "source_id": "heald_1955_abstract",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_stylolites_train_02",
+      "topic": "stylolites",
+      "question": "Стилолитовый шов обязательно совпадает с напластованием?",
+      "answer": "Нет. Многие швы параллельны напластованию, но встречаются и швы вдоль наклонных к нему трещин.",
+      "sources": [
+        "heald_1955_abstract"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_stylolites_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Milton T. Heald (1955). Stylolites in Sandstones. The Journal of Geology 63(2):101–114",
+            "url": "https://www.journals.uchicago.edu/doi/abs/10.1086/626237",
+            "locator": "Public abstract only; doi:10.1086/626237",
+            "access": "Read public abstract. Paywalled full article was not accessed or downloaded.",
+            "source_id": "heald_1955_abstract",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_stylolites_train_03",
+      "topic": "stylolites",
+      "question": "Как растворение под давлением влияет на обломочные зёрна?",
+      "answer": "Оно может изменять размеры и форму зерновых контактов, угловатость и сферичность. Наблюдаемая форма не всегда сохраняет только условия переноса.",
+      "sources": [
+        "heald_1955_abstract"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_stylolites_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Milton T. Heald (1955). Stylolites in Sandstones. The Journal of Geology 63(2):101–114",
+            "url": "https://www.journals.uchicago.edu/doi/abs/10.1086/626237",
+            "locator": "Public abstract only; doi:10.1086/626237",
+            "access": "Read public abstract. Paywalled full article was not accessed or downloaded.",
+            "source_id": "heald_1955_abstract",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_stylolites_train_04",
+      "topic": "stylolites",
+      "question": "Количество стилолитовых швов прямо задаёт количество кварцевого цемента?",
+      "answer": "Нет. Растворённый кремнезём может участвовать в цементации, но простого локального соответствия между объёмом растворения и количеством цемента нет.",
+      "sources": [
+        "heald_1955_abstract"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_stylolites_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Milton T. Heald (1955). Stylolites in Sandstones. The Journal of Geology 63(2):101–114",
+            "url": "https://www.journals.uchicago.edu/doi/abs/10.1086/626237",
+            "locator": "Public abstract only; doi:10.1086/626237",
+            "access": "Read public abstract. Paywalled full article was not accessed or downloaded.",
+            "source_id": "heald_1955_abstract",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_concretions_train_01",
+      "topic": "concretions",
+      "question": "Округлое плотное включение обязательно является окаменелостью?",
+      "answer": "Нет. Конкреции могут быть округлыми минеральными стяжениями и напоминать окаменелости. Нужны признаки строения и состава, а не одна форма.",
+      "sources": [
+        "kgs_concretion"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_concretions_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kansas Geological Survey / GeoKansas: Concretion",
+            "url": "https://geokansas.ku.edu/concretion",
+            "locator": "Concretion; Septarian Concretions",
+            "access": "Read complete public HTML geology-survey page.",
+            "source_id": "kgs_concretion",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_concretions_train_02",
+      "topic": "concretions",
+      "question": "Конкреции образуются только до уплотнения осадка?",
+      "answer": "Нет. Они часто растут в осадке, но могут формироваться и в затвердевшей породе при осаждении минералов в порах и полостях.",
+      "sources": [
+        "kgs_concretion"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_concretions_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kansas Geological Survey / GeoKansas: Concretion",
+            "url": "https://geokansas.ku.edu/concretion",
+            "locator": "Concretion; Septarian Concretions",
+            "access": "Read complete public HTML geology-survey page.",
+            "source_id": "kgs_concretion",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_concretions_train_03",
+      "topic": "concretions",
+      "question": "Какая форма возможна у конкреций кроме шаровидной?",
+      "answer": "Встречаются овальные, вытянутые, дисковидные и неправильные конкреции. Поэтому округлость не является обязательным критерием.",
+      "sources": [
+        "kgs_concretion"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_concretions_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kansas Geological Survey / GeoKansas: Concretion",
+            "url": "https://geokansas.ku.edu/concretion",
+            "locator": "Concretion; Septarian Concretions",
+            "access": "Read complete public HTML geology-survey page.",
+            "source_id": "kgs_concretion",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_concretions_train_04",
+      "topic": "concretions",
+      "question": "Что представляют собой минерализованные трещины септарии?",
+      "answer": "Это сеть трещин внутри конкреции, заполненных минералами, например кальцитом. Их нельзя автоматически принимать за трещиноватость всей вмещающей толщи.",
+      "sources": [
+        "kgs_concretion"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_concretions_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kansas Geological Survey / GeoKansas: Concretion",
+            "url": "https://geokansas.ku.edu/concretion",
+            "locator": "Concretion; Septarian Concretions",
+            "access": "Read complete public HTML geology-survey page.",
+            "source_id": "kgs_concretion",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_chert_and_limestone_train_01",
+      "topic": "chert_and_limestone",
+      "question": "Чем кремень chert по составу отличается от известняка?",
+      "answer": "Кремень состоит из микроскопического кварца, то есть кремнезёма; известняк преимущественно карбонатный, обычно кальцитовый. Сходный цвет не означает одинакового состава.",
+      "sources": [
+        "kgs_flint_hills"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_chert_and_limestone_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kansas Geological Survey / GeoKansas: Rocks and Minerals of the Flint Hills",
+            "url": "https://geokansas.ku.edu/rocks-and-minerals-flint-hills",
+            "locator": "Chert; Limestone; Geodes",
+            "access": "Read complete public HTML geology-survey page.",
+            "source_id": "kgs_flint_hills",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_chert_and_limestone_train_02",
+      "topic": "chert_and_limestone",
+      "question": "Какой излом характерен для кремня?",
+      "answer": "Часто наблюдается раковистый излом с острыми краями. Это полезный признак, но состав и другие свойства также следует проверять.",
+      "sources": [
+        "kgs_flint_hills"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_chert_and_limestone_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kansas Geological Survey / GeoKansas: Rocks and Minerals of the Flint Hills",
+            "url": "https://geokansas.ku.edu/rocks-and-minerals-flint-hills",
+            "locator": "Chert; Limestone; Geodes",
+            "access": "Read complete public HTML geology-survey page.",
+            "source_id": "kgs_flint_hills",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_chert_and_limestone_train_03",
+      "topic": "chert_and_limestone",
+      "question": "Кремень внутри известняка бывает только отдельной галькой?",
+      "answer": "Нет. Он может присутствовать в виде конкреций или протяжённых прослоев. Сам факт нахождения кремня не доказывает перенос гальки.",
+      "sources": [
+        "kgs_flint_hills"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_chert_and_limestone_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kansas Geological Survey / GeoKansas: Rocks and Minerals of the Flint Hills",
+            "url": "https://geokansas.ku.edu/rocks-and-minerals-flint-hills",
+            "locator": "Chert; Limestone; Geodes",
+            "access": "Read complete public HTML geology-survey page.",
+            "source_id": "kgs_flint_hills",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_chert_and_limestone_train_04",
+      "topic": "chert_and_limestone",
+      "question": "Кристаллы на стенках полости обязательно являются обломочными зёрнами?",
+      "answer": "Нет. В жеодах минералы осаждаются из раствора на стенках полости. Такое заполнение отличается от накопления обломочного материала.",
+      "sources": [
+        "kgs_flint_hills"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_chert_and_limestone_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kansas Geological Survey / GeoKansas: Rocks and Minerals of the Flint Hills",
+            "url": "https://geokansas.ku.edu/rocks-and-minerals-flint-hills",
+            "locator": "Chert; Limestone; Geodes",
+            "access": "Read complete public HTML geology-survey page.",
+            "source_id": "kgs_flint_hills",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_mudcracks_way_up_train_01",
+      "topic": "mudcracks_way_up",
+      "question": "Как трещины усыхания помогают определить стратиграфический верх?",
+      "answer": "Типичная трещина шире у бывшей поверхности и сужается вниз. При сохранной геометрии это помогает установить направление первоначального верха слоя.",
+      "sources": [
+        "psu_reading_sedimentary"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_mudcracks_way_up_train_01",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Pennsylvania State University, GEOSC 10: Reading Sedimentary Rocks",
+            "url": "https://courses.ems.psu.edu/geosc10/node/2100",
+            "locator": "Mud Cracks — Capitol Reef National Park; text and transcript",
+            "access": "Read public HTML lesson and transcript. Broad simplified environment claims not adopted.",
+            "source_id": "psu_reading_sedimentary",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_mudcracks_way_up_train_02",
+      "topic": "mudcracks_way_up",
+      "question": "Почему древние трещины усыхания могут быть заполнены другим осадком?",
+      "answer": "После высыхания последующее отложение осадка заполняет трещины. Такое заполнение может сохранить их форму при превращении осадка в породу.",
+      "sources": [
+        "psu_reading_sedimentary"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_mudcracks_way_up_train_02",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Pennsylvania State University, GEOSC 10: Reading Sedimentary Rocks",
+            "url": "https://courses.ems.psu.edu/geosc10/node/2100",
+            "locator": "Mud Cracks — Capitol Reef National Park; text and transcript",
+            "access": "Read public HTML lesson and transcript. Broad simplified environment claims not adopted.",
+            "source_id": "psu_reading_sedimentary",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_mudcracks_way_up_train_03",
+      "topic": "mudcracks_way_up",
+      "question": "Нужно ли отличать современный верх фото от первоначального верха слоя?",
+      "answer": "Да. Порода может быть перевёрнута после накопления. Направление верха устанавливают по сохранным геологическим признакам, а не по ориентации снимка.",
+      "sources": [
+        "psu_reading_sedimentary"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_mudcracks_way_up_train_03",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Pennsylvania State University, GEOSC 10: Reading Sedimentary Rocks",
+            "url": "https://courses.ems.psu.edu/geosc10/node/2100",
+            "locator": "Mud Cracks — Capitol Reef National Park; text and transcript",
+            "access": "Read public HTML lesson and transcript. Broad simplified environment claims not adopted.",
+            "source_id": "psu_reading_sedimentary",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "theory20261025_mudcracks_way_up_train_04",
+      "topic": "mudcracks_way_up",
+      "question": "Что прежде описать у предполагаемой трещины усыхания в разрезе?",
+      "answer": "Её расширение к поверхности, сужение вниз и характер заполнения. Эти наблюдения важнее одного внешнего сходства с линией на фото.",
+      "sources": [
+        "psu_reading_sedimentary"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round2/train.jsonl",
+        "origin_manifest_sha256": "613872f984b0c0f785291fda9f88ab3d0993f2bf783fab4563ddb936a5f114b0",
+        "origin_record_id": "theory20261025_mudcracks_way_up_train_04",
+        "origin_source_group": "theory_sources_20261025",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "user_requested_source_checked_qa_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Pennsylvania State University, GEOSC 10: Reading Sedimentary Rocks",
+            "url": "https://courses.ems.psu.edu/geosc10/node/2100",
+            "locator": "Mud Cracks — Capitol Reef National Park; text and transcript",
+            "access": "Read public HTML lesson and transcript. Broad simplified environment claims not adopted.",
+            "source_id": "psu_reading_sedimentary",
+            "accessed_date": "2026-10-25"
+          }
+        ]
+      }
+    }
+  ]
+}

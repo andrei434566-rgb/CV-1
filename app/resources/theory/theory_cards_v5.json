@@ -107,6 +107,15 @@
     "bre": {
       "title": "Большая российская энциклопедия: Обломочные горные породы",
       "url": "https://bigenc.ru/c/oblomochnye-gornye-porody-312eed"
+    },
+    "iodp_tn5_2023": {
+      "source_id": "iodp_tn5_2023",
+      "title": "Marsaglia and Milliken (2023), IODP Technical Note 5: Practical guide for description and analysis of sedimentary cores",
+      "url": "https://iodp.tamu.edu/publications/TN/TNote_5.pdf",
+      "locator": "Section 4.1.4.3, PDF pages 43 and 45; color mottling, PDF page 52",
+      "accessed_date": "2026-10-25",
+      "license": "CC BY 4.0 except where otherwise noted, per PDF page 2",
+      "pdf_sha256": "ae7ecccf76831fec562735f41647dfa7cfdbac611f0bd18274d7a0ad6be4fc76"
     }
   },
   "cards": [
@@ -1102,12 +1111,27 @@
         "Когда пятнистость не следует записывать как биотурбацию?",
         "Почему пятнистость не обязательно биотурбация?"
       ],
-      "answer": "Нет. Пятнистость возможна из-за диагенеза, окисления и изменения состава. Для биотурбации нужны форма ходов и их отношение к ламинациям; без них запиши «пятнистая текстура, генезис не установлен».",
+      "answer": "Пятнистость может быть биогенной или диагенетической. Геометрия ходов и нарушение первичной слоистости поддерживают диагноз, но отдельные ходы не обязательны при полной переработке осадка. Если доказательств нет, запишите пятнистость и неопределённый генезис; при необходимости помогают рентгенограммы керна.",
       "sources": [
-        "iodp329",
-        "usgs_log"
+        "iodp_tn5_2023"
       ],
-      "holdout": false
+      "holdout": false,
+      "metadata": {
+        "review_status": "derived_from_source_checked_overrides_not_geologist_reviewed",
+        "geology_approved": false,
+        "correction_record_ids": [
+          "v4_mottled_a",
+          "v4_mottled_b"
+        ],
+        "correction_file": "vlm_source/theory_round2/overrides.json",
+        "correction_file_sha256": "9d94e3192e02a5d1ecaf16dc529b7b028047901a7e0bc53c673848ed6d8dab7b",
+        "reason": "remove_false_required_visible_burrow_condition; neutral answer for closed and open aliases; no new geological facts",
+        "previous_answer_sha256": "2cf4a79dfcc4c7e8ec0c24195a9592af9d343698f264f7e8fcfc5a6e9d8e3a03",
+        "previous_sources": [
+          "iodp329",
+          "usgs_log"
+        ]
+      }
     },
     {
       "id": "v4_burrow_evidence",

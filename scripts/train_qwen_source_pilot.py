@@ -1,7 +1,9 @@
 """Offline Qwen3-VL source-label pilot: base comparison, fresh LoRA, comparison.
 
 Only approved training rows are accepted. Validation is never used for loss or
-checkpoint selection; the sealed test split is refused. Saved adapters are
+checkpoint selection; the prepared project test split is refused. Original
+publisher folder names are provenance and may have been regrouped by well.
+Saved adapters are
 candidates and are never installed into Kern Analyzer by this script.
 """
 from __future__ import annotations
@@ -359,7 +361,10 @@ def main() -> None:
             "generation": {"do_sample": False, "repetition_penalty": 1.05,
                            "classification_max_new_tokens": args.classification_max_new_tokens,
                            "theory_max_new_tokens": args.theory_max_new_tokens},
-            "test_split_used": False, "installed_in_application": False,
+            "test_split_used": False,
+            "test_split_definition": "Prepared project split/partition after regrouping; not the original publisher source_split folder.",
+            "original_source_split_is_provenance": True,
+            "installed_in_application": False,
         }
         (args.output_dir / "run_config.json").write_text(json.dumps(settings, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         cached_baseline = None
@@ -502,7 +507,7 @@ def main() -> None:
                 source: 100 * (candidate_metrics["image_classification"][source]["accuracy"] - values["accuracy"])
                 for source, values in baseline_metrics["image_classification"].items()},
             "limitations": ["Source-class validation accuracy is not accuracy of full geological descriptions or facies.",
-                            "Validation subsets are small; held-out source test images were not used.",
+                            "Validation subsets are small; prepared project test rows were not used. Original source folders may have been regrouped by well.",
                             "Text and conversation responses require human review; loss is not accuracy.",
                             "Noncommercial datasets can impose restrictions on resulting use.",
                             "Adapter is separate and has not replaced any active application model."],

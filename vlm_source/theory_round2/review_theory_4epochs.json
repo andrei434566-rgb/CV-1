@@ -1,0 +1,1595 @@
+{
+  "schema": "qwen_theory_round3_qualitative_review_v1",
+  "reviewed_date": "2026-10-26",
+  "timezone": "Asia/Yekaterinburg",
+  "review_type": "assistant_reference_based_qualitative_review",
+  "geologist_approved": false,
+  "geology_accuracy": null,
+  "reviewer_notes": [
+    "Все37 теоретических ответов round3 прочитаны; уже разобранные строки не пересматривались в ходе генерации. SHA зафиксированы после завершения полного evaluation137.",
+    "Использована неизменная заранее подготовленная рубрика; оценки baseline и round2 перенесены из прежнего отчёта без пересмотра.",
+    "Категории и их количества не являются профессиональной геологической accuracy или экспертным подтверждением.",
+    "Правильные осторожные отрицания с важными пропусками отмечены partial; короткость сама по себе не засчитывалась за освоение понятий.",
+    "Есть содержательные улучшения отдельных ответов, но грубые ошибки терминов и диагностических критериев остаются.",
+    "В пограничных кратких ответах указана средняя уверенность рецензента; вывод о неприёмке не зависит от переноса таких случаев на одну соседнюю категорию.",
+    "Этим отчётом не оценены88 image_classification и12 casual строк; их проверка должна учитываться отдельно.",
+    "Рецепт round3 выбран после просмотра прежней validation, изменены сразу learning rate и число эпох. Сравнение остаётся validation-driven и не является независимым тестом новых скважин."
+  ],
+  "rubric": {
+    "path": "open_datasets/qwen_theory_round2_rubric.json",
+    "sha256": "1d450ebc7373e7040e815419f1839536db0ce382f3e891d32ede44510011718f",
+    "prepared_before_current_outputs_review": true,
+    "modified": false
+  },
+  "input_manifest": {
+    "path": "open_datasets/qwen_theory_round2_20261025/holdout_theory.jsonl",
+    "sha256": "e13466d7b936468c8cde1a5ad61fe69b88260086874e8b6f26031ed789e08ada",
+    "modified": false
+  },
+  "prior_review": {
+    "path": "open_datasets/qwen_theory_round2_review.json",
+    "sha256": "21de87bbd1f1e207187bbd4923cee1687c640f110abd073721534b60e2d9e3cc",
+    "baseline_and_round2_labels_modified": false
+  },
+  "responses": {
+    "baseline": {
+      "path": "../vlm_core_v1/outputs/core_vlm_theory_round3_20261026_lora/baseline_responses.jsonl",
+      "sha256": "cd081c26aea98aaad281ef083efb7efa68c01189944dcc33ce734881a720e47c",
+      "byte_identical_to_round2": true
+    },
+    "round2": {
+      "path": "../vlm_core_v1/outputs/core_vlm_theory_round2_20261025_lora/candidate_responses.jsonl",
+      "sha256": "256d0cb0f922478a106a3d42db3faab20f1980d9501a21086e535b1e22858cd5"
+    },
+    "candidate": {
+      "path": "../vlm_core_v1/outputs/core_vlm_theory_round3_20261026_lora/candidate_responses.jsonl",
+      "sha256": "29396bb4bb44550a77aa36f2fce5ca2c7fb38ce8a8214e85f9992ebab86a639d"
+    }
+  },
+  "completed_evaluation": {
+    "finished_utc": "2026-10-25T20:01:23.726733+00:00",
+    "client_finished_time": "2026-10-26 01:01:23 Asia/Yekaterinburg",
+    "all_rows": 137,
+    "theory_rows": 37,
+    "metrics_sha256": "345bb078e1017ab800218c96eb197256c0c87659683ee670e280daf630cd7feb"
+  },
+  "recipe_protocol": {
+    "schema": "qwen_theory_round3_protocol_v1",
+    "date": "2026-10-26",
+    "hypothesis": "Test whether stronger fitting of the same curated Russian text set reduces underfitting.",
+    "initialization": "fresh unchanged local Qwen3-VL-2B-Instruct; no previous adapter initialization",
+    "training_rows": 292,
+    "epochs": 4,
+    "learning_rate": 0.00005,
+    "lora_rank": 8,
+    "changed_from_round2": {
+      "epochs": [
+        2,
+        4
+      ],
+      "learning_rate": [
+        0.00002,
+        0.00005
+      ]
+    },
+    "validation_driven_recipe_tuning": true,
+    "independent_test_accuracy": null,
+    "new_internet_examples_added_in_this_trial": 0,
+    "installed_in_application": false,
+    "baseline_reused_with_strict_identity_checks": true,
+    "rubric_sha256": "1d450ebc7373e7040e815419f1839536db0ce382f3e891d32ede44510011718f",
+    "manifests_unchanged": true,
+    "limitations": [
+      "Validation re-used to compare recipes; not independent geology accuracy.",
+      "Original Mendeley folders regrouped into prepared project/well partitions.",
+      "No application activation without content and regression review."
+    ]
+  },
+  "coverage": {
+    "expected_records": 37,
+    "reviewed_records": 37,
+    "unique_ids": 37,
+    "questions_and_references_match_locked_rubric": true
+  },
+  "category_counts": {
+    "baseline": {
+      "correct": 2,
+      "partial": 9,
+      "incorrect": 26,
+      "uncertain": 0
+    },
+    "round2": {
+      "correct": 0,
+      "partial": 18,
+      "incorrect": 18,
+      "uncertain": 1
+    },
+    "candidate": {
+      "correct": 2,
+      "partial": 22,
+      "incorrect": 12,
+      "uncertain": 1
+    },
+    "interpretation": "Descriptive rubric counts only; not geological accuracy."
+  },
+  "truncation_counts": {
+    "baseline": 24,
+    "round2": 6,
+    "candidate": 0,
+    "method": "Saved generation truncated flags; separate from content categories."
+  },
+  "category_transitions_from_round2": {
+    "incorrect -> incorrect": 10,
+    "incorrect -> partial": 7,
+    "partial -> partial": 15,
+    "incorrect -> uncertain": 1,
+    "partial -> correct": 2,
+    "partial -> incorrect": 1,
+    "uncertain -> incorrect": 1
+  },
+  "decision": {
+    "recommendation": "do_not_activate_for_general_geological_assistant",
+    "reason": "Ноль обрывов и отдельные правильные ограничения не компенсируют ложные объяснения основных пород, рифов, биотурбации, размерных классов и осадочных структур.",
+    "retain_as": "Separate local experimental adapter; not accepted for production theory assistant.",
+    "genuine_improvements": [
+      "Пористость: назван объём порового пространства вместо количества отверстий.",
+      "Лабораторная проба: состав отнесён к одному образцу, другие места требуют отдельных проверок."
+    ],
+    "remaining_critical_errors": [
+      "Алеврит назван минералом вместо размерной категории.",
+      "Риф определён как наклонный/изогнутый слой с поперечными трещинами.",
+      "Для биотурбации потребованы отдельный видимый ход и органический материал.",
+      "Конгломерат и брекчия разграничены крупностью и HTP.",
+      "Shale противопоставлен mudstone плотностью/крупностью вместо делимости.",
+      "Линзовидность подменена резкостью контактов.",
+      "Уголь определяется вязкостью/цветом вместо преобладания органики."
+    ],
+    "next_review": "Нужна проверка того, чему фактически учится адаптер, с профессиональной проверкой основных понятий. Не продолжать наращивать эпохи только ради коротких ответов или низкого loss; рабочую модель выбирать по содержанию и независимым данным."
+  },
+  "records": [
+    {
+      "record_id": "v3_conglomerate_breccia",
+      "question": "Как отличить конгломерат от осадочной брекчии?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "8a913179c39bc2a90ec2e515c0166e000a5e6ba02f9b3951b903e38a7330065e",
+        "response_excerpt": "Конгломерат и осадочная брекчия — это два типа осадочных пород, отличающихся по составу и структуре.\n\n**Конгломерат** — это порода, состоящая из крупных, неравномерно распределённы",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверное различие по размеру обломков вместо окатанности; выдуманные типы конгломерата."
+        ],
+        "reviewer_notes": "Нет различия по окатанности; брекчия ошибочно описана как порода из мелких частиц, предложены выдуманные «взвешенный» и «сухой» типы конгломерата."
+      },
+      "round2": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "2929641950ef68a0c315327e9cdac8b3d164eaa94f21d931d90d711350921bb3",
+        "response_excerpt": "Конгломерат — это осадочная порода, состоящая из крупных частиц, которые образованы в результате разрушения и переработки твердых тел (например, камней, валунов) под воздействием в",
+        "category": "incorrect",
+        "material_errors": [
+          "Брекчия представлена мелкозернистой; ошибочный верхний размер конгломерата 20 мм; цвет подменяет диагноз."
+        ],
+        "reviewer_notes": "Брекчия снова объявлена более мелкой породой; конгломерату приписан предел «до 20 мм» и различие по темноте. Ключевой признак окатанности отсутствует."
+      },
+      "candidate": {
+        "record_id": "v3_conglomerate_breccia",
+        "question": "Как отличить конгломерат от осадочной брекчии?",
+        "truncated": false,
+        "generated_tokens": 91,
+        "response_sha256": "44c487a31b1fa13ff9229c1520235312b1dc04d1d889ffc2eccdc869efd2ac96",
+        "response_excerpt": "Конгломерат — это крупные частицы, связанные с водой и образовавшиеся в условиях высокого давления и температуры. Осадочная брекчия — это мелкие частицы, образовавшиеся в условиях низкой температуры и",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверное различие по размеру; выдуманное разграничение по температуре и давлению."
+        ],
+        "reviewer_notes": "Брекчия по-прежнему ложно названа мелкообломочной, а различие пород выведено из высоких/низких температуры и давления. Критерия окатанности нет."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> incorrect"
+    },
+    {
+      "record_id": "v3_mud_shale",
+      "question": "Чем глинистый сланец shale отличается от массивного mudstone?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "88b93aca0abde01b9011477203d7cb43d9bf0158eaabaedd54e063355d76abf1",
+        "response_excerpt": "Глинистый сланец (shale) и массивный мутноватый песчаник (mudstone) — это разные типы осадочных пород, отличающиеся в основном по составу, структуре и свойствам.\n\n**Глинистый слане",
+        "category": "incorrect",
+        "material_errors": [
+          "Mudstone ошибочно переведён как песчаник; минералогическая путаница."
+        ],
+        "reviewer_notes": "Mudstone назван «массивным мутноватым песчаником»; кварц и доломит причислены к глинистым минералам. Делимость не объяснена."
+      },
+      "round2": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "1d7d54fd28ec5c675466121d293828398486b9722be0d421df2da46f4c86608f",
+        "response_excerpt": "Глинистый сланец (shale) и массивный мутноватый песчаник (mudstone) — это разные типы осадочных пород, отличающиеся в основном по составу и структуре.  \n\nГлинистый сланец — это пор",
+        "category": "incorrect",
+        "material_errors": [
+          "Mudstone ошибочно трактуется как песчаник; ключевая делимость shale пропущена."
+        ],
+        "reviewer_notes": "Mudstone по-прежнему «мутноватый песчаник», состоящий из песка; противопоставление построено на плотности и пористости, а не делимости."
+      },
+      "candidate": {
+        "record_id": "v3_mud_shale",
+        "question": "Чем глинистый сланец shale отличается от массивного mudstone?",
+        "truncated": false,
+        "generated_tokens": 43,
+        "response_sha256": "c7327147a944ffb46ff3fe79c555776ecf11b0f591822fb15d55d07e509333f3",
+        "response_excerpt": "Глинистый сланец имеет более мелкозернистую структуру и более высокую плотность, чем массивный глинистый осадок.",
+        "category": "incorrect",
+        "material_errors": [
+          "Недостоверное определение через относительную зернистость и плотность."
+        ],
+        "reviewer_notes": "Ошибка перевода «мутноватый песчаник» исчезла, но shale теперь определяется более мелкой зернистостью и высокой плотностью. Делимость параллельно напластованию и массивность не объяснены."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> incorrect"
+    },
+    {
+      "record_id": "v3_carbonate_mudstone",
+      "question": "Почему карбонатный mudstone не равен терригенному глинистому mudstone?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "117cae826e150fd423ca36e5c987e8a29d4ff153c1ca330459aadfb7748d4598",
+        "response_excerpt": "Карбонатный mudstone (карбонатный мутный известняк) и терригенный глинистый mudstone (терригенный мутный глинистый известняк) — это разные типы осадочных пород, отличающиеся в осно",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверные обязательные условия и перевод терригенного mudstone как известняка."
+        ],
+        "reviewer_notes": "Выдуманы высокие температуры, вулканические зоны и высокий кислород как определяющие условия; терригенный mudstone также назван известняком."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 162,
+        "response_sha256": "58f958e2f65f74f62ac475307f40a8fe714de091bbc61c643c104ff5c306391e",
+        "response_excerpt": "Карбонатный mudstone и терригенный глинистый mudstone — это разные типы осадочных пород, образующихся в разных условиях. Карбонатный mudstone образуется в условиях высокой концентр",
+        "category": "incorrect",
+        "material_errors": [
+          "Ложное определение через высокую/низкую активность микроорганизмов."
+        ],
+        "reviewer_notes": "Различие объяснено выдуманными уровнями активности микроорганизмов и дисперсности. Нет микритовой опоры, порога 10% и состава терригенной породы."
+      },
+      "candidate": {
+        "record_id": "v3_carbonate_mudstone",
+        "question": "Почему карбонатный mudstone не равен терригенному глинистому mudstone?",
+        "truncated": false,
+        "generated_tokens": 60,
+        "response_sha256": "fddd386f88b11a9d99a5167747619b93b11c81b9d43e1e766499a9fb36a559a2",
+        "response_excerpt": "Карбонатный mudstone — это осадок, в котором основной минералом является карбонат (например, известняк), а не глина. Глинистый mudstone содержит преимущественно глинистые минералы.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Главное противопоставление карбонатного и глинистого состава стало ближе к правильному. Однако известняк назван примером минерала; контекст Данэма, микритовая опора и порог 10% отсутствуют."
+      },
+      "reviewer_confidence": "medium",
+      "change_vs_round2": "incorrect -> partial"
+    },
+    {
+      "record_id": "v3_facies_limit",
+      "question": "Можно ли по одной косой слоистости назвать русловую фацию?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 170,
+        "response_sha256": "f965dfcc88a30492457ea41e5e11bd4ee52427d264bfdce84cf76478df215a50",
+        "response_excerpt": "Нет, по одной косой слоистости нельзя однозначно назвать русловую фацию. Русловая фация — это типовая фация, характеризующаяся наличием русловых (реконструктивных) слоев в осадках,",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Главное отрицание и необходимость других признаков верны, но введены неясные «реконструктивные слои»; не раскрыта неуникальность косой слоистости в разных средах."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 100,
+        "response_sha256": "291e079a0e8c00ba575f621ee91460c495bffb10d4c58a654cc5392032ae6b90",
+        "response_excerpt": "Нет, по одной косой слоистости нельзя назвать русловую фацию. Русловая фация — это совокупность признаков, характерных для русловых осадков, включая их структуру, состав, условия ф",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верно, что одного признака недостаточно; упомянута совокупность состава и структуры. Не разъяснены другие среды и последовательность/геометрия контактов; ответ остаётся общим."
+      },
+      "candidate": {
+        "record_id": "v3_facies_limit",
+        "question": "Можно ли по одной косой слоистости назвать русловую фацию?",
+        "truncated": false,
+        "generated_tokens": 51,
+        "response_sha256": "18a33f92afa849ae9de0fdb248619d14729bfd21ff0d46384329708783238290",
+        "response_excerpt": "Нет. Косая слоистость может быть результатом трансверсального перемещения или переслаивания. Название фации должно соответствовать наблюдаемым признакам и условиям их формирования.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильное отрицание и требование наблюдаемых признаков сохранены. «Трансверсальное перемещение или переслаивание» не объясняет неуникальность косой слоистости; контакты и последовательность не раскрыты."
+      },
+      "reviewer_confidence": "medium",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "v3_homogeneous",
+      "question": "Однородный керн без слоистости обязательно полностью биотурбирован?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 255,
+        "response_sha256": "f895dc823b2ef7eb5c3adf92d453349f16bc9ea5172ed4dfe0595fd5e17b8f15",
+        "response_excerpt": "Нет, однородный керн без слоистости не обязательно полностью биотурбирован.  \n\nБиотурбация — это процесс переработки осадка организмами, который может проявляться в виде изменений ",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верно отвергнута обязательная биотурбация и допущено первичное равномерное накопление. Полная гомогенизация и ограниченная видимость структур не объяснены."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 59,
+        "response_sha256": "826b7f8646104ebaa9cc2ef413f7109c77fff55bdf4cd26af9f5e60ac0d12f5b",
+        "response_excerpt": "Нет. Однородный керн без слоистости не обязательно биотурбирован. Это зависит от наличия в керне органических остатков и их распределения. Без дополнительных данных сложно сделать ",
+        "category": "incorrect",
+        "material_errors": [
+          "Органические остатки поставлены как определяющий критерий биотурбации."
+        ],
+        "reviewer_notes": "После верного «нет» диагноз ошибочно привязан к наличию и распределению органических остатков; они не являются достаточным или обязательным критерием биотурбации."
+      },
+      "candidate": {
+        "record_id": "v3_homogeneous",
+        "question": "Однородный керн без слоистости обязательно полностью биотурбирован?",
+        "truncated": false,
+        "generated_tokens": 65,
+        "response_sha256": "6033d6e75620e428aa90ee6fe7e6a58b8bf0ea0d9cca1bd3ca6289407df09372",
+        "response_excerpt": "Нет. Однородный керн может быть образован только одним процессом, например, турбулентной перемешкой, но не обязательно переработкой. Наличие слоистости и текстуры требуют дополнительного анализа.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верно отвергнута обязательная биотурбация и допущено физическое перемешивание. Фраза «может быть образован только одним процессом» неоднозначна; полная биогенная гомогенизация и ограниченная видимость не объяснены. Не трактую «может» как утверждение универсального единственного механизма."
+      },
+      "reviewer_confidence": "medium",
+      "change_vs_round2": "incorrect -> partial"
+    },
+    {
+      "record_id": "v3_burrow_vs_drilling",
+      "question": "Как отличить биотурбационные ходы от повреждений при бурении?",
+      "priority_previous_failure": true,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "b596d3fda915bb068b91cdffd878b8fe13f5dbed8268a7dbb858701ba6f533a8",
+        "response_excerpt": "Биотурбационные ходы и повреждения при бурении различаются по характеру изменения породы и структуры. Биотурбация — это процесс, при котором организмами (например, бактериями, водо",
+        "category": "incorrect",
+        "material_errors": [
+          "Недиагностические изменения выданы за признаки ходов; ответ не решает различение."
+        ],
+        "reviewer_notes": "Биотурбация описана через нехарактерные диагностические списки цвета, плёнок, пористости и трещин; внутреннее заполнение, пересечение ламинаций и поверхность не сопоставлены."
+      },
+      "round2": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "4411894b337758aa21b39bdb8c68a99ce0a499fa97ed455eb7503a84baee8b2e",
+        "response_excerpt": "Биотурбационные ходы — это результат жизнедеятельности организмов, которые вызывают изменение структуры и текстуры породы. Повреждения при бурении — это механические или химические",
+        "category": "incorrect",
+        "material_errors": [
+          "Недостоверные критерии однородности повреждений и «тонкости» биогенной структуры."
+        ],
+        "reviewer_notes": "Предлагается недостоверное различие: сложные/неоднородные биогенные структуры против однородных буровых повреждений. Нет ключевых признаков заполнения, ламинаций и поверхности."
+      },
+      "candidate": {
+        "record_id": "v3_burrow_vs_drilling",
+        "question": "Как отличить биотурбационные ходы от повреждений при бурении?",
+        "truncated": false,
+        "generated_tokens": 42,
+        "response_sha256": "6a34a049a4c6d7172588e12351623665d6684ca62041ef9386ca17be7e8ef15f",
+        "response_excerpt": "Повреждения могут быть неправильными, но ходы с резкими границами и неравномерной текстурой лучше проверить на фото.",
+        "category": "uncertain",
+        "material_errors": [],
+        "reviewer_notes": "Содержательного различения практически нет: «неправильные повреждения» и совет проверить ходы с резкими границами на фото. Не названы внутреннее заполнение/ореол, пересечение ламинаций и связь артефактов с обработанной поверхностью. Надёжный главный вывод отсутствует."
+      },
+      "reviewer_confidence": "medium",
+      "change_vs_round2": "incorrect -> uncertain"
+    },
+    {
+      "record_id": "v3_no_single_facies",
+      "question": "Можно ли назвать обстановку осадконакопления по одной фотографии без контекста?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 135,
+        "response_sha256": "b369e5dedfeb1a00b81e6424e92c8261497af3e10c846e453b5fdca57f16d298",
+        "response_excerpt": "Нет, нельзя назвать обстановку осадконакопления по одной фотографии без контекста. Фотография может показать только часть структуры или признаки осадка, но не дать полную информаци",
+        "category": "correct",
+        "material_errors": [],
+        "reviewer_notes": "Верно объяснены ограниченность одного снимка и необходимость описания, других слоёв и геологической карты. Основной смысл и ограничение интерпретации сохранены."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 29,
+        "response_sha256": "9e722fd899b6a53d93a617c1918f4ee2365ff1ffad2d3abf7c63f8e1a4e8cd0b",
+        "response_excerpt": "Нет, нельзя. Без контекста невозможно точно определить обстановку осадконакопления по одной фотографии.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильное краткое отрицание и признание недостатка контекста. Не объяснено, что можно описать по фото и какие данные нужны для интерпретации."
+      },
+      "candidate": {
+        "record_id": "v3_no_single_facies",
+        "question": "Можно ли назвать обстановку осадконакопления по одной фотографии без контекста?",
+        "truncated": false,
+        "generated_tokens": 48,
+        "response_sha256": "35f938ade32159677ce5a39e368a381198c772d906621cafb4882de8d21299ef",
+        "response_excerpt": "Нет. Нужно знать условия осадконакопления, например, глубину, режим воды и состав донных осадков. Одна фотография может показывать только один из них.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верно, что одного фото недостаточно и нужны сведения об обстановке. Но объяснение частично круговое — для определения условий предлагается уже знать условия; последовательность, контакты и разделение наблюдения/гипотезы не раскрыты."
+      },
+      "reviewer_confidence": "medium",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "v4_ooid_peloid",
+      "question": "Можно ли по обычному фото уверенно отличить ооиды от пелоидов?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "f1b3a409318cedb4645f750c52e46d0974ded35ae76b9a8ef56d6ba93b7ad20e",
+        "response_excerpt": "Нет, по обычному фото сложно уверенно отличить ооиды от пелоидов.  \n\nОоиды (например, в виде мелких, округлых или неправильных кристаллов) и пелоиды (как правило, более крупные, ча",
+        "category": "incorrect",
+        "material_errors": [
+          "Недостоверное противопоставление по размеру и кристаллической форме."
+        ],
+        "reviewer_notes": "При верном отрицании ооиды описаны как неправильные кристаллы, пелоиды — как более крупные; концентрические оболочки не названы."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 40,
+        "response_sha256": "8e278fb5b25bcbb55ac3944b5fcb754e84a5f3337f11cdfece6a9977894ee95c",
+        "response_excerpt": "Нет, по одному фото нельзя уверенно отличить ооиды от пелоидов. Нужно видеть их в разрезе, чтобы определить тип.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верны ограничение обычного фото и необходимость разреза. Но не названо главное различие внутреннего строения — оболочки ооида."
+      },
+      "candidate": {
+        "record_id": "v4_ooid_peloid",
+        "question": "Можно ли по обычному фото уверенно отличить ооиды от пелоидов?",
+        "truncated": false,
+        "generated_tokens": 41,
+        "response_sha256": "41f1b8490457d0c60e3ccd1905bd323cc1a4d1a4ac17d243ce018f4fca4fc8ab",
+        "response_excerpt": "Нет. Определение по фото требует дополнительных данных. Проверь цвет, текстуру и размеры в масштабе, а также наличие примесей.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Сохранён правильный отказ от уверенного определения по фото. Однако проверяются цвет, размеры и примеси; внутренние оболочки ооида и необходимость среза/шлифа не названы."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "v4_nodules_clasts",
+      "question": "Круглое светлое включение в керне — это обязательно обломок?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "024817f77b16b2127662927805679cde9ba5bfac0aba111575032a57053137a2",
+        "response_excerpt": "Нет, круглое светлое включение в керне не обязательно является обломком. Это может быть результатом различных процессов, таких как:\n\n- **Светлые включения** (например, минералы, вк",
+        "category": "incorrect",
+        "material_errors": [
+          "Магнетит назван светлым минералом; необоснованный механизм образования при формировании керна."
+        ],
+        "reviewer_notes": "Среди «светлых минералов» назван магнетит, выдумано образование включений при «формировании керна». Конкреция и принесённый обломок не различены."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 61,
+        "response_sha256": "460f5541d8a3c20e8ddb6c20ac235ffe91b9889f15f014d6622a22a7d1d0f9b5",
+        "response_excerpt": "Нет, круглое светлое включение в керне не обязательно обломок. Это может быть результат осадочного процесса, например, включения в осадок, образованного в результате трансформации ",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верно, что округлость не доказывает обломок. Объяснение «трансформация или переработка» расплывчато; конкреции, границы и связь с ламинациями отсутствуют."
+      },
+      "candidate": {
+        "record_id": "v4_nodules_clasts",
+        "question": "Круглое светлое включение в керне — это обязательно обломок?",
+        "truncated": false,
+        "generated_tokens": 43,
+        "response_sha256": "bec66c6ac7665290186e369d92ec7a9ea398b57ba635a6bc84d618982a0c4a15",
+        "response_excerpt": "Нет. Это может быть мелкозернистый осадок, пластина или включённый минерал. Определение требует фото и анализа.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильно отвергнута обязательность обломка. Перечислены общие альтернативы, но минеральная конкреция, отличие её роста от привноса обломка и отношения с ламинациями не объяснены."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "v4_chert_limestone",
+      "question": "Светлая плотная порода на фото — кремень или известняк?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 183,
+        "response_sha256": "52bbab4a1482e8b49c0ede7dac672e550bee9f3efb03ba9877d3bd144a66043e",
+        "response_excerpt": "На основе предоставленного изображения сложно точно определить, но светлая плотная порода, вероятно, **керн** или **известняк**, если она имеет характерный белый цвет и слабо порис",
+        "category": "incorrect",
+        "material_errors": [
+          "Керн ошибочно используется как литологический тип; необоснованная диагностика известняка по цвету."
+        ],
+        "reviewer_notes": "Без изображения приписаны белый цвет и слабая пористость, «керн» предложен как название породы; большинство таких пород без основания названы известняками."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 51,
+        "response_sha256": "cca873bc36fdd1cd92164207e0e9c55821b4d6eeb5ca64fb2e28c117ed0a6c8f",
+        "response_excerpt": "На фото видна светлая, плотная порода с небольшим блеском. Это может быть кремень (или кремнистый известняк), но без дополнительных данных сложно точно определить.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Сохранена неопределённость, но без изображения добавлен блеск и предложена догадка о кремне/кремнистом известняке. Нет проверки кислоты, твёрдости или состава."
+      },
+      "candidate": {
+        "record_id": "v4_chert_limestone",
+        "question": "Светлая плотная порода на фото — кремень или известняк?",
+        "truncated": false,
+        "generated_tokens": 37,
+        "response_sha256": "3643c3ca8c3fa59d49c1579598eb540e1bfb9106cafe516c6bdbf884cc5a2e2e",
+        "response_excerpt": "Плотность и цвет могут быть связаны с минералом, но не определяют породу. Нужно проверить состав и текстуру.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильно сказано, что цвет/плотный вид не определяют породу, и предложена проверка состава и текстуры. Угадывание блеска/названия исчезло; при этом не раскрыты кремнистый/карбонатный состав и конкретные доступные проверки."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "v4_root_vs_burrow",
+      "question": "Как отличить корневой след от животного хода в керне?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "3f5e72386f9ae35baa080490ed95e4c3cd919f268a39ee3cdac27b3a52fe0172",
+        "response_excerpt": "Корневой след и животный ход в керне различаются по форме, структуре и характеру рисунка.\n\n**Корневой след** — это типичная форма, образованная при движении корня в почве. Он обычн",
+        "category": "incorrect",
+        "material_errors": [
+          "Надуманные правила рисунка и чёткости границ вместо диагностики."
+        ],
+        "reviewer_notes": "Противопоставление по чёткости границ и «пазлам» не является надёжным диагностическим правилом; ветвление вниз, стенка и заполнение не объяснены."
+      },
+      "round2": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "e5d3cd86f79be8da81707c21a33bf54cf7cca4382945ad77c9be725cf205e3e1",
+        "response_excerpt": "Корневой след — это резко выраженный, часто сильный, непрерывный след, который образуется при движении корня. Он имеет характерную форму, обычно с плавными изгибами и резкими углам",
+        "category": "incorrect",
+        "material_errors": [
+          "Ложные диагностические обобщения о толщине, гладкости и однонаправленности корней."
+        ],
+        "reviewer_notes": "Утверждены недостоверные правила: корневой след обычно шире, толще, глаже, чётче и направлен в одну сторону. Основные признаки отсутствуют."
+      },
+      "candidate": {
+        "record_id": "v4_root_vs_burrow",
+        "question": "Как отличить корневой след от животного хода в керне?",
+        "truncated": false,
+        "generated_tokens": 89,
+        "response_sha256": "bd233ec38ed15b78152c3f67cf8f3110b66be454edd08658353ec4afbf984e65",
+        "response_excerpt": "Корневой след — это резко выраженный угловой путь, который может быть неправильной траекторией. Ход животного — более слабый, изогнутый и часто с неровными краями. Убедись, что форма соответствует тип",
+        "category": "incorrect",
+        "material_errors": [
+          "Чёткость и угловатость/кривизна без основания представлены как главное различие корня и хода."
+        ],
+        "reviewer_notes": "Снова предложены ложные диагностические обобщения: корень — резко выраженный угловой путь, животный ход — более слабый и изогнутый. Нет ветвления вниз, стенки и заполнения."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> incorrect"
+    },
+    {
+      "record_id": "v4_vug_porosity",
+      "question": "Можно ли по отверстиям на фото измерить пористость известняка?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "8c44bfb0d2a6f9d0450ce46fbadb118b92c0823b95bd47b43f394cb5fd523e1b",
+        "response_excerpt": "Да, можно по отверстиям на фото измерять пористость известняка, но только в случае, если они соответствуют определённым условиям.  \n\nНа фотографии отверстия (например, в пустотах и",
+        "category": "incorrect",
+        "material_errors": [
+          "Допускается измерение общей пористости по поверхностным отверстиям без обоснования."
+        ],
+        "reviewer_notes": "Начальное «да, можно измерять» не исправлено последующими оговорками: поверхность и объёмная пористость не разведены."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 49,
+        "response_sha256": "503c56e4828d30a28b78adc044a3e5937fc73c626ff650ec2018eef7569c1fd9",
+        "response_excerpt": "Нет, по отверстиям на фото нельзя точно измерить пористость известняка. Это требует точного анализа микроструктуры, который не может быть сделан только по фотографии.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильно отказано в точном измерении по отверстиям на фото. Не объяснены невидимые поры, объёмный характер свойства и отдельное описание каверн."
+      },
+      "candidate": {
+        "record_id": "v4_vug_porosity",
+        "question": "Можно ли по отверстиям на фото измерить пористость известняка?",
+        "truncated": false,
+        "generated_tokens": 42,
+        "response_sha256": "c5deaa3f7490d4f5ae7bcabbbc7584ee39e4e7a333c13dae41988ea75f0fdb1e",
+        "response_excerpt": "Нет. Отверстия на фото не дают точного значения пористости. Нужно измерять объем порового пространства в пробе, а не только их количество.",
+        "category": "correct",
+        "material_errors": [],
+        "reviewer_notes": "Верно отделены отверстия на фото от точного значения пористости и прямо назван объём порового пространства в пробе вместо одного количества отверстий. Это содержательно передаёт ключевое отличие поверхностного изображения и объёмного свойства; не требую всех факультативных примеров измерений."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> correct"
+    },
+    {
+      "record_id": "v4_lens_bedding",
+      "question": "Чем линзовидная слоистость отличается от волнистой?",
+      "priority_previous_failure": true,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "7b201bc7549556b06cf978b0039bf8bc15df46e1c651c65e12227f5d5487d726",
+        "response_excerpt": "Линзовидная слоистость и волнистая — это два типа слоистости, характерных для осадочных пород, но различаются по форме и структуре.\n\nЛинзовидная слоистость — это сложная форма, при",
+        "category": "incorrect",
+        "material_errors": [
+          "Ложное определение и необоснованный вулканический генезис."
+        ],
+        "reviewer_notes": "Линзовидность определена круглыми/овальными формами и выдуманными давлением, температурой, вулканическими процессами. Прерывистость не названа."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 83,
+        "response_sha256": "4c72ceff626a4cdc80bd8a119d462a0681f293f9a0615407fcd36bd9f970749f",
+        "response_excerpt": "Линзовидная слоистость — это слоистость с четкими, почти круглыми или овальными границами между слоями, часто с небольшим изгибом. Волнистая слоистость имеет более плавные, волнооб",
+        "category": "incorrect",
+        "material_errors": [
+          "Геометрия круглых/овальных пятен подменяет прерывистость линз."
+        ],
+        "reviewer_notes": "Вулканические объяснения исчезли, но остался неверный основной критерий круглых/овальных границ. Прерывистость линз и непрерывность волнистых границ не объяснены."
+      },
+      "candidate": {
+        "record_id": "v4_lens_bedding",
+        "question": "Чем линзовидная слоистость отличается от волнистой?",
+        "truncated": false,
+        "generated_tokens": 43,
+        "response_sha256": "de5f61595c7ea88953f100b85af8259b7a1f4ed10e6e2cdcb0135fc46ebfe656",
+        "response_excerpt": "Линзовидная слоистость имеет четкие, резкие границы между слоями, а волнистая — неровные, с плавными переходами.",
+        "category": "incorrect",
+        "material_errors": [
+          "Прерывистость линз подменена резкостью контакта; волнистость смешана с плавностью перехода."
+        ],
+        "reviewer_notes": "Круглые/овальные границы заменены другим неверным критерием: резкость границ противопоставлена неровности и плавности переходов. Линзы как прерывистые прослои и волнистая геометрия непрерывных границ не объяснены."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> incorrect"
+    },
+    {
+      "record_id": "v4_cementation",
+      "question": "По фотографии видно, какой именно цемент связывает песчаник?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 117,
+        "response_sha256": "abf81bdc724e7e7da823f556d366020d37a56b6353222f55680f97e075e2e801",
+        "response_excerpt": "На основе предоставленной фотографии невозможно точно определить, какой именно цемент связывает песчаник. Визуально можно заметить, что породный материал имеет светло-серый цвет и ",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Главный вывод о невозможности определить цемент по фото и необходимости микроскопии/состава правильный. Однако выдуманы светло-серый цвет и пористость отсутствующего снимка."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 72,
+        "response_sha256": "2f7df0272dd01d011bd2ef6531a05dc2c451c1c28247553f9cdd8d88f9bd54cf",
+        "response_excerpt": "На фотографии видно, что цемент связывает песчаник в виде светлого, мелкозернистого вещества, характерного для кальцитового цемента. Это может быть кальцитовый цемент, который обра",
+        "category": "incorrect",
+        "material_errors": [
+          "Выдуманные признаки снимка используются для диагностики кальцита; неподтверждённые условия HTP."
+        ],
+        "reviewer_notes": "Кандидат уверенно описывает несуществующее изображение и предлагает кальцитовый цемент по светлому веществу; затем приписывает ему образование при высоких температуре и давлении."
+      },
+      "candidate": {
+        "record_id": "v4_cementation",
+        "question": "По фотографии видно, какой именно цемент связывает песчаник?",
+        "truncated": false,
+        "generated_tokens": 70,
+        "response_sha256": "7eb962381e6101e9a8695ff35f6086fac62bc69b47db10c3bafe8142abb161aa",
+        "response_excerpt": "Песчаник с цементацией в виде мелких кристаллов, плотно заполняющих поровую структуру. Цемент может быть известняком, доломитом или другой минералом. Уточните цвет и текстуру образца.",
+        "category": "incorrect",
+        "material_errors": [
+          "Неподтверждённые визуальные признаки; порода известняк смешана с минералом цемента."
+        ],
+        "reviewer_notes": "Без изображения описано плотное заполнение пор кристаллами, а «известняк» предложен как минерал цемента. Нет ограничения определения по общему фото и проверки состава."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> incorrect"
+    },
+    {
+      "record_id": "v4_coarse_color",
+      "question": "Порода стала светлее вверх. Доказывает ли это уменьшение зернистости?",
+      "priority_previous_failure": true,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 192,
+        "response_sha256": "d67c7af73976a924a3cc6a1cfbeabd571c44225e4401afffa612805bb1926edd",
+        "response_excerpt": "Нет, изменение цвета породы вверх (светлее) не обязательно указывает на уменьшение зернистости. Светлее может быть связано с другими факторами, такими как:\n\n- изменение состава мин",
+        "category": "correct",
+        "material_errors": [],
+        "reviewer_notes": "Верно, что осветление не доказывает уменьшение зёрен; названы альтернативы цвета и проверка размера частиц. Основное различие сохранено."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 42,
+        "response_sha256": "19c3038ebb8e9a76a11847eb42affa9fd60208781da286861fc46320f278f21d",
+        "response_excerpt": "Нет, это не доказывает уменьшение зернистости. Светлее может быть связано с изменением окисления или изменениями в условиях осаждения.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильное отрицание, приведены возможные изменения окраски. Но необходимость непосредственно проследить размер зёрен и описать только цвет при низком разрешении пропущена."
+      },
+      "candidate": {
+        "record_id": "v4_coarse_color",
+        "question": "Порода стала светлее вверх. Доказывает ли это уменьшение зернистости?",
+        "truncated": false,
+        "generated_tokens": 44,
+        "response_sha256": "167d510a7177de62ad50d9c0e8dbeb634817930d668aa7d8326d57eac5169211",
+        "response_excerpt": "Нет. Светлый цвет может быть вызван изменением освещения, поглощением или изменением состава. Проверь освещение и цвет фотоматериала.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верное отрицание, названы освещение и состав как возможные причины цвета. Прямая проверка изменения размера зёрен и сохранение только цветового наблюдения не объяснены."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "v4_carbonate_fossil",
+      "question": "Раковины в известняке автоматически означают риф?",
+      "priority_previous_failure": true,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 178,
+        "response_sha256": "f8d953b1020acac9e5124a64d7d561e8cefba1f4df08c4f2262292203dfc2e8c",
+        "response_excerpt": "Нет, раковины в известняке не автоматически означают риф. Раковины могут быть образованы в различных условиях, и их наличие в известняке не обязательно связано с рифовым окружением",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верно, что раковины не доказывают риф. Но нет переноса обломков, роста in situ и каркаса; объяснение через волны и «раковины кораллов» неточное."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 113,
+        "response_sha256": "ed520ed161c453fee74aa51497ead9733524ff2d4217b3c35ca79e17573b0ae5",
+        "response_excerpt": "Нет, раковины в известняке не обязательно указывают на риф. Это может быть результатом образования в условиях, где водные массы проходят через песчаные или мелкие породы, но не все",
+        "category": "incorrect",
+        "material_errors": [
+          "Недостоверное объяснение рифов через мелкие частицы и течения."
+        ],
+        "reviewer_notes": "После верного отрицания рифы объяснены мелкими частицами и течениями, а раковины — прохождением водных масс через породы. Это не объясняет биогенный каркас."
+      },
+      "candidate": {
+        "record_id": "v4_carbonate_fossil",
+        "question": "Раковины в известняке автоматически означают риф?",
+        "truncated": false,
+        "generated_tokens": 43,
+        "response_sha256": "9f6c158a47d5b48bd476367d04a0894698065db3f1387936d67cb3d6e215f5f5",
+        "response_excerpt": "Нет. Раковины могут быть в известняках, доломитах, мраморах и других породах. Уточните тип породы и условия образования.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Главный ответ «нет» верный; ложное объяснение рифа из частиц исчезло. Но вместо переноса раковин, роста in situ и каркаса дан список пород, поэтому рифовая диагностика не объяснена."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> partial"
+    },
+    {
+      "record_id": "v4_surface_vs_internal",
+      "question": "Почему гладкий след на распиле не следует называть ламинацией?",
+      "priority_previous_failure": true,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "599e82b1f2a9ca718f99d54d2797346acfe32e8fe802a3eec00ffe0d49b44329",
+        "response_excerpt": "Гладкий след на распиле не следует называть ламинацией, потому что ламинация — это **набор слоёв** пород, образующихся в процессе **объединения или переплетения** осадочных пород, ",
+        "category": "incorrect",
+        "material_errors": [
+          "Ложное определение ламинации как переплетения/трансформации пород."
+        ],
+        "reviewer_notes": "Ламинация ложно объяснена объединением/переплетением пород и трансформацией под давлением/температурой; диагностические проверки отсутствуют."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 82,
+        "response_sha256": "6a9638bc9bef4d8f91d20e1a777390c737b736fe80eb4ecd7a52f11f2a35bddf",
+        "response_excerpt": "Гладкий след на распиле — это не ламинация, потому что ламинация — это слой, образованный в процессе седиментации, который сохраняется в виде тонкой пленки или слоя. Гладкий след н",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Основное различие природной седиментационной структуры и резания стало верным. Однако след категорически объявлен результатом резания без проверки внутреннего продолжения и соседней поверхности."
+      },
+      "candidate": {
+        "record_id": "v4_surface_vs_internal",
+        "question": "Почему гладкий след на распиле не следует называть ламинацией?",
+        "truncated": false,
+        "generated_tokens": 45,
+        "response_sha256": "f16cc9afd1b82de81de3c32db93501264fa47febd28fa1fe87484ed54dbac85d",
+        "response_excerpt": "Гладкость может быть результатом резания, а не структуры. Ламинация — это слоистость, которую можно увидеть в поперечном разрезе.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Гладкость правильно связана с возможным резанием, а ламинация — со слоистостью. Упоминание разреза полезно, но проверки внутреннего продолжения/соседней поверхности и связей с составом не развёрнуты."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "v4_compaction",
+      "question": "Сплющенные обломки на фото доказывают тектоническую деформацию?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "fac20ee446fd6b9e4a5397b4357ba5bd073133b399e76f9be1453c498512e94e",
+        "response_excerpt": "Да, сплющенные обломки на фотографии могут свидетельствовать о тектонической деформации, если они имеют характерные признаки изгиба, смещения или растяжения, которые не соответству",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Признана неуникальность тектонического вывода, но перечисленные «другие» причины почти все снова тектонические; уплотнение, бурение и мягкоосадочная деформация отсутствуют."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 47,
+        "response_sha256": "e206eef545514ffd0ff2200ee004b85bce7c89087d3be33b98d0bb4aecbe811f",
+        "response_excerpt": "Да, если сплющенные обломки имеют характерную форму и расположение, то это может свидетельствовать о тектонической деформации. Однако без дополнительной информации сложно сделать в",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Есть осторожное «может свидетельствовать» и необходимость дополнительных данных. Но не разграничены свидетельство и доказательство, альтернативные механизмы не названы."
+      },
+      "candidate": {
+        "record_id": "v4_compaction",
+        "question": "Сплющенные обломки на фото доказывают тектоническую деформацию?",
+        "truncated": false,
+        "generated_tokens": 53,
+        "response_sha256": "7fedeea3526f7ade7e8c7f48978638a0d1301ceb9271b42ff1dab525f8ad6b88",
+        "response_excerpt": "Нет. Сплющенные обломки могут быть результатом тектоники, но также могут быть образованы в процессе переработки или перемещения. Проверь контекст и другие признаки.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Главное «нет, не доказывают» стало яснее; сохранена необходимость контекста. «Переработка или перемещение» остаётся слишком общим и не заменяет уплотнение, мягкоосадочную деформацию и буровые артефакты."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "v4_coal_vs_carbonaceous",
+      "question": "Как отличать уголь от углистой глинистой породы?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "bca12ffa32588aa0b90338ebbcf2fca8ca65d322b00c1c9ecc216361393a35dd",
+        "response_excerpt": "Уголь и углистой глинистой порода — это разные типы осадочных пород, отличающиеся в составе, структуре и свойствах.\n\n**Основное различие:**\n\n- **Уголь** — это **непроницаемый, плот",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверное определение через углеводороды, магматические условия и универсальные свойства."
+        ],
+        "reviewer_notes": "Уголь выведен из углеводородов в магматических/метаморфических условиях и описан неподходящими универсальными физическими свойствами. Главная доля органики не объяснена."
+      },
+      "round2": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "a2dfd0388a9f3c9021593cbc7746225d5847bc15cd70c771777960cc4348d808",
+        "response_excerpt": "Уголь — это твердый, плотный, слабо пористый материал, который образуется в условиях высокой температуры и давления. Углистой глинистой породой называют глину, которая содержит угл",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверное утверждение об отсутствии пористости и подмена состава физическими обобщениями."
+        ],
+        "reviewer_notes": "Утверждается отсутствие пористости угля и его определение через плотность, сухость и HTP. Доля органики против минеральной составляющей не раскрыта."
+      },
+      "candidate": {
+        "record_id": "v4_coal_vs_carbonaceous",
+        "question": "Как отличать уголь от углистой глинистой породы?",
+        "truncated": false,
+        "generated_tokens": 102,
+        "response_sha256": "a589a5bb24e55903e0162fa5860f149e0ec004f9ec7a1aaf60e2e96d97a5fd97",
+        "response_excerpt": "Уголь — это плотный, темный, слабо пористый материал с высокой вязкостью и низкой поглощаемостью воды. Углисто-глинистые породы имеют более светлый цвет, более мелкозернистую структуру и повышенную во",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверные универсальные физические критерии и подмена состава цветом/вязкостью."
+        ],
+        "reviewer_notes": "Уголь определяется высокой вязкостью, плотностью и водопоглощением, а углистые глины — светлостью и повышенной водопроницаемостью. Преобладание органики против минеральной составляющей не объяснено."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> incorrect"
+    },
+    {
+      "record_id": "v5_pseudo_beds",
+      "question": "Может ли тёмная полоска между дисками керна быть буровым шламом?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "6b24c12c74e415c6e7dd15de3de234bb1e96d3cd424d0690b6f052a3a6e85ff3",
+        "response_excerpt": "Тёмная полоска между дисками керна может быть буровым шламом, если она имеет следующие характеристики:\n\n- **Количественный состав**: содержит высокий уровень органических веществ, ",
+        "category": "incorrect",
+        "material_errors": [
+          "Высокое содержание органики/углеводородов представлено как определяющая характеристика шлама."
+        ],
+        "reviewer_notes": "Введены необоснованные условия высокого содержания органики/углеводородов для шлама. Нет biscuiting, краёв дисков и внутреннего продолжения."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 64,
+        "response_sha256": "58543e1e1a2ae41b22e16b73c85753fa9e665bca845484797dd2511c5d0078e6",
+        "response_excerpt": "Да, возможно. Тёмная полоска между дисками керна может быть буровым шламом, если она имеет характерный цвет и текстуру. Однако, без дополнительной информации о составе керна и усло",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верны возможность бурового шлама и осторожность. Но цвет/текстура остаются главным объяснением; признаки biscuiting и проверки целых кусков не названы."
+      },
+      "candidate": {
+        "record_id": "v5_pseudo_beds",
+        "question": "Может ли тёмная полоска между дисками керна быть буровым шламом?",
+        "truncated": false,
+        "generated_tokens": 26,
+        "response_sha256": "c14bc893d0c750e28af891ade83d2af951c5a357bf3c5adaf5bf20f0f2054a0e",
+        "response_excerpt": "Да, возможно. Проверь цвет и текстуру шлама и сравните с образцом.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильно допущен буровой шлам, но предложено лишь сравнение цвета/текстуры. Biscuiting, края дисков и отсутствие внутреннего продолжения полосы не названы."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "v5_bio_no_trace",
+      "question": "Если на фото нет отдельного хода, можно ли считать керн биотурбированным?",
+      "priority_previous_failure": true,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "86983a032d14789500842ab5d6a9a39e8f3a2fbdd0a8de8a8eb634caa81a7602",
+        "response_excerpt": "Если на фото нет отдельного хода (например, видимых слоев или структурных изменений, которые бы позволяли определить наличие биотурбации), то **не можем точно сказать**, что керн б",
+        "category": "incorrect",
+        "material_errors": [
+          "Органические остатки и частицы смешаны с доказательствами биотурбационного перемешивания."
+        ],
+        "reviewer_notes": "Органические обломки, растительные остатки и мелкие частицы выданы за признаки биотурбации; механизм уничтожения ходов не объяснён."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 54,
+        "response_sha256": "6a1f48a317e2bda62947dfaab05c0e55f2f0576cad43db52d8ea4dca92ca41c7",
+        "response_excerpt": "Нет, если на фото нет отдельного хода, то нельзя судить о биотурбации. Нужно иметь данные о структуре керна и наличии в нем биотурбационных признаков.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Корректно не назначена биотурбация без данных, но не объяснено, что полное перемешивание может скрыть ходы. Начальное условие об отсутствии отдельного хода остаётся двусмысленным."
+      },
+      "candidate": {
+        "record_id": "v5_bio_no_trace",
+        "question": "Если на фото нет отдельного хода, можно ли считать керн биотурбированным?",
+        "truncated": false,
+        "generated_tokens": 44,
+        "response_sha256": "dddf7c1eae20ec173af9abcc51e46afc7cb790f5919f55c99e27d49bd28dae9b",
+        "response_excerpt": "Нет. Отсутствие хода не доказывает биотурбацию. Нужно найти отдельный ход и проверить наличие органического материала в нем.",
+        "category": "incorrect",
+        "material_errors": [
+          "Для биотурбации необоснованно потребованы отдельный ход и органический материал внутри него."
+        ],
+        "reviewer_notes": "Теперь прямо введено ложное необходимое условие: «нужно найти отдельный ход» и органический материал в нём. Возможность полной гомогенизации без отдельного видимого хода не понята."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> incorrect"
+    },
+    {
+      "record_id": "v5_redox_color",
+      "question": "Как поступить, если два снимка одного керна имеют разный оттенок?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "81cf9201c7dcff4b74a1624891845a7002a9c81e53afd2e6f807587a3c714153",
+        "response_excerpt": "Если два снимка одного керна имеют разный оттенок, это может быть связано с различными факторами, такими как:\n\n1. **Состояние керна** — возможно, один керн был более сильно выдержа",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Есть световые условия и ошибки съёмки, но нет баланса белого, влажности, свежего среза и окисления; часть уточнений нерелевантна."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 92,
+        "response_sha256": "9b8e9bbaee4fe6c7f2a5ead7f1ec71a2e3dfdd63b6faac783075c798641817a9",
+        "response_excerpt": "Если два снимка одного керна имеют разный оттенок, это может быть связано с различными условиями освещения, толщиной слоя, или изменением цвета в процессе анализа. Важно проверить,",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Есть освещение и проверка ошибки съёмки. «Толщина слоя» как причина оттенка одного керна не обоснована; влажность/окисление и фиксация состояния не раскрыты."
+      },
+      "candidate": {
+        "record_id": "v5_redox_color",
+        "question": "Как поступить, если два снимка одного керна имеют разный оттенок?",
+        "truncated": false,
+        "generated_tokens": 35,
+        "response_sha256": "911c7167118f40392442f10888c97ad7b4f4e391d08f54b9fbd81bd699f165a7",
+        "response_excerpt": "Одинаковый оттенок не гарантирует одинаковую окраску. Опиши цвет и освещение на обоих снимках.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Совет описать освещение и цвет полезен. Первая фраза об одинаковом оттенке не отвечает условию о разных снимках; влажность, баланс белого, свежесть и окисление не раскрыты."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "v5_russian_boundary",
+      "question": "Алеврит 0,055 мм по какой шкале может попасть в песок?",
+      "priority_previous_failure": true,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 231,
+        "response_sha256": "a489bccb08ad0da3ab9c95cf97564405978403ca66561c683e91cef5c01c4ac2",
+        "response_excerpt": "Алеврит 0,055 мм — это **маленький размер**, который **не попадает в песок**.  \n\nВ шкале классификации по размеру частиц (например, по ГОСТ 12748-90 или аналогичным стандартам), **",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверная гравийная классификация 0,055 мм; недостоверная нормативная ссылка."
+        ],
+        "reviewer_notes": "0,055 мм ошибочно отнесено к гравию и приведена недостоверная ссылка на ГОСТ; сравнение двух шкал провалено."
+      },
+      "round2": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "57de3a923fb7beaa7594b4790b65b81583071d94faaf2e41aa6944d37da488ac",
+        "response_excerpt": "Алеврит 0,055 мм — это **маленький размер**, он **может попасть в песок**.  \nОн **не будет в пыли**, а **в песке**.  \nПри этом он **не будет в гравии**.  \nОн **не будет в глине**. ",
+        "category": "incorrect",
+        "material_errors": [
+          "Нет требуемого сравнения шкал; ложное исключение размера из глинистых пород; патологическая повторяемость."
+        ],
+        "reviewer_notes": "Границы 0,05/0,063 мм не названы; ответ зациклился на фразе о глинистых породах до лимита. Утверждение, что такая частица не бывает в глинистых породах, смешивает размерность и состав породы."
+      },
+      "candidate": {
+        "record_id": "v5_russian_boundary",
+        "question": "Алеврит 0,055 мм по какой шкале может попасть в песок?",
+        "truncated": false,
+        "generated_tokens": 64,
+        "response_sha256": "6e87b9129bc19ffa0d15e67a18feae6221fb36028745fc094cfacddf21698eb8",
+        "response_excerpt": "При размере 0,055 мм это алеврит, но не обязательно песчаный. Песок — это тонкозернистая порода, а алеврит — минерал. Уточните, что вы имеете в виду.",
+        "category": "incorrect",
+        "material_errors": [
+          "Алеврит ошибочно назван минералом; размерная классификация подменена типом вещества."
+        ],
+        "reviewer_notes": "Зацикливание исчезло, но вместо сравнения порогов 0,05/0,063 мм алеврит назван минералом, а песок — тонкозернистой породой. Принятая шкала не указана."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> incorrect"
+    },
+    {
+      "record_id": "v5_top_debris",
+      "question": "У верха рейса лежат чужеродные обломки. Их можно включить в фациальную последовательность?",
+      "priority_previous_failure": true,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 114,
+        "response_sha256": "259d7b2a243303b215d17a93683ffdc24dd1809f98a0dfe6ab303c18f536d7c7",
+        "response_excerpt": "Нет, чужеродные обломки, если они не являются частью основного осадочного материала, не могут быть включены в фациальную последовательность. Фациальность — это система классификаци",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Осторожность в отношении чужеродных обломков есть, но условное исключение через «основную фацию» не объясняет fall-in, глубину и проверку происхождения."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 47,
+        "response_sha256": "a358ce988514cc654bf7dde7a0cd45088ffed29ae23ceca0a57fec7cd2ccf644",
+        "response_excerpt": "Нет, чужеродные обломки не могут быть включены в фациальную последовательность. Они не являются частью осадка и не соответствуют условиям формирования фации.",
+        "category": "incorrect",
+        "material_errors": [
+          "Без проверки объявлено, что обломки не являются частью осадка и не могут входить в последовательность."
+        ],
+        "reviewer_notes": "Чужеродные обломки категорически объявлены нечастью осадка. Возможность fall-in и неопределённость происхождения не рассмотрены; доказательство подменено утверждением."
+      },
+      "candidate": {
+        "record_id": "v5_top_debris",
+        "question": "У верха рейса лежат чужеродные обломки. Их можно включить в фациальную последовательность?",
+        "truncated": false,
+        "generated_tokens": 45,
+        "response_sha256": "c2efd5357676496a7dc3810712314670ceaa6d186c3ace1d675b68964fd3ab3b",
+        "response_excerpt": "Нет. Чужеродные обломки не являются частью основной фации. Уточните, что они были найдены в одном и том же слое и каких размеров.",
+        "category": "incorrect",
+        "material_errors": [
+          "Неподтверждённое категорическое исключение обломков из осадка; fall-in не рассмотрен."
+        ],
+        "reviewer_notes": "Чужеродные обломки снова без проверки объявлены нечастью основной фации. Размер и нахождение в одном слое не заменяют исключение fall-in и подтверждение глубинного происхождения."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> incorrect"
+    },
+    {
+      "record_id": "theory20261025_rock_naming_holdout_01",
+      "question": "Песчаник назвали дельтовым только из-за положения скважины. Как уточнить запись?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "f4286801ed6e09eb5bcf80b34a4d05a245723395d53cc34df42c3042d896660e",
+        "response_excerpt": "Песчаник, названный дельтовым из-за положения скважины, — это не обязательно его истинный литотип. Название \"дельтовый\" в данном случае может быть ошибочным или необоснованным, есл",
+        "category": "incorrect",
+        "material_errors": [
+          "Выдуманные резонансные/дельтовые структуры как критерий."
+        ],
+        "reviewer_notes": "Потребность проверить породу признана, но затем выдуманы «резонансные структуры в палеоэкспозиции»; описательное название и генетическая интерпретация чётко не разделены."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 63,
+        "response_sha256": "caa6869821cb27f4bee03715db18585475896de63a1a56b8e7a4d07c09efa1b0",
+        "response_excerpt": "Песчаник может быть дельтовым или не дельтовым, если в скважине есть дельтовый позиционный контур. Уточнение зависит от положения скважины и наличия дельтового контура.",
+        "category": "incorrect",
+        "material_errors": [
+          "Неподтверждённый «позиционный контур» подменяет описательное название породы."
+        ],
+        "reviewer_notes": "Дельтовость привязана к неясному «дельтовому позиционному контуру» и положению скважины. Возврата к наблюдаемым свойствам нет."
+      },
+      "candidate": {
+        "record_id": "theory20261025_rock_naming_holdout_01",
+        "question": "Песчаник назвали дельтовым только из-за положения скважины. Как уточнить запись?",
+        "truncated": false,
+        "generated_tokens": 52,
+        "response_sha256": "a68cb277d02275384c2c505604502cc3ffccaa171c99f4a3ec685d3c30854c28",
+        "response_excerpt": "Проверьте положение скважины и наличие дельтовых отложений в поперечном разрезе. Название песчаника зависит от его состава и формы, а не только от положения скважины.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Наконец указано, что название зависит от состава и формы, а не только положения скважины; выдуманный «позиционный контур» исчез. Но описательное название и отдельная дельтовая интерпретация явно не разведены."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> partial"
+    },
+    {
+      "record_id": "theory20261025_laboratory_evidence_holdout_01",
+      "question": "Есть фото керна и анализ одной порошковой пробы. Можно распространить состав на всю колонку?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 153,
+        "response_sha256": "d3ddc64ecd9f3271f558cbb9d4b38273f8794e0d6b9a74487b6b0e94a4611762",
+        "response_excerpt": "Нет, на основании предоставленных данных (фото керна и анализа одной порошковой пробы) нельзя распространять состав на всю колонку. Это требует дополнительной информации, включая:\n",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильно запрещён автоматический перенос и названа потребность в других пробах/слоях. Привязка конкретной пробы к интервалу не раскрыта."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 41,
+        "response_sha256": "69d4e1f5c3f51d4276b55db33d53b0e32113388b527f4e778f08933a54e8d9a0",
+        "response_excerpt": "Нет, на основе одного изображения и одной пробы нельзя распространять состав на всю колонку. Нужно иметь данные по всем слоям и их структуре.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильный отказ от переноса одной пробы на всю колонку. Не объяснены положение, представительность и пределы интервала пробы."
+      },
+      "candidate": {
+        "record_id": "theory20261025_laboratory_evidence_holdout_01",
+        "question": "Есть фото керна и анализ одной порошковой пробы. Можно распространить состав на всю колонку?",
+        "truncated": false,
+        "generated_tokens": 51,
+        "response_sha256": "2d0bb9daf14ad4ef498e4f314a11663489f3be5f9b7de37b0c4bccc03ae3ac03",
+        "response_excerpt": "Нет. Порошковый анализ показывает состав одного образца, а фото дают лишь видимые признаки. Нужно проверить состав и текстуру в нескольких местах и описать их отдельно.",
+        "category": "correct",
+        "material_errors": [],
+        "reviewer_notes": "Верно: анализ относится к одному образцу, фото показывает видимые признаки, для других мест нужны отдельные проверки и описания. Главный предел представительности и запрет автоматического переноса переданы; не требую дословной формулы эталона."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> correct"
+    },
+    {
+      "record_id": "theory20261025_preparation_artifacts_holdout_01",
+      "question": "Вдоль распила тянется гладкая полоса, а внутри образца её нет. Это ламинация?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "f0dbcbe02c5d81d9ea0ca6b7d6e8da054479a744edeca72708ee0e1fffe6f3aa",
+        "response_excerpt": "Нет, это не ламинация.  \nЛаминация — это слой или полоса, которая образуется в результате повторного накопления осадков, обычно в условиях стабильной динамики (например, в палеозон",
+        "category": "incorrect",
+        "material_errors": [
+          "Ложное определение ламинации и необоснованные взаимные перемещения пород."
+        ],
+        "reviewer_notes": "При верном начальном отрицании ламинация получила ложные обязательные свойства одинаковой ориентации/непрерывного перекрытия, а артефакт разделения не объяснён."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 74,
+        "response_sha256": "2d62ac36074fd917709a91b0be3477e3be017afb9881318ffbd98c8df23d3850",
+        "response_excerpt": "Нет, это не ламинация. Ламинация — это слой, который образуется в процессе сушения и высыхания, когда вода испаряется и образуются слои. В данном случае, если в образце нет ламинац",
+        "category": "incorrect",
+        "material_errors": [
+          "Ламинация сведена к испарению воды и высыханию."
+        ],
+        "reviewer_notes": "Ламинация ошибочно определена как продукт сушения и высыхания. Смазывание и проверка поверхности пропущены."
+      },
+      "candidate": {
+        "record_id": "theory20261025_preparation_artifacts_holdout_01",
+        "question": "Вдоль распила тянется гладкая полоса, а внутри образца её нет. Это ламинация?",
+        "truncated": false,
+        "generated_tokens": 58,
+        "response_sha256": "1d4ea452237abb414e6f0799a634f429fcf8347c8d454bc07ffe70a63ce9d39d",
+        "response_excerpt": "Нет. Гладкая полоса может быть пленкой, трещиной или слоем. Проверь, есть ли в образце другие признаки ламинации (например, микропористость, зернистость).",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верное начальное отрицание; названы возможные поверхностные объекты и необходимость других признаков. Ложная сушка исчезла, но смазывание при разделении и проверка внутреннего продолжения не объяснены; микропористость названа неубедительным самостоятельным признаком ламинации."
+      },
+      "reviewer_confidence": "medium",
+      "change_vs_round2": "incorrect -> partial"
+    },
+    {
+      "record_id": "theory20261025_ichnofabric_holdout_01",
+      "question": "На фото видны перекрывающиеся расплывчатые ходы. Это обязательно слабая биотурбация?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "1dfae5786cc5aa6fae3c5eb901e369da6f7321022bb9cf29d2d60d8a61d8740f",
+        "response_excerpt": "Нет, перекрывающиеся расплывчатые ходы на фото не обязательно указывают на слабую биотурбацию. Такие ходы могут быть результатом различных процессов, включая:\n\n- **Седиментарное по",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Начальное отрицание верно, но ответ уходит от интенсивности к необоснованным альтернативам происхождения следов. Нарушение первичной ткани и шкала отсутствуют."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 83,
+        "response_sha256": "32f649bab5debf848daeeabecb10d1a104d66dab0bed4060c1991d8261c61808",
+        "response_excerpt": "Нет, это не обязательно слабая биотурбация. Расплывчатые ходы могут быть результатом динамического перемещения или тектонической активности, а не биотурбации. Без дополнительной ин",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Главное «не обязательно слабая» верно. Однако вместо перекрытия ходов и сохранности ткани предложены динамика/тектоника; интенсивность подменена типом/происхождением."
+      },
+      "candidate": {
+        "record_id": "theory20261025_ichnofabric_holdout_01",
+        "question": "На фото видны перекрывающиеся расплывчатые ходы. Это обязательно слабая биотурбация?",
+        "truncated": false,
+        "generated_tokens": 43,
+        "response_sha256": "7ca577a1809b130cc23b9668bef9a7de8409e7ee83887a2728eb54865399bde8",
+        "response_excerpt": "Нет. Расплывчатость может быть и от минерализации, и от турбулентности. Нужно проверить цвет, текстуру и наличие примесей.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильное «не обязательно слабая», но расплывчатость объяснена минерализацией/турбулентностью и предлагается цвет/примеси. Нет перекрытия ходов, степени нарушения первичной ткани и выбранной шкалы."
+      },
+      "reviewer_confidence": "medium",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "theory20261025_soft_sediment_deformation_holdout_01",
+      "question": "Песчаные языки направлены вниз в мягкую глину. Что описать прежде причины?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "5be7d2d0648b0e00bc255ff23e55670f7452f5886b6d6e18df31dbc64aa303f3",
+        "response_excerpt": "Песчаные языки, направленные вниз в мягкую глину, могут быть результатом **направленного перемещения песчаников** под воздействием **внутренних сил**, таких как **внутреннее давлен",
+        "category": "incorrect",
+        "material_errors": [
+          "Необоснованная вулканическая/тектоническая причина вместо описания нагрузочной геометрии."
+        ],
+        "reviewer_notes": "Нагрузочная геометрия не распознана; вместо неё выдуманы вулканические процессы и движения плит."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 50,
+        "response_sha256": "9e02cad842767fb8fdf1cc4778d82003cfda410072a9f4dc08d1f1b81dd8711e",
+        "response_excerpt": "Песчаные языки направлены вниз в мягкую глину. Это может быть связано с трансформацией песчаниковых структур под воздействием глинистой среды.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Направление языков повторено правильно, но ответ о «трансформации под воздействием глинистой среды» не объясняет нижний контакт, деформацию ила или нагрузочную гипотезу."
+      },
+      "candidate": {
+        "record_id": "theory20261025_soft_sediment_deformation_holdout_01",
+        "question": "Песчаные языки направлены вниз в мягкую глину. Что описать прежде причины?",
+        "truncated": false,
+        "generated_tokens": 25,
+        "response_sha256": "cf3c1c0578f94db0ee6bdd52986a7a68809c6cbcfff2ddefdc5cdb7d2671ef5f",
+        "response_excerpt": "Опиши направление и глубину языков, затем уточни материал под ними.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Дан уместный порядок наблюдений: направление, протяжённость языков и материал под ними. Но нижний контакт, деформация мягкого ила и нагрузочная гипотеза не объяснены."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "theory20261025_reef_framework_holdout_01",
+      "question": "Верно ли объяснение: «риф — это слои песка, поднимающиеся вверх»?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "ac8cc90222b9dfd63bcfdda1487bc2e5dea5ffd377fa1b41d32f5dddd021008a",
+        "response_excerpt": "Нет, это неверное объяснение.  \n«Риф» — это не слои песка, поднимающиеся вверх.  \nРиф — это **объекты, образующиеся в морских условиях**, часто в виде **наблюдаемых структур** (нап",
+        "category": "incorrect",
+        "material_errors": [
+          "Недостоверное происхождение рифа из набора камней/песка под воздействием волн."
+        ],
+        "reviewer_notes": "Исходное объяснение отвергнуто, но риф затем назван набором камней/песка от воздействия волн; карбонатный скелет не упомянут."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 234,
+        "response_sha256": "77267f9ede1978eb6ac4ca8b4a861caf07903a7b9ae7fd64916d0576b6479fa2",
+        "response_excerpt": "Нет, это неверно.  \n«Риф» — это не слои песка, поднимающиеся вверх. Это — **объекты рифов**, которые образуются в морских условиях, часто в виде **многолетних структур** из **глубо",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверное определение рифа через глубоководные песчаные/глинистые осадки."
+        ],
+        "reviewer_notes": "Риф объяснён глубоководными песчаными или глинистыми осадками и выдуманным «ривер-рифом». Основной биогенный механизм не усвоен."
+      },
+      "candidate": {
+        "record_id": "theory20261025_reef_framework_holdout_01",
+        "question": "Верно ли объяснение: «риф — это слои песка, поднимающиеся вверх»?",
+        "truncated": false,
+        "generated_tokens": 68,
+        "response_sha256": "fa589600eedd578db93237039feeebff0b521b3e8109771e984725e915efb940",
+        "response_excerpt": "Нет. Риф — это резко изогнутый или наклонный слой, часто с поперечными трещинами. Песчаные слои могут быть плоскими, наклонными или изогнутыми, но не обязательно рифовидными.",
+        "category": "incorrect",
+        "material_errors": [
+          "Риф ошибочно определён геометрией наклонного/изогнутого слоя и трещинами."
+        ],
+        "reviewer_notes": "Риф теперь ложно определён как резко изогнутый или наклонный слой с поперечными трещинами. Отрицание исходной песчаной фразы не исправляет отсутствие карбонатных скелетов и роста колоний."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> incorrect"
+    },
+    {
+      "record_id": "theory20261025_diagenetic_overprint_holdout_01",
+      "question": "Внутри похожего на ход пятна обнаружен пирит. След организма исключён?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 199,
+        "response_sha256": "c51a8ea4b6678e4a77ad717e9c77a3974d3e646f6e9bc7fa944538895a3d8cb4",
+        "response_excerpt": "Нет, след организма не исключен. Пирит может быть образован в результате биотурбации, когда органические вещества или микроорганизмы способны к окислению и формированию металлическ",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверная геохимическая причинность образования пирита."
+        ],
+        "reviewer_notes": "Начальный вывод о неисключённом следе верен, но пирит объяснён окислением и высокотемпературным окислением сульфидов."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 36,
+        "response_sha256": "1d6b6a0b9dbe32fb725e8bcedb4b760db43773e16998e9e191efe3ee27ac3ee6",
+        "response_excerpt": "Нет, пирит не является следом организма. Он — это минерал, образованный в результате геохимических процессов.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Пирит правильно назван минералом, но вопрос о совместимости минерализации и хода не решён. Нет пиритизированных ходов и проверки геометрии."
+      },
+      "candidate": {
+        "record_id": "theory20261025_diagenetic_overprint_holdout_01",
+        "question": "Внутри похожего на ход пятна обнаружен пирит. След организма исключён?",
+        "truncated": false,
+        "generated_tokens": 33,
+        "response_sha256": "f7725a0ca59619037da9a70bc9770a392fbe30bf71dd5a9258ffc5b18eb8ba3a",
+        "response_excerpt": "Нет. Пирит может быть образован в результате разложения или замещения. Организм не нужен для его выявления.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Правильное отрицание и возможность замещения не исключают след, но ответ снова касается происхождения/выявления минерала. Пиритизированные ходы, сохранение формы и проверка геометрии не объяснены."
+      },
+      "reviewer_confidence": "medium",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "theory20261025_russian_core_log_holdout_01",
+      "question": "В паспорте проходка 6 м, а вынос 4 м. Нужно ли сделать их одинаковыми?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 156,
+        "response_sha256": "77aa2e0670d54cc7fb1a20adc0e10a8af6b9a0e6870890c0ec36d135d5a180f1",
+        "response_excerpt": "Нет, в паспорте проходка и вынос не должны быть одинаковыми. Проходка — это глубина, на которую забирается материал (обычно до 6 м), а вынос — это расстояние, на которое материал п",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверное определение выноса и причин различия величин."
+        ],
+        "reviewer_notes": "Вынос ошибочно определён расстоянием подъёма материала и связан с доступом/нагрузкой на оборудование."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 73,
+        "response_sha256": "de7a3cdc2d08050969804f8a6cc1186eb8d5371f871a55ff44636adc22c2069a",
+        "response_excerpt": "Нет, в паспорте проходка и вынос не должны быть равны. Проходка — это глубина, на которую забирается материал, а вынос — это расстояние от поверхности до точки, где происходит разг",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверное определение выноса как расстояния до разгрузки."
+        ],
+        "reviewer_notes": "Вынос снова ошибочно определён расстоянием от поверхности до разгрузки. Различие интервала проходки и длины извлечённого материала не усвоено."
+      },
+      "candidate": {
+        "record_id": "theory20261025_russian_core_log_holdout_01",
+        "question": "В паспорте проходка 6 м, а вынос 4 м. Нужно ли сделать их одинаковыми?",
+        "truncated": false,
+        "generated_tokens": 39,
+        "response_sha256": "6655d65815b24d1173b89aa1d2f791f8c65750959dd300f9fded40e15284afcb",
+        "response_excerpt": "Нет. Вынос и глубина проходки могут отличаться. Проверь, что в паспорте указано истинное расстояние до поверхности.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верно, что величины могут отличаться; ложное определение разгрузкой больше не высказано. Но проверка расстояния до поверхности не определяет вынос как длину извлечённого материала и не объясняет проходку как пройденный интервал."
+      },
+      "reviewer_confidence": "medium",
+      "change_vs_round2": "incorrect -> partial"
+    },
+    {
+      "record_id": "theory20261025_stylolites_holdout_01",
+      "question": "Тонкий сутурный шов в песчанике объявили первичной ламинацией. Что проверить?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "f0ee8c0cb35791b1e7b88f831c9170890b97a734f3c258d40c8fef708d7d2758",
+        "response_excerpt": "Проверить следует наличие **первичной ламинации** в тонком сутурном шве в песчанике. Это может быть связано с:\n\n1. **Сравнением сопряжения** — наличие слоя, который образовался в п",
+        "category": "incorrect",
+        "material_errors": [
+          "Неверные процессы и подмена природы сутурного шва."
+        ],
+        "reviewer_notes": "Вместо растворения под давлением предложены высыхание, переплетение пород и биотурбация. Сутурные контакты не объяснены."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 155,
+        "response_sha256": "3057e371e5115adb12f419c35890af05deb459586eb3d7916f53324ed4fd515b",
+        "response_excerpt": "Проверить:  \n1. Степень тонкости шва (насколько он узкий).  \n2. Повреждения на поверхности шва.  \n3. Присутствие пленок или слоев на поверхности.  \n4. Отсутствие трещин или разломо",
+        "category": "uncertain",
+        "material_errors": [],
+        "reviewer_notes": "Дан общий список из десяти проверок без ключевого признака растворения под давлением или изменённых зерновых контактов. Содержательного ответа на различение нет."
+      },
+      "candidate": {
+        "record_id": "theory20261025_stylolites_holdout_01",
+        "question": "Тонкий сутурный шов в песчанике объявили первичной ламинацией. Что проверить?",
+        "truncated": false,
+        "generated_tokens": 53,
+        "response_sha256": "c20cc7ad6e0110c9c1dc9d924dbb2f8784e46b1b46e59c39ea70eeb575d6b51a",
+        "response_excerpt": "Проверьте толщину шва и наличие вторичных слоев. Наличие тонкой ламинации может быть результатом пересечения двух слоёв или неправильного измерения.",
+        "category": "incorrect",
+        "material_errors": [
+          "Неподтверждённый механизм пересечения слоёв или измерительной ошибки вместо проверки стилолитизации."
+        ],
+        "reviewer_notes": "Вместо растворения под давлением и сутурных зерновых контактов предлагаются толщина, вторичные слои и пересечение двух слоёв/ошибка измерения как объяснение ламинации. Это подмена нужного механизма."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "uncertain -> incorrect"
+    },
+    {
+      "record_id": "theory20261025_concretions_holdout_01",
+      "question": "Плотный округлый объект похож на яйцо. Можно сразу записать ископаемое яйцо?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "5a7a93c1d99876247b4bcd1758a03a0cb2b4346324227c86db0c91eb382819b8",
+        "response_excerpt": "Нет, нельзя сразу записывать ископаемое яйцо. Плотный округлый объект, похожий на яйцо, может быть результатом различных процессов, и его интерпретация требует дополнительного анал",
+        "category": "incorrect",
+        "material_errors": [
+          "Ископаемое яйцо представлено лишь метафорой, биологическая интерпретация необоснованно отвергается."
+        ],
+        "reviewer_notes": "Отказ от немедленного диагноза верен, но ископаемое яйцо ошибочно объявлено метафорой; затем введён неясный «фациональный элемент»."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 101,
+        "response_sha256": "4992a75921598d002a0c115a212b3e87cb6074abf303f67c0ddb5417a1dc0074",
+        "response_excerpt": "Нет, нельзя. Плотный округлый объект похож на яйцо, но это не обязательно ископаемое яйцо. Нужно проверить контекст: есть ли в документах или фото признаки, указывающие на то, что ",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Сохранён правильный отказ от диагноза по силуэту. Конкреция как конкретная альтернатива и признаки её проверки не названы."
+      },
+      "candidate": {
+        "record_id": "theory20261025_concretions_holdout_01",
+        "question": "Плотный округлый объект похож на яйцо. Можно сразу записать ископаемое яйцо?",
+        "truncated": false,
+        "generated_tokens": 46,
+        "response_sha256": "af3657663475d5f5d2677a3c6704291fff85915ec0a65aa7fe0b706312117915",
+        "response_excerpt": "Нет. Плотный округлый объект может быть ископаемым яйцом, и может быть и неправильной телом. Нужно проверить контекст и размер.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верно, что силуэт яйца не устанавливает происхождение; нужны дополнительные признаки. Конкреция как конкретная минеральная альтернатива не названа, а выражение «неправильное тело» неинформативно."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "theory20261025_chert_and_limestone_holdout_01",
+      "question": "В известняке увидели тёмные кремнистые стяжения. Это обязательно конгломерат?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "fe633056d07e5065c55686bcdb9d489c4fd86b60825d97a81ff95d83e4a1a87d",
+        "response_excerpt": "Нет, в известняке тёмные кремнистые стяжения не обязательно являются конгломератом.  \n\nКонгломерат — это породный материал, состоящий из крупных, неравномерно ориентированных части",
+        "category": "incorrect",
+        "material_errors": [
+          "Биотурбация выдана за обычную причину кремнистых стяжений."
+        ],
+        "reviewer_notes": "После правильного отрицания кремнистые стяжения преимущественно приписаны биотурбации; определение конгломерата неточное."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 67,
+        "response_sha256": "4e085c1e0877c38f87bb9590d32962b38e727e98f979de0fbe3d5799477b1d1d",
+        "response_excerpt": "Нет, это не обязательно конгломерат. Тёмные кремнистые стяжения в известняке могут быть результатом окисления, минерализации или других процессов, не связанных с конгломератом. Без",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верное отрицание, но нет конкреций/прослоев и проверки обломочной природы. Окисление предложено без обоснования."
+      },
+      "candidate": {
+        "record_id": "theory20261025_chert_and_limestone_holdout_01",
+        "question": "В известняке увидели тёмные кремнистые стяжения. Это обязательно конгломерат?",
+        "truncated": false,
+        "generated_tokens": 32,
+        "response_sha256": "22a900174af041c60761c56cee96d4fec72fe46342c95d3e898b5073b46645f4",
+        "response_excerpt": "Нет. Укажите цвет и форму частиц, размер и плотность, а также наличие мелкого песчаного материала.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "Верное отрицание, но вместо конкреций/прослоев и доказательства обломочного скопления предложен общий список цвета, плотности и мелкого песка. Природа кремнистых стяжений не раскрыта."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "partial -> partial"
+    },
+    {
+      "record_id": "theory20261025_mudcracks_way_up_holdout_01",
+      "question": "Заполненные трещины сужаются к нижней стороне образца. Какую гипотезу проверить?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": true,
+        "generated_tokens": 260,
+        "response_sha256": "d6aba2c1f0d5ffe64bbf456daaff90caf288eeb965cf277b325bff1d212fbd52",
+        "response_excerpt": "Гипотеза: **Трещины в образце сужаются к нижней стороне — это может быть следствием изменения давления или напряжения в зоне разлома, связанного с изменением структуры или свойств ",
+        "category": "incorrect",
+        "material_errors": [
+          "Неподтверждённый механизм давления/тектоники подменяет диагностическую гипотезу."
+        ],
+        "reviewer_notes": "Ожидаемая гипотеза о трещинах усыхания и стратиграфическом верхе отсутствует; заменена давлением и тектоникой."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 45,
+        "response_sha256": "22a52c55d89ef392785f318e56cf882067a2d53ebb4fb88dbfbd1c47da78211f",
+        "response_excerpt": "Гипотеза: образование заполненных трещин сужается к нижней стороне из-за снижения давления или изменения структуры породы внизу.",
+        "category": "incorrect",
+        "material_errors": [
+          "Необоснованное снижение давления выдано как причина геометрии."
+        ],
+        "reviewer_notes": "Сужение объяснено снижением давления внизу. Не названы трещины усыхания, расширение к поверхности и проверка верха."
+      },
+      "candidate": {
+        "record_id": "theory20261025_mudcracks_way_up_holdout_01",
+        "question": "Заполненные трещины сужаются к нижней стороне образца. Какую гипотезу проверить?",
+        "truncated": false,
+        "generated_tokens": 48,
+        "response_sha256": "d2d9a44549371c3d7f766f30b8916d5325d0383a5486f4ed27e0ca715852e238",
+        "response_excerpt": "Проверьте, не либо волнистость или наклон образца вызвана смещением или растяжением. Уточните направление и глубину сужения.",
+        "category": "incorrect",
+        "material_errors": [
+          "Геометрия сужающейся заполненной трещины подменена другим структурным сюжетом."
+        ],
+        "reviewer_notes": "Ожидаемая гипотеза о трещинах усыхания и первоначальном верхе слоя отсутствует. Вопрос заменён волнистостью, наклоном, смещением и растяжением без обоснования."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> incorrect"
+    },
+    {
+      "record_id": "russia2025_yamal_case_bio_reworking",
+      "question": "В опубликованном разрезе ХМ3 могла ли первичная слоистость почти исчезнуть при биотурбации?",
+      "priority_previous_failure": false,
+      "baseline": {
+        "truncated": false,
+        "generated_tokens": 159,
+        "response_sha256": "68abc0fc76c8493473efdf44fe53516c4b9edccfdc80aa3cdb9c001b904f573f",
+        "response_excerpt": "В опубликованном разрезе ХМ3 первичная слоистость, по всей видимости, не исчезла при биотурбации. Биотурбация может вызвать изменение текстуры и структуры осадка, но в данном случа",
+        "category": "incorrect",
+        "material_errors": [
+          "Утверждение противоречит известному описанию конкретного разреза."
+        ],
+        "reviewer_notes": "Вопреки опубликованному описанию утверждается, что в ХМ3 слоистость по-видимому не исчезла; затем перечислены общие оговорки."
+      },
+      "round2": {
+        "truncated": false,
+        "generated_tokens": 131,
+        "response_sha256": "588d6344568488964594d2b1209001526fe6f03169b13cdd623862936adaa8a1",
+        "response_excerpt": "В разрезе ХМ3 первичная слоистость может быть частично или полностью исчезнувшей при биотурбации, если в процессе переработки осадка образуются новые слои, которые заменяют или пер",
+        "category": "incorrect",
+        "material_errors": [
+          "Биотурбационное перемешивание ошибочно объяснено созданием новых слоёв."
+        ],
+        "reviewer_notes": "Начальное допущение исчезновения слоистости ближе к эталону, но выдуман механизм образования новых замещающих/переплетающихся слоёв. Конкретное опубликованное наблюдение не подтверждено."
+      },
+      "candidate": {
+        "record_id": "russia2025_yamal_case_bio_reworking",
+        "question": "В опубликованном разрезе ХМ3 могла ли первичная слоистость почти исчезнуть при биотурбации?",
+        "truncated": false,
+        "generated_tokens": 55,
+        "response_sha256": "6538750fb10480bdbdc0d519204bb41a1c4070f1ab91e62d00bc25509de1668b",
+        "response_excerpt": "Да, возможна потеря слоистости при биотурбации. При этом слоистость может сохраняться в виде небольших зон, особенно если биотурбация не затрагивает всю толщу.",
+        "category": "partial",
+        "material_errors": [],
+        "reviewer_notes": "В отличие от round2 исчез ложный механизм образования новых слоёв; корректно допущены потеря слоистости и местные остатки. Но конкретное опубликованное наблюдение авторов по ХМ3 не подтверждено — ответ остаётся общим рассуждением."
+      },
+      "reviewer_confidence": "high",
+      "change_vs_round2": "incorrect -> partial"
+    }
+  ]
+}
