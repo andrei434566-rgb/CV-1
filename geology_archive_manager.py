@@ -50,6 +50,25 @@ class HybridWorker(QObject):
         finally:
             self.done.emit()
 
+class VlmPhotoWorker(QObject):
+    finished = Signal(dict)
+    failed = Signal(str)
+    done = Signal()
+
+    def __init__(self, photo, output, model):
+        super().__init__()
+        self.photo, self.output, self.model = photo, output, model
+
+    @Slot()
+    def run(self):
+        try:
+            from cv1_vlm_photo import analyze
+            self.finished.emit(analyze(self.photo, self.output, self.model))
+        except Exception as exc:
+            self.failed.emit("".join(traceback.format_exception(type(exc), exc, exc.__traceback__)))
+        finally:
+            self.done.emit()
+
 
 class ArchiveManager(QMainWindow):
     def __init__(self):
@@ -83,6 +102,7 @@ class ArchiveManager(QMainWindow):
             ("Проверить CVAT YOLO",self.inspect_cvat),
             ("Импорт CVAT YOLO",self.import_cvat),
             ("YOLO + VLM: фото",self.hybrid_photo),
+            ("VLM: анализ керна",self.vlm_photo),
             ("Привязка глубин",self.depth_mapping),
         ]:
             button=QPushButton(title)
@@ -223,6 +243,42 @@ class ArchiveManager(QMainWindow):
                     "Создан lane_annotations.json. Укажите координаты рядов и их интервалы; повторное нажатие построит карту глубин.")
         except Exception as exc:
             QMessageBox.critical(self,"Ошибка привязки глубин",str(exc))
+
+    def vlm_photo(self):
+        if self.hybrid_thread is not None:
+            QMessageBox.information(self, "VLM", "Дождитесь завершения анализа.")
+            return
+        photo, _ = QFileDialog.getOpenFileName(
+            self, "Фотография для VLM", str(BASE),
+            "Изображения (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.webp)")
+        if not photo:
+            return
+        from PySide6.QtWidgets import QInputDialog
+        model, ok = QInputDialog.getText(
+            self, "Локальная VLM", "Название установленной модели Ollama:",
+            text="qwen2.5vl:7b")
+        if not ok or not model.strip():
+            return
+        import hashlib
+        key = hashlib.sha256(str(Path(photo).resolve()).encode("utf-8")).hexdigest()[:12]
+        destination = self.output_dir / "vlm_photos" / key
+        self.hybrid_thread = QThread(self)
+        self.hybrid_worker = VlmPhotoWorker(photo, destination, model.strip())
+        self.hybrid_worker.moveToThread(self.hybrid_thread)
+        self.hybrid_thread.started.connect(self.hybrid_worker.run)
+        self.hybrid_worker.finished.connect(self._vlm_photo_complete)
+        self.hybrid_worker.failed.connect(self._hybrid_failed)
+        self.hybrid_worker.done.connect(self.hybrid_thread.quit)
+        self.hybrid_worker.done.connect(self.hybrid_worker.deleteLater)
+        self.hybrid_thread.finished.connect(self._hybrid_cleanup)
+        self.status.appendPlainText("VLM анализирует фотографию без YOLO...")
+        self.hybrid_thread.start()
+
+    @Slot(dict)
+    def _vlm_photo_complete(self, result):
+        self.status.appendPlainText(
+            "=== VLM: геологическое описание ===\\n" + result["description"] +
+            "\\nФайл: " + result["description_file"])
 
     def hybrid_photo(self):
         if self.hybrid_thread is not None:
