@@ -47,6 +47,7 @@ class ReviewWindow(QMainWindow):
         self.photo = QLabel("Выберите фотографию")
         self.original_pixmap = QPixmap()
         self.core_boxes = []
+        self.columns_verified = False
         self.recognizer = None
         self.photo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.photo.setMinimumSize(320, 260)
@@ -74,6 +75,9 @@ class ReviewWindow(QMainWindow):
         right_layout.addWidget(QLabel("Фото керна"))
         right_layout.addWidget(self.photo_scroll, 5)
         right_layout.addWidget(self.detect_button)
+        verify_columns = QPushButton("Подтвердить контуры столбиков")
+        verify_columns.clicked.connect(self.verify_columns)
+        right_layout.addWidget(verify_columns)
         depths = QHBoxLayout()
         depths.addWidget(QLabel('Паспорт ящика: от'))
         self.box_top = QLineEdit()
@@ -260,6 +264,7 @@ class ReviewWindow(QMainWindow):
         pixmap = QPixmap(str(path))
         self.original_pixmap = pixmap
         self.core_boxes = []
+        self.columns_verified = False
         verified=self._box_span(pair)
         self.box_top.setText(str(verified[0]) if verified else '')
         self.box_bottom.setText(str(verified[1]) if verified else '')
@@ -347,12 +352,25 @@ class ReviewWindow(QMainWindow):
             if self.recognizer is None:
                 self.recognizer = CoreColumnRecognizer()
             self.core_boxes = self._select_lanes(self.recognizer.recognize(image, orientation="auto"))
+            self.columns_verified = False
             self.render_photo()
             self.details.append(f"\nKern Analyzer: найдено {len(self.core_boxes)} столбиков/рядов. Проверьте контуры.")
         except Exception as exc:
             self.details.append(f"\nДетектор: {exc}")
             if not silent:
                 QMessageBox.warning(self, "Детектор керна", str(exc))
+
+    def verify_columns(self):
+        if not self.core_boxes:
+            QMessageBox.warning(self, "Контуры", "Сначала найдите столбики.")
+            return
+        answer = QMessageBox.question(
+            self, "Проверка контуров",
+            "Все зелёные прямоугольники содержат только керн, без линейки, "
+            "этикеток и перегородок? Подтвердите только после визуальной проверки.")
+        if answer == QMessageBox.StandardButton.Yes:
+            self.columns_verified = True
+            self.details.append("\\nКонтуры визуально подтверждены оператором.")
 
     @staticmethod
     def _select_lanes(boxes):
@@ -533,7 +551,8 @@ class ReviewWindow(QMainWindow):
             "reviewed_at": datetime.now(timezone.utc).isoformat(),
             "well": pair.get("well"),
             "box_depth": self._box_span(pair),
-            "geometry_status": "provisional_projection",
+            "geometry_status": "operator_verified_columns" if self.columns_verified else "unverified_columns",
+            "core_boxes": self.core_boxes if self.columns_verified else [],
         }
         payload = {"source_index": str(self.index_file), "decisions": self.decisions}
         temporary = self.review_file.with_suffix(".tmp")
