@@ -64,3 +64,40 @@ if __name__=="__main__":
     parser.add_argument("index_dir",type=Path)
     args=parser.parse_args()
     print(json.dumps(export(args.index_dir),ensure_ascii=False,indent=2))
+
+
+def export_text_knowledge(index_dir: Path):
+    """Export all usable Excel geological descriptions without inventing image labels."""
+    index_dir = Path(index_dir)
+    archive = json.loads((index_dir / "archive_index.json").read_text(encoding="utf-8"))
+    destination = index_dir / "vlm_dataset"
+    destination.mkdir(parents=True, exist_ok=True)
+    output = destination / "geology_text_knowledge.jsonl"
+    seen = set()
+    count = 0
+    with output.open("w", encoding="utf-8") as stream:
+        for row in archive.get("descriptions", []):
+            description = str(row.get("description") or "").strip()
+            facies = str(row.get("facies") or "").strip()
+            lithology = str(row.get("lithology") or "").strip()
+            index = str(row.get("facies_index") or "").strip()
+            if not any((description, facies, lithology, index)):
+                continue
+            key = (description, facies, lithology, index)
+            if key in seen:
+                continue
+            seen.add(key)
+            item = {
+                "type": "geological_text_reference",
+                "description": description,
+                "facies": facies,
+                "facies_index": index,
+                "lithology": lithology,
+                "depositional_environment": str(row.get("depositional_environment") or ""),
+                "source": {"excel": row.get("file"), "sheet": row.get("sheet"), "row": row.get("row")},
+                "is_image_ground_truth": False,
+                "note": "Text-only geological knowledge. Do not use as image-caption training pairs."
+            }
+            stream.write(json.dumps(item, ensure_ascii=False) + "\n")
+            count += 1
+    return {"text_examples": count, "output": str(output), "image_labels_created": 0}
