@@ -49,7 +49,14 @@ def analyze(photo: str | Path, model_path: str | Path, output: str | Path,
         raise ValueError(f"RGB conversion failed: shape={rgb_array.shape}")
     # A CHW float tensor bypasses image loaders that may add an alpha channel.
     import torch
-    tensor = torch.from_numpy(rgb_array).permute(2, 0, 1).unsqueeze(0).float().div_(255.0).contiguous()
+    tensor = torch.from_numpy(rgb_array.copy()).permute(2, 0, 1).unsqueeze(0).float().div_(255.0).contiguous()
+    # Tensor inputs bypass Ultralytics letterboxing, so pad explicitly to stride 32.
+    import torch.nn.functional as F
+    height, width = rgb_array.shape[:2]
+    pad_h = (-height) % 32
+    pad_w = (-width) % 32
+    if pad_h or pad_w:
+        tensor = F.pad(tensor, (0, pad_w, 0, pad_h), mode="constant", value=0.0)
     if tensor.shape[1] != 3:
         raise ValueError(f"YOLO input must have 3 channels, got {tuple(tensor.shape)}")
     yolo = YOLO(str(model_path))
@@ -73,7 +80,9 @@ def analyze(photo: str | Path, model_path: str | Path, output: str | Path,
         cls = int(result.boxes.cls[i].item())
         score = float(result.boxes.conf[i].item())
         name = str(result.names.get(cls, cls))
-        xy = [(float(x), float(y)) for x, y in points]
+        # Padding is added only at right/bottom, preserving original coordinates.
+        xy = [(min(float(width - 1), max(0.0, float(x))),
+               min(float(height - 1), max(0.0, float(y)))) for x, y in points]
         if len(xy) < 3:
             continue
         mask = Image.new("L", original.size, 0)
