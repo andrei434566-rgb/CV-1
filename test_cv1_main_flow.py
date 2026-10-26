@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import tempfile
 import unittest
 from collections import deque
@@ -101,6 +102,62 @@ class Cv1MainFlowTests(unittest.TestCase):
         self.assertEqual(config["model_mode"], "base")
         self.settings.setValue("vlm/model_mode", "lora")
         self.assertEqual(self.window._local_vlm_config()["model_mode"], "lora")
+
+    def test_selected_yolo_is_saved_to_disk_and_survives_restart_and_new_project(self):
+        model = self.root / "best.pt"
+        model.write_bytes(b"checkpoint fixture; actual loading is mocked")
+        with patch.dict(sys.modules, {"ultralytics": SimpleNamespace(YOLO=lambda _: SimpleNamespace(task="segment"))}):
+            self.window.select_detection_model(filename_override=model)
+        # A different QSettings instance reads the durable choice, as on restart.
+        restored_settings = QSettings(self.settings.fileName(), QSettings.Format.IniFormat)
+        self.assertEqual(restored_settings.value("facies/model_path"), str(model.resolve()))
+        with (
+            patch(_MODULE + ".QSettings", return_value=restored_settings),
+            patch.dict(sys.modules, {"ultralytics": SimpleNamespace(YOLO=Mock(side_effect=AssertionError("startup must not load weights")))}),
+        ):
+            restarted = MainWindow()
+        try:
+            self.assertEqual(restarted._resolve_model_path(), model.resolve())
+            restarted.new_project()
+            self.assertEqual(restarted._resolve_model_path(), model.resolve())
+        finally:
+            restarted.close()
+
+    def test_missing_remembered_yolo_is_reported_once_without_picking_another_model(self):
+        missing = self.root / "missing_best.pt"
+        self.settings.setValue("facies/model_path", str(missing))
+        with (
+            patch(_MODULE + ".AssistantPanel.append_message") as append,
+            patch(_MODULE + ".QFileDialog.getOpenFileName") as chooser,
+        ):
+            restarted = MainWindow()
+            try:
+                self.assertIsNone(restarted._resolve_model_path())
+                restarted._show_remembered_model_status()
+                restarted.new_project()
+                warnings = [call.args[1] for call in append.call_args_list if "Последняя модель границ" in str(call.args[1])]
+                self.assertEqual(len(warnings), 1)
+                self.assertIn(str(missing), warnings[0])
+                self.assertEqual(self.settings.value("facies/model_path"), str(missing))
+                chooser.assert_not_called()
+            finally:
+                restarted.close()
+
+    def test_invalid_new_checkpoint_does_not_replace_remembered_yolo(self):
+        good = self.root / "best.pt"
+        good.write_bytes(b"good fixture")
+        bad = self.root / "detect_only.pt"
+        bad.write_bytes(b"bad fixture")
+        self.window._selected_model_path = good
+        self.settings.setValue("facies/model_path", str(good))
+        with (
+            patch.dict(sys.modules, {"ultralytics": SimpleNamespace(YOLO=lambda _: SimpleNamespace(task="detect"))}),
+            patch(_MODULE + ".QMessageBox.warning") as warning,
+        ):
+            self.window.select_detection_model(filename_override=bad)
+        warning.assert_called_once()
+        self.assertEqual(self.window._resolve_model_path(), good)
+        self.assertEqual(self.settings.value("facies/model_path"), str(good))
 
     def test_import_chat_photos_reuses_existing_record_and_deduplicates_paths(self):
         existing = self.record()

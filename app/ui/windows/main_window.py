@@ -114,6 +114,7 @@ class MainWindow(QMainWindow):
         self._primary_facies_catalog = self._load_global_primary_catalog()
         saved_facies_model = str(self._settings.value("facies/model_path", "") or "")
         self._selected_model_path: Path | None = Path(saved_facies_model) if saved_facies_model else None
+        self._missing_model_notice: str | None = None
         self._gis_data: dict | None = None
         self._rigis_data: dict | None = None
         self._lithology_palette = self._read_lithology_palette()
@@ -183,6 +184,7 @@ class MainWindow(QMainWindow):
         self._build_ui()
         self._build_project_sidebar()
         self._build_visual_shell()
+        self._show_remembered_model_status()
 
     def closeEvent(self, event) -> None:
         if self._chat_photo_thread is not None and self._chat_photo_thread.isRunning():
@@ -1909,7 +1911,8 @@ class MainWindow(QMainWindow):
         self._project_folder = None
         self._expert_session_id = uuid4().hex
         self._primary_facies_catalog = self._load_global_primary_catalog()
-        self._selected_model_path = None
+        # The last explicitly chosen YOLO belongs to the application, not to
+        # the project being cleared. Keep it for the next photos as well.
         self._project_title = "Новый проект"
         self._gis_data = None
         self._rigis_data = None
@@ -1936,7 +1939,11 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Kern Analyzer — Новый проект")
         self._refresh_project_tree()
         self._refresh_training_bar()
-        self.statusBar().showMessage("Создан новый проект")
+        model = self._resolve_model_path()
+        model_note = f" · модель границ: {model.name}" if model else ""
+        self.statusBar().showMessage("Создан новый проект" + model_note)
+        if model is None:
+            self._show_remembered_model_status()
 
     def open_project_dialog(self) -> None:
         folder = QFileDialog.getExistingDirectory(self, "Открыть проект Kern Analyzer", str(self._projects_root()))
@@ -2031,8 +2038,12 @@ class MainWindow(QMainWindow):
         self._refresh_project_tree()
         self._refresh_training_bar()
         message = f"Открыт проект: {title} · фото: {len(records)}"
-        if self._selected_model_path is not None:
-            message += " · выбрана последняя дообученная модель"
+        model = self._resolve_model_path()
+        if model is not None:
+            message += f" · модель границ: {model.name}"
+        elif self._selected_model_path is not None:
+            message += " · сохранённый best.pt недоступен"
+            self._show_remembered_model_status()
         if missing:
             message += f" · не найдены: {len(missing)}"
         self.statusBar().showMessage(message)
@@ -2704,6 +2715,7 @@ class MainWindow(QMainWindow):
 
         model_path = self._resolve_model_path()
         if model_path is None:
+            self._show_remembered_model_status()
             for record in records:
                 record.analysis_mode = PIPELINE_MODE
                 if not record.core_columns_verified:
@@ -2847,6 +2859,26 @@ class MainWindow(QMainWindow):
         # model is not necessarily the user's model or even a facies model.
         path = self._selected_model_path
         return path if path is not None and path.is_file() else None
+
+    def _show_remembered_model_status(self) -> None:
+        """Restore the last explicit choice without loading checkpoint weights."""
+        path = self._selected_model_path
+        if path is None:
+            return
+        if path.is_file():
+            self._missing_model_notice = None
+            self.statusBar().showMessage(f"Модель границ запомнена: {path.name}")
+            return
+        key = str(path)
+        if self._missing_model_notice == key:
+            return
+        self._missing_model_notice = key
+        message = (
+            f"Последняя модель границ «{path.name}» не найдена: {path}. "
+            "Добавьте best.pt в чат или выберите файл в настройках модели."
+        )
+        self.assistant_panel.append_message("system", message)
+        self.statusBar().showMessage(message)
 
     def _resolve_core_column_model_path(self) -> Path | None:
         """Return only a dedicated stage-1 model; never confuse it with facies."""
@@ -2993,7 +3025,7 @@ class MainWindow(QMainWindow):
             )
         if not file_path:
             return
-        candidate = Path(file_path)
+        candidate = Path(file_path).expanduser().resolve()
         if not candidate.is_file():
             QMessageBox.warning(self, "Модель сегментации", "Файл модели .pt не найден.")
             return
@@ -3008,8 +3040,10 @@ class MainWindow(QMainWindow):
             return
         self._selected_model_path = candidate
         self._settings.setValue("facies/model_path", str(self._selected_model_path))
+        self._settings.sync()
+        self._missing_model_notice = None
         self._refresh_training_bar()
-        self.statusBar().showMessage(f"Выбрана модель: {self._selected_model_path.name}")
+        self.statusBar().showMessage(f"Модель границ запомнена: {self._selected_model_path.name}")
         if self._records:
             self.resegment_facies_with_selected_model()
 

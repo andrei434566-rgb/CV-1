@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 from unittest.mock import patch
 
+from PySide6.QtCore import QSettings
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication, QMessageBox
 
@@ -21,10 +22,13 @@ _APP = QApplication.instance() or QApplication([])
 
 class ModelResegmentationTests(unittest.TestCase):
     def test_selecting_model_offers_and_runs_full_reannotation(self):
-        window = MainWindow()
-        record = PhotoRecord("one", "memory.jpg", QPixmap(10, 10))
-        window._records = [record]
         with tempfile.TemporaryDirectory() as directory:
+            settings = QSettings(str(Path(directory) / "test.ini"), QSettings.Format.IniFormat)
+            with patch("app.ui.windows.main_window.QSettings", return_value=settings):
+                window = MainWindow()
+            self.addCleanup(window.close)
+            record = PhotoRecord("one", "memory.jpg", QPixmap(10, 10))
+            window._records = [record]
             model_path = (Path(directory) / "candidate.pt").resolve()
             model_path.write_bytes(b"test model placeholder")
             with (
