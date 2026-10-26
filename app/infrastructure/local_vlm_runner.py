@@ -155,6 +155,8 @@ class LocalModel:
                 "выбери ближайшую обоснованную категорию и пометь её как предположение с уровнем уверенности. "
                 "В поле description обязательно назови различимый общий цвет и видимые текстуры, "
                 "а затем кратко обозначь спорные свойства как гипотезы и укажи, на каких признаках они основаны. "
+                "Пиши компактно: каждый классификационный параметр — короткая фраза, description — не более двух "
+                "коротких предложений и 35 слов. Не повторяй одни и те же основания и уровень уверенности. "
                 "Геометрия уже выделена отдельной моделью; не меняй границы и не выдавай координаты. "
                 "Не придумывай глубину. Если свойство нельзя наблюдать напрямую, но нужно дать оценку, "
                 "приведи наиболее вероятную гипотезу, явно отличив её от наблюдения; не выдавай её за факт. "
@@ -287,7 +289,7 @@ class LocalModel:
             else:
                 raise RuntimeError("Runtime не умеет отключать LoRA. Переключитесь на базовый режим в настройках.")
         detail_requested = bool(re.search(r"подробн|развернут|по шагам|детальн", str(request.get("question") or "").casefold()))
-        max_tokens = 340 if operation == "describe" else 800 if operation == "photo_chat" else 460 if detail_requested else 320
+        max_tokens = 220 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
         final_limit = max_tokens
         with torch.inference_mode(), adapter_context:
             generated = self.model.generate(
@@ -305,7 +307,8 @@ class LocalModel:
                 # The first pass was stopped by our token budget, not by Qwen.
                 # Repeat deterministically with more room so the answer can finish.
                 del generated, new_tokens
-                final_limit = min(max_tokens + 300, 1100)
+                retry_allowance = 100 if operation == "describe" else 120 if operation == "photo_chat" else 300
+                final_limit = min(max_tokens + retry_allowance, 1100)
                 generated = self.model.generate(
                     **inputs, max_new_tokens=final_limit,
                     do_sample=False,

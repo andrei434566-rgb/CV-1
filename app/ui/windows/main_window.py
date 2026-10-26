@@ -517,10 +517,15 @@ class MainWindow(QMainWindow):
         self._activity_dialog.setValue(0)
         self._activity_dialog.show()
 
-    def _update_activity(self, label: str, current: int, total: int) -> None:
+    def _update_activity(self, label: str, current: int, total: int, *, busy: bool = False) -> None:
         if self._activity_dialog is None:
             return
         self._activity_dialog.setLabelText(label)
+        if busy:
+            # The VLM runs one column at a time and cannot report token-level
+            # progress. Show an active indicator instead of a misleading 0%.
+            self._activity_dialog.setRange(0, 0)
+            return
         self._activity_dialog.setRange(0, max(1, total))
         self._activity_dialog.setValue(max(0, min(current, max(1, total))))
 
@@ -4956,7 +4961,7 @@ class MainWindow(QMainWindow):
                 subject = "столбик" if whole_column else "интервал"
                 label = f"Описываю {subject} {self._analysis_done + 1}/{self._analysis_total} · {Path(record.path).name}"
                 self.assistant_panel.status.setText("●  " + label)
-                self._update_activity(label, self._analysis_done, self._analysis_total)
+                self._update_activity(label, self._analysis_done, self._analysis_total, busy=True)
                 return
             except Exception as exc:
                 crop.unlink(missing_ok=True)
