@@ -44,3 +44,6 @@ class PhotoRecord:
     # stage-1 column recognizer.  Automatically detected rectangles are kept
     # for inference and display, but never silently become training truth.
     core_columns_verified: bool = False
+    # Strict CV-1 records retain YOLO geometry without legacy gap synthesis.
+    analysis_mode: str = "legacy"
+    analysis_issues: list[dict] = field(default_factory=list)

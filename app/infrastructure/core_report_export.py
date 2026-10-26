@@ -97,7 +97,7 @@ def _merge_layer_attributes(target: dict, source: dict) -> None:
 
 
 def _merged_layers(well: dict) -> list[dict]:
-    """Coalesce uninterrupted occurrences of one facies across photo columns."""
+    """Coalesce legacy facies while preserving each strict YOLO layer boundary."""
     indexed_layers = list(enumerate(well.get("layers") or []))
     indexed_layers.sort(
         key=lambda item: (
@@ -116,6 +116,12 @@ def _merged_layers(well: dict) -> list[dict]:
             merged
             and start is not None
             and end is not None
+            # In CV-1 the mask is the unit of interpretation. Two neighbouring
+            # masks may describe the same facies but still mark a real contact.
+            # Preserve both rows, including overlaps that need expert review.
+            # Per-photo geometry IDs alone cannot identify one geological bed.
+            and not layer["attributes"].get("__geometry_only")
+            and not merged[-1]["attributes"].get("__geometry_only")
             and _facies_key(merged[-1]) == _facies_key(layer)
             and dict(merged[-1].get("vlm") or {}) == dict(layer.get("vlm") or {})
             and all(str(merged[-1]["attributes"].get(field) or "") == str(layer["attributes"].get(field) or "")

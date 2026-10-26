@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import math
+import gc
+import sys
 from pathlib import Path
 
 import cv2
@@ -8,7 +11,7 @@ import numpy as np
 from PySide6.QtCore import QObject, QPointF, Qt, Signal, Slot
 from PySide6.QtGui import QPainterPath, QPolygonF
 
-from app.domain.facies_catalog import facies_identity, resolve_facies_class
+from app.domain.facies_catalog import FACIES_REFERENCE_FIELDS, facies_identity, resolve_facies_class
 from app.domain.models import FaciesDetection
 from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES, complete_core_column_coverage
 from app.infrastructure.ml.core_column_service import CoreColumnRecognizer, normalize_columns
@@ -28,22 +31,31 @@ class YoloModelService:
         confidence_threshold: float | None = None,
         image_size: int = 640,
         max_detections: int = 1000,
+        geometry_only: bool = False,
     ):
         from ultralytics import YOLO
 
         self.model = YOLO(str(model_path))
+        self.geometry_only = bool(geometry_only)
+        self.geometry_issues: list[dict[str, object]] = []
+        task = str(getattr(self.model, "task", "") or "")
+        if self.geometry_only and task and task != "segment":
+            raise ValueError(
+                "Для геометрии нужен best.pt модели сегментации YOLO (task=segment). "
+                f"Загруженная модель выполняет задачу {task!r}; рамки не заменяют полигоны слоёв."
+            )
         self._description_generator = None
         self._description_facies: set[str] = set()
         checkpoint = getattr(self.model, "ckpt", None)
         embedded = checkpoint.get("core_description_checkpoint") if isinstance(checkpoint, dict) else None
         standalone = Path(model_path).with_name("description_best.pt")
-        if embedded is not None or standalone.is_file():
+        if not self.geometry_only and (embedded is not None or standalone.is_file()):
             from excel_photo_model_studio.description_model import DescriptionGenerator
 
             self._description_generator = DescriptionGenerator(embedded if embedded is not None else standalone)
             self._description_facies = set(self._description_generator.checkpoint.get("facies_names", []))
         self.device, self.device_label = self._best_device()
-        self._facies_catalog = self._load_facies_catalog(model_path)
+        self._facies_catalog = {} if self.geometry_only else self._load_facies_catalog(model_path)
         self.fallback_facies_label = UNRECOGNIZED_FACIES
         self.confidence_threshold = self._normalize_confidence(confidence_threshold)
         self.image_size = self._normalize_image_size(image_size)
@@ -70,6 +82,9 @@ class YoloModelService:
             # default per-image detection cap.
             max_det=self.max_detections,
         )
+
+        if getattr(self, "geometry_only", False):
+            return self._geometry_from_results(results, image_path, target_size, core_columns_override)
 
         core_columns = self._core_columns(image_path) if core_columns_override is None else []
         source_height = target_size[1] if target_size is not None else 1
@@ -144,6 +159,152 @@ class YoloModelService:
         completed = complete_core_column_coverage(detections, coverage_columns, self.fallback_facies_label)
         self._attach_generated_descriptions(image_path, target_size, coverage_columns, completed)
         return completed
+
+    def _geometry_from_results(
+        self,
+        results,
+        image_path: str,
+        target_size: tuple[int, int] | None,
+        columns: list[dict[str, float]] | None,
+    ) -> list[FaciesDetection]:
+        """Keep measured YOLO masks without transferring their class semantics.
+
+        No rectangles, visual-contact heuristics, catalogue priors, text heads
+        or gap-filling facies may enter this route. Missing coverage is reported
+        separately so that the geologist can correct it explicitly.
+        """
+        self.geometry_issues = []
+        detections: list[FaciesDetection] = []
+        coverage_columns = list(columns) if columns is not None else None
+        for result in results:
+            source_height, source_width = getattr(result, "orig_shape", (0, 0))
+            if source_width <= 0 or source_height <= 0:
+                raise ValueError("YOLO не вернула размер исходного фото для привязки полигонов.")
+            display_width, display_height = target_size or (source_width, source_height)
+            x_scale, y_scale = display_width / source_width, display_height / source_height
+            if coverage_columns is None:
+                coverage_columns = [
+                    {"left": left * x_scale, "top": top * y_scale,
+                     "right": right * x_scale, "bottom": bottom * y_scale}
+                    for left, top, right, bottom in self._core_columns(image_path)
+                ]
+            boxes = getattr(result, "boxes", None)
+            if boxes is None or len(boxes) == 0:
+                continue
+            masks = getattr(result, "masks", None)
+            mask_polygons = getattr(masks, "xy", None) if masks is not None else None
+            if mask_polygons is None or len(mask_polygons) != len(boxes):
+                raise ValueError(
+                    "YOLO вернула рамки без соответствующих полигонов masks.xy. "
+                    "Загрузите сегментационный best.pt; геометрия из рамок не создаётся."
+                )
+            image_rect = QPolygonF([
+                QPointF(0, 0), QPointF(display_width, 0),
+                QPointF(display_width, display_height), QPointF(0, display_height),
+            ]).boundingRect()
+            for index, box in enumerate(boxes):
+                class_id = int(box.cls.item())
+                label = str(result.names[class_id])
+                if self._is_excluded_label(label):
+                    continue
+                points = [
+                    QPointF(float(point[0]) * x_scale, float(point[1]) * y_scale)
+                    for point in mask_polygons[index] if len(point) >= 2
+                ]
+                if len(points) < 3 or any(not math.isfinite(p.x()) or not math.isfinite(p.y()) for p in points):
+                    self.geometry_issues.append({"kind": "invalid_mask", "message": f"Полигон YOLO №{index + 1} некорректен и пропущен."})
+                    continue
+                confidence = float(box.conf.item())
+                if not math.isfinite(confidence):
+                    self.geometry_issues.append({"kind": "invalid_confidence", "message": f"Полигон YOLO №{index + 1} имеет некорректную уверенность и пропущен."})
+                    continue
+                points = self._clip_polygon_to_rect(points, image_rect)
+                fragments = self._geometry_fragments(points, coverage_columns)
+                for part, (polygon, column_index) in enumerate(fragments, start=1):
+                    if len(polygon) < 3 or self._path_area(self._polygon_path(polygon)) <= 0:
+                        continue
+                    attributes = {
+                        "__geometry_only": "1",
+                        "__geometry_id": f"yolo:{len(detections) + 1}",
+                        "__source_model_class": label,
+                        "__source_model_class_id": str(class_id),
+                        "__source_mask_index": str(index),
+                        "__source_mask_fragment": str(part),
+                        "Источник геометрии": "YOLO masks.xy",
+                        "Статус интерпретации": "ожидает VLM",
+                    }
+                    if column_index is not None:
+                        attributes["__core_column_index"] = str(column_index)
+                    detections.append(FaciesDetection(
+                        label="Интервал YOLO", confidence=max(0.0, min(1.0, confidence)),
+                        polygon=polygon, attributes=attributes, training_ready=False,
+                    ))
+        self._geometry_coverage_issues(detections, coverage_columns or [])
+        if not detections:
+            self.geometry_issues.append({
+                "kind": "no_masks", "message": "YOLO не нашла полигонов керна. Фации и описания не созданы; требуется проверка геолога.",
+            })
+        if not coverage_columns:
+            self.geometry_issues.append({
+                "kind": "unverified_columns", "message": "Границы столбиков не найдены: полнота покрытия керна полигонами не проверена.",
+            })
+        return detections
+
+    @classmethod
+    def _geometry_fragments(
+        cls, points: list[QPointF], columns: list[dict[str, float]],
+    ) -> list[tuple[list[QPointF], int | None]]:
+        """Intersect a real mask with each physical column without bridging gaps."""
+        if not columns:
+            return [(points, None)]
+        source = cls._polygon_path(points)
+        output: list[tuple[list[QPointF], int | None]] = []
+        for column_index, values in enumerate(columns):
+            try:
+                left, top, right, bottom = (float(values[name]) for name in ("left", "top", "right", "bottom"))
+            except (KeyError, TypeError, ValueError):
+                continue
+            if not all(math.isfinite(v) for v in (left, top, right, bottom)) or right <= left or bottom <= top:
+                continue
+            rectangle = cls._polygon_path([QPointF(left, top), QPointF(right, top), QPointF(right, bottom), QPointF(left, bottom)])
+            clipped = source.intersected(rectangle)
+            for polygon in clipped.toSubpathPolygons():
+                fragment = list(polygon)
+                if len(fragment) >= 3 and cls._path_area(cls._polygon_path(fragment)) > 0:
+                    output.append((fragment, column_index))
+        return output
+
+    def _geometry_coverage_issues(
+        self, detections: list[FaciesDetection], columns: list[dict[str, float]],
+    ) -> None:
+        covered = QPainterPath()
+        for index, detection in enumerate(detections):
+            path = self._polygon_path(detection.polygon)
+            overlap_area = self._path_area(covered.intersected(path))
+            if overlap_area > 1.0:
+                self.geometry_issues.append({
+                    "kind": "overlapping_masks", "mask_index": index, "area_px2": round(overlap_area, 3),
+                    "message": "Полигоны YOLO перекрываются: проверьте границу и привязку описаний.",
+                })
+            covered = covered.united(path)
+        for column_index, values in enumerate(columns):
+            try:
+                left, top, right, bottom = (float(values[name]) for name in ("left", "top", "right", "bottom"))
+            except (KeyError, TypeError, ValueError):
+                continue
+            if not all(math.isfinite(v) for v in (left, top, right, bottom)) or right <= left or bottom <= top:
+                continue
+            rectangle = self._polygon_path([QPointF(left, top), QPointF(right, top), QPointF(right, bottom), QPointF(left, bottom)])
+            missing = rectangle.subtracted(covered)
+            missing_area = self._path_area(missing)
+            if missing_area > 1.0:
+                bounds = missing.boundingRect()
+                self.geometry_issues.append({
+                    "kind": "uncovered_core", "column_index": column_index,
+                    "area_px2": round(missing_area, 3),
+                    "bounds": {"left": bounds.left(), "top": bounds.top(), "right": bounds.right(), "bottom": bounds.bottom()},
+                    "message": f"В столбике №{column_index + 1} есть керн без полигонов YOLO. Требуется ручная проверка; фация не придумана.",
+                })
 
     def _attach_generated_descriptions(
         self,
@@ -380,8 +541,10 @@ class YoloModelService:
         # A canonical model label is authoritative over stale sidecar indices.
         resolved = resolve_facies_class(label) if "@" in label else resolve_facies_class(label, trained.get("Индекс фации"))
         has_reference = bool(trained or resolved)
-        values = dict(trained) if trained else dict(resolved["metadata"]) if resolved else {}
-        values["Класс модели"] = label
+        values = {key: value for key, value in trained.items() if key in FACIES_REFERENCE_FIELDS}
+        if resolved:
+            values.update(resolved["metadata"])
+        values["Класс модели"] = str(resolved["model_label"]) if resolved else label
         values["__source_model_class"] = label
         values["Статус фации"] = "прогноз, требуется проверка" if has_reference else "не сопоставлена со справочником"
         values["Источник описания"] = "справочник фаций; гипотеза по прогнозу модели, не наблюдение"
@@ -594,6 +757,7 @@ class SegmentationWorker(QObject):
     progress_changed = Signal(int, int, str)
     # path, gap-free facies bands, stage-1 core-column rectangles
     image_ready = Signal(str, object, object)
+    geometry_issues_ready = Signal(str, object)
     failed = Signal(str)
     finished = Signal()
 
@@ -605,6 +769,7 @@ class SegmentationWorker(QObject):
         image_size: int = 640,
         max_detections: int = 1000,
         column_model_path: Path | None = None,
+        geometry_only: bool = False,
     ):
         super().__init__()
         self.model_path = model_path
@@ -613,11 +778,15 @@ class SegmentationWorker(QObject):
         self.image_size = image_size
         self.max_detections = max_detections
         self.column_model_path = column_model_path
+        self.geometry_only = bool(geometry_only)
 
     @Slot()
     def run(self) -> None:
+        service = None
+        column_recognizer = None
         try:
-            service = YoloModelService(self.model_path, self.confidence_threshold, self.image_size, self.max_detections)
+            kwargs = {"geometry_only": True} if self.geometry_only else {}
+            service = YoloModelService(self.model_path, self.confidence_threshold, self.image_size, self.max_detections, **kwargs)
             column_recognizer = CoreColumnRecognizer(self.column_model_path, image_size=self.image_size)
             total = len(self.image_paths)
             self.progress_changed.emit(0, total, f"{service.device_label} · {service.image_size}px · порог {service.confidence_threshold:.0%}")
@@ -629,10 +798,24 @@ class SegmentationWorker(QObject):
                     recognized_columns = normalize_columns(core_columns, (width, height))
                 else:
                     recognized_columns = column_recognizer.recognize_path(image_path, (width, height))
-                self.progress_changed.emit(index, total, f"Этап 2/2 · интервалы и фации · {Path(image_path).name}")
+                stage = "полигоны YOLO" if self.geometry_only else "интервалы и фации"
+                self.progress_changed.emit(index, total, f"Этап 2/2 · {stage} · {Path(image_path).name}")
                 detections = service.predict(image_path, (width, height), recognized_columns)
+                if self.geometry_only:
+                    self.geometry_issues_ready.emit(image_path, list(service.geometry_issues))
                 self.image_ready.emit(image_path, detections, recognized_columns)
         except Exception as exc:
             self.failed.emit(str(exc))
         finally:
+            # VLM starts after ``finished``; release YOLO CUDA tensors first so
+            # both networks do not occupy the small local GPU simultaneously.
+            del service, column_recognizer
+            gc.collect()
+            torch = sys.modules.get("torch")
+            if torch is not None:
+                try:
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+                except (AttributeError, RuntimeError):
+                    pass
             self.finished.emit()

@@ -261,6 +261,9 @@ class TrainingCenterDialog(QDialog):
         if self.process.state() != QProcess.ProcessState.NotRunning:
             QMessageBox.information(self, "Обучение", "Дождитесь завершения текущего обучения Qwen.")
             return
+        if self.main._analysis_active or self.main._segmentation_thread is not None:
+            QMessageBox.information(self, "Обучение", "Дождитесь завершения анализа керна перед обучением Qwen.")
+            return
         manifest = Path(str(self.settings.value(f"training/{track}_manifest", "") or ""))
         config = self.main._local_vlm_config()
         python = Path(config["python"])

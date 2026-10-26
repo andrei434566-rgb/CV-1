@@ -7,6 +7,7 @@ from pathlib import Path
 datas = [
     ('app', 'app'),
     ('MODEL_GUIDE.md', '.'),
+    ('CV1_ARCHITECTURE_RU.md', '.'),
     ('README_OPEN_DATASETS_RU.md', '.'),
     ('requirements.txt', '.'),
     ('README_EXCEL_JPG_IMPORT.md', '.'),

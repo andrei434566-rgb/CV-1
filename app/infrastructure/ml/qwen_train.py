@@ -7,6 +7,7 @@ This script intentionally refuses unreviewed rows unless
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 from pathlib import Path
 
@@ -24,6 +25,22 @@ from transformers import (
 PROJECT_ROOT = Path(__file__).resolve().parent
 DEFAULT_MANIFEST = PROJECT_ROOT / "data" / "qwen3_vl_candidates.jsonl"
 DEFAULT_MODEL = "Qwen/Qwen3-VL-2B-Instruct"
+
+
+def save_portable_adapter_manifest(base_path: Path, adapter_path: Path) -> Path:
+    # This file is also invoked directly by QProcess from a packaged app.
+    # Resolve the sibling helper by __file__, independently of cwd/PYTHONPATH.
+    if __package__:
+        from ..local_vlm_modes import write_adapter_manifest
+    else:
+        helper_path = Path(__file__).resolve().parents[1] / "local_vlm_modes.py"
+        specification = importlib.util.spec_from_file_location("cv1_local_vlm_modes", helper_path)
+        if specification is None or specification.loader is None:
+            raise RuntimeError("Не найден локальный модуль паспорта LoRA-адаптера.")
+        helper = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(helper)
+        write_adapter_manifest = helper.write_adapter_manifest
+    return write_adapter_manifest(base_path, adapter_path)
 
 
 def read_records(manifest: Path, include_candidates: bool) -> list[dict]:
@@ -266,6 +283,7 @@ def main():
     train_result = trainer.train()
     trainer.save_model(str(args.output_dir))
     processor.save_pretrained(args.output_dir)
+    save_portable_adapter_manifest(model_path, args.output_dir)
     metrics = train_result.metrics
     metrics.update(
         {

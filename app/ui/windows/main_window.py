@@ -39,6 +39,10 @@ from app.infrastructure.local_chat_intents import hide_unsolicited_sources, need
 from app.infrastructure.local_search_worker import LocalSearchWorker
 from app.infrastructure.local_theory_lookup import lookup_theory_answer
 from app.infrastructure.local_vlm_client import LocalVlmClient
+from app.infrastructure.vlm_training_data import expert_description_digest, expert_description_is_confirmed
+from app.infrastructure.cv1_analysis import (
+    PIPELINE_MODE, IntervalJob, apply_interval_description, mark_interval_failure, write_interval_crop,
+)
 from app.infrastructure.ml.fine_tune_worker import FineTuneWorker
 from app.infrastructure.ml.core_column_service import (
     CoreColumnRecognizer,
@@ -135,8 +139,15 @@ class MainWindow(QMainWindow):
         self._project_title = "Новый проект"
         self._vlm_target: tuple[PhotoRecord, object | None] | None = None
         self._vlm_pending: tuple[str, str, object | None, str] | None = None
+        self._selected_description_job: IntervalJob | None = None
         self._vlm_history: list[dict[str, str]] = []
+        self._analysis_queue: deque[IntervalJob] = deque()
+        self._analysis_pending: tuple[str, IntervalJob, Path] | None = None
+        self._analysis_active = False
+        self._analysis_total = self._analysis_done = self._analysis_success = 0
+        self._analysis_geometry_issues: list[dict] = []
         self._chat_photo_path: Path | None = None
+        self._chat_record_ids: dict[str, str] = {}
         self._chat_pending_photos: list[Path] = []
         self._chat_pending_excel_path: Path | None = None
         self._chat_document_path: Path | None = None
@@ -183,6 +194,11 @@ class MainWindow(QMainWindow):
             event.ignore()
             return
         if hasattr(self, "_vlm_client"):
+            self._analysis_active = False
+            self._analysis_queue.clear()
+            if self._analysis_pending is not None:
+                self._analysis_pending[2].unlink(missing_ok=True)
+                self._analysis_pending = None
             self._vlm_client.stop()
         self._cleanup_vlm_image()
         super().closeEvent(event)
@@ -843,7 +859,7 @@ class MainWindow(QMainWindow):
         defaults = {
             "python": root / ".venv" / "Scripts" / "python.exe",
             "base": str(snapshots[-1]) if snapshots else "",
-            "adapter": str(root / "outputs" / "core_vlm_v8_single_column_lora") if (root / "outputs" / "core_vlm_v8_single_column_lora" / "adapter_model.safetensors").is_file() else "",
+            "adapter": "",
             "folders": [str(root / "data" / "knowledge")] if (root / "data" / "knowledge").is_dir() else [],
         }
         raw_folders = self._settings.value("vlm/knowledge_folders_json", "")
@@ -856,6 +872,7 @@ class MainWindow(QMainWindow):
             "base": str(self._settings.value("vlm/base", "") or defaults["base"]),
             "adapter": str(self._settings.value("vlm/adapter", "") or defaults["adapter"]),
             "theory_adapter": str(self._settings.value("vlm/theory_adapter", "") or ""),
+            "model_mode": str(self._settings.value("vlm/model_mode", "base") or "base"),
             "folders": [str(folder) for folder in folders if isinstance(folder, str)],
         }
 
@@ -901,6 +918,9 @@ class MainWindow(QMainWindow):
         return folders[:12]
 
     def configure_local_vlm(self) -> None:
+        if self._analysis_active or self._vlm_pending is not None:
+            self.assistant_panel.append_message("system", "Дождитесь завершения текущего ответа перед сменой модели.")
+            return
         dialog = LocalVlmSettingsDialog(self._local_vlm_config(), self)
         if dialog.exec() != dialog.DialogCode.Accepted:
             return
@@ -909,6 +929,7 @@ class MainWindow(QMainWindow):
         self._settings.setValue("vlm/base", config["base"])
         self._settings.setValue("vlm/adapter", config["adapter"])
         self._settings.setValue("vlm/theory_adapter", config["theory_adapter"])
+        self._settings.setValue("vlm/model_mode", config["model_mode"])
         self._settings.setValue("vlm/knowledge_folders_json", json.dumps(config["folders"], ensure_ascii=False))
         self._settings.sync()
         self._vlm_client.stop()
@@ -1044,6 +1065,8 @@ class MainWindow(QMainWindow):
         temporary = user_data_root() / "vlm_temp"
         temporary.mkdir(parents=True, exist_ok=True)
         path = temporary / "selected_core.png"
+        if crop_facies and detection is not None and detection.attributes.get("__geometry_only") == "1":
+            return str(write_interval_crop(record, IntervalJob.create(record, detection), path))
         if not image.save(str(path), "PNG"):
             raise RuntimeError("Не удалось подготовить выбранное фото для локальной VLM")
         return str(path)
@@ -1060,20 +1083,20 @@ class MainWindow(QMainWindow):
 
     def _attach_chat_files(self) -> None:
         """One chat entry point for photos, depth descriptions and local reading material."""
-        if self._vlm_pending is not None or self._chat_photo_thread is not None:
+        if self._analysis_active or self._vlm_pending is not None or self._chat_photo_thread is not None:
             self.assistant_panel.append_message("system", "Дождитесь завершения текущего анализа.")
             return
         start = str(self._chat_photo_path.parent) if self._chat_photo_path else ""
         filenames, _ = QFileDialog.getOpenFileNames(
             self, "Добавить материалы в чат", start,
-            "Фото, Excel, документы и учебные архивы (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.webp *.xlsx *.xlsm *.xls *.csv *.tsv *.txt *.md *.pdf *.docx *.json *.jsonl *.zip);;Все файлы (*)",
+            "Фото, модели, Excel и документы (*.jpg *.jpeg *.png *.tif *.tiff *.bmp *.webp *.pt *.xlsx *.xlsm *.xls *.csv *.tsv *.txt *.md *.pdf *.docx *.json *.jsonl *.zip);;Все файлы (*)",
         )
         if not filenames:
             return
         self._handle_chat_files(filenames)
 
     def _handle_chat_files(self, filenames: list[str]) -> None:
-        if self._vlm_pending is not None or self._chat_photo_thread is not None:
+        if self._analysis_active or self._vlm_pending is not None or self._chat_photo_thread is not None:
             self.assistant_panel.append_message("system", "Дождитесь завершения текущего анализа.")
             return
         image_suffixes = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp"}
@@ -1084,6 +1107,11 @@ class MainWindow(QMainWindow):
         excels = [path for path in paths if path.suffix.casefold() in excel_suffixes]
         documents = [path for path in paths if path.suffix.casefold() in document_suffixes]
         archives = [path for path in paths if path.suffix.casefold() == ".zip"]
+        models = [path for path in paths if path.suffix.casefold() == ".pt"]
+        for path in models[:1]:
+            self.select_detection_model(filename_override=path)
+        if len(models) > 1:
+            self.assistant_panel.append_message("system", "Для границ используется один best.pt. Добавьте нужный файл отдельно.")
         if archives:
             self._attach_dataset_archives(archives)
         for path in documents + excels:
@@ -1091,7 +1119,7 @@ class MainWindow(QMainWindow):
         if len(excels) > 1:
             self.assistant_panel.append_message("system", f"Таблиц добавлено: {len(excels)}. Для сопоставления с фото использую «{excels[0].name}»; остальные доступны для вопросов в чате.")
         for path in paths:
-            if path not in images + excels + documents + archives:
+            if path not in images + excels + documents + archives + models:
                 self.assistant_panel.append_message("system", f"Тип файла «{path.name}» пока не поддерживается.")
         if images:
             try:
@@ -1185,13 +1213,77 @@ class MainWindow(QMainWindow):
     def _analyze_chat_photo(self, question: str) -> None:
         if self._chat_photo_path is None:
             return
-        if self._vlm_pending is not None or self._chat_photo_thread is not None:
+        if self._analysis_active or self._vlm_pending is not None or self._chat_photo_thread is not None:
             self.assistant_panel.append_message("system", "Дождитесь ответа на текущий запрос.")
             return
         if self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
             self.assistant_panel.append_message("system", "Дождитесь завершения текущей обработки или обучения, затем повторите анализ фото.")
             return
         self._chat_photo_question = question
+        # All new chat photos use the same CV-1 geometry/description path as
+        # project imports. The legacy column worker is kept for old projects.
+        if self._resolve_model_path() is not None:
+            existing = self._record_for_chat_photo(self._chat_photo_path)
+            if existing is None or existing.analysis_mode != PIPELINE_MODE or (not existing.detections and not existing.analysis_issues):
+                self._import_chat_analysis_photos(self._chat_pending_photos or [self._chat_photo_path])
+                return
+            retry = [
+                detection for detection in existing.detections
+                if detection.attributes.get("__interpretation_status") == "error"
+                and not detection.training_ready and detection.attributes.get("__manual_contour") != "1"
+            ]
+            if retry:
+                for detection in retry:
+                    detection.attributes["__interpretation_status"] = "waiting"
+                    detection.attributes["Статус интерпретации"] = "ожидает VLM"
+                self._start_cv1_descriptions()
+                return
+        self._send_vlm_request(
+            "photo_chat", question, image_override=str(self._chat_photo_path),
+            extra_context=(
+                "Границы интервалов определяет отдельная модель YOLO. Не придумывай координаты, глубины или число физических столбиков. "
+                "Текущий запрос относится к видимым признакам фото."
+            ),
+        )
+        return
+
+    def _import_chat_analysis_photos(self, paths: list[Path]) -> None:
+        records: list[PhotoRecord] = []
+        new_records: list[PhotoRecord] = []
+        for path in paths:
+            existing = self._record_for_chat_photo(path)
+            if existing is not None:
+                if not any(item is existing for item in records):
+                    records.append(existing)
+                continue
+            pixmap = load_working_pixmap(path)
+            if pixmap.isNull():
+                self.assistant_panel.append_message("system", f"Не удалось прочитать фото «{path.name}».")
+                continue
+            top, base = self._photo_interval_from_path(path)
+            record = PhotoRecord(
+                uuid4().hex, str(path), pixmap, well_name=self._active_well_name,
+                photo_depth_from=top, photo_depth_to=base, analysis_mode=PIPELINE_MODE,
+            )
+            self._records.append(record)
+            self._chat_record_ids[str(path.resolve())] = record.identifier
+            records.append(record)
+            new_records.append(record)
+        if new_records:
+            self.workspace.add_photos(new_records)
+        if records:
+            self._vlm_target = (records[-1], None)
+            self._update_header_context()
+            self._refresh_project_tree()
+            self.run_segmentation(records)
+
+    def _record_for_chat_photo(self, path: Path) -> PhotoRecord | None:
+        resolved = path.resolve()
+        identifier = self._chat_record_ids.get(str(resolved))
+        return next((record for record in self._records if record.identifier == identifier or Path(record.path).resolve() == resolved), None)
+
+    def _analyze_chat_photo_legacy(self, question: str) -> None:
+        """Compatibility helper for old projects; not the CV-1 chat entry path."""
         if self._chat_photo_columns and self._chat_photo_columns.get("path") == str(self._chat_photo_path):
             self._send_vlm_request(
                 "photo_chat", question, image_override=str(self._chat_photo_path),
@@ -1261,6 +1353,9 @@ class MainWindow(QMainWindow):
         self._chat_photo_worker = None
 
     def _send_vlm_request(self, operation: str, question: str = "", *, image_override: str = "", extra_context: str = "") -> None:
+        if self._analysis_active or self._segmentation_thread is not None:
+            self.assistant_panel.append_message("system", "Сейчас обрабатываю интервалы керна. Дождитесь завершения анализа.")
+            return
         if self._vlm_pending is not None:
             self.assistant_panel.append_message("system", "Дождитесь ответа на текущий запрос.")
             return
@@ -1305,10 +1400,17 @@ class MainWindow(QMainWindow):
                 ) if operation == "chat" and not use_image else [],
                 "base": config["base"], "adapter": config["adapter"],
                 "theory_adapter": config["theory_adapter"],
+                "model_mode": config["model_mode"],
             }
             target = self._vlm_target[1] if self._vlm_target is not None else None
+            self._selected_description_job = (
+                IntervalJob.create(self._vlm_target[0], target)
+                if operation == "describe" and target is not None and target.attributes.get("__geometry_only") == "1"
+                else None
+            )
             request_id = self._vlm_client.send(config["python"], payload)
         except Exception as exc:
+            self._selected_description_job = None
             self._cleanup_vlm_image()
             self.assistant_panel.append_message("system", str(exc))
             self.assistant_panel.set_busy(False)
@@ -1492,10 +1594,14 @@ class MainWindow(QMainWindow):
         self._send_vlm_request("describe")
 
     def _on_vlm_reply(self, result: dict) -> None:
+        if self._analysis_pending is not None and str(result.get("id")) == self._analysis_pending[0]:
+            self._on_cv1_interval_reply(result)
+            return
         pending = self._vlm_pending
         if pending is None or str(result.get("id")) != pending[0]:
             return
         self._vlm_pending = None
+        selected_job, self._selected_description_job = self._selected_description_job, None
         self._cleanup_vlm_image()
         self.assistant_panel.set_busy(False)
         if not result.get("ok"):
@@ -1541,6 +1647,16 @@ class MainWindow(QMainWindow):
                 self.assistant_panel.append_message("system", "VLM не вернула корректные поля. Ответ оставлен для ручной проверки:\n" + answer)
                 return
             record, layer = found
+            if selected_job is not None:
+                try:
+                    apply_interval_description(record, selected_job, result)
+                except ValueError as exc:
+                    mark_interval_failure(selected_job, str(exc))
+                    self.assistant_panel.append_message("system", str(exc))
+                    return
+                self._refresh_facies_views(record)
+                self.assistant_panel.append_message("assistant", "Черновик описания привязан к выбранному полигону. Проверьте его перед экспортом:\n" + str(layer.attributes.get("__vlm_description") or ""))
+                return
             layer.attributes.update({
                 "__vlm_facies_association": str(fields.get("facies_association") or ""),
                 "__vlm_depositional_environment": str(fields.get("depositional_environment") or ""),
@@ -1773,6 +1889,9 @@ class MainWindow(QMainWindow):
         return record, record.detections[index]
 
     def new_project(self) -> None:
+        if self._analysis_active or self._segmentation_thread is not None or self._vlm_pending is not None:
+            self.assistant_panel.append_message("system", "Дождитесь завершения текущего анализа перед сменой проекта.")
+            return
         if self._records:
             answer = QMessageBox.question(
                 self,
@@ -1808,6 +1927,7 @@ class MainWindow(QMainWindow):
         self._chat_pending_excel_path = None
         self._chat_document_path = None
         self._chat_photo_path = None
+        self._chat_record_ids.clear()
         self._chat_pending_photos = []
         self.assistant_panel.clear_photo()
         self._active_well_name = "Скважина 1"
@@ -1824,7 +1944,7 @@ class MainWindow(QMainWindow):
             self._open_project(Path(folder))
 
     def _open_project(self, folder: Path) -> None:
-        if self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
+        if self._analysis_active or self._vlm_pending is not None or self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
             QMessageBox.information(self, "Подождите", "Дождитесь окончания сегментации перед открытием проекта.")
             return
         try:
@@ -1840,9 +1960,12 @@ class MainWindow(QMainWindow):
         self._chat_pending_excel_path = None
         self._chat_document_path = None
         self._chat_photo_path = None
+        self._chat_record_ids.clear()
         self._chat_pending_photos = []
         self.assistant_panel.clear_photo()
         for record in records:
+            if record.analysis_mode == PIPELINE_MODE:
+                continue
             for detection in record.detections:
                 resolved = self._resolve_training_class(
                     detection.label, (detection.attributes or {}).get("Индекс фации")
@@ -2025,6 +2148,7 @@ class MainWindow(QMainWindow):
             record = PhotoRecord(
                 identifier=str(uuid4()), path=str(image_path), pixmap=pixmap, well_name=well_name,
                 photo_depth_from=photo_depth_from, photo_depth_to=photo_depth_to,
+                analysis_mode=PIPELINE_MODE,
             )
             self._records.append(record)
             records.append(record)
@@ -2049,7 +2173,7 @@ class MainWindow(QMainWindow):
             self._refresh_training_bar()
             self.statusBar().showMessage(
                 f"Загружено {len(records)} фото · столбиков: {columns_found} · "
-                f"интервалов для проверки: {unresolved_intervals} · модель фаций не подключена"
+                f"интервалов для проверки: {unresolved_intervals} · добавьте best.pt для выделения границ"
             )
             if self._pending_photo_imports:
                 QTimer.singleShot(25, self._load_next_photo_batch)
@@ -2559,9 +2683,16 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Фото восстановлено")
 
     def run_segmentation(self, records: list[PhotoRecord] | None = None) -> None:
-        records = list(records or self._records)
+        records = list({id(record): record for record in (records or self._records)}.values())
         if not records:
             QMessageBox.information(self, "Kern Analyzer", "Сначала загрузите фотографии через File → Загрузить фотографии.")
+            return
+        if self._analysis_active:
+            self._queued_records.extend(records)
+            self.statusBar().showMessage("Фото добавлены в очередь после описания текущих интервалов…")
+            return
+        if self._vlm_pending is not None or self._chat_photo_thread is not None or self._training_thread is not None:
+            self.assistant_panel.append_message("system", "Дождитесь завершения текущего ответа или обучения перед анализом фото.")
             return
         if self._column_training_thread is not None:
             QMessageBox.information(self, "Распознавание", "Дождитесь окончания обучения модели столбиков.")
@@ -2574,9 +2705,9 @@ class MainWindow(QMainWindow):
         model_path = self._resolve_model_path()
         if model_path is None:
             for record in records:
+                record.analysis_mode = PIPELINE_MODE
                 if not record.core_columns_verified:
                     record.core_columns = self._suggest_core_columns(record)
-                self._fill_unclassified_columns(record)
                 self.workspace.update_photo_detections(record)
             self._show_stack()
             self._refresh_project_tree()
@@ -2585,12 +2716,14 @@ class MainWindow(QMainWindow):
                 self._save_current_project(self._project_folder)
             missing = sum(not record.core_columns for record in records)
             self.statusBar().showMessage(
-                f"Колонки собраны без модели фаций · фото без найденных столбиков: {missing} · "
-                "неопределённые интервалы требуют разметки"
+                f"Фото подготовлены · без столбиков: {missing}. Добавьте best.pt, чтобы выделить реальные границы интервалов."
             )
             return
 
+        # Sequential GPU stages avoid keeping Qwen and YOLO resident together.
+        self._vlm_client.stop()
         self._segmentation_failed = False
+        self._analysis_geometry_issues = []
         self._segmentation_updated_count = 0
         self._show_activity("Сегментация", f"Подготовка {len(records)} фото…", len(records))
         self._refresh_training_bar()
@@ -2611,11 +2744,13 @@ class MainWindow(QMainWindow):
             self._segmentation_options()["image_size"],
             self._segmentation_options()["max_detections"],
             self._resolve_core_column_model_path(),
+            geometry_only=True,
         )
         self._segmentation_worker.moveToThread(self._segmentation_thread)
         self._segmentation_thread.started.connect(self._segmentation_worker.run)
         self._segmentation_worker.progress_changed.connect(self._show_segmentation_progress)
         self._segmentation_worker.image_ready.connect(self._apply_image_detections)
+        self._segmentation_worker.geometry_issues_ready.connect(self._on_geometry_issues)
         self._segmentation_worker.failed.connect(self._segmentation_error)
         self._segmentation_worker.finished.connect(self._segmentation_thread.quit)
         self._segmentation_thread.finished.connect(self._on_segmentation_finished)
@@ -2754,6 +2889,9 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(f"Модель столбиков выбрана: {self._selected_column_model_path.name}")
 
     def start_core_column_training(self) -> None:
+        if self._analysis_active or self._vlm_pending is not None:
+            self.assistant_panel.append_message("system", "Дождитесь завершения анализа перед обучением.")
+            return
         """Train stage 1 only from explicitly confirmed column rectangles."""
         if self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
             QMessageBox.information(self, "Обучение столбиков", "Дождитесь окончания текущей операции.")
@@ -2840,16 +2978,19 @@ class MainWindow(QMainWindow):
         """Different control splits are not a valid automatic model ranking."""
         return None
 
-    def select_detection_model(self) -> None:
-        if self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
+    def select_detection_model(self, *, filename_override: Path | None = None) -> None:
+        if self._analysis_active or self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
             QMessageBox.information(self, "Модель фаций", "Дождитесь окончания текущей операции.")
             return
-        file_path, _ = QFileDialog.getOpenFileName(
-            self,
-            "Выбрать модель сегментации",
-            str(self._selected_model_path.parent) if self._selected_model_path else "",
-            "Модели YOLO (*.pt);;Все файлы (*)",
-        )
+        if filename_override is not None:
+            file_path = str(filename_override)
+        else:
+            file_path, _ = QFileDialog.getOpenFileName(
+                self,
+                "Выбрать модель границ керна",
+                str(self._selected_model_path.parent) if self._selected_model_path else "",
+                "Модели YOLO (*.pt);;Все файлы (*)",
+            )
         if not file_path:
             return
         candidate = Path(file_path)
@@ -3110,6 +3251,8 @@ class MainWindow(QMainWindow):
 
     def _fill_unclassified_columns(self, record: PhotoRecord) -> None:
         """Build a complete editable facies tape even before a model is loaded."""
+        if record.analysis_mode == PIPELINE_MODE:
+            return
         if not record.core_columns:
             return
         self._update_depth_segments_for_columns(record)
@@ -3188,6 +3331,9 @@ class MainWindow(QMainWindow):
 
     def start_fine_tune(self) -> None:
         """Export reviewed contours and fine-tune a separate copy of the model."""
+        if self._analysis_active or self._vlm_pending is not None:
+            self.assistant_panel.append_message("system", "Дождитесь завершения анализа перед обучением.")
+            return
         if self._segmentation_thread is not None:
             QMessageBox.information(self, "Дообучение", "Сначала дождитесь окончания сегментации.")
             return
@@ -3864,6 +4010,10 @@ class MainWindow(QMainWindow):
         # masks for only some columns.  Fill missing intervals before assembling
         # the tape; keep existing reviewed contours and mark gaps unresolved.
         for record in self._records:
+            if record.analysis_mode == PIPELINE_MODE:
+                # Display the actual masks and gaps; never redraw geometry as
+                # a side effect of opening the assembled column.
+                continue
             if record.core_columns and not record.core_columns_verified:
                 cleaned = normalize_columns(
                     record.core_columns, (record.pixmap.width(), record.pixmap.height()),
@@ -4587,6 +4737,7 @@ class MainWindow(QMainWindow):
         record = next((item for item in self._records if item.path == image_path), None)
         if record is None:
             return
+        record.analysis_mode = PIPELINE_MODE
         record.core_columns = [dict(column) for column in core_columns]
         self._update_depth_segments_for_columns(record)
         preserved = [
@@ -4594,6 +4745,8 @@ class MainWindow(QMainWindow):
             if item.training_ready or item.attributes.get("__manual_contour") == "1"
         ]
         record.detections = postprocess_detections(record, [*preserved, *detections])
+        for detection in detections:
+            self._sync_depth_range_from_polygon(record, detection)
         self.workspace.update_photo_detections(record)
         self._segmentation_updated_count += 1
         if self._segmentation_updated_count % 10 == 0:
@@ -4634,6 +4787,138 @@ class MainWindow(QMainWindow):
                 f"Сегментация завершена · интервалов: {count}, требуют уточнения: {unresolved}, "
                 f"фото без столбиков: {missing} · {assembly}"
             )
+            self._start_cv1_descriptions()
+
+    def _on_geometry_issues(self, image_path: str, issues: list[dict]) -> None:
+        record = next((item for item in self._records if item.path == image_path), None)
+        if record is not None:
+            record.analysis_issues = [dict(issue) for issue in issues]
+        self._analysis_geometry_issues.extend({"photo": Path(image_path).name, **issue} for issue in issues)
+
+    def _start_cv1_descriptions(self) -> None:
+        """Start the text stage only after the YOLO worker released its GPU memory."""
+        if self._analysis_active:
+            return
+        self._analysis_geometry_issues = [
+            {"photo": Path(record.path).name, **issue}
+            for record in self._records if record.analysis_mode == PIPELINE_MODE
+            for issue in record.analysis_issues
+        ]
+        self._analysis_queue.clear()
+        for record in self._records:
+            if record.analysis_mode != PIPELINE_MODE:
+                continue
+            for detection in record.detections:
+                if (
+                    detection.attributes.get("__geometry_only") == "1"
+                    and detection.attributes.get("__interpretation_status", "waiting") == "waiting"
+                    and not detection.training_ready
+                ):
+                    try:
+                        self._analysis_queue.append(IntervalJob.create(record, detection))
+                    except ValueError as exc:
+                        detection.attributes["Статус интерпретации"] = str(exc)
+        self._analysis_total = len(self._analysis_queue)
+        self._analysis_done = self._analysis_success = 0
+        if not self._analysis_queue:
+            self.assistant_panel.append_message("system", "Геометрия обработана; новых интервалов для описания нет. Проверьте найденные границы и пропуски.")
+            return
+        self._analysis_active = True
+        self.assistant_panel.set_busy(True)
+        self._show_activity("Описание керна", "Подготовка локальной модели…", self._analysis_total)
+        QTimer.singleShot(0, self._advance_cv1_description)
+
+    def _advance_cv1_description(self) -> None:
+        if not self._analysis_active or self._analysis_pending is not None:
+            return
+        while self._analysis_queue:
+            job = self._analysis_queue.popleft()
+            record = next((item for item in self._records if item.identifier == job.record_id), None)
+            crop = user_data_root() / "vlm_temp" / f"interval_{uuid4().hex}.png"
+            try:
+                if record is None or not job.is_current(record):
+                    self._analysis_done += 1
+                    continue
+                write_interval_crop(record, job, crop)
+                config = self._local_vlm_config()
+                if not Path(config["python"]).is_file() or not (Path(config["base"]) / "config.json").is_file():
+                    raise RuntimeError("Укажите локальную базовую Qwen и Python в настройках ИИ. Интернет для анализа не используется.")
+                context = f"Скважина: {record.well_name}. Показан один полигон YOLO; белый фон вне породы игнорируй. "
+                if job.detection.depth_from is not None and job.detection.depth_to is not None:
+                    context += f"Заданный интервал: {job.detection.depth_from:g}–{job.detection.depth_to:g} м. "
+                request_id = self._vlm_client.send(config["python"], {
+                    "operation": "describe", "image": str(crop), "context": context,
+                    "base": config["base"], "adapter": config["adapter"],
+                    "theory_adapter": config["theory_adapter"], "model_mode": config["model_mode"],
+                    "folders": [], "use_knowledge": False,
+                })
+                self._analysis_pending = (request_id, job, crop)
+                label = f"Описываю интервал {self._analysis_done + 1}/{self._analysis_total} · {Path(record.path).name}"
+                self.assistant_panel.status.setText("●  " + label)
+                self._update_activity(label, self._analysis_done, self._analysis_total)
+                return
+            except Exception as exc:
+                crop.unlink(missing_ok=True)
+                if record is not None:
+                    mark_interval_failure(job, str(exc))
+                self._analysis_done += 1
+                # A missing runtime affects every interval; do not loop through
+                # the same failing configuration or launch repeated processes.
+                if isinstance(exc, RuntimeError):
+                    for remaining in self._analysis_queue:
+                        mark_interval_failure(remaining, str(exc))
+                    self._analysis_done += len(self._analysis_queue)
+                    self._analysis_queue.clear()
+                    self.assistant_panel.append_message("system", str(exc))
+        self._finish_cv1_descriptions()
+
+    def _on_cv1_interval_reply(self, result: dict) -> None:
+        pending = self._analysis_pending
+        if pending is None:
+            return
+        self._analysis_pending = None
+        _, job, crop = pending
+        crop.unlink(missing_ok=True)
+        record = next((item for item in self._records if item.identifier == job.record_id), None)
+        if record is not None:
+            try:
+                apply_interval_description(record, job, result)
+                self._analysis_success += 1
+            except ValueError as exc:
+                if job.is_current(record):
+                    mark_interval_failure(job, str(exc))
+            self.workspace.update_photo_detections(record)
+        self._analysis_done += 1
+        if not result.get("ok"):
+            error = str(result.get("error") or "Локальная модель не ответила.")
+            for remaining in self._analysis_queue:
+                mark_interval_failure(remaining, error)
+            self._analysis_done += len(self._analysis_queue)
+            self._analysis_queue.clear()
+            self.assistant_panel.append_message("system", error)
+        QTimer.singleShot(0, self._advance_cv1_description)
+
+    def _finish_cv1_descriptions(self) -> None:
+        self._analysis_active = False
+        self.assistant_panel.set_busy(False)
+        self._close_activity()
+        self._show_stack()
+        self._refresh_project_tree()
+        self._refresh_training_bar()
+        if self._project_folder is not None:
+            self._save_current_project(self._project_folder)
+        message = (
+            f"Анализ завершён. Описано интервалов: {self._analysis_success} из {self._analysis_total}. "
+            "Контуры получены от YOLO; описания и фации — черновики локальной VLM. Проверьте их в карточках слоёв."
+        )
+        if self._analysis_geometry_issues:
+            message += f" Замечаний к покрытию и пересечениям: {len(self._analysis_geometry_issues)}. Пропуски не заполнены выдуманными фациями."
+            message += "\n" + "\n".join(f"{issue['photo']}: {issue.get('message', '')}" for issue in self._analysis_geometry_issues[:3])
+        self.assistant_panel.append_message("assistant", message)
+        self.statusBar().showMessage(message)
+        if self._queued_records:
+            records, self._queued_records = self._queued_records, []
+            QTimer.singleShot(0, lambda: self.run_segmentation(records))
 
     def _update_depth_segments_for_columns(self, record: PhotoRecord) -> None:
         """Calibrate the continuous stage-1 tape when a photo interval is known."""
@@ -4696,6 +4981,7 @@ class MainWindow(QMainWindow):
             self,
             training_ready=detection.training_ready,
             primary_catalog=self._primary_facies_catalog,
+            description_confirmed=expert_description_is_confirmed(detection),
         )
         dialog.setModal(False)
         dialog.accepted.connect(lambda: self._save_lithology(record, detection, dialog))
@@ -4812,6 +5098,17 @@ class MainWindow(QMainWindow):
         detection.depth_to = depth_to
         geometry_updated = self._sync_polygon_to_depth_range(record, detection)
         detection.training_ready = dialog.training_confirmed.isChecked()
+        detection.attributes.pop("__expert_description_confirmed", None)
+        detection.attributes.pop("__expert_description_sha256", None)
+        if detection.attributes.get("__geometry_only") == "1":
+            if dialog.description_confirmed.isChecked() and detection.training_ready and detection.attributes.get("__vlm_description", "").strip():
+                detection.attributes["__interpretation_status"] = "reviewed"
+                detection.attributes["Статус интерпретации"] = "описание, фация и границы подтверждены специалистом"
+                detection.attributes["__expert_description_confirmed"] = "1"
+                detection.attributes["__expert_description_sha256"] = expert_description_digest(detection)
+            else:
+                detection.attributes["__interpretation_status"] = "draft"
+                detection.attributes["Статус интерпретации"] = "черновик, требуется проверка геолога"
         if record.core_columns:
             record.detections = postprocess_detections(record, record.detections)
         self._refresh_facies_views(record)
@@ -4899,7 +5196,7 @@ class MainWindow(QMainWindow):
     def _sync_depth_range_from_polygon(self, record: PhotoRecord, detection) -> bool:
         """Map the edited vertical polygon span back to measured depth."""
         segment = self._depth_mapping_for_polygon(record, detection)
-        if segment is None:
+        if segment is None or not all(key in segment for key in ("depth_from", "depth_to")):
             return False
         bounds = QPolygonF(detection.polygon).boundingRect()
         pixel_top, pixel_base = segment["top"], segment["bottom"]
@@ -4920,6 +5217,7 @@ class MainWindow(QMainWindow):
         depth_from, depth_to = detection.depth_from, detection.depth_to
         if (
             segment is None or depth_from is None or depth_to is None
+            or not all(key in segment for key in ("depth_from", "depth_to"))
             or depth_to <= depth_from or not detection.polygon
         ):
             return False

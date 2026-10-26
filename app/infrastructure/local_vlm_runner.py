@@ -11,15 +11,20 @@ from pathlib import Path
 
 # QProcess sends UTF-8 JSON lines. Windows Python may otherwise use the
 # machine's ANSI code page, corrupting Cyrillic questions and model paths.
-sys.stdin.reconfigure(encoding="utf-8")
-sys.stdout.reconfigure(encoding="utf-8")
-sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+for stream in (sys.stdin, sys.stdout, sys.stderr):
+    if hasattr(stream, "reconfigure"):
+        stream.reconfigure(encoding="utf-8", errors="replace")
 
 os.environ["HF_HUB_OFFLINE"] = "1"
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ["HF_DATASETS_OFFLINE"] = "1"
 
-from local_knowledge_search import search_folders
+if __package__:
+    from .local_knowledge_search import search_folders
+    from .local_vlm_modes import adapter_for_operation, normalize_model_request, validate_local_models
+else:
+    from local_knowledge_search import search_folders
+    from local_vlm_modes import adapter_for_operation, normalize_model_request, validate_local_models
 
 
 class LocalModel:
@@ -28,25 +33,32 @@ class LocalModel:
         self.processor = None
         self.loaded_config = None
 
-    def load(self, base: str, adapter: str, theory_adapter: str):
-        configuration = (base, adapter, theory_adapter)
+    def load(self, base: str, adapter: str, theory_adapter: str, model_mode: str = ""):
+        effective = normalize_model_request({
+            "base": base, "adapter": adapter, "theory_adapter": theory_adapter,
+            "model_mode": model_mode,
+        })
+        configuration = tuple(effective[key] for key in ("base", "adapter", "theory_adapter"))
         if configuration == self.loaded_config:
             return
+        # Check metadata before importing the GPU runtime or discarding the
+        # current model. No adapter may silently fall back to another base.
+        validate_local_models(effective)
         import torch
         from transformers import AutoProcessor, Qwen3VLForConditionalGeneration
 
-        base_path = Path(base)
-        if not base_path.is_dir() or not (base_path / "config.json").is_file():
-            raise RuntimeError("Локальная папка Qwen3-VL не найдена. Укажите её в настройках ИИ.")
+        base_path = Path(effective["base"])
         if not torch.cuda.is_available():
             raise RuntimeError("Для Qwen3-VL-2B требуется доступная CUDA-видеокарта и PyTorch с CUDA.")
         self.model = None
+        self.loaded_config = None
+        torch.cuda.empty_cache()
         self.processor = AutoProcessor.from_pretrained(base_path, local_files_only=True)
         model = Qwen3VLForConditionalGeneration.from_pretrained(
             base_path, local_files_only=True, torch_dtype=torch.float16,
             attn_implementation="sdpa", device_map="cuda",
         )
-        for name, folder in (("description", adapter), ("theory", theory_adapter)):
+        for name, folder in (("description", effective["adapter"]), ("theory", effective["theory_adapter"])):
             if not folder:
                 continue
             adapter_path = Path(folder)
@@ -66,19 +78,23 @@ class LocalModel:
         from PIL import Image
 
         operation = request.get("operation")
+        effective = normalize_model_request(request)
         self.load(
             str(request.get("base") or ""),
             str(request.get("adapter") or ""),
             str(request.get("theory_adapter") or ""),
+            str(request.get("model_mode") or ""),
         )
         if operation == "describe":
             question = (
                 "Опиши только показанный фрагмент керна на русском языке. Верни строго JSON "
-                'с тремя строковыми ключами: "facies_association", '
-                '"depositional_environment", "description". '
+                'со строковыми ключами "facies_name", "lithology", "texture", '
+                '"facies_association", "depositional_environment", "description". '
                 "Описание должно содержать только видимые цвет, зернистость, текстуру, "
                 "слоистость, контакты и особенности. Если ассоциацию фаций или обстановку "
                 "нельзя обосновать по снимку и контексту, оставь соответствующее поле пустым. "
+                "Название фации и литологию тоже оставляй пустыми, если их нельзя уверенно определить. "
+                "Геометрия уже выделена отдельной моделью; не меняй границы и не выдавай координаты. "
                 "Не придумывай глубину, минералогию и скрытые признаки. "
                 + str(request.get("context") or "")[:1800]
             )
@@ -166,11 +182,22 @@ class LocalModel:
         if image is not None:
             kwargs["images"] = [image]
         inputs = self.processor(**kwargs).to("cuda")
-        selected_adapter = "description" if operation in {"describe", "photo_chat"} else "theory"
-        adapter_path = request.get("adapter") if operation in {"describe", "photo_chat"} else request.get("theory_adapter")
-        if adapter_path and hasattr(self.model, "set_adapter"):
+        selected_adapter, adapter_path = adapter_for_operation(request, str(operation or ""))
+        if adapter_path:
+            if not hasattr(self.model, "set_adapter"):
+                raise RuntimeError("Локальный runtime не умеет включать выбранный LoRA-адаптер.")
             self.model.set_adapter(selected_adapter)
-        adapter_context = self.model.disable_adapter() if not adapter_path and hasattr(self.model, "disable_adapter") else nullcontext()
+        # Explicit base mode loads no adapters at all. Legacy requests may load
+        # a photo adapter while using the unadapted base for ordinary text.
+        adapter_context = nullcontext()
+        if not adapter_path and (effective["adapter"] or effective["theory_adapter"]):
+            disable = getattr(self.model, "disable_adapter", None)
+            if disable is not None:
+                adapter_context = disable()
+            elif hasattr(self.model, "disable_adapters"):
+                self.model.disable_adapters()
+            else:
+                raise RuntimeError("Runtime не умеет отключать LoRA. Переключитесь на базовый режим в настройках.")
         detail_requested = bool(re.search(r"подробн|развернут|по шагам|детальн", str(request.get("question") or "").casefold()))
         max_tokens = 340 if operation == "describe" else 800 if operation == "photo_chat" else 460 if detail_requested else 320
         final_limit = max_tokens
@@ -205,17 +232,23 @@ class LocalModel:
             if incomplete:
                 completed = list(re.finditer(r"[.!?…](?=\s|$|[»”\"'])", answer))
                 answer = answer[:completed[-1].end()].strip() if completed else ""
-        result = {"answer": answer, "hits": hits, "incomplete": incomplete}
+        result = {
+            "answer": answer, "hits": hits, "incomplete": incomplete,
+            "model_info": {
+                "model_mode": "lora" if adapter_path else "base",
+                "base": effective["base"], "adapter": adapter_path,
+            },
+        }
         if operation == "describe":
             cleaned = answer.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
             try:
                 parsed = json.loads(cleaned)
             except (ValueError, TypeError):
                 parsed = None
-            if isinstance(parsed, dict):
+            field_names = ("facies_name", "lithology", "texture", "facies_association", "depositional_environment", "description")
+            if isinstance(parsed, dict) and all(isinstance(parsed.get(key), str) for key in field_names):
                 result["fields"] = {
-                    key: str(parsed.get(key) or "").strip()
-                    for key in ("facies_association", "depositional_environment", "description")
+                    key: parsed[key].strip() for key in field_names
                 }
         return result
 

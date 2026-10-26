@@ -1,0 +1,40 @@
+name: CV-1 geometry and local VLM checks
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "app/**"
+      - "test_cv1*"
+      - "test_local_vlm*"
+      - "test_yolo*"
+      - "test_vlm_training_data.py"
+      - ".github/workflows/cv1-pipeline-tests.yml"
+  pull_request:
+    paths:
+      - "app/**"
+      - "test_cv1*"
+      - "test_local_vlm*"
+      - "test_yolo*"
+      - "test_vlm_training_data.py"
+      - ".github/workflows/cv1-pipeline-tests.yml"
+
+jobs:
+  offline-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update && sudo apt-get install -y libegl1 libopengl0
+      - run: python -m pip install PySide6 numpy Pillow PyYAML openpyxl python-docx pypdf opencv-python-headless
+      - name: No model downloads or GPU required
+        run: >-
+          python -m unittest -v test_yolo_geometry_contract test_yolo_confidence
+          test_unified_model_description test_vlm_training_data test_cv1_reviewed_pairs
+          test_cv1_analysis test_cv1_exports test_cv1_main_flow test_local_vlm_modes
+          test_local_vlm_transport

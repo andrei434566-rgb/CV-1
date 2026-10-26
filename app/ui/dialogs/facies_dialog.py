@@ -30,6 +30,7 @@ class FaciesDialog(QDialog):
         *,
         training_ready: bool = False,
         primary_catalog: dict | None = None,
+        description_confirmed: bool = False,
     ):
         super().__init__(parent)
         self._uses_primary_catalog = primary_catalog is not None
@@ -57,7 +58,8 @@ class FaciesDialog(QDialog):
         self.attribute_combos: dict[str, QComboBox] = {}
 
         layout = QVBoxLayout(self)
-        confidence_label = QLabel(f"Оценка модели: {confidence:.0%} (не вероятность правильности)")
+        confidence_title = "Оценка геометрии YOLO" if attributes.get("__geometry_only") == "1" else "Оценка модели"
+        confidence_label = QLabel(f"{confidence_title}: {confidence:.0%} (не вероятность правильности фации)")
         confidence_label.setStyleSheet("color: #687087;")
         layout.addWidget(confidence_label)
 
@@ -156,6 +158,11 @@ class FaciesDialog(QDialog):
         self.training_confirmed.setChecked(training_ready)
         self.training_confirmed.setToolTip("Отметьте после проверки класса и контура. Сохранить черновик можно без этой отметки.")
         layout.addWidget(self.training_confirmed)
+        self.description_confirmed = QCheckBox("Описание проверено — использовать при обучении ИИ")
+        self.description_confirmed.setChecked(description_confirmed)
+        self.description_confirmed.setToolTip("Подтвердите текст отдельно от класса и границ. Непроверенные ответы ИИ в обучение не попадут.")
+        self.description_confirmed.setVisible(attributes.get("__geometry_only") == "1")
+        layout.addWidget(self.description_confirmed)
         try:
             suggestions = json.loads(str(attributes.get("__attribute_suggestions") or "{}"))
         except (ValueError, TypeError):
@@ -233,6 +240,11 @@ class FaciesDialog(QDialog):
         values["__vlm_facies_association"] = self.vlm_association.text().strip()
         values["__vlm_depositional_environment"] = self.vlm_environment.text().strip()
         values["__vlm_description"] = self.vlm_description.toPlainText().strip()
+        if values.get("__geometry_only") == "1":
+            # The editable text is authoritative over the original draft.
+            values["Краткое описание"] = values["__vlm_description"]
+            values["Фациальная ассоциация"] = values["__vlm_facies_association"]
+            values["Обстановка седиментации"] = values["__vlm_depositional_environment"]
         self.settings.setValue("last/facies", self.selected_facies())
         saturation = str(values.get("Флюидонасыщение") or "")
         if saturation:

@@ -53,6 +53,10 @@ def postprocess_detections(
     are finally converted to a vertical partition: every selected core pixel
     belongs to exactly one facies band.
     """
+    if record.analysis_mode == "yolo_vlm" or any(item.attributes.get("__geometry_only") == "1" for item in detections):
+        # Real YOLO polygons remain authoritative even after VLM assigns text.
+        # Missing coverage is a review issue, never a synthetic facies band.
+        return list(detections)
     if record.pixmap.isNull():
         return detections
     min_height = max(5.0, record.pixmap.height() * 0.002)

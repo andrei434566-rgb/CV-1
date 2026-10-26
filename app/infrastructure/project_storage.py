@@ -51,6 +51,8 @@ def save_project(
                 "depth_segments": record.depth_segments,
                 "core_columns": record.core_columns,
                 "core_columns_verified": record.core_columns_verified,
+                "analysis_mode": record.analysis_mode,
+                "analysis_issues": record.analysis_issues,
                 "display_size": [record.pixmap.width(), record.pixmap.height()],
                 "position": [positions.get(record.identifier, QPointF()).x(), positions.get(record.identifier, QPointF()).y()],
                 "detections": [
@@ -140,6 +142,8 @@ def load_project(folder: Path) -> tuple[str, list[PhotoRecord], dict[str, QPoint
                     if isinstance(column, dict)
                 ],
                 core_columns_verified=bool(item.get("core_columns_verified", False)),
+                analysis_mode=str(item.get("analysis_mode") or "legacy"),
+                analysis_issues=[dict(issue) for issue in item.get("analysis_issues", []) if isinstance(issue, dict)],
             )
         )
         position = item.get("position") or [0, 0]

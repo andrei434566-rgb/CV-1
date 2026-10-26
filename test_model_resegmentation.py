@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import unittest
 import tempfile
+import types
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
@@ -26,6 +28,7 @@ class ModelResegmentationTests(unittest.TestCase):
             model_path = (Path(directory) / "candidate.pt").resolve()
             model_path.write_bytes(b"test model placeholder")
             with (
+                patch.dict(sys.modules, {"ultralytics": types.SimpleNamespace(YOLO=lambda _: types.SimpleNamespace(task="segment"))}),
                 patch("app.ui.windows.main_window.QFileDialog.getOpenFileName", return_value=(str(model_path), "")),
                 patch("app.ui.windows.main_window.QMessageBox.question", return_value=QMessageBox.StandardButton.Yes),
                 patch.object(window, "run_segmentation") as run_segmentation,
