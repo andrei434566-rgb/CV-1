@@ -1,0 +1,42 @@
+{
+  "gval_01_clasts": {
+    "A": "no_reference",
+    "B": "reference"
+  },
+  "gval_02_shale": {
+    "A": "reference",
+    "B": "no_reference"
+  },
+  "gval_03_mudstone": {
+    "A": "reference",
+    "B": "no_reference"
+  },
+  "gval_04_coal": {
+    "A": "no_reference",
+    "B": "reference"
+  },
+  "gval_05_roundness_sorting": {
+    "A": "reference",
+    "B": "no_reference"
+  },
+  "gval_06_matrix_cement": {
+    "A": "no_reference",
+    "B": "reference"
+  },
+  "gval_07_grading": {
+    "A": "no_reference",
+    "B": "reference"
+  },
+  "gval_08_bioturbation": {
+    "A": "reference",
+    "B": "no_reference"
+  },
+  "gval_09_missing_porosity": {
+    "A": "reference",
+    "B": "no_reference"
+  },
+  "gval_10_dunham": {
+    "A": "no_reference",
+    "B": "reference"
+  }
+}

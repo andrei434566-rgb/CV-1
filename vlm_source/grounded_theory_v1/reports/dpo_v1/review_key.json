@@ -1,0 +1,74 @@
+{
+  "gval_01_clasts": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "gval_02_shale": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "gval_03_mudstone": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "gval_04_coal": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "gval_05_roundness_sorting": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "gval_06_matrix_cement": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "gval_07_grading": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "gval_08_bioturbation": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "gval_09_missing_porosity": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "gval_10_dunham": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "source_pilot_friendly_holdout_01": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "source_pilot_friendly_holdout_02": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "source_pilot_friendly_holdout_03": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "source_pilot_friendly_holdout_04": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "v3_carbonate_mudstone": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "v3_conglomerate_breccia": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "v3_mud_shale": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "v4_coal_vs_carbonaceous": {
+    "A": "baseline",
+    "B": "candidate"
+  }
+}

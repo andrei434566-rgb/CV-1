@@ -1,0 +1,520 @@
+{
+  "schema": "grounded_geology_sft_result_v1",
+  "reviewed_date": "2026-10-27",
+  "record_type": "model_experiment_evaluation_not_geological_reference",
+  "status": "rejected_for_general_assistant",
+  "installed_in_application": false,
+  "geologist_approved": false,
+  "geology_accuracy": null,
+  "base_model": "Qwen3-VL-2B-Instruct",
+  "base_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "model_source_fingerprint": {
+    "algorithm": "sha256",
+    "digest": "2cdd8c6ae57793d9192ad471bfdd0758d03b4e36596c4e92e389580ffca34478",
+    "files": {
+      "chat_template.json": "6f8a6a55027e3da5160105556cda5dd69f6423f1c32645f6730d32de7773d0c4",
+      "config.json": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+      "generation_config.json": "1e241830b48b397cb0900101421df5450baddc7adf01e5fc86b5615865f3bae4",
+      "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+      "model.safetensors": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+      "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "tokenizer.json": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7",
+      "tokenizer_config.json": "c2da771801886ad9ae98181793ffd3dfb7f1af30f6f7c6a4e15d7dbba52e2399",
+      "video_preprocessor_config.json": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    }
+  },
+  "train_rows": 124,
+  "train_row_composition": {
+    "source_conditioned_qa": 64,
+    "ordinary_conversation": 60
+  },
+  "recipe": {
+    "seed": 20261027,
+    "epochs": 2.0,
+    "learning_rate": 2e-05,
+    "batch_size": 1,
+    "gradient_accumulation": 4,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "lora_targets_recipe": "qv",
+    "max_sequence_tokens": 1024,
+    "generation": {
+      "do_sample": false,
+      "repetition_penalty": 1.05,
+      "classification_max_new_tokens": 24,
+      "theory_max_new_tokens": 160
+    },
+    "training_preflight": {
+      "checked_rows": 124,
+      "max_observed_tokens": 717,
+      "max_sequence_tokens": 1024,
+      "truncated_rows": 0
+    }
+  },
+  "training": {
+    "train_runtime": 134.9344,
+    "train_samples_per_second": 1.838,
+    "train_steps_per_second": 0.459,
+    "train_loss": 1.7250299953645276,
+    "epoch": 2.0,
+    "optimizer_steps": 62
+  },
+  "qualitative_counts": {
+    "closed_book_theory": {
+      "candidate": {
+        "rows": 4,
+        "correct": 0,
+        "partial": 0,
+        "incorrect": 4,
+        "uncertain": 0,
+        "completed": 0
+      },
+      "baseline": {
+        "rows": 4,
+        "correct": 0,
+        "partial": 0,
+        "incorrect": 4,
+        "uncertain": 0,
+        "completed": 0
+      }
+    },
+    "dialogue_guard": {
+      "baseline": {
+        "rows": 4,
+        "correct": 4,
+        "partial": 0,
+        "incorrect": 0,
+        "uncertain": 0,
+        "completed": 4
+      },
+      "candidate": {
+        "rows": 4,
+        "correct": 4,
+        "partial": 0,
+        "incorrect": 0,
+        "uncertain": 0,
+        "completed": 4
+      }
+    },
+    "source_conditioned_theory": {
+      "baseline": {
+        "rows": 10,
+        "correct": 8,
+        "partial": 1,
+        "incorrect": 1,
+        "uncertain": 0,
+        "completed": 10
+      },
+      "candidate": {
+        "rows": 10,
+        "correct": 7,
+        "partial": 2,
+        "incorrect": 1,
+        "uncertain": 0,
+        "completed": 10
+      }
+    }
+  },
+  "source_class_image_guard": {
+    "baseline": {
+      "rows": 8,
+      "correct": 2
+    },
+    "candidate": {
+      "rows": 8,
+      "correct": 2
+    },
+    "meaning": "Tiny original-source class guard only, not core facies accuracy."
+  },
+  "decision": "The candidate did not improve source-conditioned theory (8 to 7 correct); closed-book geological failures persist. Do not replace the active base model.",
+  "selected_changes": [
+    {
+      "record_id": "gval_02_shale",
+      "change": "partial to correct"
+    },
+    {
+      "record_id": "gval_03_mudstone",
+      "change": "correct to partial"
+    },
+    {
+      "record_id": "gval_08_bioturbation",
+      "change": "correct to partial"
+    },
+    {
+      "record_id": "gval_07_grading",
+      "change": "incorrect in both"
+    }
+  ],
+  "adapter": {
+    "relative_local_directory": "vlm_core_v1/outputs/core_vlm_grounded_v1_20261027_lora/adapter",
+    "binary_uploaded_to_git": false,
+    "adapter_sha256": "4940ed32a36e4a1531e7b7858f0215dc089dcf87689bd658fa76427ae21946f4"
+  },
+  "decoded_review": [
+    {
+      "record_id": "v4_coal_vs_carbonaceous",
+      "condition": "candidate",
+      "group": "closed_book_theory",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Верно упомянут органический источник угля, но различие по долям органического и минерального материала не раскрыто. Вместо него приведены неподтверждённые универсальные свойства: непроницаемость, высокая плотность, вязкость, теплопроводность и отсутствие глинистых примесей. Ответ обрывается до описания второй породы.",
+      "flags": [
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "v4_coal_vs_carbonaceous",
+      "condition": "baseline",
+      "group": "closed_book_theory",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Уголь ошибочно объяснён через образование из углеводородов в магматических или метаморфических условиях; требуемое соотношение органической и минеральной составляющих не дано. Добавлены неподтверждённые универсальные физические свойства, текст оборван.",
+      "flags": [
+        "unsupported_fact",
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_04",
+      "condition": "baseline",
+      "group": "dialogue_guard",
+      "category": "correct",
+      "completed": true,
+      "reason": "Прямо и по-русски подтверждает возможность отвечать на русском.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_04",
+      "condition": "candidate",
+      "group": "dialogue_guard",
+      "category": "correct",
+      "completed": true,
+      "reason": "Прямо и по-русски подтверждает возможность отвечать на русском.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_02",
+      "condition": "candidate",
+      "group": "dialogue_guard",
+      "category": "correct",
+      "completed": true,
+      "reason": "Уместно отвечает на благодарность и предлагает дальнейшую помощь.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_02",
+      "condition": "baseline",
+      "group": "dialogue_guard",
+      "category": "correct",
+      "completed": true,
+      "reason": "Уместно отвечает на благодарность и предлагает дальнейшую помощь.",
+      "flags": []
+    },
+    {
+      "record_id": "v3_carbonate_mudstone",
+      "condition": "baseline",
+      "group": "closed_book_theory",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Терригенный mudstone назван глинистым известняком, что смешивает два значения термина. Микритовая опора и порог менее 10% зёрен не объяснены; обязательные высокая концентрация кислорода и высокие температуры не следуют из reference. Текст оборван.",
+      "flags": [
+        "unsupported_fact",
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "v3_carbonate_mudstone",
+      "condition": "candidate",
+      "group": "closed_book_theory",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Терригенный mudstone назван известняком и объяснён преобладанием органического вещества. Утверждения о кислых водах и цинке, магнии и кальции как карбонатных минералах не поддержаны reference; различие опоры и состава не раскрыто. Текст оборван.",
+      "flags": [
+        "unsupported_fact",
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_01",
+      "condition": "candidate",
+      "group": "dialogue_guard",
+      "category": "correct",
+      "completed": true,
+      "reason": "Нормально подтверждает присутствие и приглашает задать вопрос.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_01",
+      "condition": "baseline",
+      "group": "dialogue_guard",
+      "category": "correct",
+      "completed": true,
+      "reason": "Нормально подтверждает, что отвечает, и приглашает задать вопрос.",
+      "flags": []
+    },
+    {
+      "record_id": "v3_mud_shale",
+      "condition": "candidate",
+      "group": "closed_book_theory",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Mudstone назван песчаником, а кварц и гидрохлориды отнесены к глинистым минералам. Ключевое различие по делимости не дано; плотность и пластичность подставлены вместо требуемого признака. Текст оборван.",
+      "flags": [
+        "unsupported_fact",
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "v3_mud_shale",
+      "condition": "baseline",
+      "group": "closed_book_theory",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Mudstone назван песчаником; кварц и доломит перечислены как глинистые минералы. Выдуманные общие свойства заменяют различие по делимости, отсутствует оговорка о значении термина. Текст оборван.",
+      "flags": [
+        "unsupported_fact",
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "v3_conglomerate_breccia",
+      "condition": "baseline",
+      "group": "closed_book_theory",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Не дано основное различие по окатанности и не раскрыта брекчия. Конгломерат описан через капли, мелкие фрагменты и перемешивание; такие подстановки не поддерживают reference. Ответ оборван.",
+      "flags": [
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "v3_conglomerate_breccia",
+      "condition": "candidate",
+      "group": "closed_book_theory",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Вместо окатанных против угловатых обломков заявлено, что частицы конгломерата не связаны и не имеют единого происхождения. Это не следует из reference и не различает данную пару пород. Ответ оборван.",
+      "flags": [
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_06_matrix_cement",
+      "condition": "baseline",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Разделяет цемент, образовавшийся в порах и связавший зёрна, и тонкий обломочный матрикс. Кальцит не назван повторно, но требуемое разграничение по условию дано; выражение «рядом с цементом» менее точно, чем «между песчаными зёрнами».",
+      "flags": []
+    },
+    {
+      "record_id": "gval_06_matrix_cement",
+      "condition": "candidate",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Верно относит к цементу кристаллизующийся в порах материал, а к матриксу — более тонкий материал между песчаными зёрнами. Не подменяет один компонент другим.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_07_grading",
+      "condition": "candidate",
+      "group": "source_conditioned_theory",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Название «нормальная» выбрано верно, но объяснение прямо противоположно справке и числам: 0,8 → 0,4 → 0,15 мм является уменьшением вверх, а ответ называет это увеличением и обратным направлением.",
+      "flags": [
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "gval_07_grading",
+      "condition": "baseline",
+      "group": "source_conditioned_theory",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Название «нормальная» выбрано верно, но уменьшение размера зёрен вверх названо увеличением и обратным изменением. Противоречивое обоснование не позволяет считать ответ правильным.",
+      "flags": [
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "gval_05_roundness_sorting",
+      "condition": "candidate",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Раздельно описывает плохую сортировку из-за широкого диапазона размеров и окатанность по сглаженным краям.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_05_roundness_sorting",
+      "condition": "baseline",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Различает низкую сортировку по размерам и высокую окатанность по сглаженным краям, не смешивая эти признаки.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_03",
+      "condition": "baseline",
+      "group": "dialogue_guard",
+      "category": "correct",
+      "completed": true,
+      "reason": "Кратко представляется именем приложения; соответствует смыслу reference.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_03",
+      "condition": "candidate",
+      "group": "dialogue_guard",
+      "category": "correct",
+      "completed": true,
+      "reason": "Кратко представляется именем приложения; соответствует смыслу reference.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_04_coal",
+      "condition": "candidate",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Верно отвергает определение по одному цвету и требует соотношение органического и минерального материала.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_04_coal",
+      "condition": "baseline",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Объясняет возможность одинакового чёрного цвета и необходимость оценить органическое вещество относительно минеральной основы.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_02_shale",
+      "condition": "baseline",
+      "group": "source_conditioned_theory",
+      "category": "partial",
+      "completed": true,
+      "reason": "Основной ответ верен: делимость не требует видимой первичной ламинации. Однако заключение, что её невидимость «подтверждает» узкое определение, сильнее справки: это совместимость признаков, а не подтверждающий диагностический признак; варианты употребления термина не оговорены.",
+      "flags": [
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_02_shale",
+      "condition": "candidate",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Верно говорит об отсутствии противоречия и различает делимость и первичную ламинацию. Оговорка о разном употреблении терминов опущена, но ответ на поставленный вопрос по существу правильный.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_01_clasts",
+      "condition": "candidate",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Соотносит окатанные обломки с конгломератом, угловатые с брекчией и не подменяет форму одинаковым размером. Формулировка о составе избыточна, но не меняет верного разграничения данной пары.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_01_clasts",
+      "condition": "baseline",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Явно называет первый образец конгломератом, второй брекчией и объясняет различие формой обломков, а не обязательной разницей размера.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_10_dunham",
+      "condition": "baseline",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Верно выбирает packstone по зерновой опоре с микритом и противопоставляет grainstone без микрита.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_10_dunham",
+      "condition": "candidate",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Корректно использует наличие микрита при зерновой опоре для выбора packstone и приводит согласованное определение grainstone.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_08_bioturbation",
+      "condition": "candidate",
+      "group": "source_conditioned_theory",
+      "category": "partial",
+      "completed": true,
+      "reason": "Основной вывод о невозможности исключить микроскопическую биотурбацию верен. Последняя часть вводит не сообщённые наблюдения в шлифе и неподтверждённое «особенно» при отсутствии нарушения слоёв; в справке эти признаки перечислены как объекты поиска, а не уже полученные результаты.",
+      "flags": [
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_08_bioturbation",
+      "condition": "baseline",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Не исключает биотурбацию по обычному фото и точно указывает на нехватку сведений о микроскопических следах, которые можно уточнять в шлифе.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_03_mudstone",
+      "condition": "baseline",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Отвергает обязательное присутствие глинистых минералов и связывает карбонатный mudstone с микритовой опорой и менее 10% зёрен. Тонкий карбонатный состав микрита не повторён явно, но смысл ответа согласован с данным контекстом.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_03_mudstone",
+      "condition": "candidate",
+      "group": "source_conditioned_theory",
+      "category": "partial",
+      "completed": true,
+      "reason": "Первые два предложения верно отрицают обязательные глинистые минералы и называют микритовую опору. Последнее предложение вновь называет mudstone именно в данном карбонатном контексте «тонкозернистой обломочной породой», смешивая два разных значения вопреки справке.",
+      "flags": [
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "gval_09_missing_porosity",
+      "condition": "candidate",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Отказывается выдумывать процент и верно указывает отсутствие данных о пористости. Дополнительные сведения о составе и структуре названы широко и не представлены как достаточная замена измерениям.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_09_missing_porosity",
+      "condition": "baseline",
+      "group": "source_conditioned_theory",
+      "category": "correct",
+      "completed": true,
+      "reason": "Точно говорит, что из предоставленной справки нельзя рассчитать пористость конкретного образца; значение в процентах не выдумано.",
+      "flags": []
+    }
+  ],
+  "limitations": [
+    "Assistant blind review, not an independent geologist's approval.",
+    "Small reused development/regression checks; not a sealed independent test and not general accuracy.",
+    "The theory checks share source notes and concepts with training; the retriever was debugged during development.",
+    "Exact training/validation questions are separate, but this does not make the concepts independent.",
+    "No claim about facies accuracy, full core descriptions, or 95% recognition follows from these counts.",
+    "Raw model outputs include false statements; they are audit evidence, never accepted geological facts or SFT targets."
+  ]
+}

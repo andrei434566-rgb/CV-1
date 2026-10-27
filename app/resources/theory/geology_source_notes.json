@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "created_date": "2026-10-27",
+  "target_language": "ru",
+  "geologist_reviewed": false,
+  "review_status": "source_checked_original_russian_notes_not_geologist_reviewed",
+  "scope": "Short factual reference notes for local retrieval and a separate context-grounded learning experiment. These are not image labels, expert-approved descriptions, or evaluation questions.",
+  "sources": {
+    "earle2019": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition",
+      "url": "https://opentextbc.ca/physicalgeology2ed/",
+      "license": "CC BY 4.0, except individually credited exceptions; only original prose is paraphrased",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footers explicitly license Physical Geology - 2nd Edition, Copyright 2019 Steven Earle, under CC BY 4.0. No separately licensed image or exercise is reproduced.",
+      "sections": ["6.1 Clastic Sedimentary Rocks: Table 6.2, lithification, cementation, sandstone matrix, conglomerate and breccia", "6.2 Chemical Sedimentary Rocks: clastic and chemical components, limestone and carbonate skeletal fragments", "6.4 Sedimentary Structures and Fossils: bedding, partings, cross-bedding, grading, grain characteristics", "Glossary: conglomerate and mudrock"],
+      "section_urls": ["https://opentextbc.ca/physicalgeology2ed/chapter/6-1-clastic-sedimentary-rocks/", "https://opentextbc.ca/physicalgeology2ed/chapter/6-2-chemical-sedimentary-rocks/", "https://opentextbc.ca/physicalgeology2ed/chapter/6-4-sedimentary-structures-and-fossils/", "https://opentextbc.ca/physicalgeology2ed/back-matter/glossary/"],
+      "attribution": "Short original Russian adaptations of Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, selection and condensation of factual definitions.",
+      "access": "Official publisher chapter and glossary HTML pages directly inspected; scientific content and licence footers read.",
+      "source_checked_date": "2026-10-27"
+    },
+    "iodp356": {
+      "title": "Gallagher et al. (2017), Expedition 356 methods, Proceedings of the International Ocean Discovery Program",
+      "url": "https://publications.iodp.org/proceedings/356/102/356_102.html",
+      "doi": "10.14379/iodp.proc.356.102.2017",
+      "license": "CC BY 4.0 except where otherwise noted; prose only, no third-party figures",
+      "license_url": "https://iodp.tamu.edu/scienceops/copyright.html",
+      "license_evidence": "The official JRSO Copyright Statement directly inspected during this task states that expedition publications are CC BY 4.0 except where otherwise noted. The public methods chapter was read directly.",
+      "sections": ["Lithostratigraphy and sedimentology", "Principal carbonate names", "Carbonate modifiers", "Principal siliciclastic lithologies"],
+      "attribution": "Original Russian paraphrases of Gallagher et al., Expedition 356 methods (2017), IODP/JRSO, CC BY 4.0. Changes: translation and condensation; expedition-specific conventions are identified as such.",
+      "access": "Official chapter HTML directly inspected, including the explicit mudstone, wackestone, packstone and grainstone definitions.",
+      "source_checked_date": "2026-10-27"
+    },
+    "usgs_coal": {
+      "title": "U.S. Geological Survey, What is coal?",
+      "url": "https://www.usgs.gov/faqs/what-coal",
+      "license": "USGS-authored information in the U.S. public domain; no third-party illustrations reproduced",
+      "license_url": "https://www.usgs.gov/faqs/are-usgs-reportspublications-copyrighted?qt-news_science_products=0",
+      "license_evidence": "Official USGS policy identifies USGS-authored information as U.S. public domain and asks for source acknowledgement; separately copyrighted third-party items are excluded. Only the authored FAQ definition is used.",
+      "sections": ["Opening definition: composition, mass and volume fractions, formation from plant remains"],
+      "attribution": "Source: U.S. Geological Survey, What is coal? Original short Russian paraphrase; numerical criteria retain the FAQ's stated measurement basis.",
+      "access": "Official FAQ HTML directly inspected. No report whose PDF returned 403 is used in these notes.",
+      "source_checked_date": "2026-10-27"
+    },
+    "biddle2025": {
+      "title": "Biddle, LaGrange, Harris, Egenhoff and Gingras (2025), Current concepts in mudstone description and deposition: A synthesis for mudstone initiates, Sedimentologika",
+      "url": "https://oap.unige.ch/journals/sdk/article/view/1621",
+      "doi": "10.57035/journals/sdk.2025.e31.1621",
+      "source_type": "Author-written peer-reviewed synthesis/review, not a new primary experiment",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The full article's License section explicitly states Copyright 2025 the five authors and CC BY 4.0. The full HTML and relevant sections were read directly; figures are not reproduced.",
+      "sections": ["2.1 Mudstone or Mudrock?", "2.2 Shale or Mudstone?", "2.3 Grain size", "Table 3 and associated microscopic-bioturbation discussion", "5 Organic Matter Enrichment"],
+      "attribution": "Short original Russian adaptations of Biddle et al. (2025), Sedimentologika, DOI 10.57035/journals/sdk.2025.e31.1621, CC BY 4.0. Changes: translation, condensation and explicit separation of terminology from observations.",
+      "access": "Official journal full-text HTML directly inspected, including sections 2.1-2.3, 5 and the licence statement.",
+      "source_checked_date": "2026-10-27"
+    }
+  },
+  "notes": [
+    {
+      "id": "coarse_clasts",
+      "topic": "conglomerate_breccia",
+      "text": "Конгломерат и осадочная брекчия относятся к крупнообломочным породам с существенной долей обломков крупнее 2 мм. В конгломерате крупные обломки преимущественно окатанные, в осадочной брекчии — угловатые. Различие этой пары не заключается в том, что брекчия обязательно мельче. Размер, окатанность и состав обломков — отдельные признаки описания.",
+      "sources": ["earle2019"]
+    },
+    {
+      "id": "shale_fissility",
+      "topic": "shale_mudstone",
+      "text": "В узком текстурном употреблении shale — тонкозернистая порода с делимостью: она предпочтительно раскалывается по близким примерно параллельным поверхностям. Массивный или блоковый mudstone такой выраженной делимости не показывает. Делимость описывает раскалывание и не тождественна видимой первичной ламинации. В литературе mudstone и shale используют также шире, поэтому принятое значение термина следует указывать.",
+      "sources": ["biddle2025"]
+    },
+    {
+      "id": "mudstone_two_meanings",
+      "topic": "carbonate_terrigenous_mudstone",
+      "text": "Терригенный mudstone обозначает тонкозернистую обломочную породу; в широком употреблении термин охватывает разные соотношения алевритовых и глинистых частиц. В карбонатной классификации Данэма mudstone — карбонатная порода с опорой на микритовый материал и менее 10% зёрен. Микрит здесь означает тонкий карбонатный материал, а не обязательно глинистые минералы. Одинаковое английское слово не устанавливает одинаковый состав этих пород.",
+      "sources": ["biddle2025", "iodp356"]
+    },
+    {
+      "id": "coal_carbonaceous",
+      "topic": "coal_carbonaceous_mudrock",
+      "text": "Уголь — преимущественно органический горючий осадочный материал, образованный преобразованием растительных остатков. В определении USGS он содержит более 50% по массе и более 70% по объёму углистого вещества; массовое определение включает собственную влагу. Углистая тонкозернистая порода может сохранять минеральную основу и быть лишь обогащённой органикой. Для различения нужны данные о соотношении органического и минерального материала, а не одно тёмное окрашивание.",
+      "sources": ["usgs_coal", "biddle2025"]
+    },
+    {
+      "id": "sorting_roundness",
+      "topic": "grain_characteristics",
+      "text": "Сортировка характеризует однородность размеров частиц: при хорошей сортировке диапазон размеров сравнительно узок. Окатанность характеризует сглаженность углов и рёбер отдельных обломков. Минеральный состав — ещё один самостоятельный признак. Поэтому хорошо отсортированный песок не обязательно состоит только из кварца, а окатанные частицы не обязательно одинаковы по размеру.",
+      "sources": ["earle2019"]
+    },
+    {
+      "id": "grain_size_mineralogy",
+      "topic": "grain_size_and_composition",
+      "text": "Размерная глинистая фракция и глинистые минералы — разные понятия. Очень мелкие частицы кварца и полевых шпатов могут попадать в глинистую размерную фракцию, а пластинки глинистых минералов могут иметь алевритовый размер. Границу глинистой фракции разные схемы проводят по-разному. При описании надо отдельно назвать классификацию размеров и установленный минеральный состав.",
+      "sources": ["biddle2025"]
+    },
+    {
+      "id": "matrix_cement",
+      "topic": "matrix_and_cement",
+      "text": "В песчанике матриксом называют более тонкий материал между песчаными зёрнами, обычно алевритовый и глинистый. Цемент образуется при кристаллизации минералов в порах и у контактов зёрен. Кальцит, кварц и другие минералы могут выступать цементом. Доля матрикса и состав цемента описывают разные составляющие породы и не должны подменять друг друга.",
+      "sources": ["earle2019"]
+    },
+    {
+      "id": "compaction_cementation",
+      "topic": "diagenesis",
+      "text": "Литификация превращает рыхлый осадок в породу и включает несколько процессов. При уплотнении частицы сближаются, а часть воды и воздуха удаляется из промежутков. При цементации минералы кристаллизуются в межзерновом пространстве и связывают зёрна. Уплотнение и цементация различаются по механизму, хотя могут совместно изменять один осадок.",
+      "sources": ["earle2019"]
+    },
+    {
+      "id": "bedding_parting",
+      "topic": "bedding",
+      "text": "Напластование выражается чередованием слоёв, различающихся текстурой, составом, цветом или выветриванием. Между соседними слоями могут быть поверхности или узкие промежутки раздела. Поэтому одинаковая крупность не исключает заметного напластования. Само наличие слоёв встречается во многих обстановках и не задаёт единственную среду накопления.",
+      "sources": ["earle2019"]
+    },
+    {
+      "id": "cross_bedding",
+      "topic": "sedimentary_structures",
+      "text": "Косая слоистость содержит наклонные слойки внутри более крупных слоёв. Она возникает при перемещении ряби или дюн, когда материал накапливается на их переднем склоне. Последующие формы могут частично срезать предыдущие отложения. Такая структура образуется как при движении воды, так и при ветровом переносе; одного её наличия недостаточно для выбора между ними.",
+      "sources": ["earle2019"]
+    },
+    {
+      "id": "normal_grading",
+      "topic": "graded_bedding",
+      "text": "Градационная слоистость описывает изменение размера частиц по мощности одного слоя. При нормальной градации материал крупнее внизу и становится тоньше к верху. При обратной градации крупность, наоборот, растёт вверх. Для такого описания необходимы ориентировка слоя и сведения именно о размере частиц; изменение цвета само по себе не является измерением зернистости.",
+      "sources": ["earle2019"]
+    },
+    {
+      "id": "carbonate_support",
+      "topic": "dunham_classification",
+      "text": "В карбонатной схеме Данэма mudstone имеет микритовую опору и менее 10% зёрен, а wackestone — микритовую опору и более 10% зёрен. У packstone опору создают зёрна, но между ними присутствует тонкий карбонатный материал. Grainstone имеет зерновую опору без такого материала. Главные признаки здесь — тип опоры и наличие микрита, а не только размер зёрен или цвет.",
+      "sources": ["iodp356"]
+    },
+    {
+      "id": "carbonate_components",
+      "topic": "carbonate_grains",
+      "text": "Карбонатные зёрна могут быть обломками скелетов организмов либо нескелетными частицами, например ооидами и пелоидами. Волны и течения дробят и перераспределяют карбонатные скелеты, создавая частицы разных размеров. В методике IODP 356 ооиды и пелоиды иногда было трудно различить макроскопически, и тогда применяли более общее описание нескелетных зёрен. При неразличимых деталях конкретный тип частицы не следует считать установленным.",
+      "sources": ["earle2019", "iodp356"]
+    },
+    {
+      "id": "microscopic_bioturbation",
+      "topic": "bioturbation",
+      "text": "Тонкозернистая порода без заметных макроскопических ходов может содержать микроскопические следы биогенной переработки. В шлифе ищут нарушение слоек, ориентировку частиц по краю предполагаемого хода и отличие его заполнения от окружения. Малый размер и слабый контраст затрудняют уверенное определение ихнорода. Отсутствие различимых ходов на обычном фото не доказывает отсутствие биотурбации.",
+      "sources": ["biddle2025"]
+    }
+  ]
+}

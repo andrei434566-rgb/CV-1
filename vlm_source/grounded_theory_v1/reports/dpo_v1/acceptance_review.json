@@ -1,0 +1,18 @@
+{
+  "schema": "qwen_acceptance_review_v1",
+  "reviewed_date": "2026-10-27",
+  "status": "rejected_for_general_assistant",
+  "geologist_approved": false,
+  "installed_in_application": false,
+  "reason_codes": [
+    "no_grounded_gain",
+    "unresolved_core_geology_errors",
+    "porosity_source_constraint_regression"
+  ],
+  "reason": "Улучшения вопросов со справкой нет: 8 правильных ответов у базы против 7 у DPO. Сохраняются основные геологические ошибки; ответ об отсутствии данных для пористости дополнен неподтвержденными условиями измерения.",
+  "raw_metrics_preserved": true,
+  "geology_accuracy": null,
+  "qualitative_review": "dpo_result.json",
+  "candidate_theory_truncated": 4,
+  "review_scope": "10 source-conditioned theory, 4 closed-book theory, 4 dialogue guards, 8 source-class image guards"
+}

@@ -20,6 +20,13 @@ MAX_FILES = 2000
 MAX_ENTRIES = 50_000
 MAX_BYTES = 25 * 1024 * 1024
 MAX_CHARS = 120_000
+MODEL_EVALUATION_FILES = {
+    "baseline_responses.jsonl", "candidate_responses.jsonl", "blind_review.json",
+    "review_blind_ratings.json", "runtime_blind_review.json", "runtime_blind_ratings.json",
+    "application_runtime_comparison.json", "qualitative_review.json", "acceptance_review.json",
+    "baseline_metrics.json", "candidate_metrics.json", "validation_questions.json",
+    "holdout_theory.jsonl", "holdout_conversation.jsonl", "val_visual.jsonl",
+}
 
 SEARCH_STOPWORDS = {
     "найди", "найдите", "найти", "поищи", "поищите", "ищи", "ищите", "поиск",
@@ -130,7 +137,18 @@ def search_photo_files(
 def _document_text(path: Path) -> str:
     suffix = path.suffix.casefold()
     if suffix in TEXT_SUFFIXES:
-        return path.read_text(encoding="utf-8-sig", errors="replace")[:MAX_CHARS]
+        if path.name.casefold() in MODEL_EVALUATION_FILES:
+            return ""
+        content = path.read_text(encoding="utf-8-sig", errors="replace")[:MAX_CHARS]
+        if suffix in {".json", ".jsonl"} and (
+            "rejected_false_statement_not_ground_truth" in content
+            or re.search(r'"preference_rejected"\s*:', content)
+            or re.search(r'"schema"\s*:\s*"(?:qwen_|grounded_geology_|geology_preference_)', content)
+        ):
+            # Deliberately false preference examples and raw model evaluations
+            # are training/research artifacts, never geological references.
+            return ""
+        return content
     if suffix == ".docx":
         with zipfile.ZipFile(path) as archive:
             if archive.getinfo("word/document.xml").file_size > 12 * 1024 * 1024:

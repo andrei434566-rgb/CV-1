@@ -85,6 +85,16 @@ def validate_training_tokens(full_ids: list[int], prompt_ids: list[int], labels:
             "supervised_tokens": supervised, "final_token_supervised": True}
 
 
+def validate_loss_records(records: list[dict], loss_mode: str) -> None:
+    if loss_mode == "dpo":
+        from app.infrastructure.preference_loss import validate_preference_records
+        validate_preference_records(records)
+    elif loss_mode != "sft":
+        raise ValueError("Unknown training loss mode")
+    elif any("preference_rejected" in row for row in records):
+        raise ValueError("Preference records require --loss-mode dpo; refusing accidental SFT")
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -211,7 +221,8 @@ def evaluation_metrics(image_rows: list[dict], eval_rows: list[dict], responses:
     }
 
 
-def load_reusable_baseline(folder: Path, settings: dict, eval_rows: list[dict]) -> tuple[list[dict], dict]:
+def load_reusable_baseline(folder: Path, settings: dict, eval_rows: list[dict], *,
+                           allow_different_training_manifest: bool = False) -> tuple[list[dict], dict]:
     """Validate the full comparison identity before reusing any baseline answers."""
     config_path = folder / "run_config.json"
     responses_path = folder / "baseline_responses.jsonl"
@@ -226,6 +237,8 @@ def load_reusable_baseline(folder: Path, settings: dict, eval_rows: list[dict]) 
     if set(old_manifests) != set(new_manifests):
         raise ValueError("Baseline reuse rejected: manifest set differs")
     for name, value in new_manifests.items():
+        if name == "training" and allow_different_training_manifest:
+            continue
         if old_manifests[name].get("sha256") != value.get("sha256"):
             raise ValueError(f"Baseline reuse rejected: {name} manifest checksum differs")
     responses = [json.loads(line) for line in responses_path.read_text(encoding="utf-8-sig").splitlines() if line.strip()]
@@ -257,6 +270,12 @@ def load_reusable_baseline(folder: Path, settings: dict, eval_rows: list[dict]) 
         "validation": "exact model/config, manifest hashes, generation, image size, seed, versions, IDs, kinds, questions and references",
         "metrics_recomputed_from_raw_responses": True,
     }
+    if allow_different_training_manifest:
+        provenance["training_manifest_is_not_a_baseline_input"] = {
+            "previous_sha256": old_manifests.get("training", {}).get("sha256"),
+            "current_sha256": new_manifests.get("training", {}).get("sha256"),
+            "reason": "Fresh unadapted base responses depend on exact evaluation inputs, not preference training rows.",
+        }
     return responses, provenance
 
 
@@ -332,6 +351,8 @@ def main() -> None:
                         help="Language-only LoRA recipe; qv preserves the original pilot targets")
     parser.add_argument("--max-sequence-tokens", type=int, default=1024,
                         help="Reject longer training sequences without truncation, including visual tokens")
+    parser.add_argument("--loss-mode", choices=("sft", "dpo"), default="sft")
+    parser.add_argument("--dpo-beta", type=float, default=0.1)
     parser.add_argument("--theory-limit", type=int, default=8)
     parser.add_argument("--theory-max-new-tokens", type=int, default=260)
     parser.add_argument("--classification-max-new-tokens", type=int, default=24)
@@ -346,6 +367,9 @@ def main() -> None:
     if args.epochs <= 0 or args.learning_rate <= 0 or args.max_image_side < 56 or args.max_sequence_tokens <= 0:
         raise ValueError("Invalid training parameters")
     train_rows = read_records(args.manifest, training=True)
+    validate_loss_records(train_rows, args.loss_mode)
+    if args.loss_mode == "dpo" and (not math.isfinite(args.dpo_beta) or args.dpo_beta <= 0):
+        raise ValueError("DPO beta must be finite and positive")
     image_eval = read_records(args.eval_manifest, training=False)
     if not all(row.get("image") for row in image_eval):
         raise ValueError("Image validation manifest must contain only image classification rows")
@@ -408,6 +432,7 @@ def main() -> None:
             "max_image_side": args.max_image_side, "batch_size": 1, "gradient_accumulation": 4,
             "lora_rank": 8, "lora_alpha": 16, "lora_dropout": 0.05,
             "lora_targets_recipe": args.lora_targets, "max_sequence_tokens": args.max_sequence_tokens,
+            "loss_mode": args.loss_mode, "dpo_beta": args.dpo_beta,
             "torch": torch.__version__, "transformers": transformers.__version__, "peft": peft.__version__,
             "cuda": torch.version.cuda, "gpu": torch.cuda.get_device_name(0),
             "generation": {"do_sample": False, "repetition_penalty": 1.05,
@@ -421,7 +446,10 @@ def main() -> None:
         (args.output_dir / "run_config.json").write_text(json.dumps(settings, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         cached_baseline = None
         if args.reuse_baseline_dir:
-            cached_baseline, reuse = load_reusable_baseline(args.reuse_baseline_dir, settings, eval_rows)
+            cached_baseline, reuse = load_reusable_baseline(
+                args.reuse_baseline_dir, settings, eval_rows,
+                allow_different_training_manifest=args.loss_mode == "dpo",
+            )
             settings["baseline_reuse"] = reuse
             (args.output_dir / "baseline_reuse.json").write_text(json.dumps(reuse, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             shutil.copyfile(args.reuse_baseline_dir / "baseline_responses.jsonl", args.output_dir / "baseline_responses.jsonl")
@@ -430,7 +458,7 @@ def main() -> None:
         progress("loading_processor", model=str(args.model), train_rows=len(train_rows), validation_rows=len(eval_rows))
         processor = AutoProcessor.from_pretrained(str(args.model), local_files_only=True)
 
-        def messages(row, *, target=False):
+        def messages(row, *, target=False, answer_text=None):
             question = row["conversations"][0]["value"].replace("<image>", "", 1).strip()
             content = []
             image = None
@@ -442,11 +470,12 @@ def main() -> None:
             content.append({"type": "text", "text": question})
             turns = [{"role": "system", "content": system_prompt}, {"role": "user", "content": content}]
             if target:
-                turns.append({"role": "assistant", "content": [{"type": "text", "text": row["conversations"][1]["value"]}]})
+                turns.append({"role": "assistant", "content": [{"type": "text", "text": (
+                    row["conversations"][1]["value"] if answer_text is None else answer_text)}]})
             return turns, image
 
-        def encode(row, *, target=False):
-            turns, image = messages(row, target=target)
+        def encode(row, *, target=False, answer_text=None):
+            turns, image = messages(row, target=target, answer_text=answer_text)
             text = processor.apply_chat_template(turns, tokenize=False, add_generation_prompt=not target)
             return processor(text=[text], **({"images": [image]} if image else {}), return_tensors="pt")
 
@@ -466,18 +495,51 @@ def main() -> None:
                 return {key: value.squeeze(0) if key in {"input_ids", "attention_mask", "labels"} else value
                         for key, value in full.items()}
 
-        dataset = CheckedDataset(train_rows, processor, args.max_image_side, system_prompt)
+        if args.loss_mode == "dpo":
+            from app.infrastructure.preference_loss import (
+                PreferencePairCollator, model_preference_loss, preference_labels, supports_target_logits,
+            )
+            assistant_eos = processor.tokenizer.convert_tokens_to_ids("<|im_end|>")
+            if not isinstance(assistant_eos, int) or assistant_eos == processor.tokenizer.unk_token_id:
+                raise ValueError("DPO requires the Qwen assistant <|im_end|> token")
+
+            class PreferenceDataset(CorePhotoDataset):
+                def __getitem__(self, index):
+                    row = self.records[index]
+                    prompt_ids = encode(row)["input_ids"][0].tolist()
+                    pair = {}
+                    for branch, answer in (("chosen", row["conversations"][1]["value"]),
+                                           ("rejected", row["preference_rejected"])):
+                        full = encode(row, target=True, answer_text=answer)
+                        labels = preference_labels(
+                            full["input_ids"][0].tolist(), prompt_ids, eos_token_id=assistant_eos,
+                            max_sequence_tokens=args.max_sequence_tokens, identity=record_id(row) + ":" + branch,
+                        )
+                        full["labels"] = torch.tensor([labels], dtype=torch.long)
+                        pair[branch] = {key: value.squeeze(0) if key in {"input_ids", "attention_mask", "labels"} else value
+                                        for key, value in full.items()}
+                    return pair
+
+            dataset = PreferenceDataset(train_rows, processor, args.max_image_side, system_prompt)
+            collator = PreferencePairCollator(SingleImageCollator(processor.tokenizer.pad_token_id))
+        else:
+            dataset = CheckedDataset(train_rows, processor, args.max_image_side, system_prompt)
+            collator = SingleImageCollator(processor.tokenizer.pad_token_id)
         # Check every row before model allocation, baseline generation or training.
         max_observed_tokens = 0
         for index, row in enumerate(train_rows):
-            item = dataset[index]
-            size = int(item["input_ids"].shape[-1])
-            max_observed_tokens = max(max_observed_tokens, size)
-            progress("training_preflight", index=index + 1, total=len(train_rows),
-                     modality="image" if row.get("image") else "text", record_id=record_id(row),
-                     sequence_tokens=size, supervised_tokens=int((item["labels"] != -100).sum()),
-                     final_token_supervised=bool(item["labels"][-1] != -100))
-            del item
+            prepared = dataset[index]
+            branches = prepared.items() if args.loss_mode == "dpo" else [("sft", prepared)]
+            for branch, item in branches:
+                size = int(item["input_ids"].shape[-1])
+                max_observed_tokens = max(max_observed_tokens, size)
+                extra = ({"branch": branch, "assistant_eos_supervised": bool(
+                    item["labels"][item["labels"] != -100][-1] == assistant_eos)} if args.loss_mode == "dpo"
+                         else {"final_token_supervised": bool(item["labels"][-1] != -100)})
+                progress("training_preflight", index=index + 1, total=len(train_rows),
+                         modality="image" if row.get("image") else "text", record_id=record_id(row),
+                         sequence_tokens=size, supervised_tokens=int((item["labels"] != -100).sum()), **extra)
+            del prepared, item
         settings["training_preflight"] = {"checked_rows": len(train_rows), "max_observed_tokens": max_observed_tokens,
                                           "max_sequence_tokens": args.max_sequence_tokens, "truncated_rows": 0}
         progress("loading_model", model=str(args.model), train_rows=len(train_rows), validation_rows=len(eval_rows))
@@ -486,6 +548,11 @@ def main() -> None:
         ).to("cuda")
         targets = select_lora_targets(model.named_modules(), args.lora_targets)
         settings["target_modules"] = targets
+        if args.loss_mode == "dpo":
+            settings["dpo"] = {"reference": "same_fresh_base_with_disabled_adapter_no_grad_eval",
+                               "initial_adapter": None, "sequence_logps": "sum_assistant_tokens_including_im_end",
+                               "template_suffix_after_im_end": "masked", "batch_size": 1,
+                               "target_logits_supported": supports_target_logits(model)}
         (args.output_dir / "run_config.json").write_text(json.dumps(settings, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
         def evaluate(stage):
@@ -539,15 +606,30 @@ def main() -> None:
         model.print_trainable_parameters()
         trainable = sum(param.numel() for param in model.parameters() if param.requires_grad)
         progress("training_started", trainable_parameters=trainable, target_modules=targets,
-                 lora_targets_recipe=args.lora_targets, lora_rank=8, lora_alpha=16, lora_dropout=0.05)
+                 lora_targets_recipe=args.lora_targets, lora_rank=8, lora_alpha=16, lora_dropout=0.05,
+                 loss_mode=args.loss_mode, dpo_beta=args.dpo_beta)
 
         class LogCallback(TrainerCallback):
             def on_log(self, arguments, state, control, logs=None, **kwargs):
                 values = {key: value for key, value in (logs or {}).items() if isinstance(value, (int, float, str))}
                 progress("training_log", step=state.global_step, **values)
 
-        trainer = Trainer(model=model, args=training_args, train_dataset=dataset,
-                          data_collator=SingleImageCollator(processor.tokenizer.pad_token_id),
+        trainer_type = Trainer
+        if args.loss_mode == "dpo":
+            class PreferenceTrainer(Trainer):
+                def __init__(self, *values, **kwargs):
+                    super().__init__(*values, **kwargs)
+                    # This pair loss does not use HF global assistant-token normalization.
+                    self.model_accepts_loss_kwargs = False
+
+                def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+                    owner = self.accelerator.unwrap_model(model)
+                    loss, outputs = model_preference_loss(model, inputs, beta=args.dpo_beta, adapter_model=owner)
+                    return (loss, outputs) if return_outputs else loss
+
+            trainer_type = PreferenceTrainer
+        trainer = trainer_type(model=model, args=training_args, train_dataset=dataset,
+                          data_collator=collator,
                           processing_class=processor, callbacks=[LogCallback()])
         train_result = trainer.train()
         adapter_dir = args.output_dir / "adapter"

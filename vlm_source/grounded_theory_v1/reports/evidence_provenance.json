@@ -1,0 +1,21 @@
+{
+  "schema": "grounded_geology_report_provenance_v1",
+  "record_type": "audit_evidence_not_training_truth",
+  "copied_without_changes": {
+    "baseline_responses.jsonl": "00a1ee845ecb8fb4b005c00a2e3dcfb495b72ce9a83ea62060bec872f87d8cca",
+    "candidate_responses.jsonl": "192aaa6f50d5b46a8d4addba612819da5780eb567c30416036a3b96eee1e499b",
+    "baseline_metrics.json": "d17a30d888aa3e6c4ff1ffd5781f8ce86bb0014fc8ac6c601bc31b61079664c4",
+    "candidate_metrics.json": "775a7f1e0146284d34bdec585dcb9a3c1c05bcace89e48a55f52b981530119e6",
+    "blind_review.json": "5af63eeb26747ae607aa8fcf2452388697fc34b638566c391e42347ddd09509f",
+    "review_key.json": "ef72fdaa0cae107d68dad224feadcbebd77a4a33676e9522f8574f89c6f3097b",
+    "review_blind_ratings.json": "f6f8f618bacfa0c5a096bc48b1871b41b68bb6fdb6440cb5dd7e27f0053d795e",
+    "runtime_blind_review.json": "413402d654d02c7a0bd7df16ae4bf552208b787b09b999e7d3234cec906ea64c",
+    "runtime_review_key.json": "19b36cdc5facdca180f243080a6458bd17292db3232c599bd152028ec0821ced",
+    "runtime_blind_ratings.json": "3b247780c57f87384d438ae1bf7411f72b309757a483a333a1086387096d7a4a"
+  },
+  "original_runtime_sha256": "6bf1b5376566be15935dc3c66c2af365e629da71ade0d88c302565ac5d5a84aa",
+  "portable_runtime_sha256": "171fa44026827ce9d27aa3291aaed0fc761037d9dea0bbf399d1dd871414110a",
+  "raw_model_outputs_contain_errors": true,
+  "raw_images_included": false,
+  "model_weights_included": false
+}

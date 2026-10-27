@@ -1,0 +1,106 @@
+{
+  "image_classification": {
+    "dcid": {
+      "rows": 4,
+      "correct": 1,
+      "accuracy": 0.25,
+      "macro_f1": 0.25,
+      "confusion_matrix": {
+        "Базальт.": {
+          "Базальт.": 0,
+          "Глинистая порода (mudstone).": 1,
+          "Гранит.": 0,
+          "Красный песчаник.": 0,
+          "__unknown__": 0
+        },
+        "Глинистая порода (mudstone).": {
+          "Базальт.": 0,
+          "Глинистая порода (mudstone).": 0,
+          "Гранит.": 0,
+          "Красный песчаник.": 0,
+          "__unknown__": 1
+        },
+        "Гранит.": {
+          "Базальт.": 0,
+          "Глинистая порода (mudstone).": 0,
+          "Гранит.": 0,
+          "Красный песчаник.": 0,
+          "__unknown__": 1
+        },
+        "Красный песчаник.": {
+          "Базальт.": 0,
+          "Глинистая порода (mudstone).": 0,
+          "Гранит.": 0,
+          "Красный песчаник.": 1,
+          "__unknown__": 0
+        }
+      },
+      "unknown_output": 2,
+      "truncated": 0
+    },
+    "mendeley": {
+      "rows": 4,
+      "correct": 1,
+      "accuracy": 0.25,
+      "macro_f1": 0.16666666666666666,
+      "confusion_matrix": {
+        "Глинистая порода (shale).": {
+          "Глинистая порода (shale).": 0,
+          "Известняк.": 0,
+          "Не керн: помехи или пустой лоток.": 0,
+          "Песчаник.": 0,
+          "__unknown__": 1
+        },
+        "Известняк.": {
+          "Глинистая порода (shale).": 1,
+          "Известняк.": 0,
+          "Не керн: помехи или пустой лоток.": 0,
+          "Песчаник.": 0,
+          "__unknown__": 0
+        },
+        "Не керн: помехи или пустой лоток.": {
+          "Глинистая порода (shale).": 0,
+          "Известняк.": 0,
+          "Не керн: помехи или пустой лоток.": 0,
+          "Песчаник.": 1,
+          "__unknown__": 0
+        },
+        "Песчаник.": {
+          "Глинистая порода (shale).": 0,
+          "Известняк.": 0,
+          "Не керн: помехи или пустой лоток.": 0,
+          "Песчаник.": 1,
+          "__unknown__": 0
+        }
+      },
+      "unknown_output": 1,
+      "truncated": 0
+    }
+  },
+  "theory": {
+    "rows": 14,
+    "accuracy": null,
+    "evaluation": "qualitative; raw responses and references saved",
+    "truncated": 4
+  },
+  "casual_guard": {
+    "rows": 4,
+    "accuracy": null,
+    "evaluation": "qualitative conversation regression guard",
+    "empty_answers": 0
+  },
+  "seconds": 129.683,
+  "reuse_provenance": {
+    "source_directory": "C:\\Users\\Я\\Desktop\\Синтетический керн\\vlm_core_v1\\outputs\\core_vlm_grounded_v1_20261027_lora",
+    "run_config_sha256": "18059b2ed2ce9ea93eb934ad3e866f884763be84ca8b3a3b458270712f98b1af",
+    "baseline_responses_sha256": "00a1ee845ecb8fb4b005c00a2e3dcfb495b72ce9a83ea62060bec872f87d8cca",
+    "rows": 26,
+    "validation": "exact model/config, manifest hashes, generation, image size, seed, versions, IDs, kinds, questions and references",
+    "metrics_recomputed_from_raw_responses": true,
+    "training_manifest_is_not_a_baseline_input": {
+      "previous_sha256": "6bcaf4ffce30231a4320b506cc398b24ba34d226c48aa1dbaf940e6920de0454",
+      "current_sha256": "e1cd2d8a56a9275279ba0fdefcf30859969e46b79dbc80fcd6822ad897a198eb",
+      "reason": "Fresh unadapted base responses depend on exact evaluation inputs, not preference training rows."
+    }
+  }
+}

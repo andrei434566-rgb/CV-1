@@ -1,0 +1,19 @@
+{
+  "schema": "geology_preference_evidence_provenance_v1",
+  "record_type": "audit_evidence_not_training_truth",
+  "copied_without_changes": {
+    "baseline_responses.jsonl": "00a1ee845ecb8fb4b005c00a2e3dcfb495b72ce9a83ea62060bec872f87d8cca",
+    "candidate_responses.jsonl": "974178e47470e69a27ccc4ac00b90ffdd25ba1c21e920586d615094030bce85f",
+    "baseline_metrics.json": "f2aed9fd5d92bc954a3fc64703e9bdbdf4a9e0e887a17b0637db7508d7ab7346",
+    "candidate_metrics.json": "4d614acb420318542708c5855612fee0cc806b89286afcb6dc80b9d87f53c13f",
+    "blind_review.json": "4b6d52f0631600b8f48d9e67e33e64bb0c7fb863a78d10c5c4325a5915aa336e",
+    "review_key.json": "b9f16fa88da7465ad8737c6fe9da9eb7835986ad123756512914b094fa362319",
+    "review_blind_ratings.json": "c581963e984f93490fb6374140674c50f41954684cf85ed54d16d470301f3c28"
+  },
+  "protocol_original_sha256": "db1f1d7f8e1d11d595fe097a22161e57e11bc7724c818142120a25a3332254d3",
+  "baseline_reuse_original_sha256": "5e4752bea26306c80b0bba894b86cc405d5c2bd59e82b864d5cd323ba6091471",
+  "run_config_original_sha256": "757d53a1dbc8692ade8882ddba1d42f6372fdd032c06a1f79758b08f233fcc61",
+  "raw_model_outputs_contain_errors": true,
+  "raw_images_included": false,
+  "model_weights_included": false
+}

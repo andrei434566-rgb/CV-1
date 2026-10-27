@@ -1,0 +1,263 @@
+{
+  "schema": "grounded_geology_native_reference_result_v1",
+  "reviewed_date": "2026-10-27",
+  "record_type": "model_experiment_evaluation_not_geological_reference",
+  "actual_backend": "llama.cpp b11913 Q8_0",
+  "lora_active": false,
+  "compared_factor": "Whole source-reference routing change on the same base model/runtime/generation settings, not an isolated effect of adding factual note text.",
+  "prompt_changes": {
+    "request_project_context_both_conditions": "Проект: Новый проект. Скважина: Скважина 1.",
+    "no_reference": "Ordinary chat routing retains project/folder context.",
+    "reference": "Reference routing replaces project/folder context with retrieved source notes and instructions to use only those facts in 1–3 complete sentences.",
+    "causality": "Note content, task instructions, and removal of irrelevant context change together; their separate contributions were not isolated."
+  },
+  "max_new_tokens_both_conditions": 650,
+  "parallel_slots": 4,
+  "requests": 20,
+  "total_seconds": 32.6922219999833,
+  "qualitative_counts": {
+    "no_reference": {
+      "rows": 10,
+      "correct": 1,
+      "partial": 4,
+      "incorrect": 5,
+      "uncertain": 0,
+      "completed": 9
+    },
+    "reference": {
+      "rows": 10,
+      "correct": 5,
+      "partial": 3,
+      "incorrect": 2,
+      "uncertain": 0,
+      "completed": 10
+    }
+  },
+  "decoded_review": [
+    {
+      "record_id": "gval_07_grading",
+      "condition": "no_reference",
+      "group": "source_reference_comparison",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Нормальная и обратная градации определены наоборот: уменьшение 0,8 → 0,4 → 0,15 мм вверх названо обратной градацией. Связь с биотурбацией или переработкой не дана в справке и не вытекает из наблюдения.",
+      "flags": [
+        "contradicts_reference",
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_07_grading",
+      "condition": "reference",
+      "group": "source_reference_comparison",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Название «нормальная» угадано, но убывающая последовательность названа увеличением кверху, а уменьшение крупности приписано низу. Обоснование прямо противоречит числам, reference и определению в справке.",
+      "flags": [
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "gval_10_dunham",
+      "condition": "no_reference",
+      "group": "source_reference_comparison",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Микрит между зёрнами ошибочно объявлен признаком переработки и биотурбации; packstone описан без зерновой опоры, а grainstone допускается с микритом. Поздний выбор packstone сопровождается выдуманными критериями плотности и переработки, поэтому не исправляет основные ошибки. Текст явно оборван.",
+      "flags": [
+        "contradicts_reference",
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_10_dunham",
+      "condition": "reference",
+      "group": "source_reference_comparison",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Определение packstone дано верно, но grainstone описан противоположно справке: «опору не имеют, но имеется микрит». Для поставленного сравнения это существенная ошибка в двух ключевых признаках.",
+      "flags": [
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "gval_06_matrix_cement",
+      "condition": "no_reference",
+      "group": "source_reference_comparison",
+      "category": "partial",
+      "completed": true,
+      "reason": "Кальцит верно назван цементом, а тонкий материал сначала верно отнесён к матриксу. Затем матриксом назван весь песчаник, в том числе в итоговом выводе, что смешивает компонент с породой целиком.",
+      "flags": [
+        "contradicts_reference"
+      ]
+    },
+    {
+      "record_id": "gval_06_matrix_cement",
+      "condition": "reference",
+      "group": "source_reference_comparison",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно различает связующий цемент в порах и более тонкий матрикс между зёрнами. Однако кальцит из условия ошибочно назван «кальцина»; это может быть опиской, но точное название минерала в конечном ответе не воспроизведено.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_02_shale",
+      "condition": "reference",
+      "group": "source_reference_comparison",
+      "category": "correct",
+      "completed": true,
+      "reason": "Правильно объясняет, что предпочтительное раскалывание по близким параллельным поверхностям не требует видимой первичной ламинации. Ответ прямо решает поставленный вопрос.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_02_shale",
+      "condition": "no_reference",
+      "group": "source_reference_comparison",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Начальное «не противоречит» верно, но вместо различия делимости и ламинации выведены средняя или высокая переработка, вторичное разрушение и низкая текстурная сложность shale. Эти диагностические утверждения отсутствуют в evidence и не объясняют термин.",
+      "flags": [
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_03_mudstone",
+      "condition": "reference",
+      "group": "source_reference_comparison",
+      "category": "correct",
+      "completed": true,
+      "reason": "Отвергает обязательные глинистые минералы, правильно связывает 5% зёрен с порогом Данэма и прямо поясняет, что микрит здесь является тонким карбонатным материалом.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_03_mudstone",
+      "condition": "no_reference",
+      "group": "source_reference_comparison",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Верное начальное отрицание окружено вымышленными определениями: «мутные, тяжёлые частицы», «мутные пески», связь доли зёрен с плотностью и альтернативное органическое вещество из-за биотурбации. Микритовая опора как требуемое карбонатное основание не объяснена.",
+      "flags": [
+        "contradicts_reference",
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_05_roundness_sorting",
+      "condition": "reference",
+      "group": "source_reference_comparison",
+      "category": "correct",
+      "completed": true,
+      "reason": "Раздельно и верно описывает плохую сортировку по широкому диапазону размеров и окатанность по сглаженным краям крупных частиц.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_05_roundness_sorting",
+      "condition": "no_reference",
+      "group": "source_reference_comparison",
+      "category": "partial",
+      "completed": true,
+      "reason": "Неоднородность размеров и сглаженность краёв распознаны раздельно, но вместо обычного описания плохой сортировки добавлены неустановленные транспортные условия. Окатанность и итоговое предположение о биотурбации бактериями или водорослями не поддержаны справкой и условием.",
+      "flags": [
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_09_missing_porosity",
+      "condition": "reference",
+      "group": "source_reference_comparison",
+      "category": "partial",
+      "completed": true,
+      "reason": "Правильно отказывается придумывать процент и указывает отсутствие нужных данных. Однако объявляет размеры и состав обломков необходимыми для вычисления пористости в дополнение к объёму пустот и породы, чего справка не утверждает; основной пробел — отсутствие измерений конкретного образца.",
+      "flags": [
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_09_missing_porosity",
+      "condition": "no_reference",
+      "group": "source_reference_comparison",
+      "category": "correct",
+      "completed": true,
+      "reason": "Верно отказывает в точном проценте из одной классификационной справки и требует дополнительные данные образца. Перечень возможных данных широк и избыточен, но конкретного процента или утверждения, что название породы определяет пористость, нет.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_04_coal",
+      "condition": "no_reference",
+      "group": "source_reference_comparison",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Цвет верно назван недостаточным, но необходимое соотношение органического и минерального материала заменено коксом, сажей, отсутствием примесей и посторонними физическими признаками. Вулканические и метаморфические условия приведены как примеры осадочного процесса. Это серьёзно искажает различие пород.",
+      "flags": [
+        "contradicts_reference",
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_04_coal",
+      "condition": "reference",
+      "group": "source_reference_comparison",
+      "category": "partial",
+      "completed": true,
+      "reason": "Требуемый вывод о недостаточности цвета и необходимости соотношения органики с минералами правильный. Причина «в угле может быть отсутствующий минеральный материал» не дана справкой и не объясняет, почему одинаковый цвет не различает два образца.",
+      "flags": [
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_01_clasts",
+      "condition": "no_reference",
+      "group": "source_reference_comparison",
+      "category": "partial",
+      "completed": true,
+      "reason": "В конце верно соотносит образец 1 с конгломератом, образец 2 с брекчией. Ранее размывает основной критерий, описывая крупные обломки конгломерата как часто окатанные или с резкими углами, и вводит не относящуюся к условию одинаковость формы и лишнюю неопределённость.",
+      "flags": [
+        "contradicts_reference",
+        "unsupported_fact"
+      ]
+    },
+    {
+      "record_id": "gval_01_clasts",
+      "condition": "reference",
+      "group": "source_reference_comparison",
+      "category": "correct",
+      "completed": true,
+      "reason": "Правильно противопоставляет преобладающую окатанность конгломерата и угловатость брекчии, используя форму при одинаковом размере обломков.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_08_bioturbation",
+      "condition": "reference",
+      "group": "source_reference_comparison",
+      "category": "correct",
+      "completed": true,
+      "reason": "Не исключает микроскопическую биотурбацию по обычному фото; корректно перечисляет признаки для исследования в шлифе и ограничения размера и контраста.",
+      "flags": []
+    },
+    {
+      "record_id": "gval_08_bioturbation",
+      "condition": "no_reference",
+      "group": "source_reference_comparison",
+      "category": "partial",
+      "completed": true,
+      "reason": "Основной вывод о невозможности уверенно исключить биотурбацию верен. Но поперечные трещины и песчаные или смешанные слои без описания биогенных следов перечислены как её признаки, чего evidence не утверждает и условие не подтверждает.",
+      "flags": [
+        "unsupported_fact"
+      ]
+    }
+  ],
+  "interpretation": "In these ten development questions, the complete source-reference routing branch improves the base model's answers. Both conditions still fail the grading and Dunham questions. This tests the combined reference-routing behavior, not LoRA or the isolated causal effect of note facts.",
+  "geology_accuracy": null,
+  "geologist_approved": false,
+  "limitations": [
+    "Assistant blind review, not an independent geologist's approval.",
+    "Small reused development/regression checks; not a sealed independent test and not general accuracy.",
+    "The theory checks share source notes and concepts with training; the retriever was debugged during development.",
+    "Exact training/validation questions are separate, but this does not make the concepts independent.",
+    "No claim about facies accuracy, full core descriptions, or 95% recognition follows from these counts.",
+    "Raw model outputs include false statements; they are audit evidence, never accepted geological facts or SFT targets.",
+    "Reference routing changes source facts, task instructions and project/folder context together. This experiment cannot attribute the observed difference to note text alone.",
+    "Do not compare these counts directly to the Transformers SFT evaluation: native Q8_0 and token limit 650 differ from Transformers FP16 and token limit 160.",
+    "32.69 seconds is the total elapsed check of 20 text requests in four slots, including initial model loading; it is not a core-photo throughput benchmark."
+  ]
+}

@@ -1,0 +1,1908 @@
+{
+  "schema_version": 1,
+  "created_date": "2026-10-27",
+  "target_language": "ru",
+  "record_type": "pairwise_preference_training_only",
+  "review_status": "source_checked_authored_chosen_vs_deliberately_false_rejected_not_geologist_reviewed",
+  "geologist_reviewed": false,
+  "source_qa_file": "training_questions.json",
+  "source_qa_sha256": "ae971901592d2ef8b043bc10f439e22582bb32bd5434c6047821f24cd2ec140d",
+  "source_notes_file": "source_notes.json",
+  "source_notes_sha256": "09503ff0348e4b3ce106fa9d77861e0ec29854585525c72afca27a54fc802fdc",
+  "scope": "64 TRAIN geology preference pairs. Chosen text is unchanged from source QA; rejected text is deliberately false and is not geological knowledge.",
+  "counts": {
+    "pairs": 64,
+    "source_supported_chosen": 56,
+    "insufficient_context_chosen": 8,
+    "validation_pairs": 0,
+    "dialogue_pairs": 0
+  },
+  "rejected_training_role": "rejected_false_statement_not_ground_truth",
+  "limitations": [
+    "Rejected answers are synthetic counterexamples, not source statements or actual sample descriptions.",
+    "Never use rejected answers as SFT targets, reference-card answers, or image/facies labels.",
+    "No validation records or model responses on validation were used to construct these pairs.",
+    "Chosen answers and source notes remain unchanged; approval is source checking by an assistant, not geological expert review.",
+    "Preference training on these pairs does not establish geological, visual, or out-of-distribution accuracy."
+  ],
+  "cards": [
+    {
+      "id": "gqa_coarse_clasts_01",
+      "note_id": "coarse_clasts",
+      "question": "В породе преобладают крупные окатанные обломки. Какое название из справки подходит: конгломерат или осадочная брекчия?",
+      "answer": "Подходит конгломерат: его крупные обломки преимущественно окатанные.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Подходит конгломерат: его крупные обломки преимущественно окатанные.",
+      "rejected": "Это осадочная брекчия: её крупные обломки преимущественно окатанные.",
+      "rejection_reason": "Окатанные крупные обломки в справке определяют конгломерат; угловатые — брекчию.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_coarse_clasts_02",
+      "note_id": "coarse_clasts",
+      "question": "Если крупные обломки в основном угловатые, какое название выбирают для этой осадочной породы?",
+      "answer": "Осадочная брекчия. Её отличительный признак в этой паре — преобладание угловатых крупных обломков.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Осадочная брекчия. Её отличительный признак в этой паре — преобладание угловатых крупных обломков.",
+      "rejected": "Это конгломерат, для которого характерно преобладание угловатых крупных обломков.",
+      "rejection_reason": "Перепутаны окатанность конгломерата и угловатость осадочной брекчии.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_coarse_clasts_03",
+      "note_id": "coarse_clasts",
+      "question": "Верно ли, что брекчия отличается от конгломерата обязательно меньшим размером обломков?",
+      "answer": "Нет, обе породы содержат существенную долю обломков крупнее 2 мм. Для их различения здесь важна прежде всего окатанность, а не обязательное различие крупности.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, обе породы содержат существенную долю обломков крупнее 2 мм. Для их различения здесь важна прежде всего окатанность, а не обязательное различие крупности.",
+      "rejected": "Да, брекчия обязательно мельче конгломерата; именно крупность всегда различает эту пару.",
+      "rejection_reason": "Справка прямо отрицает обязательное различие крупности; обе породы крупнообломочные.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_coarse_clasts_04",
+      "note_id": "coarse_clasts",
+      "question": "В описании крупнообломочной породы записали размер и состав частиц. Какого признака ещё не хватает для выбора между конгломератом и брекчией?",
+      "answer": "Нужно описать окатанность крупных обломков: преимущественно окатанные характерны для конгломерата, угловатые — для осадочной брекчии.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нужно описать окатанность крупных обломков: преимущественно окатанные характерны для конгломерата, угловатые — для осадочной брекчии.",
+      "rejected": "Других признаков не нужно: одинаковые размер и состав всегда задают одинаковое название независимо от окатанности.",
+      "rejection_reason": "Пропущен необходимый здесь признак окатанности, который справка описывает отдельно от размера и состава.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_shale_fissility_01",
+      "note_id": "shale_fissility",
+      "question": "Тонкозернистая порода легко раскалывается по близким примерно параллельным поверхностям. Как называется этот признак?",
+      "answer": "Это делимость. В узком текстурном употреблении она характерна для shale.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Это делимость. В узком текстурном употреблении она характерна для shale.",
+      "rejected": "Это первичная ламинация; наблюдение раскалывания само по себе ничего не говорит о делимости.",
+      "rejection_reason": "Раскалывание по близким параллельным поверхностям описывает делимость, а не тождественную ей ламинацию.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_shale_fissility_02",
+      "note_id": "shale_fissility",
+      "question": "В узком текстурном смысле что отличает массивный mudstone от shale?",
+      "answer": "Массивный или блоковый mudstone не показывает выраженной делимости, а shale предпочтительно раскалывается по близким примерно параллельным поверхностям.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Массивный или блоковый mudstone не показывает выраженной делимости, а shale предпочтительно раскалывается по близким примерно параллельным поверхностям.",
+      "rejected": "Массивный mudstone выраженно делим, а shale не показывает предпочтительного раскалывания.",
+      "rejection_reason": "Свойства в узком текстурном употреблении поменяны местами.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_shale_fissility_03",
+      "note_id": "shale_fissility",
+      "question": "Если на распиле видны тонкие первичные слойки, можно ли считать делимость уже установленной?",
+      "answer": "Нет, видимая первичная ламинация и делимость не тождественны. Делимость описывает то, как порода раскалывается.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, видимая первичная ламинация и делимость не тождественны. Делимость описывает то, как порода раскалывается.",
+      "rejected": "Да, видимые первичные слойки полностью доказывают делимость; это одно и то же свойство.",
+      "rejection_reason": "Справка различает первичную ламинацию и поведение породы при раскалывании.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_shale_fissility_04",
+      "note_id": "shale_fissility",
+      "question": "Почему в описании нужно уточнять, в каком значении использованы слова shale и mudstone?",
+      "answer": "В литературе эти слова используют и шире узкого текстурного значения. Уточнение принятого смысла помогает не смешивать название породы с наблюдаемой делимостью.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "В литературе эти слова используют и шире узкого текстурного значения. Уточнение принятого смысла помогает не смешивать название породы с наблюдаемой делимостью.",
+      "rejected": "Уточнение не требуется: shale и mudstone во всех публикациях имеют только одно одинаковое значение.",
+      "rejection_reason": "Справка указывает более широкие употребления терминов и необходимость оговаривать принятый смысл.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_mudstone_two_meanings_01",
+      "note_id": "mudstone_two_meanings",
+      "question": "Слово mudstone встретилось и в терригенном, и в карбонатном описании. Обязательно ли состав этих пород одинаков?",
+      "answer": "Нет, одинаковое слово не устанавливает одинаковый состав. Терригенный mudstone — тонкозернистая обломочная порода, а карбонатный mudstone определяется в схеме Данэма.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, одинаковое слово не устанавливает одинаковый состав. Терригенный mudstone — тонкозернистая обломочная порода, а карбонатный mudstone определяется в схеме Данэма.",
+      "rejected": "Да, терригенный и карбонатный mudstone обязательно имеют одинаковый минеральный состав, поскольку название одно.",
+      "rejection_reason": "Совпадение английского слова не устанавливает одинаковый состав двух пород.",
+      "sources": [
+        "biddle2025",
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_mudstone_two_meanings_02",
+      "note_id": "mudstone_two_meanings",
+      "question": "Какие два условия в справке определяют карбонатный mudstone по Данэму?",
+      "answer": "Это карбонатная порода с опорой на микритовый материал и менее 10% зёрен.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Это карбонатная порода с опорой на микритовый материал и менее 10% зёрен.",
+      "rejected": "Карбонатный mudstone по Данэму имеет зерновую опору и более половины зёрен.",
+      "rejection_reason": "В справке для mudstone указаны микритовая опора и менее 10% зёрен.",
+      "sources": [
+        "biddle2025",
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_mudstone_two_meanings_03",
+      "note_id": "mudstone_two_meanings",
+      "question": "Микрит в карбонатном mudstone обязательно означает глинистые минералы?",
+      "answer": "Нет, микрит здесь означает тонкий карбонатный материал, а не обязательно глинистые минералы.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, микрит здесь означает тонкий карбонатный материал, а не обязательно глинистые минералы.",
+      "rejected": "Да, микрит означает исключительно глинистые минералы и не может быть тонким карбонатным материалом.",
+      "rejection_reason": "Микрит в этой справке — тонкий карбонатный материал, а не обязательно глинистые минералы.",
+      "sources": [
+        "biddle2025",
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_mudstone_two_meanings_04",
+      "note_id": "mudstone_two_meanings",
+      "question": "В широком терригенном употреблении mudstone задаёт единственное соотношение алевритовых и глинистых частиц?",
+      "answer": "Нет, в таком употреблении термин охватывает разные соотношения алевритовых и глинистых частиц. Речь идёт о тонкозернистой обломочной породе.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, в таком употреблении термин охватывает разные соотношения алевритовых и глинистых частиц. Речь идёт о тонкозернистой обломочной породе.",
+      "rejected": "Да, широкий терригенный термин mudstone всегда означает строго равные доли алевритовых и глинистых частиц.",
+      "rejection_reason": "В широком употреблении термин охватывает разные соотношения этих размерных частиц.",
+      "sources": [
+        "biddle2025",
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_coal_carbonaceous_01",
+      "note_id": "coal_carbonaceous",
+      "question": "Из какого исходного материала образован уголь согласно справке?",
+      "answer": "Уголь образован преобразованием растительных остатков. Это преимущественно органический горючий осадочный материал.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Уголь образован преобразованием растительных остатков. Это преимущественно органический горючий осадочный материал.",
+      "rejected": "Уголь образуется кристаллизацией карбонатных минералов из раствора, а растительные остатки к его происхождению не относятся.",
+      "rejection_reason": "Справка определяет уголь как преимущественно органический материал из преобразованных растительных остатков.",
+      "sources": [
+        "usgs_coal",
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_coal_carbonaceous_02",
+      "note_id": "coal_carbonaceous",
+      "question": "Какие массовый и объёмный пороги углистого вещества приводит определение USGS для угля?",
+      "answer": "Более 50% по массе и более 70% по объёму углистого вещества. В массовом определении учитывается собственная влага.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Более 50% по массе и более 70% по объёму углистого вещества. В массовом определении учитывается собственная влага.",
+      "rejected": "По приведённому определению уголь содержит менее 50% углистого вещества по массе и менее 70% по объёму.",
+      "rejection_reason": "Направления обоих неравенств обращены: в справке указано более 50% по массе и более 70% по объёму.",
+      "sources": [
+        "usgs_coal",
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_coal_carbonaceous_03",
+      "note_id": "coal_carbonaceous",
+      "question": "Порода обогащена органикой, но сохраняет минеральную основу. Обязательно ли называть её углём?",
+      "answer": "Нет, углистая тонкозернистая порода может сохранять минеральную основу. Для различения нужно знать соотношение органического и минерального материала.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, углистая тонкозернистая порода может сохранять минеральную основу. Для различения нужно знать соотношение органического и минерального материала.",
+      "rejected": "Да, любое обогащение органикой автоматически делает породу углём, даже когда её основа остаётся минеральной.",
+      "rejection_reason": "Углистая тонкозернистая порода может сохранять минеральную основу; требуется различать соотношение составляющих.",
+      "sources": [
+        "usgs_coal",
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_coal_carbonaceous_04",
+      "note_id": "coal_carbonaceous",
+      "question": "Достаточно ли тёмной окраски для выбора между углём и углистой тонкозернистой породой?",
+      "answer": "Нет, одно тёмное окрашивание не определяет это различие. Нужны данные о соотношении органического и минерального материала.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, одно тёмное окрашивание не определяет это различие. Нужны данные о соотношении органического и минерального материала.",
+      "rejected": "Да, чёрная окраска сама по себе доказывает уголь; соотношение органического и минерального материала не требуется.",
+      "rejection_reason": "Справка прямо отвергает одно тёмное окрашивание как достаточный критерий.",
+      "sources": [
+        "usgs_coal",
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_sorting_roundness_01",
+      "note_id": "sorting_roundness",
+      "question": "В осадке частицы близки по размеру, но их углы не сглажены. Хорошая сортировка противоречит угловатости?",
+      "answer": "Нет, сортировка относится к диапазону размеров, а окатанность — к сглаженности углов и рёбер. Это разные признаки.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, сортировка относится к диапазону размеров, а окатанность — к сглаженности углов и рёбер. Это разные признаки.",
+      "rejected": "Да, хорошая сортировка требует сглаженных углов; угловатые частицы всегда плохо отсортированы независимо от размеров.",
+      "rejection_reason": "Сортировка относится к диапазону размеров, а сглаженность углов — отдельный признак окатанности.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_sorting_roundness_02",
+      "note_id": "sorting_roundness",
+      "question": "Все обломки окатанные, но размеры сильно различаются. Значит ли это, что сортировка хорошая?",
+      "answer": "Нет, окатанность не означает одинаковый размер частиц. Хорошая сортировка предполагает сравнительно узкий диапазон размеров.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, окатанность не означает одинаковый размер частиц. Хорошая сортировка предполагает сравнительно узкий диапазон размеров.",
+      "rejected": "Да, окатанные обломки всегда хорошо отсортированы независимо от широкого разброса размеров.",
+      "rejection_reason": "Окатанность не означает одинаковые размеры; при хорошей сортировке диапазон размеров сравнительно узок.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_sorting_roundness_03",
+      "note_id": "sorting_roundness",
+      "question": "Может ли хорошо отсортированный песок состоять не только из кварца?",
+      "answer": "Да, сортировка описывает однородность размеров частиц. Минеральный состав устанавливается отдельно.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Да, сортировка описывает однородность размеров частиц. Минеральный состав устанавливается отдельно.",
+      "rejected": "Нет, хорошо отсортированный песок обязательно состоит только из кварца.",
+      "rejection_reason": "Минеральный состав самостоятелен; справка прямо допускает некварцевые составляющие хорошо отсортированного песка.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_sorting_roundness_04",
+      "note_id": "sorting_roundness",
+      "question": "Какой признак нужно описывать, если оценивают сглаженность углов и рёбер обломков?",
+      "answer": "Окатанность. Она не заменяет описание сортировки или минерального состава.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Окатанность. Она не заменяет описание сортировки или минерального состава.",
+      "rejected": "Это сортировка: она характеризует сглаженность углов, а окатанность описывает однородность размеров.",
+      "rejection_reason": "Определения сортировки и окатанности переставлены местами.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_grain_size_mineralogy_01",
+      "note_id": "grain_size_mineralogy",
+      "question": "Если кварцевая частица попала в глинистую размерную фракцию, она стала глинистым минералом?",
+      "answer": "Нет, размерная фракция и минеральный состав — разные понятия. Очень мелкие частицы кварца могут попадать в глинистую размерную фракцию.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, размерная фракция и минеральный состав — разные понятия. Очень мелкие частицы кварца могут попадать в глинистую размерную фракцию.",
+      "rejected": "Да, любая частица глинистого размера является глинистым минералом; кварц в такую фракцию не попадает.",
+      "rejection_reason": "Справка допускает очень мелкий кварц в глинистой размерной фракции и разделяет размер и минералогию.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_grain_size_mineralogy_02",
+      "note_id": "grain_size_mineralogy",
+      "question": "Пластинка глинистого минерала может иметь алевритовый размер?",
+      "answer": "Да, такая возможность прямо указана в справке. Название минерала не задаёт единственный размер его частицы.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Да, такая возможность прямо указана в справке. Название минерала не задаёт единственный размер его частицы.",
+      "rejected": "Нет, частица глинистого минерала не может иметь алевритовый размер: название минерала однозначно задаёт размер.",
+      "rejection_reason": "Справка прямо указывает возможность алевритового размера пластинок глинистых минералов.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_grain_size_mineralogy_03",
+      "note_id": "grain_size_mineralogy",
+      "question": "Почему вместе с названием глинистой размерной фракции нужно указывать принятую классификацию?",
+      "answer": "Разные схемы проводят её границу по-разному. Без названия схемы размерный термин может быть неоднозначным.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Разные схемы проводят её границу по-разному. Без названия схемы размерный термин может быть неоднозначным.",
+      "rejected": "Схему можно не указывать: граница глинистой фракции одинакова во всех классификациях.",
+      "rejection_reason": "В справке сказано, что разные схемы проводят границу по-разному.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_grain_size_mineralogy_04",
+      "note_id": "grain_size_mineralogy",
+      "question": "Какие сведения о тонком осадке следует записывать отдельно, чтобы не смешать размер частиц и состав?",
+      "answer": "Отдельно указывают классификацию размеров и установленный минеральный состав. Глинистая размерная фракция не равна набору только глинистых минералов.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Отдельно указывают классификацию размеров и установленный минеральный состав. Глинистая размерная фракция не равна набору только глинистых минералов.",
+      "rejected": "Достаточно назвать размерную фракцию, потому что она одновременно устанавливает минеральный состав.",
+      "rejection_reason": "Справка требует отдельно указывать классификацию размеров и установленный минеральный состав.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_matrix_cement_01",
+      "note_id": "matrix_cement",
+      "question": "Между песчаными зёрнами находится более тонкий алевритовый и глинистый материал. Как он называется?",
+      "answer": "Это матрикс песчаника. Он отличается от цемента, образующегося при кристаллизации минералов в порах и у контактов зёрен.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Это матрикс песчаника. Он отличается от цемента, образующегося при кристаллизации минералов в порах и у контактов зёрен.",
+      "rejected": "Это цемент: любой тонкий алевритовый и глинистый материал между песчаными зёрнами называется цементом.",
+      "rejection_reason": "Описанный тонкий материал — матрикс; цемент образуется при кристаллизации минералов.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_matrix_cement_02",
+      "note_id": "matrix_cement",
+      "question": "Минералы кристаллизовались в порах и у контактов зёрен. К какой составляющей песчаника относится этот материал?",
+      "answer": "К цементу. Его образование отличается от присутствия более тонкого матрикса между песчаными зёрнами.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "К цементу. Его образование отличается от присутствия более тонкого матрикса между песчаными зёрнами.",
+      "rejected": "Это матрикс: он кристаллизуется в порах, а цемент представляет собой тонкий обломочный материал между зёрнами.",
+      "rejection_reason": "Механизмы и определения матрикса и цемента поменяны местами.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_matrix_cement_03",
+      "note_id": "matrix_cement",
+      "question": "Какие примеры минералов цемента перечислены в справке?",
+      "answer": "Кальцит и кварц; цементом могут быть и другие минералы.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Кальцит и кварц; цементом могут быть и другие минералы.",
+      "rejected": "Только глина; кальцит и кварц, по этой справке, цементом быть не могут.",
+      "rejection_reason": "В справке кальцит и кварц прямо перечислены как возможные минералы цемента.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_matrix_cement_04",
+      "note_id": "matrix_cement",
+      "question": "Можно ли использовать долю матрикса вместо описания состава цемента?",
+      "answer": "Нет, они описывают разные составляющие породы. Долю матрикса и состав цемента нужно указывать раздельно.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, они описывают разные составляющие породы. Долю матрикса и состав цемента нужно указывать раздельно.",
+      "rejected": "Да, доля матрикса однозначно определяет состав цемента, поэтому отдельно его описывать не нужно.",
+      "rejection_reason": "Доля матрикса и состав цемента описывают разные составляющие и не подменяют друг друга.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_compaction_cementation_01",
+      "note_id": "compaction_cementation",
+      "question": "Частицы осадка сближаются, а из промежутков удаляется часть воды и воздуха. Какой процесс описан?",
+      "answer": "Уплотнение. Его механизм заключается в сближении частиц и удалении части воды и воздуха из промежутков.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Уплотнение. Его механизм заключается в сближении частиц и удалении части воды и воздуха из промежутков.",
+      "rejected": "Это цементация: её определяет только сближение частиц и удаление воды без кристаллизации минералов.",
+      "rejection_reason": "Сближение частиц и удаление воды и воздуха описывают уплотнение; цементация связана с кристаллизацией.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_compaction_cementation_02",
+      "note_id": "compaction_cementation",
+      "question": "В межзерновом пространстве кристаллизуются минералы и связывают зёрна. Как называется этот процесс?",
+      "answer": "Цементация. В отличие от уплотнения здесь зёрна связываются кристаллизующимися минералами.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Цементация. В отличие от уплотнения здесь зёрна связываются кристаллизующимися минералами.",
+      "rejected": "Это уплотнение: кристаллизация связывающих зёрна минералов в порах не относится к цементации.",
+      "rejection_reason": "В справке кристаллизация минералов, связывающих зёрна, определяет именно цементацию.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_compaction_cementation_03",
+      "note_id": "compaction_cementation",
+      "question": "Уплотнение и цементация не могут действовать на один и тот же осадок?",
+      "answer": "Могут. Эти процессы различаются по механизму, но способны совместно изменять один осадок.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Могут. Эти процессы различаются по механизму, но способны совместно изменять один осадок.",
+      "rejected": "Не могут: уплотнение и цементация взаимно исключают друг друга в одном осадке.",
+      "rejection_reason": "Справка допускает совместное изменение одного осадка этими процессами.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_compaction_cementation_04",
+      "note_id": "compaction_cementation",
+      "question": "Что означает литификация и сводится ли она к одному процессу?",
+      "answer": "Литификация превращает рыхлый осадок в породу и включает несколько процессов. В справке различаются уплотнение и цементация.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Литификация превращает рыхлый осадок в породу и включает несколько процессов. В справке различаются уплотнение и цементация.",
+      "rejected": "Литификация сводится исключительно к механическому уплотнению и не включает цементацию.",
+      "rejection_reason": "Литификация включает несколько процессов; справка явно рассматривает уплотнение и цементацию.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_bedding_parting_01",
+      "note_id": "bedding_parting",
+      "question": "Крупность соседних слоёв одинакова, но их цвет и состав различаются. Это исключает заметное напластование?",
+      "answer": "Нет, напластование может выражаться различиями цвета и состава, а не только крупности.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, напластование может выражаться различиями цвета и состава, а не только крупности.",
+      "rejected": "Да, одинаковая крупность полностью исключает напластование независимо от различий цвета и состава.",
+      "rejection_reason": "Справка допускает выраженное напластование при одинаковой крупности и других различиях слоёв.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_bedding_parting_02",
+      "note_id": "bedding_parting",
+      "question": "Какие различия соседних слоёв могут выражать напластование согласно справке?",
+      "answer": "Различия текстуры, состава, цвета или выветривания. Одинаковая крупность сама по себе не исключает напластование.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Различия текстуры, состава, цвета или выветривания. Одинаковая крупность сама по себе не исключает напластование.",
+      "rejected": "Только размер зёрен: различия текстуры, состава, цвета и выветривания не могут выражать напластование.",
+      "rejection_reason": "Именно текстура, состав, цвет и выветривание перечислены в справке как возможные различия слоёв.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_bedding_parting_03",
+      "note_id": "bedding_parting",
+      "question": "Что может располагаться между соседними слоями?",
+      "answer": "Между ними могут быть поверхности или узкие промежутки раздела.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Между ними могут быть поверхности или узкие промежутки раздела.",
+      "rejected": "Соседние слои обязательно переходят друг в друга без поверхностей или узких промежутков раздела.",
+      "rejection_reason": "Справка прямо допускает такие поверхности и промежутки между соседними слоями.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_bedding_parting_04",
+      "note_id": "bedding_parting",
+      "question": "Если порода слоистая, можно ли по этому признаку выбрать единственную обстановку накопления?",
+      "answer": "Нет, слои встречаются во многих обстановках. Само их наличие не задаёт единственную среду накопления.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, слои встречаются во многих обстановках. Само их наличие не задаёт единственную среду накопления.",
+      "rejected": "Да, наличие слоёв однозначно доказывает речное русло и исключает остальные обстановки.",
+      "rejection_reason": "Справка указывает многие обстановки слоеобразования и не позволяет выбрать единственную по одному признаку.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_cross_bedding_01",
+      "note_id": "cross_bedding",
+      "question": "Как устроена косая слоистость согласно справке?",
+      "answer": "Она содержит наклонные слойки внутри более крупных слоёв.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Она содержит наклонные слойки внутри более крупных слоёв.",
+      "rejected": "Косая слоистость состоит только из горизонтальных слоек и не содержит наклонных слоек внутри крупных слоёв.",
+      "rejection_reason": "Определение в справке, напротив, включает наклонные слойки внутри более крупных слоёв.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_cross_bedding_02",
+      "note_id": "cross_bedding",
+      "question": "С каким перемещением форм связана описанная в справке косая слоистость?",
+      "answer": "С перемещением ряби или дюн. Материал накапливается на их переднем склоне.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "С перемещением ряби или дюн. Материал накапливается на их переднем склоне.",
+      "rejected": "Она связана с неподвижной рябью: перемещение ряби и дюн не участвует в формировании этих слоек.",
+      "rejection_reason": "Приведённый механизм прямо связан с перемещением ряби или дюн и накоплением на переднем склоне.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_cross_bedding_03",
+      "note_id": "cross_bedding",
+      "question": "Что могут делать следующие рябь или дюна с ранее отложенным материалом?",
+      "answer": "Последующие формы могут частично срезать предыдущие отложения.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Последующие формы могут частично срезать предыдущие отложения.",
+      "rejected": "Последующие формы всегда сохраняют предыдущие отложения целиком и не могут их частично срезать.",
+      "rejection_reason": "Справка допускает частичное срезание предыдущих отложений следующими формами.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_cross_bedding_04",
+      "note_id": "cross_bedding",
+      "question": "Косая слоистость сама по себе доказывает только водный перенос и исключает ветер?",
+      "answer": "Нет, такая структура образуется и при движении воды, и при ветровом переносе. Одного её наличия недостаточно, чтобы выбрать между ними.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, такая структура образуется и при движении воды, и при ветровом переносе. Одного её наличия недостаточно, чтобы выбрать между ними.",
+      "rejected": "Да, косая слоистость доказывает только водный перенос; при ветровом переносе она невозможна.",
+      "rejection_reason": "Справка прямо допускает косую слоистость и при воде, и при ветровом переносе.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_normal_grading_01",
+      "note_id": "normal_grading",
+      "question": "В ориентированном слое материал крупнее внизу и тоньше вверху. Как называется такая градация?",
+      "answer": "Это нормальная градация: крупность уменьшается к верху одного слоя.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Это нормальная градация: крупность уменьшается к верху одного слоя.",
+      "rejected": "Это обратная градация: уменьшение крупности вверх является её определяющим признаком.",
+      "rejection_reason": "Уменьшение крупности вверх в справке определяет нормальную, а не обратную градацию.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_normal_grading_02",
+      "note_id": "normal_grading",
+      "question": "Размер частиц в одном слое растёт вверх. Какая градация описана?",
+      "answer": "Обратная градация. При ней крупность растёт вверх, в противоположность нормальной градации.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Обратная градация. При ней крупность растёт вверх, в противоположность нормальной градации.",
+      "rejected": "Это нормальная градация, при которой размер частиц растёт вверх.",
+      "rejection_reason": "Рост крупности вверх определяет обратную градацию; у нормальной крупность уменьшается вверх.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_normal_grading_03",
+      "note_id": "normal_grading",
+      "question": "Цвет породы постепенно меняется вверх, но размеры частиц не измерены. Достаточно ли этого для определения градационной слоистости?",
+      "answer": "Нет, изменение цвета само по себе не является измерением зернистости. Нужны сведения о размере частиц и ориентировке слоя.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, изменение цвета само по себе не является измерением зернистости. Нужны сведения о размере частиц и ориентировке слоя.",
+      "rejected": "Да, одного изменения цвета достаточно: размеры частиц и ориентировку слоя для градации знать не нужно.",
+      "rejection_reason": "Справка требует сведения именно о размере и ориентировке; цвет не является измерением зернистости.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_normal_grading_04",
+      "note_id": "normal_grading",
+      "question": "Где в слое с нормальной градацией находится более крупный материал?",
+      "answer": "В нижней части слоя. К его верху материал становится тоньше.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "В нижней части слоя. К его верху материал становится тоньше.",
+      "rejected": "Более крупный материал находится в верхней части слоя, а к основанию становится тоньше.",
+      "rejection_reason": "Для нормальной градации в справке задан противоположный порядок: крупнее внизу, тоньше вверх.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_carbonate_support_01",
+      "note_id": "carbonate_support",
+      "question": "В карбонатной породе микритовая опора и 5% зёрен. Какой термин схемы Данэма подходит по справке?",
+      "answer": "Mudstone: у него микритовая опора и менее 10% зёрен.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Mudstone: у него микритовая опора и менее 10% зёрен.",
+      "rejected": "Wackestone: микритовая опора и 5% зёрен определяют именно этот тип.",
+      "rejection_reason": "При микритовой опоре и менее 10% зёрен справка определяет mudstone, не wackestone.",
+      "sources": [
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_carbonate_support_02",
+      "note_id": "carbonate_support",
+      "question": "В карбонатной породе микритовая опора и 25% зёрен. Как её назвать по приведённой схеме?",
+      "answer": "Wackestone: в этой схеме у него микритовая опора и более 10% зёрен.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Wackestone: в этой схеме у него микритовая опора и более 10% зёрен.",
+      "rejected": "Mudstone: 25% зёрен при микритовой опоре меньше его предела в этой схеме.",
+      "rejection_reason": "В справке mudstone имеет менее 10%, а при микритовой опоре и 25% подходит wackestone.",
+      "sources": [
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_carbonate_support_03",
+      "note_id": "carbonate_support",
+      "question": "Опору в карбонатной породе создают зёрна, а между ними есть тонкий карбонатный материал. Какое название подходит?",
+      "answer": "Packstone. Он имеет зерновую опору, но содержит тонкий карбонатный материал между зёрнами.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Packstone. Он имеет зерновую опору, но содержит тонкий карбонатный материал между зёрнами.",
+      "rejected": "Grainstone: для него обязательно присутствие микрита между опорными зёрнами.",
+      "rejection_reason": "Зерновая опора с тонким карбонатным материалом соответствует packstone; grainstone такого материала не имеет.",
+      "sources": [
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_carbonate_support_04",
+      "note_id": "carbonate_support",
+      "question": "Карбонатная порода имеет зерновую опору без тонкого карбонатного материала между зёрнами. Какой термин применить?",
+      "answer": "Grainstone: зерновая опора без такого тонкого карбонатного материала.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Grainstone: зерновая опора без такого тонкого карбонатного материала.",
+      "rejected": "Packstone: его определяет зерновая опора с полным отсутствием тонкого карбонатного материала.",
+      "rejection_reason": "Полное отсутствие такого материала при зерновой опоре определяет grainstone, а не packstone.",
+      "sources": [
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_carbonate_components_01",
+      "note_id": "carbonate_components",
+      "question": "Карбонатные зёрна обязательно являются обломками скелетов?",
+      "answer": "Нет, они могут быть как скелетными обломками, так и нескелетными частицами, например ооидами и пелоидами.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, они могут быть как скелетными обломками, так и нескелетными частицами, например ооидами и пелоидами.",
+      "rejected": "Да, все карбонатные зёрна являются только обломками скелетов; нескелетных частиц среди них не бывает.",
+      "rejection_reason": "Справка прямо называет и скелетные обломки, и нескелетные ооиды и пелоиды.",
+      "sources": [
+        "earle2019",
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_carbonate_components_02",
+      "note_id": "carbonate_components",
+      "question": "Какие два примера нескелетных карбонатных частиц названы в справке?",
+      "answer": "Ооиды и пелоиды.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Ооиды и пелоиды.",
+      "rejected": "Обломки раковин и другие фрагменты скелетов — это два названных примера нескелетных карбонатных частиц.",
+      "rejection_reason": "В качестве нескелетных примеров названы ооиды и пелоиды, а не скелетные фрагменты.",
+      "sources": [
+        "earle2019",
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_carbonate_components_03",
+      "note_id": "carbonate_components",
+      "question": "Как волны и течения могут создавать карбонатные частицы разных размеров?",
+      "answer": "Они дробят и перераспределяют карбонатные скелеты. Так возникают частицы разных размеров.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Они дробят и перераспределяют карбонатные скелеты. Так возникают частицы разных размеров.",
+      "rejected": "Волны и течения не дробят и не перераспределяют карбонатные скелеты, поэтому не могут создавать разный размер частиц.",
+      "rejection_reason": "Справка прямо описывает дробление и перераспределение скелетов волнами и течениями.",
+      "sources": [
+        "earle2019",
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_carbonate_components_04",
+      "note_id": "carbonate_components",
+      "question": "Макроскопически нельзя уверенно отличить ооид от пелоида. Какое описание допускает приведённая методика IODP 356?",
+      "answer": "Можно использовать более общее описание «нескелетные зёрна». При неразличимых деталях конкретный тип частицы не считают установленным.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Можно использовать более общее описание «нескелетные зёрна». При неразличимых деталях конкретный тип частицы не считают установленным.",
+      "rejected": "Нужно обязательно назвать частицу ооидом, даже когда макроскопически её нельзя отличить от пелоида.",
+      "rejection_reason": "При неразличимых деталях справка допускает общее описание нескелетных зёрен, а не обязательный выбор конкретного типа.",
+      "sources": [
+        "earle2019",
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_microscopic_bioturbation_01",
+      "note_id": "microscopic_bioturbation",
+      "question": "На обычном фото тонкозернистой породы ходы не различимы. Доказывает ли это отсутствие биотурбации?",
+      "answer": "Нет, порода может содержать микроскопические следы биогенной переработки без заметных макроскопических ходов.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, порода может содержать микроскопические следы биогенной переработки без заметных макроскопических ходов.",
+      "rejected": "Да, отсутствие заметных ходов на обычном фото полностью исключает и микроскопическую биотурбацию.",
+      "rejection_reason": "Справка прямо указывает микроскопические следы при отсутствии видимых макроскопических ходов.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_microscopic_bioturbation_02",
+      "note_id": "microscopic_bioturbation",
+      "question": "Какие признаки предполагаемого хода предлагают искать в шлифе?",
+      "answer": "Нарушение слоек, ориентировку частиц по краю предполагаемого хода и отличие его заполнения от окружения.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нарушение слоек, ориентировку частиц по краю предполагаемого хода и отличие его заполнения от окружения.",
+      "rejected": "Шлиф не подходит для поиска мелких ходов; нарушение слоек и отличие заполнения нужно игнорировать.",
+      "rejection_reason": "Нарушение слоек, ориентировка частиц и отличие заполнения перечислены как признаки для изучения в шлифе.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_microscopic_bioturbation_03",
+      "note_id": "microscopic_bioturbation",
+      "question": "Почему очень мелкий и слабо контрастный след трудно уверенно отнести к определённому ихнороду?",
+      "answer": "Малый размер и слабый контраст затрудняют такое определение. Конкретный ихнород при этих ограничениях нельзя считать уверенно установленным.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Малый размер и слабый контраст затрудняют такое определение. Конкретный ихнород при этих ограничениях нельзя считать уверенно установленным.",
+      "rejected": "Малый размер и слабый контраст не затрудняют определение: по ним можно безошибочно назвать конкретный ихнород.",
+      "rejection_reason": "Справка утверждает обратное: эти ограничения затрудняют уверенное определение ихнорода.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_microscopic_bioturbation_04",
+      "note_id": "microscopic_bioturbation",
+      "question": "Обязательно ли биогенная переработка тонкозернистой породы видна в виде крупных ходов?",
+      "answer": "Нет, возможны микроскопические следы без заметных макроскопических ходов. Их признаки ищут в шлифе.",
+      "split": "train",
+      "metadata": {
+        "kind": "source_supported",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Нет, возможны микроскопические следы без заметных макроскопических ходов. Их признаки ищут в шлифе.",
+      "rejected": "Да, биогенная переработка обязательно выражена крупными ходами; микроскопические проявления без них невозможны.",
+      "rejection_reason": "Справка допускает микроскопические следы биогенной переработки без заметных крупных ходов.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_insufficient_01",
+      "note_id": "coarse_clasts",
+      "supplied_note_id": "coarse_clasts",
+      "question": "На какой точной глубине моей скважины находится конгломерат, о котором говорится в справке?",
+      "answer": "В справке нет сведений о вашей скважине и глубине. Точную отметку по ней определить нельзя.",
+      "split": "train",
+      "metadata": {
+        "kind": "insufficient_context",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "В справке нет сведений о вашей скважине и глубине. Точную отметку по ней определить нельзя.",
+      "rejected": "Конгломерат находится на глубине 1250,0 м; эта точная отметка прямо следует из справки.",
+      "rejection_reason": "Справка не содержит данных скважины или глубины; численная отметка выдумана.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_insufficient_02",
+      "note_id": "shale_fissility",
+      "supplied_note_id": "shale_fissility",
+      "question": "По этой справке назови измеренную пористость моего образца shale в процентах.",
+      "answer": "В справке описана делимость, но нет измерения пористости вашего образца. Назвать процент по ней нельзя.",
+      "split": "train",
+      "metadata": {
+        "kind": "insufficient_context",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "В справке описана делимость, но нет измерения пористости вашего образца. Назвать процент по ней нельзя.",
+      "rejected": "Пористость вашего образца shale составляет 12,5%; это измеренное значение устанавливается по описанию делимости.",
+      "rejection_reason": "В справке нет измерения пористости образца, а делимость не задаёт приведённое число.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_insufficient_03",
+      "note_id": "mudstone_two_meanings",
+      "supplied_note_id": "mudstone_two_meanings",
+      "question": "Каков точный геологический возраст моего образца mudstone?",
+      "answer": "Справка объясняет значения термина mudstone, но не содержит данных о возрасте вашего образца. Точный возраст по ней не установлен.",
+      "split": "train",
+      "metadata": {
+        "kind": "insufficient_context",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Справка объясняет значения термина mudstone, но не содержит данных о возрасте вашего образца. Точный возраст по ней не установлен.",
+      "rejected": "Возраст вашего mudstone точно равен 250 миллионам лет, поскольку такой возраст следует из самого термина.",
+      "rejection_reason": "Термин объясняет разновидности породы, но в справке нет возраста конкретного образца.",
+      "sources": [
+        "biddle2025",
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_insufficient_04",
+      "note_id": "coal_carbonaceous",
+      "supplied_note_id": "coal_carbonaceous",
+      "question": "Сколько процентов углистого вещества фактически измерено в моём образце?",
+      "answer": "В справке приведены общие признаки и пороги определения, но нет результатов измерения вашего образца. Фактическое содержание по ней назвать нельзя.",
+      "split": "train",
+      "metadata": {
+        "kind": "insufficient_context",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "В справке приведены общие признаки и пороги определения, но нет результатов измерения вашего образца. Фактическое содержание по ней назвать нельзя.",
+      "rejected": "В вашем образце фактически измерено 65,0% углистого вещества; это результат анализа, приведённый справкой.",
+      "rejection_reason": "Общие определения и пороги не являются измерением образца; число и ссылка на анализ выдуманы.",
+      "sources": [
+        "usgs_coal",
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_insufficient_05",
+      "note_id": "matrix_cement",
+      "supplied_note_id": "matrix_cement",
+      "question": "Какой конкретно минерал образует цемент в моём присланном образце песчаника?",
+      "answer": "Справка перечисляет возможные минералы цемента, но не устанавливает состав цемента вашего образца. Выбрать конкретный минерал по ней нельзя.",
+      "split": "train",
+      "metadata": {
+        "kind": "insufficient_context",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Справка перечисляет возможные минералы цемента, но не устанавливает состав цемента вашего образца. Выбрать конкретный минерал по ней нельзя.",
+      "rejected": "Цемент вашего образца состоит только из кальцита; перечисление возможных минералов в справке устанавливает этот конкретный состав.",
+      "rejection_reason": "Перечень возможных минералов не устанавливает минерал цемента пользовательского образца.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_insufficient_06",
+      "note_id": "compaction_cementation",
+      "supplied_note_id": "compaction_cementation",
+      "question": "Дай численное значение проницаемости моего образца после литификации.",
+      "answer": "В справке нет измерений проницаемости вашего образца. Общего описания уплотнения и цементации недостаточно для такого числа.",
+      "split": "train",
+      "metadata": {
+        "kind": "insufficient_context",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "В справке нет измерений проницаемости вашего образца. Общего описания уплотнения и цементации недостаточно для такого числа.",
+      "rejected": "После литификации проницаемость вашего образца точно составляет 18 мД; это число определяется описанными процессами.",
+      "rejection_reason": "В справке отсутствуют измерения проницаемости; описание механизмов не даёт указанного численного значения.",
+      "sources": [
+        "earle2019"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_insufficient_07",
+      "note_id": "carbonate_support",
+      "supplied_note_id": "carbonate_support",
+      "question": "Какой процент зёрен на самом деле насчитан в моём известняке?",
+      "answer": "Справка даёт критерии классификации, но не результат подсчёта зёрен в вашем образце. Фактический процент из неё не следует.",
+      "split": "train",
+      "metadata": {
+        "kind": "insufficient_context",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "Справка даёт критерии классификации, но не результат подсчёта зёрен в вашем образце. Фактический процент из неё не следует.",
+      "rejected": "В вашем известняке насчитано ровно 7% зёрен: критерии схемы Данэма заменяют подсчёт конкретного образца.",
+      "rejection_reason": "Справка содержит критерии классификации, а не результаты подсчёта зёрен в пользовательском образце.",
+      "sources": [
+        "iodp356"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    },
+    {
+      "id": "gqa_insufficient_08",
+      "note_id": "microscopic_bioturbation",
+      "supplied_note_id": "microscopic_bioturbation",
+      "question": "Поставь точный числовой индекс биотурбации моему образцу по этой справке.",
+      "answer": "В справке нет наблюдений вашего образца и его оценки по шкале. Назначить точный индекс по ней нельзя.",
+      "split": "train",
+      "metadata": {
+        "kind": "insufficient_context",
+        "preference_source": "authored_direct_contradiction_of_supplied_training_note",
+        "chosen_role": "unchanged_source_qa_answer"
+      },
+      "chosen": "В справке нет наблюдений вашего образца и его оценки по шкале. Назначить точный индекс по ней нельзя.",
+      "rejected": "Индекс биотурбации вашего образца точно равен 3; эта числовая оценка уже дана теоретической справкой.",
+      "rejection_reason": "В справке нет ни наблюдений образца, ни его числовой оценки по шкале; индекс придуман.",
+      "sources": [
+        "biddle2025"
+      ],
+      "rejected_metadata": {
+        "training_role": "rejected_false_statement_not_ground_truth",
+        "intentional_false_statement": true,
+        "source_supported": false,
+        "allowed_usage": "rejected_side_of_pairwise_preference_training_only",
+        "forbidden_usage": [
+          "sft_target",
+          "reference_answer",
+          "geological_ground_truth"
+        ]
+      }
+    }
+  ]
+}

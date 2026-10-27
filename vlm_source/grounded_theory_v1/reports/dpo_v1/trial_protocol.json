@@ -1,0 +1,43 @@
+{
+  "schema": "geology_preference_pilot_v1",
+  "status": "prepared_before_training",
+  "training_pairs": 72,
+  "source_conditioned_pairs": 64,
+  "ordinary_conversation_pairs": 8,
+  "recipe": {
+    "loss": "DPO",
+    "beta": 0.1,
+    "epochs": 2,
+    "learning_rate": 5e-06,
+    "lora_rank": 8,
+    "targets": "language-only q/v",
+    "fresh_base": true,
+    "seed": 20261027
+  },
+  "input_sha256": {
+    "vlm_source\\grounded_theory_v1\\preference_questions.json": "b5ed3c3a69428a14d698ec62014049b2093cc372da614955f214074303fef280",
+    "previous_train_manifest": "6bcaf4ffce30231a4320b506cc398b24ba34d226c48aa1dbaf940e6920de0454"
+  },
+  "manifest_sha256": {
+    "mixed.jsonl": "e1cd2d8a56a9275279ba0fdefcf30859969e46b79dbc80fcd6822ad897a198eb",
+    "holdout_theory.jsonl": "335f3c58e5af774bc0edc1e6a4206674951e44d604e26f266365883d3d2b8bf6",
+    "holdout_conversation.jsonl": "6d5a00a5b1f315e05e91dd7a23cd2a06f7146beebc7ccdda95b880a9f6281ccf",
+    "val_visual.jsonl": "3ae3f14470ad90bb5ae3da26a9ccc5d7bb4c28cef8696e90b5ff765e02d53986",
+    "system_prompt.txt": "478a02ce9aab00bc0b7ef6ec574a78e653e51e9162f65020a8e3438e78b0e0bb"
+  },
+  "partition_checks": {
+    "train_unique_normalized_questions": 72,
+    "holdout_unique_normalized_questions": 18,
+    "train_duplicate_question_excess_rows": 0,
+    "train_holdout_normalized_question_overlap": 0,
+    "duplicate_record_ids": 0
+  },
+  "limitations": [
+    "Rejected statements are deliberate false counterexamples, never factual references",
+    "Targets are assistant checked against primary notes, not geologist reviewed",
+    "Evaluation is the same development/regression set as the prior grounded experiment",
+    "Recipe was selected after reviewing prior SFT results; no independent test or 95% accuracy claim",
+    "Raw validation model answers were not used to generate preference pairs",
+    "Only explicit preference mode may consume preference_rejected"
+  ]
+}
