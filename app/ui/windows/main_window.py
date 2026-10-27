@@ -39,6 +39,7 @@ from app.infrastructure.local_chat_intents import hide_unsolicited_sources, need
 from app.infrastructure.local_search_worker import LocalSearchWorker
 from app.infrastructure.local_theory_lookup import lookup_theory_answer
 from app.infrastructure.local_vlm_client import LocalVlmClient
+from app.infrastructure.local_llama_runtime import available_runtime
 from app.infrastructure.vlm_training_data import expert_description_digest, expert_description_is_confirmed
 from app.infrastructure.cv1_analysis import (
     PIPELINE_MODE, IntervalJob, apply_interval_description, create_core_column_description_detections,
@@ -141,10 +142,14 @@ class MainWindow(QMainWindow):
         self._project_title = "Новый проект"
         self._vlm_target: tuple[PhotoRecord, object | None] | None = None
         self._vlm_pending: tuple[str, str, object | None, str] | None = None
+        self._vlm_pending_meta: dict | None = None
+        self._vlm_chat_queue: deque[dict] = deque()
+        self._vlm_dispatch_scheduled = False
+        self._vlm_closing = False
         self._selected_description_job: IntervalJob | None = None
         self._vlm_history: list[dict[str, str]] = []
         self._analysis_queue: deque[IntervalJob] = deque()
-        self._analysis_pending: tuple[str, IntervalJob, Path] | None = None
+        self._analysis_pending: tuple[str, IntervalJob | list[IntervalJob], Path | list[Path]] | None = None
         self._analysis_active = False
         self._analysis_total = self._analysis_done = self._analysis_success = 0
         self._analysis_geometry_issues: list[dict] = []
@@ -156,6 +161,7 @@ class MainWindow(QMainWindow):
         self._chat_photo_columns: dict | None = None
         self._chat_photo_question = ""
         self._chat_photo_history: list[dict[str, str]] = []
+        self._chat_photo_histories: dict[str, list[dict[str, str]]] = {}
         self._chat_photo_thread: QThread | None = None
         self._chat_photo_worker: ChatPhotoColumnWorker | None = None
         self._local_search_worker: LocalSearchWorker | None = None
@@ -197,11 +203,20 @@ class MainWindow(QMainWindow):
             event.ignore()
             return
         if hasattr(self, "_vlm_client"):
+            self._vlm_closing = True
             self._analysis_active = False
             self._analysis_queue.clear()
             if self._analysis_pending is not None:
-                self._analysis_pending[2].unlink(missing_ok=True)
+                crops = self._analysis_pending[2]
+                for crop in crops if isinstance(crops, list) else [crops]:
+                    crop.unlink(missing_ok=True)
                 self._analysis_pending = None
+            for request in self._vlm_chat_queue:
+                self._cleanup_vlm_image(request.get("temporary_image"))
+            self._vlm_chat_queue.clear()
+            if self._vlm_pending_meta is not None:
+                self._cleanup_vlm_image(self._vlm_pending_meta.get("temporary_image"))
+                self._vlm_pending_meta = None
             self._vlm_client.stop()
         self._cleanup_vlm_image()
         super().closeEvent(event)
@@ -509,7 +524,7 @@ class MainWindow(QMainWindow):
             self._activity_dialog.setCancelButton(None)
             self._activity_dialog.setAutoClose(False)
             self._activity_dialog.setAutoReset(False)
-            self._activity_dialog.setWindowModality(Qt.WindowModality.WindowModal)
+            self._activity_dialog.setWindowModality(Qt.WindowModality.NonModal)
             self._activity_dialog.setMinimumDuration(0)
         self._activity_dialog.setWindowTitle(title)
         self._activity_dialog.setLabelText(label)
@@ -761,7 +776,7 @@ class MainWindow(QMainWindow):
 
         self._vlm_client = LocalVlmClient(self)
         self._vlm_client.reply.connect(self._on_vlm_reply)
-        self._vlm_client.state_changed.connect(self.assistant_panel.status.setText)
+        self._vlm_client.state_changed.connect(self._on_vlm_state_changed)
 
         self.workspace.setProperty("clean_background", True)
         self.workspace.viewport().update()
@@ -1082,7 +1097,7 @@ class MainWindow(QMainWindow):
                 image = image.copy(rect)
         temporary = user_data_root() / "vlm_temp"
         temporary.mkdir(parents=True, exist_ok=True)
-        path = temporary / "selected_core.png"
+        path = temporary / f"selected_core_{uuid4().hex}.png"
         if crop_facies and detection is not None and detection.attributes.get("__geometry_only") == "1":
             return str(write_interval_crop(record, IntervalJob.create(record, detection), path))
         if not image.save(str(path), "PNG"):
@@ -1090,9 +1105,10 @@ class MainWindow(QMainWindow):
         return str(path)
 
     @staticmethod
-    def _cleanup_vlm_image() -> None:
+    def _cleanup_vlm_image(path: str | Path | None = None) -> None:
         try:
-            (user_data_root() / "vlm_temp" / "selected_core.png").unlink(missing_ok=True)
+            if path:
+                Path(path).unlink(missing_ok=True)
         except OSError:
             pass
 
@@ -1101,9 +1117,6 @@ class MainWindow(QMainWindow):
 
     def _attach_chat_files(self) -> None:
         """One chat entry point for photos, depth descriptions and local reading material."""
-        if self._analysis_active or self._vlm_pending is not None or self._chat_photo_thread is not None:
-            self.assistant_panel.append_message("system", "Дождитесь завершения текущего анализа.")
-            return
         start = str(self._chat_photo_path.parent) if self._chat_photo_path else ""
         filenames, _ = QFileDialog.getOpenFileNames(
             self, "Добавить материалы в чат", start,
@@ -1114,9 +1127,6 @@ class MainWindow(QMainWindow):
         self._handle_chat_files(filenames)
 
     def _handle_chat_files(self, filenames: list[str]) -> None:
-        if self._analysis_active or self._vlm_pending is not None or self._chat_photo_thread is not None:
-            self.assistant_panel.append_message("system", "Дождитесь завершения текущего анализа.")
-            return
         image_suffixes = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp"}
         excel_suffixes = {".xlsx", ".xlsm", ".xls"}
         document_suffixes = {".csv", ".tsv", ".txt", ".md", ".pdf", ".docx", ".json", ".jsonl"}
@@ -1130,12 +1140,10 @@ class MainWindow(QMainWindow):
             self.select_detection_model(filename_override=path)
         if len(models) > 1:
             self.assistant_panel.append_message("system", "Для границ используется один best.pt. Добавьте нужный файл отдельно.")
-        if archives:
-            self._attach_dataset_archives(archives)
-        for path in documents + excels:
+        for path in documents + excels + archives:
             self._add_chat_document(path)
         if len(excels) > 1:
-            self.assistant_panel.append_message("system", f"Таблиц добавлено: {len(excels)}. Для сопоставления с фото использую «{excels[0].name}»; остальные доступны для вопросов в чате.")
+            self.assistant_panel.append_message("system", f"Таблиц добавлено: {len(excels)}. Они доступны для вопросов в чате; сопоставление с проектом запускается отдельно.")
         for path in paths:
             if path not in images + excels + documents + archives + models:
                 self.assistant_panel.append_message("system", f"Тип файла «{path.name}» пока не поддерживается.")
@@ -1148,37 +1156,15 @@ class MainWindow(QMainWindow):
             self._chat_photo_path = images[-1]
             self._chat_pending_photos = list(images)
             self._chat_photo_columns = None
-            self._chat_photo_history.clear()
+            self._chat_photo_history = list(self._chat_photo_histories.get(str(images[-1].resolve()), []))
             if len(images) > 1:
-                self.assistant_panel.append_message("system", f"Добавлено фото: {len(images)}. В чате показано последнее; при добавлении Excel сопоставлю всю подборку.")
-        excel = excels[0] if excels else self._chat_pending_excel_path
-        if excel is not None:
-            try:
-                described_layers, _ = read_description_workbook(excel)
-            except Exception:
-                described_layers = []
-            if described_layers:
-                if images or self._chat_photo_path is not None:
-                    photo_paths = images or self._chat_pending_photos or [self._chat_photo_path]
-                    self._chat_pending_excel_path = None
-                    self._chat_pending_photos = []
-                    self.import_excel_photo_batch(photo_paths_override=photo_paths, excel_path_override=excel)
-                else:
-                    self._chat_pending_excel_path = excel
-                    self.assistant_panel.append_message("system", "Таблица добавлена. Добавьте фото керна, чтобы сопоставить их с интервалами; перед использованием разметку нужно проверить.")
-            else:
-                self._chat_pending_excel_path = None
-                try:
-                    read_primary_facies_workbook(excel)
-                except Exception:
-                    self.assistant_panel.append_message("system", "Таблица доступна для вопросов в чате. Если это интервальные описания, проверьте, что в ней указаны скважина, кровля и подошва.")
-                else:
-                    if self.import_primary_facies_catalog(filename_override=excel):
-                        self.assistant_panel.append_message("system", "Распознан справочник фаций. Он подключён для следующих описаний и разметки.")
-                if images:
-                    self._describe_chat_photo()
-        elif images:
-            self._describe_chat_photo()
+                self.assistant_panel.append_message("system", f"Добавлено фото: {len(images)}. В чате показано последнее.")
+        if excels:
+            self._chat_pending_excel_path = excels[0]
+        if images:
+            self.assistant_panel.append_message(
+                "system", "Фото прикреплено к чату. Задайте вопрос о нём. Для обработки проекта напишите «обработай фото» или «собери колонку».",
+            )
 
     def _add_chat_document(self, source: Path) -> None:
         try:
@@ -1199,8 +1185,6 @@ class MainWindow(QMainWindow):
             self.assistant_panel.append_message("system", f"Не удалось добавить «{source.name}»: {exc}")
 
     def _clear_chat_photo(self) -> None:
-        if self._vlm_pending is not None or self._chat_photo_thread is not None:
-            return
         self._chat_photo_path = None
         self._chat_pending_photos = []
         self._chat_photo_columns = None
@@ -1221,41 +1205,14 @@ class MainWindow(QMainWindow):
         if self._chat_photo_path is None:
             self.assistant_panel.append_message("system", "Сначала добавьте фото кнопкой «Добавить файл».")
             return
-        if self._vlm_pending is not None or self._chat_photo_thread is not None:
-            self.assistant_panel.append_message("system", "Дождитесь ответа на текущий запрос.")
-            return
         question = "Опиши загруженное фото керна на русском: видимые породы, цвет, зернистость, текстуры, слоистость и контакты. Не придумывай глубины и невидимые признаки."
-        self.assistant_panel.append_message("user", f"Найди столбики и опиши фото: {self._chat_photo_path.name}")
+        self.assistant_panel.append_message("user", f"Опиши фото: {self._chat_photo_path.name}")
         self._analyze_chat_photo(question)
 
     def _analyze_chat_photo(self, question: str) -> None:
         if self._chat_photo_path is None:
             return
-        if self._analysis_active or self._vlm_pending is not None or self._chat_photo_thread is not None:
-            self.assistant_panel.append_message("system", "Дождитесь ответа на текущий запрос.")
-            return
-        if self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
-            self.assistant_panel.append_message("system", "Дождитесь завершения текущей обработки или обучения, затем повторите анализ фото.")
-            return
         self._chat_photo_question = question
-        # All new chat photos use the same CV-1 geometry/description path as
-        # project imports. The legacy column worker is kept for old projects.
-        if self._resolve_model_path() is not None:
-            existing = self._record_for_chat_photo(self._chat_photo_path)
-            if existing is None or existing.analysis_mode != PIPELINE_MODE or (not existing.detections and not existing.analysis_issues):
-                self._import_chat_analysis_photos(self._chat_pending_photos or [self._chat_photo_path])
-                return
-            retry = [
-                detection for detection in existing.detections
-                if detection.attributes.get("__interpretation_status") == "error"
-                and not detection.training_ready and detection.attributes.get("__manual_contour") != "1"
-            ]
-            if retry:
-                for detection in retry:
-                    detection.attributes["__interpretation_status"] = "waiting"
-                    detection.attributes["Статус интерпретации"] = "ожидает VLM"
-                self._start_cv1_descriptions()
-                return
         self._send_vlm_request(
             "photo_chat", question, image_override=str(self._chat_photo_path),
             extra_context=(
@@ -1371,12 +1328,6 @@ class MainWindow(QMainWindow):
         self._chat_photo_worker = None
 
     def _send_vlm_request(self, operation: str, question: str = "", *, image_override: str = "", extra_context: str = "") -> None:
-        if self._analysis_active or self._segmentation_thread is not None:
-            self.assistant_panel.append_message("system", "Сейчас обрабатываю интервалы керна. Дождитесь завершения анализа.")
-            return
-        if self._vlm_pending is not None:
-            self.assistant_panel.append_message("system", "Дождитесь ответа на текущий запрос.")
-            return
         if operation == "photo_chat" and image_override:
             remembered = exact_correction(
                 question, operation="photo_chat", image_path=image_override,
@@ -1397,10 +1348,12 @@ class MainWindow(QMainWindow):
                 return
         config = self._local_vlm_config()
         folders = self._knowledge_folders(question)
+        temporary_image = ""
         try:
             use_image = operation in {"describe", "photo_chat"} or (operation == "chat" and needs_selected_image(question))
             use_knowledge = operation == "search" or (operation in {"chat", "photo_chat"} and (needs_local_knowledge(question) or wants_sources(question))) or (operation == "chat" and self._chat_document_path is not None)
             image = image_override or (self._vlm_image_path(crop_facies=operation == "describe") if use_image else "")
+            temporary_image = image if image and not image_override else ""
             if operation == "describe" and not image:
                 raise ValueError("Нет изображения выбранной фации для описания.")
             context = extra_context if operation == "photo_chat" else (
@@ -1421,23 +1374,95 @@ class MainWindow(QMainWindow):
                 "model_mode": config["model_mode"],
             }
             target = self._vlm_target[1] if self._vlm_target is not None else None
-            self._selected_description_job = (
+            selected_job = (
                 IntervalJob.create(self._vlm_target[0], target)
                 if operation == "describe" and target is not None and target.attributes.get("__geometry_only") == "1"
                 else None
             )
-            request_id = self._vlm_client.send(config["python"], payload)
         except Exception as exc:
-            self._selected_description_job = None
-            self._cleanup_vlm_image()
+            self._cleanup_vlm_image(temporary_image)
             self.assistant_panel.append_message("system", str(exc))
-            self.assistant_panel.set_busy(False)
             return
-        self._vlm_pending = (request_id, operation, target, question)
-        self.assistant_panel.set_busy(True)
+        self._vlm_chat_queue.append({
+            "python": config["python"], "payload": payload, "target": target,
+            "selected_job": selected_job, "temporary_image": temporary_image,
+            "photo_path": str(image_override) if operation == "photo_chat" else "",
+        })
+        if self._vlm_pending is not None or self._analysis_pending is not None or self._segmentation_thread is not None:
+            self.assistant_panel.append_message("system", "Вопрос в очереди. Отвечу после текущего фрагмента обработки.")
+        self._refresh_chat_status()
+        self._schedule_vlm_dispatch()
+
+    def _on_vlm_state_changed(self, text: str) -> None:
+        if self._vlm_pending is not None:
+            self.assistant_panel.status.setText(text)
+        else:
+            self._refresh_chat_status()
+
+    def _refresh_chat_status(self) -> None:
+        if self._vlm_pending is not None:
+            text = "●  Готовлю ответ. Можно отправить следующий вопрос"
+        elif self._vlm_chat_queue:
+            text = f"●  В очереди вопросов: {len(self._vlm_chat_queue)}"
+        elif self._analysis_active or self._segmentation_thread is not None:
+            text = "●  Обработка фото идёт отдельно · чат доступен"
+        else:
+            text = "●  Готов к работе"
+        self.assistant_panel.status.setText(text)
+
+    def _schedule_vlm_dispatch(self) -> None:
+        if self._vlm_closing or self._vlm_dispatch_scheduled:
+            return
+        self._vlm_dispatch_scheduled = True
+        QTimer.singleShot(0, self._drain_vlm_requests)
+
+    def _drain_vlm_requests(self) -> None:
+        self._vlm_dispatch_scheduled = False
+        if self._vlm_closing or self._vlm_pending is not None or self._analysis_pending is not None:
+            return
+        if self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
+            return
+        if self._vlm_chat_queue:
+            request = self._vlm_chat_queue.popleft()
+            payload = request["payload"]
+            if payload["operation"] == "chat":
+                payload["history"] = list(self._vlm_history[-6:])
+            elif payload["operation"] == "photo_chat" and request.get("photo_path"):
+                history_key = str(Path(request["photo_path"]).resolve())
+                payload["history"] = list(self._chat_photo_histories.get(history_key, [])[-6:])
+            try:
+                request_id = self._vlm_client.send(request["python"], request["payload"])
+            except Exception as exc:
+                self._cleanup_vlm_image(request.get("temporary_image"))
+                self.assistant_panel.append_message("system", str(exc))
+                self._schedule_vlm_dispatch()
+                return
+            self._vlm_pending = (request_id, payload["operation"], request["target"], payload["question"])
+            self._vlm_pending_meta = request
+            self._selected_description_job = request["selected_job"]
+        elif self._analysis_active:
+            self._advance_cv1_description()
+        elif self._queued_records:
+            records, self._queued_records = self._queued_records, []
+            self.run_segmentation(records)
+        self._refresh_chat_status()
 
     def _send_vlm_chat(self, question: str) -> None:
         self.assistant_panel.append_message("user", question)
+        process_project = bool(re.match(
+            r"\s*(?:обработай|обработать|проанализируй все|собери (?:(?:един\w*|общ\w*)\s+)?(?:колонк\w*|столбик\w*)|добавь .*в проект)",
+            question.casefold(),
+        ))
+        if process_project:
+            paths = list(self._chat_pending_photos or ([self._chat_photo_path] if self._chat_photo_path else []))
+            if paths:
+                if self._chat_pending_excel_path is not None:
+                    self.import_excel_photo_batch(photo_paths_override=paths, excel_path_override=self._chat_pending_excel_path)
+                else:
+                    self._import_chat_analysis_photos(paths)
+            else:
+                self.run_segmentation()
+            return
         if wants_open_datasets(question):
             self.show_open_datasets()
             return
@@ -1612,6 +1637,13 @@ class MainWindow(QMainWindow):
         self._send_vlm_request("describe")
 
     def _on_vlm_reply(self, result: dict) -> None:
+        try:
+            self._handle_vlm_reply(result)
+        finally:
+            self._refresh_chat_status()
+            self._schedule_vlm_dispatch()
+
+    def _handle_vlm_reply(self, result: dict) -> None:
         if self._analysis_pending is not None and str(result.get("id")) == self._analysis_pending[0]:
             self._on_cv1_interval_reply(result)
             return
@@ -1619,9 +1651,10 @@ class MainWindow(QMainWindow):
         if pending is None or str(result.get("id")) != pending[0]:
             return
         self._vlm_pending = None
+        meta, self._vlm_pending_meta = self._vlm_pending_meta or {}, None
+        photo_path = str(meta.get("photo_path") or "")
         selected_job, self._selected_description_job = self._selected_description_job, None
-        self._cleanup_vlm_image()
-        self.assistant_panel.set_busy(False)
+        self._cleanup_vlm_image(meta.get("temporary_image"))
         if not result.get("ok"):
             self.assistant_panel.append_message("system", str(result.get("error") or "Локальная VLM не ответила"))
             return
@@ -1649,13 +1682,16 @@ class MainWindow(QMainWindow):
             self.assistant_panel.append_message("system", message)
             return
         if operation in {"chat", "photo_chat"}:
-            history = self._chat_photo_history if operation == "photo_chat" else self._vlm_history
+            history_key = str(Path(photo_path).resolve()) if photo_path else ""
+            history = list(self._chat_photo_histories.get(history_key, [])) if operation == "photo_chat" else self._vlm_history
             history.extend([
                 {"role": "user", "content": pending[3]},
                 {"role": "assistant", "content": answer},
             ])
             if operation == "photo_chat":
-                self._chat_photo_history = history[-12:]
+                self._chat_photo_histories[history_key] = history[-12:]
+                if self._chat_photo_path is not None and str(self._chat_photo_path.resolve()) == history_key:
+                    self._chat_photo_history = history[-12:]
             else:
                 self._vlm_history = history[-12:]
         if operation == "describe":
@@ -1689,8 +1725,8 @@ class MainWindow(QMainWindow):
         ) if hits and wants_sources(pending[3]) else ""
         review_note = "\n\nЧерновик по фото: границы столбиков и геологические признаки проверьте на оригинале в полном разрешении." if operation == "photo_chat" else ""
         photo_label = (
-            f"Описание фото «{self._chat_photo_path.name}»:\n"
-            if operation == "photo_chat" and self._chat_photo_path is not None else ""
+            f"Описание фото «{Path(photo_path).name}»:\n"
+            if operation == "photo_chat" and photo_path else ""
         )
         completion_note = (
             "\n\nМодель остановилась до завершения ответа; показаны только законченные предложения. "
@@ -1698,10 +1734,10 @@ class MainWindow(QMainWindow):
             if incomplete else ""
         )
         correction = None
-        if operation == "photo_chat" and self._chat_photo_path is not None:
+        if operation == "photo_chat" and photo_path:
             correction = {
                 "operation": "photo_chat", "question": pending[3], "answer": answer,
-                "image_path": str(self._chat_photo_path),
+                "image_path": photo_path,
             }
         elif operation == "chat" and not needs_selected_image(pending[3]):
             correction = {"operation": "chat", "question": pending[3], "answer": answer}
@@ -2730,6 +2766,8 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Фото восстановлено")
 
     def run_segmentation(self, records: list[PhotoRecord] | None = None) -> None:
+        if self._vlm_closing:
+            return
         records = list({id(record): record for record in (records or self._records)}.values())
         if not records:
             QMessageBox.information(self, "Kern Analyzer", "Сначала загрузите фотографии через File → Загрузить фотографии.")
@@ -2739,7 +2777,9 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Фото добавлены в очередь после описания текущих интервалов…")
             return
         if self._vlm_pending is not None or self._chat_photo_thread is not None or self._training_thread is not None:
-            self.assistant_panel.append_message("system", "Дождитесь завершения текущего ответа или обучения перед анализом фото.")
+            self._queued_records.extend(records)
+            self.assistant_panel.append_message("system", "Фото поставлены в очередь обработки после текущего ответа или обучения.")
+            self._schedule_vlm_dispatch()
             return
         if self._column_training_thread is not None:
             QMessageBox.information(self, "Распознавание", "Дождитесь окончания обучения модели столбиков.")
@@ -3038,6 +3078,7 @@ class MainWindow(QMainWindow):
     def _on_column_training_finished(self) -> None:
         trained = self._column_training_succeeded_model is not None and self._column_training_succeeded_model.is_file()
         self._column_training_thread = None
+        self._schedule_vlm_dispatch()
         self._column_training_worker = None
         self._column_training_succeeded_model = None
         self._close_activity()
@@ -3600,6 +3641,7 @@ class MainWindow(QMainWindow):
         self._close_activity()
         completed_model = self._fine_tune_success_model
         self._training_thread = None
+        self._schedule_vlm_dispatch()
         self._training_worker = None
         self._training_epoch_current = 0
         self._training_epoch_total = 0
@@ -4852,10 +4894,14 @@ class MainWindow(QMainWindow):
 
     def _on_segmentation_finished(self) -> None:
         self._segmentation_thread = None
+        self._schedule_vlm_dispatch()
         self._segmentation_worker = None
         self._refresh_project_tree()
         self._refresh_training_bar()
         if self._queued_records:
+            if self._vlm_chat_queue:
+                self._schedule_vlm_dispatch()
+                return
             queued_records, self._queued_records = self._queued_records, []
             self.run_segmentation(queued_records)
             return
@@ -4890,6 +4936,8 @@ class MainWindow(QMainWindow):
         self._analysis_geometry_issues.extend({"photo": Path(image_path).name, **issue} for issue in issues)
 
     def _start_cv1_descriptions(self) -> None:
+        if self._vlm_closing:
+            return
         """Start the text stage only after the YOLO worker released its GPU memory."""
         if self._analysis_active:
             return
@@ -4918,12 +4966,19 @@ class MainWindow(QMainWindow):
             self.assistant_panel.append_message("system", "Геометрия обработана; новых интервалов для описания нет. Проверьте найденные границы и пропуски.")
             return
         self._analysis_active = True
-        self.assistant_panel.set_busy(True)
+        self._refresh_chat_status()
         self._show_activity("Описание керна", "Подготовка локальной модели…", self._analysis_total)
         QTimer.singleShot(0, self._advance_cv1_description)
 
     def _advance_cv1_description(self) -> None:
-        if not self._analysis_active or self._analysis_pending is not None:
+        if self._vlm_closing or not self._analysis_active or self._analysis_pending is not None:
+            return
+        if self._vlm_pending is not None or self._vlm_chat_queue:
+            self._schedule_vlm_dispatch()
+            return
+        config = self._local_vlm_config()
+        if available_runtime(config) is not None:
+            self._advance_turbo_descriptions(config)
             return
         while self._analysis_queue:
             job = self._analysis_queue.popleft()
@@ -4960,7 +5015,7 @@ class MainWindow(QMainWindow):
                 self._analysis_pending = (request_id, job, crop)
                 subject = "столбик" if whole_column else "интервал"
                 label = f"Описываю {subject} {self._analysis_done + 1}/{self._analysis_total} · {Path(record.path).name}"
-                self.assistant_panel.status.setText("●  " + label)
+                self._refresh_chat_status()
                 self._update_activity(label, self._analysis_done, self._analysis_total, busy=True)
                 return
             except Exception as exc:
@@ -4978,11 +5033,95 @@ class MainWindow(QMainWindow):
                     self.assistant_panel.append_message("system", str(exc))
         self._finish_cv1_descriptions()
 
+    def _advance_turbo_descriptions(self, config: dict) -> None:
+        """Decode several full descriptions on one shared model, with stable job bindings."""
+        if not self._analysis_queue:
+            self._finish_cv1_descriptions()
+            return
+        first = self._analysis_queue.popleft()
+        candidates = [first]
+        while self._analysis_queue and len(candidates) < 4:
+            candidates.append(self._analysis_queue.popleft())
+        jobs, crops, items = [], [], []
+        for job in candidates:
+            record = next((row for row in self._records if row.identifier == job.record_id), None)
+            crop = user_data_root() / "vlm_temp" / f"interval_{uuid4().hex}.png"
+            try:
+                if record is None or not job.is_current(record):
+                    self._analysis_done += 1
+                    continue
+                write_interval_crop(record, job, crop)
+                whole_column = job.detection.attributes.get("__core_column_description") == "1"
+                context = (
+                    f"Скважина: {record.well_name}. Показан целый столбик; опиши изменения по всей длине. "
+                    if whole_column else f"Скважина: {record.well_name}. Показан один полигон YOLO; белый фон игнорируй. "
+                )
+                if job.detection.depth_from is not None and job.detection.depth_to is not None:
+                    context += f"Заданный интервал: {job.detection.depth_from:g}–{job.detection.depth_to:g} м."
+                jobs.append(job)
+                crops.append(crop)
+                items.append({"id": str(len(jobs)), "image": str(crop), "context": context, "whole_column": whole_column})
+            except Exception as exc:
+                crop.unlink(missing_ok=True)
+                mark_interval_failure(job, str(exc))
+                self._analysis_done += 1
+        if not jobs:
+            if not self._analysis_queue:
+                self._finish_cv1_descriptions()
+            else:
+                self._schedule_vlm_dispatch()
+            return
+        try:
+            request_id = self._vlm_client.send(config["python"], {
+                **config, "operation": "describe_batch", "items": items, "folders": [], "use_knowledge": False,
+            })
+        except Exception as exc:
+            for job, crop in zip(jobs, crops):
+                crop.unlink(missing_ok=True)
+                mark_interval_failure(job, str(exc))
+            self._analysis_done += len(jobs)
+            self._schedule_vlm_dispatch()
+            return
+        self._analysis_pending = (request_id, jobs, crops)
+        label = f"Подробные описания {self._analysis_done + 1}–{self._analysis_done + len(jobs)}/{self._analysis_total}"
+        self._update_activity(label, self._analysis_done, self._analysis_total, busy=True)
+        self._refresh_chat_status()
+
+    def _apply_turbo_batch_reply(self, pending: tuple, result: dict) -> None:
+        _, jobs, crops = pending
+        replies = result.get("items") or {}
+        for index, (job, crop) in enumerate(zip(jobs, crops), start=1):
+            crop.unlink(missing_ok=True)
+            record = next((row for row in self._records if row.identifier == job.record_id), None)
+            response = replies.get(str(index)) if result.get("ok") else None
+            if not isinstance(response, dict):
+                response = {"ok": False, "error": result.get("error") or "Не получено описание данного интервала."}
+            if record is not None:
+                try:
+                    apply_interval_description(record, job, response)
+                    self._analysis_success += 1
+                except ValueError as exc:
+                    if job.is_current(record):
+                        mark_interval_failure(job, str(exc))
+                self.workspace.update_photo_detections(record)
+            self._analysis_done += 1
+        if not result.get("ok"):
+            error = str(result.get("error") or "Локальная модель не ответила.")
+            for remaining in self._analysis_queue:
+                mark_interval_failure(remaining, error)
+            self._analysis_done += len(self._analysis_queue)
+            self._analysis_queue.clear()
+            self.assistant_panel.append_message("system", error)
+        self._schedule_vlm_dispatch()
+
     def _on_cv1_interval_reply(self, result: dict) -> None:
         pending = self._analysis_pending
         if pending is None:
             return
         self._analysis_pending = None
+        if isinstance(pending[1], list):
+            self._apply_turbo_batch_reply(pending, result)
+            return
         _, job, crop = pending
         crop.unlink(missing_ok=True)
         record = next((item for item in self._records if item.identifier == job.record_id), None)
@@ -5002,11 +5141,11 @@ class MainWindow(QMainWindow):
             self._analysis_done += len(self._analysis_queue)
             self._analysis_queue.clear()
             self.assistant_panel.append_message("system", error)
-        QTimer.singleShot(0, self._advance_cv1_description)
+        self._schedule_vlm_dispatch()
 
     def _finish_cv1_descriptions(self) -> None:
         self._analysis_active = False
-        self.assistant_panel.set_busy(False)
+        self._refresh_chat_status()
         self._close_activity()
         self._show_stack()
         self._refresh_project_tree()
@@ -5030,9 +5169,7 @@ class MainWindow(QMainWindow):
             message += "\n" + "\n".join(f"{issue['photo']}: {issue.get('message', '')}" for issue in self._analysis_geometry_issues[:3])
         self.assistant_panel.append_message("assistant", message)
         self.statusBar().showMessage(message)
-        if self._queued_records:
-            records, self._queued_records = self._queued_records, []
-            QTimer.singleShot(0, lambda: self.run_segmentation(records))
+        self._schedule_vlm_dispatch()
 
     def _update_depth_segments_for_columns(self, record: PhotoRecord) -> None:
         """Calibrate the continuous stage-1 tape when a photo interval is known."""

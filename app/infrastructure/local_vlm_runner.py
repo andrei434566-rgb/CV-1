@@ -1,4 +1,4 @@
-"""Long-lived local Qwen process. JSON lines on stdin/stdout; no HTTP server."""
+"""Local Qwen worker over JSON lines, with an optional owned loopback GPU runtime."""
 
 from __future__ import annotations
 
@@ -6,7 +6,9 @@ import json
 import os
 import re
 import sys
+from time import perf_counter
 from contextlib import nullcontext
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 # QProcess sends UTF-8 JSON lines. Windows Python may otherwise use the
@@ -22,9 +24,11 @@ os.environ["HF_DATASETS_OFFLINE"] = "1"
 if __package__:
     from .local_knowledge_search import search_folders
     from .local_vlm_modes import adapter_for_operation, normalize_model_request, validate_local_models
+    from .local_llama_runtime import DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, available_runtime
 else:
     from local_knowledge_search import search_folders
     from local_vlm_modes import adapter_for_operation, normalize_model_request, validate_local_models
+    from local_llama_runtime import DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, available_runtime
 
 
 PHOTO_REFERENCE_FIELDS = (
@@ -41,7 +45,7 @@ PHOTO_REFERENCE_FIELDS = (
 )
 
 
-def _photo_reference_vocabulary() -> str:
+def _photo_reference_vocabulary(fields=PHOTO_REFERENCE_FIELDS) -> str:
     """Return the workbook's controlled vocabulary for visual descriptions."""
     app_root = str(Path(__file__).resolve().parents[2])
     if app_root not in sys.path:
@@ -57,7 +61,7 @@ def _photo_reference_vocabulary() -> str:
             "Слоистость и текстура: выбирай ближайшую категорию и помечай её предположительной при сомнении."
         )
     lines = []
-    for field in PHOTO_REFERENCE_FIELDS:
+    for field in fields:
         values = LITHOLOGY_ATTRIBUTE_OPTIONS.get(field)
         if values:
             lines.append(f"{field}: " + "; ".join(str(value) for value in values))
@@ -89,6 +93,7 @@ class LocalModel:
         self.model = None
         self.processor = None
         self.loaded_config = None
+        self.turbo = LocalLlamaRuntime()
 
     def load(self, base: str, adapter: str, theory_adapter: str, model_mode: str = ""):
         effective = normalize_model_request({
@@ -131,17 +136,31 @@ class LocalModel:
         self.loaded_config = configuration
 
     def answer(self, request: dict, hits: list[dict]) -> dict:
-        import torch
+        if request.get("operation") == "describe_batch":
+            return self._answer_batch(request)
+        started = perf_counter()
         from PIL import Image
 
         operation = request.get("operation")
         effective = normalize_model_request(request)
-        self.load(
-            str(request.get("base") or ""),
-            str(request.get("adapter") or ""),
-            str(request.get("theory_adapter") or ""),
-            str(request.get("model_mode") or ""),
-        )
+        load_started = perf_counter()
+        turbo_runtime = available_runtime(request)
+        if turbo_runtime is not None:
+            if self.model is not None:
+                import torch
+                self.model = self.processor = self.loaded_config = None
+                torch.cuda.empty_cache()
+            load_seconds = self.turbo.start(*turbo_runtime)
+        else:
+            self.turbo.close()
+            import torch
+            self.load(
+                str(request.get("base") or ""),
+                str(request.get("adapter") or ""),
+                str(request.get("theory_adapter") or ""),
+                str(request.get("model_mode") or ""),
+            )
+            load_seconds = perf_counter() - load_started
         whole_column = operation == "describe" and bool(request.get("whole_column"))
         if operation == "describe":
             subject = "целый столбик керна" if whole_column else "фрагмент керна"
@@ -160,8 +179,8 @@ class LocalModel:
                 "Геометрия уже выделена отдельной моделью; не меняй границы и не выдавай координаты. "
                 "Не придумывай глубину. Если свойство нельзя наблюдать напрямую, но нужно дать оценку, "
                 "приведи наиболее вероятную гипотезу, явно отличив её от наблюдения; не выдавай её за факт. "
-                + str(request.get("context") or "")[:1800]
                 + _photo_description_guidance()
+                + "\nКонтекст фрагмента: " + str(request.get("context") or "")[:1800]
             )
             if whole_column:
                 question += (
@@ -267,6 +286,8 @@ class LocalModel:
                 if turn.get("role") in ("user", "assistant"):
                     messages.append({"role": turn["role"], "content": str(turn.get("content") or "")[:650]})
         messages.append({"role": "user", "content": content})
+        if turbo_runtime is not None:
+            return self._turbo_reply(request, messages, hits, effective, started, load_seconds)
         rendered = self.processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         kwargs = {"text": [rendered], "return_tensors": "pt"}
         if image is not None:
@@ -291,6 +312,9 @@ class LocalModel:
         detail_requested = bool(re.search(r"подробн|развернут|по шагам|детальн", str(request.get("question") or "").casefold()))
         max_tokens = 220 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
         final_limit = max_tokens
+        torch.cuda.synchronize()
+        generation_started = perf_counter()
+        retried = False
         with torch.inference_mode(), adapter_context:
             generated = self.model.generate(
                 **inputs, max_new_tokens=max_tokens,
@@ -304,6 +328,7 @@ class LocalModel:
                 and int(new_tokens[0, -1]) not in end_ids
             )
             if hit_limit:
+                retried = True
                 # The first pass was stopped by our token budget, not by Qwen.
                 # Repeat deterministically with more room so the answer can finish.
                 del generated, new_tokens
@@ -313,6 +338,8 @@ class LocalModel:
                     **inputs, max_new_tokens=final_limit,
                     do_sample=False,
                 )
+        torch.cuda.synchronize()
+        generation_seconds = perf_counter() - generation_started
         final_tokens = generated[:, inputs["input_ids"].shape[1]:]
         answer = self.processor.batch_decode(final_tokens, skip_special_tokens=True)[0].strip()
         incomplete = final_tokens.shape[1] >= final_limit and int(final_tokens[0, -1]) not in end_ids
@@ -329,6 +356,14 @@ class LocalModel:
                 "model_mode": "lora" if adapter_path else "base",
                 "base": effective["base"], "adapter": adapter_path,
             },
+            "timing": {
+                "load_seconds": round(load_seconds, 3),
+                "generation_seconds": round(generation_seconds, 3),
+                "total_seconds": round(perf_counter() - started, 3),
+                "input_tokens": int(inputs["input_ids"].shape[1]),
+                "output_tokens": int(final_tokens.shape[1]),
+                "retried": retried,
+            },
         }
         if operation == "describe":
             cleaned = answer.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
@@ -342,6 +377,108 @@ class LocalModel:
                     key: parsed[key].strip() for key in field_names
                 }
         return result
+
+    def _turbo_reply(self, request, messages, hits, effective, started, load_seconds):
+        operation = request.get("operation")
+        if operation == "describe":
+            images = [part for part in messages[-1]["content"] if part.get("type") == "image"]
+            prompt = (
+                "Опиши породу на фотографии по-русски. Сначала описание наблюдений, затем гипотезы. "
+                "Белый фон, коробка, форма столбика и этикетки не являются признаками породы. "
+                "Описывай присутствующие признаки породы, не перечисляй отсутствующие явления. "
+                "Слова справочника — варианты выбора, а не сведения о фото. "
+                "Выбирай ближайший подходящий термин по изображению, не перечисляй все варианты. "
+                "Верни JSON со следующими шестью строками:\n"
+                "description — 3–5 законченных предложений о цвете, слоистости, текстуре, контактах, трещинах и изменениях. "
+                "Зернистость оцени предположительно; цвет не доказывает размер зерен. Не повторяй предложения.\n"
+                "lithology — одно название породы, при сомнении «предположительно: <название>, уверенность низкая».\n"
+                "texture — видимая текстура и тип слоистости, конкретные признаки.\n"
+                "facies_name — гипотеза осадочной фации по строению, например песчаная фация с горизонтальной слоистостью; не просто порода.\n"
+                "facies_association — гипотеза группы фаций: русловая, пойменная, дельтовая, приливная или морская ассоциация; не название породы.\n"
+                "depositional_environment — возможная обстановка накопления: русло, пойма, дельта, приливная равнина, мелководное море или озеро. "
+                "Трещины сами по себе не указывают обстановку осадконакопления.\n"
+                "Все поля должны содержать содержательные фразы. Не выдавай гипотезы за наблюдения. "
+                "Не определяй минералогию, флюид, цемент и точный размер зерна без данных.\n"
+                + _photo_reference_vocabulary(("Цвет", "Название породы", "Зернистость", "Слоистость", "Текстура", "Контакт"))
+                + "\nКонтекст: " + str(request.get("context") or "")[:700]
+            )
+            if request.get("whole_column"):
+                prompt += " Показан целый столбик тремя частями: слева верх, в центре середина, справа низ. Опиши вертикальные изменения, это не три отдельные фации."
+            messages = [{"role": "system", "content": "Ты помощник геолога-седиментолога. Пиши предметно по фотографии, различай наблюдение и предположение."},
+                        {"role": "user", "content": [{"type": "text", "text": prompt}, *images]}]
+        response = self.turbo.complete(
+            messages, max_tokens=650,
+            schema=DESCRIPTION_SCHEMA if operation == "describe" else None,
+        )
+        choice = response["choices"][0]
+        answer = str(choice["message"].get("content") or "").strip()
+        usage, timing = response.get("usage", {}), response.get("timings", {})
+        result = {
+            "answer": answer, "hits": hits, "incomplete": choice.get("finish_reason") == "length",
+            "model_info": {"model_mode": "base", "base": effective["base"], "adapter": "",
+                           "backend": "llama.cpp", "quantization": self.turbo.manifest.get("quantization", "Q8_0"),
+                           "gpu_backend": self.turbo.manifest.get("gpu_backend", "cuda"), "runtime_release": self.turbo.manifest["release"]},
+            "timing": {"load_seconds": round(load_seconds, 3), "total_seconds": round(perf_counter() - started, 3),
+                       "generation_seconds": round(float(timing.get("predicted_ms", 0)) / 1000, 3),
+                       "input_tokens": usage.get("prompt_tokens"), "output_tokens": usage.get("completion_tokens"),
+                       "tokens_per_second": timing.get("predicted_per_second"), "retried": False},
+        }
+        if operation == "describe":
+            try:
+                parsed = json.loads(answer)
+            except ValueError:
+                result["incomplete"] = True
+                return result
+            if not isinstance(parsed, dict) or not all(isinstance(parsed.get(key), str) for key in DESCRIPTION_FIELDS):
+                result["structured_error"] = "Локальная VLM не вернула все поля описания."
+                return result
+            result["fields"] = {key: parsed[key].strip() for key in DESCRIPTION_FIELDS}
+            if any(not re.search(r"[A-Za-zА-Яа-яЁё]", value) or re.fullmatch(r"(?:предположительно|вероятно|(?:низкая|средняя|высокая)(?: уверенность)?)[.!:; ]*", value, re.I)
+                   for value in result["fields"].values()):
+                result.pop("fields")
+                result["structured_error"] = "Вместо признака модель вернула только оговорку об уверенности."
+            else:
+                for key in ("facies_name", "facies_association", "depositional_environment"):
+                    value = result["fields"][key]
+                    if not re.search(r"предполож|вероятн|гипот", value, re.I):
+                        value = "Предположительно: " + value
+                    if "низкая" not in value.casefold():
+                        value += " (уверенность низкая)"
+                    result["fields"][key] = value
+        return result
+
+    def _answer_batch(self, request: dict) -> dict:
+        items = request.get("items")
+        if not isinstance(items, list) or not 1 <= len(items) <= 4:
+            raise ValueError("Пакет VLM должен содержать от 1 до 4 отдельных фрагментов.")
+        ids = [str(item.get("id") or "") for item in items if isinstance(item, dict)]
+        if len(ids) != len(items) or any(not value for value in ids) or len(set(ids)) != len(ids):
+            raise ValueError("В пакете VLM требуются уникальные id фрагментов.")
+        turbo = available_runtime(request)
+        if turbo and self.model is not None:
+            import torch
+            self.model = self.processor = self.loaded_config = None
+            torch.cuda.empty_cache()
+        load_seconds = self.turbo.start(*turbo) if turbo else 0.0
+        started = perf_counter()
+        def describe(item):
+            try:
+                payload = dict(request)
+                payload.pop("items", None)
+                payload.update({key: item[key] for key in ("image", "context", "whole_column") if key in item})
+                payload["operation"] = "describe"
+                return self.answer(payload, [])
+            except Exception as exc:
+                return {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
+        if turbo:
+            # Four decoder slots share one model, rather than loading four copies.
+            with ThreadPoolExecutor(max_workers=len(items)) as pool:
+                replies = list(pool.map(describe, items))
+        else:
+            replies = [describe(item) for item in items]
+        return {"items": {item_id: dict(reply, ok=reply.get("ok", True)) for item_id, reply in zip(ids, replies)},
+                "answer": "", "hits": [], "incomplete": False,
+                "timing": {"load_seconds": round(load_seconds, 3), "total_seconds": round(perf_counter() - started + load_seconds, 3)}}
 
 
 def main():

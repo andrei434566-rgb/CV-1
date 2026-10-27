@@ -190,7 +190,7 @@ class Cv1MainFlowTests(unittest.TestCase):
         import_photos.assert_not_called()
         self.assertEqual(send.call_args.args[:2], ("photo_chat", "Что видно на фото?"))
 
-    def test_chat_retry_reuses_yolo_masks_and_only_resets_unconfirmed_errors(self):
+    def test_chat_retry_does_not_mutate_or_restart_project_interpretation(self):
         record = self.record(interpreted=True)
         retry = record.detections[0]
         retry.attributes["__interpretation_status"] = "error"
@@ -211,11 +211,12 @@ class Cv1MainFlowTests(unittest.TestCase):
             patch.object(self.window, "_send_vlm_request") as send,
         ):
             self.window._analyze_chat_photo("Попробуй описать ещё раз")
-        describe.assert_called_once()
+        describe.assert_not_called()
         import_photos.assert_not_called()
         segment.assert_not_called()
-        send.assert_not_called()
-        self.assertEqual(retry.attributes["__interpretation_status"], "waiting")
+        send.assert_called_once()
+        self.assertEqual(send.call_args.args[:2], ("photo_chat", "Попробуй описать ещё раз"))
+        self.assertEqual(retry.attributes["__interpretation_status"], "error")
         self.assertEqual(confirmed.attributes["__interpretation_status"], "error")
         self.assertEqual(manual.attributes["__interpretation_status"], "error")
         self.assertEqual([(point.x(), point.y()) for point in retry.polygon], original)
@@ -294,10 +295,14 @@ class Cv1MainFlowTests(unittest.TestCase):
             patch.object(self.window.workspace, "update_photo_detections"),
             patch.object(self.window, "_refresh_project_tree"),
             patch.object(self.window, "_refresh_training_bar"),
+            patch.object(self.window, "_start_cv1_descriptions"),
         ):
             self.window.run_segmentation([record])
         fill.assert_not_called()
-        self.assertEqual(record.detections, [])
+        self.assertEqual(len(record.detections), 1)
+        self.assertEqual(record.detections[0].attributes["__core_column_description"], "1")
+        self.assertFalse(record.detections[0].training_ready)
+        self.assertEqual(record.detections[0].label, UNRECOGNIZED_FACIES)
         self.assertEqual(record.analysis_mode, PIPELINE_MODE)
 
     def test_show_stack_does_not_rewrite_strict_polygons_columns_or_labels(self):
@@ -383,8 +388,68 @@ class Cv1MainFlowTests(unittest.TestCase):
             patch.object(self.window._vlm_client, "send", return_value="ordinary") as send,
         ):
             self.window._send_vlm_request("chat", "Что такое аркоз?")
+            self.window._drain_vlm_requests()
         self.assertEqual(send.call_args.args[1]["model_mode"], "base")
         self.assertEqual(self.window._vlm_pending[0], "ordinary")
+
+    def test_photo_reply_is_bound_to_original_attachment_after_selection_changes(self):
+        old_photo, new_photo = self.root / "old.jpg", self.root / "new.jpg"
+        self.window._chat_photo_path = old_photo
+        with (
+            patch.object(self.window, "_local_vlm_config", return_value=self.runtime_config("base")),
+            patch.object(self.window, "_knowledge_folders", return_value=[]),
+            patch.object(self.window._vlm_client, "send", return_value="photo-reply"),
+        ):
+            self.window._send_vlm_request("photo_chat", "Цвет?", image_override=str(old_photo))
+            self.window._chat_photo_path = new_photo
+            self.window._drain_vlm_requests()
+            self.window._on_vlm_reply({"id": "photo-reply", "ok": True, "answer": "Светло-серый керн."})
+        args, kwargs = self.messages.call_args
+        self.assertIn("old.jpg", args[1])
+        self.assertNotIn("new.jpg", args[1])
+        self.assertEqual(kwargs["correction"]["image_path"], str(old_photo))
+
+    def test_shared_batch_keeps_results_bound_across_photo_boundaries(self):
+        first, second = self.record(name="one.png", interpreted=True), self.record(name="two.png", interpreted=True)
+        for record in (first, second):
+            record.pixmap.save(record.path)
+        self.window._records = [first, second]
+        jobs = [IntervalJob.create(record, record.detections[0]) for record in (first, second)]
+        self.window._analysis_queue = deque(jobs)
+        self.window._analysis_active = True
+        self.window._analysis_total = 2
+        with (
+            patch.object(self.window._vlm_client, "send", return_value="batch") as send,
+            patch.object(self.window.workspace, "update_photo_detections"),
+            patch.object(self.window, "_schedule_vlm_dispatch"),
+        ):
+            self.window._advance_turbo_descriptions(self.runtime_config("base"))
+            payload = send.call_args.args[1]
+            self.assertEqual(payload["operation"], "describe_batch")
+            self.assertEqual(len(payload["items"]), 2)
+            self.assertNotEqual(payload["items"][0]["image"], payload["items"][1]["image"])
+            fields_one, fields_two = self.valid_fields(), self.valid_fields()
+            fields_one["description"], fields_two["description"] = "Первый интервал.", "Второй интервал."
+            self.window._on_vlm_reply({"id": "batch", "ok": True, "items": {
+                "1": {"ok": True, "fields": fields_one}, "2": {"ok": True, "fields": fields_two},
+            }})
+        self.assertEqual(first.detections[0].attributes["Краткое описание"], "Первый интервал.")
+        self.assertEqual(second.detections[0].attributes["Краткое описание"], "Второй интервал.")
+        self.assertEqual(self.window._analysis_success, 2)
+        self.assertFalse(any(record.detections[0].training_ready for record in (first, second)))
+
+    def test_runtime_failure_does_not_restart_every_remaining_batch(self):
+        first, second = self.record(name="first.png", interpreted=True), self.record(name="next.png", interpreted=True)
+        self.window._records = [first, second]
+        first_job, second_job = [IntervalJob.create(record, record.detections[0]) for record in (first, second)]
+        self.window._analysis_queue = deque([second_job])
+        self.window._analysis_pending = ("failed-batch", [first_job], [self.root / "temporary-crop.png"])
+        self.window._analysis_active = True
+        with patch.object(self.window, "_schedule_vlm_dispatch"), patch.object(self.window.workspace, "update_photo_detections"):
+            self.window._on_cv1_interval_reply({"id": "failed-batch", "ok": False, "error": "runtime stopped"})
+        self.assertFalse(self.window._analysis_queue)
+        self.assertEqual(self.window._analysis_done, 2)
+        self.assertTrue(all(record.detections[0].attributes["__interpretation_status"] == "error" for record in (first, second)))
 
     def test_description_stage_starts_after_segmentation_thread_is_cleared(self):
         record = self.record(interpreted=True)

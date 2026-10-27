@@ -107,6 +107,8 @@ class LocalVlmClient(QObject):
         self._request_timeout.stop()
         if self.process.state() != QProcess.ProcessState.NotRunning:
             self.process.closeWriteChannel()
+            if self.process.waitForFinished(1500):
+                return
             self.process.terminate()
             if not self.process.waitForFinished(1500):
                 self.process.kill()

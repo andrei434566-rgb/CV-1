@@ -22,6 +22,14 @@
         "clear": false
       },
       "problemMatcher": []
+    },
+    {
+      "label": "CV-1: ускорить локальный ИИ",
+      "type": "process",
+      "command": "${workspaceFolder}\\..\\vlm_core_v1\\.venv\\Scripts\\python.exe",
+      "args": ["-u", "${workspaceFolder}\\scripts\\prepare_qwen_turbo_local.py"],
+      "problemMatcher": [],
+      "presentation": {"reveal": "always", "panel": "dedicated"}
     }
   ]
 }

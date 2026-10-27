@@ -90,7 +90,7 @@ class AssistantPanel(QFrame):
         self._messages_layout.addStretch(1)
         self.transcript.setWidget(self._messages_widget)
         layout.addWidget(self.transcript, 1)
-        self.append_message("assistant", "Добавьте фото, таблицу описаний или документ кнопкой «Добавить файл» либо перетащите сюда. Фото я проанализирую, а по загруженным материалам можно задавать вопросы здесь же.")
+        self.append_message("assistant", "Добавьте фото или документ и задайте вопрос. Чат работает отдельно от обработки проекта. Чтобы собрать колонку и заполнить описания, напишите «обработай фото».")
 
         self.photo_frame: QFrame | None = None
         self.photo_name: QLabel | None = None
@@ -207,10 +207,10 @@ class AssistantPanel(QFrame):
         scroll.setValue(scroll.value() + direction * max(140, self.transcript.viewport().height() * 3 // 4))
 
     def set_busy(self, busy: bool) -> None:
-        self.send_button.setEnabled(not busy)
-        self.attach_file_button.setEnabled(not busy)
+        self.send_button.setEnabled(True)
+        self.attach_file_button.setEnabled(True)
         if self.clear_photo_button is not None:
-            self.clear_photo_button.setEnabled(not busy)
+            self.clear_photo_button.setEnabled(True)
         self.status.setText("●  Обрабатываю запрос…" if busy else "●  Готов к работе")
 
     def set_photo(self, path: str | Path) -> None:

@@ -198,7 +198,7 @@ class RunnerSelectionTests(unittest.TestCase):
         return runner
 
     def answer(self, runner, request):
-        torch = SimpleNamespace(inference_mode=lambda: nullcontext())
+        torch = SimpleNamespace(inference_mode=lambda: nullcontext(), cuda=SimpleNamespace(synchronize=lambda: None))
         with patch.dict("sys.modules", {"torch": torch}):
             return runner.answer(request, [])
 

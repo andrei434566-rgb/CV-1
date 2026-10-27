@@ -2,6 +2,7 @@
 .build_venv/
 UNKNOWN.egg-info/
 __pycache__/
+.test-temp-local-runtime/
 *.py[cod]
 launch_error.log
 build/

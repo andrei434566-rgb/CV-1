@@ -222,6 +222,8 @@ def apply_interval_description(record: PhotoRecord, job: IntervalJob, response: 
     model_info = response.get("model_info")
     if isinstance(model_info, dict):
         attributes["__vlm_model_info"] = json.dumps(model_info, ensure_ascii=False, sort_keys=True)
+    if isinstance(response.get("timing"), dict):
+        attributes["__vlm_timing"] = json.dumps(response["timing"], ensure_ascii=False, sort_keys=True)
     job.detection.label = values["facies_name"] or UNRECOGNIZED_FACIES
     job.detection.attributes = attributes
     job.detection.training_ready = False
