@@ -4,3 +4,6 @@
 /app/resources/theory/geology_source_notes.json text eol=lf
 # Preserve original audit evidence bytes and recorded SHA256 on every platform.
 /vlm_source/grounded_theory_v1/reports/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+/vlm_source/geology_sft_v2_20261027/*.json text eol=lf
+/vlm_source/geology_sft_v2_20261027/reports/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+/scripts/llama_lora_converter_b11913.lock.json text eol=lf

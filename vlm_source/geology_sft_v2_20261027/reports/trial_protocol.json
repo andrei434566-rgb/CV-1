@@ -1,0 +1,363 @@
+{
+  "schema": "qwen_geology_sft_v2_protocol",
+  "status": "frozen_before_training",
+  "date": "2026-10-27",
+  "training_rows": 344,
+  "new_source_cards_used": 110,
+  "previous_training_rows": 124,
+  "omitted_previous_training_due_to_protected_questions": [],
+  "training_modes": {
+    "training": 64,
+    "previous_train": 60,
+    "closed_book_train": 110,
+    "supplied_context_train": 110
+  },
+  "omitted_new_cards": [],
+  "new_scenarios": 16,
+  "new_evaluation_conditions": "closed book and reference where retrieval succeeds",
+  "new_reference_rows": 15,
+  "old_closed_book_guards": 4,
+  "conversation_guards": 4,
+  "image_guards": 8,
+  "theory_evaluation_rows": 35,
+  "retrieval_audit": [
+    {
+      "id": "geo_v2_eval_01",
+      "note_ids": [
+        "coarse_clasts"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://opentextbc.ca/physicalgeology2ed/",
+          "excerpt": "Конгломерат и осадочная брекчия относятся к крупнообломочным породам с существенной долей обломков крупнее 2 мм. В конгломерате крупные обломки преимущественно окатанные, в осадочной брекчии — угловатые. Различие этой пары не заключается в том, что брекчия обязательно мельче. Размер, окатанность и состав обломков — отдельные признаки описания.",
+          "kind": "geology_reference",
+          "title": "Steven Earle (2019), Physical Geology, 2nd Edition",
+          "source_id": "earle2019",
+          "reference_note_id": "coarse_clasts"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_02",
+      "note_ids": [
+        "shale_fissility"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://oap.unige.ch/journals/sdk/article/view/1621",
+          "excerpt": "В узком текстурном употреблении shale — тонкозернистая порода с делимостью: она предпочтительно раскалывается по близким примерно параллельным поверхностям. Массивный или блоковый mudstone такой выраженной делимости не показывает. Делимость описывает раскалывание и не тождественна видимой первичной ламинации. В литературе mudstone и shale используют также шире, поэтому принятое значение термина следует указывать.",
+          "kind": "geology_reference",
+          "title": "Biddle, LaGrange, Harris, Egenhoff and Gingras (2025), Current concepts in mudstone description and deposition: A synthesis for mudstone initiates, Sedimentologika",
+          "source_id": "biddle2025",
+          "reference_note_id": "shale_fissility"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_03",
+      "note_ids": [
+        "mudstone_two_meanings"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://oap.unige.ch/journals/sdk/article/view/1621",
+          "excerpt": "Терригенный mudstone обозначает тонкозернистую обломочную породу; в широком употреблении термин охватывает разные соотношения алевритовых и глинистых частиц. В карбонатной классификации Данэма mudstone — карбонатная порода с опорой на микритовый материал и менее 10% зёрен. Микрит здесь означает тонкий карбонатный материал, а не обязательно глинистые минералы. Одинаковое английское слово не устанавливает одинаковый состав этих пород.",
+          "kind": "geology_reference",
+          "title": "Biddle, LaGrange, Harris, Egenhoff and Gingras (2025), Current concepts in mudstone description and deposition: A synthesis for mudstone initiates, Sedimentologika",
+          "source_id": "biddle2025",
+          "reference_note_id": "mudstone_two_meanings"
+        },
+        {
+          "path": "https://publications.iodp.org/proceedings/356/102/356_102.html",
+          "excerpt": "Терригенный mudstone обозначает тонкозернистую обломочную породу; в широком употреблении термин охватывает разные соотношения алевритовых и глинистых частиц. В карбонатной классификации Данэма mudstone — карбонатная порода с опорой на микритовый материал и менее 10% зёрен. Микрит здесь означает тонкий карбонатный материал, а не обязательно глинистые минералы. Одинаковое английское слово не устанавливает одинаковый состав этих пород.",
+          "kind": "geology_reference",
+          "title": "Gallagher et al. (2017), Expedition 356 methods, Proceedings of the International Ocean Discovery Program",
+          "source_id": "iodp356",
+          "reference_note_id": "mudstone_two_meanings"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_04",
+      "note_ids": [
+        "coal_carbonaceous"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://www.usgs.gov/faqs/what-coal",
+          "excerpt": "Уголь — преимущественно органический горючий осадочный материал, образованный преобразованием растительных остатков. В определении USGS он содержит более 50% по массе и более 70% по объёму углистого вещества; массовое определение включает собственную влагу. Углистая тонкозернистая порода может сохранять минеральную основу и быть лишь обогащённой органикой. Для различения нужны данные о соотношении органического и минерального материала, а не одно тёмное окрашивание.",
+          "kind": "geology_reference",
+          "title": "U.S. Geological Survey, What is coal?",
+          "source_id": "usgs_coal",
+          "reference_note_id": "coal_carbonaceous"
+        },
+        {
+          "path": "https://oap.unige.ch/journals/sdk/article/view/1621",
+          "excerpt": "Уголь — преимущественно органический горючий осадочный материал, образованный преобразованием растительных остатков. В определении USGS он содержит более 50% по массе и более 70% по объёму углистого вещества; массовое определение включает собственную влагу. Углистая тонкозернистая порода может сохранять минеральную основу и быть лишь обогащённой органикой. Для различения нужны данные о соотношении органического и минерального материала, а не одно тёмное окрашивание.",
+          "kind": "geology_reference",
+          "title": "Biddle, LaGrange, Harris, Egenhoff and Gingras (2025), Current concepts in mudstone description and deposition: A synthesis for mudstone initiates, Sedimentologika",
+          "source_id": "biddle2025",
+          "reference_note_id": "coal_carbonaceous"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_05",
+      "note_ids": [
+        "sorting_roundness"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://opentextbc.ca/physicalgeology2ed/",
+          "excerpt": "Сортировка характеризует однородность размеров частиц: при хорошей сортировке диапазон размеров сравнительно узок. Окатанность характеризует сглаженность углов и рёбер отдельных обломков. Минеральный состав — ещё один самостоятельный признак. Поэтому хорошо отсортированный песок не обязательно состоит только из кварца, а окатанные частицы не обязательно одинаковы по размеру.",
+          "kind": "geology_reference",
+          "title": "Steven Earle (2019), Physical Geology, 2nd Edition",
+          "source_id": "earle2019",
+          "reference_note_id": "sorting_roundness"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_06",
+      "note_ids": [
+        "grain_size_mineralogy"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://oap.unige.ch/journals/sdk/article/view/1621",
+          "excerpt": "Размерная глинистая фракция и глинистые минералы — разные понятия. Очень мелкие частицы кварца и полевых шпатов могут попадать в глинистую размерную фракцию, а пластинки глинистых минералов могут иметь алевритовый размер. Границу глинистой фракции разные схемы проводят по-разному. При описании надо отдельно назвать классификацию размеров и установленный минеральный состав.",
+          "kind": "geology_reference",
+          "title": "Biddle, LaGrange, Harris, Egenhoff and Gingras (2025), Current concepts in mudstone description and deposition: A synthesis for mudstone initiates, Sedimentologika",
+          "source_id": "biddle2025",
+          "reference_note_id": "grain_size_mineralogy"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_07",
+      "note_ids": [
+        "matrix_cement"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://opentextbc.ca/physicalgeology2ed/",
+          "excerpt": "В песчанике матриксом называют более тонкий материал между песчаными зёрнами, обычно алевритовый и глинистый. Цемент образуется при кристаллизации минералов в порах и у контактов зёрен. Кальцит, кварц и другие минералы могут выступать цементом. Доля матрикса и состав цемента описывают разные составляющие породы и не должны подменять друг друга.",
+          "kind": "geology_reference",
+          "title": "Steven Earle (2019), Physical Geology, 2nd Edition",
+          "source_id": "earle2019",
+          "reference_note_id": "matrix_cement"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_08",
+      "note_ids": [
+        "compaction_cementation"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://opentextbc.ca/physicalgeology2ed/",
+          "excerpt": "Литификация превращает рыхлый осадок в породу и включает несколько процессов. При уплотнении частицы сближаются, а часть воды и воздуха удаляется из промежутков. При цементации минералы кристаллизуются в межзерновом пространстве и связывают зёрна. Уплотнение и цементация различаются по механизму, хотя могут совместно изменять один осадок.",
+          "kind": "geology_reference",
+          "title": "Steven Earle (2019), Physical Geology, 2nd Edition",
+          "source_id": "earle2019",
+          "reference_note_id": "compaction_cementation"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_09",
+      "note_ids": [
+        "normal_grading"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://opentextbc.ca/physicalgeology2ed/",
+          "excerpt": "Градационная слоистость описывает изменение размера частиц по мощности одного слоя. При нормальной градации материал крупнее внизу и становится тоньше к верху. При обратной градации крупность, наоборот, растёт вверх. Для такого описания необходимы ориентировка слоя и сведения именно о размере частиц; изменение цвета само по себе не является измерением зернистости.",
+          "kind": "geology_reference",
+          "title": "Steven Earle (2019), Physical Geology, 2nd Edition",
+          "source_id": "earle2019",
+          "reference_note_id": "normal_grading"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_10",
+      "note_ids": [
+        "carbonate_support"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://publications.iodp.org/proceedings/356/102/356_102.html",
+          "excerpt": "В карбонатной схеме Данэма mudstone имеет микритовую опору и менее 10% зёрен, а wackestone — микритовую опору и более 10% зёрен. У packstone опору создают зёрна, но между ними присутствует тонкий карбонатный материал. Grainstone имеет зерновую опору без такого материала. Главные признаки здесь — тип опоры и наличие микрита, а не только размер зёрен или цвет.",
+          "kind": "geology_reference",
+          "title": "Gallagher et al. (2017), Expedition 356 methods, Proceedings of the International Ocean Discovery Program",
+          "source_id": "iodp356",
+          "reference_note_id": "carbonate_support"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_11",
+      "note_ids": [
+        "microscopic_bioturbation"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://oap.unige.ch/journals/sdk/article/view/1621",
+          "excerpt": "Тонкозернистая порода без заметных макроскопических ходов может содержать микроскопические следы биогенной переработки. В шлифе ищут нарушение слоек, ориентировку частиц по краю предполагаемого хода и отличие его заполнения от окружения. Малый размер и слабый контраст затрудняют уверенное определение ихнорода. Отсутствие различимых ходов на обычном фото не доказывает отсутствие биотурбации.",
+          "kind": "geology_reference",
+          "title": "Biddle, LaGrange, Harris, Egenhoff and Gingras (2025), Current concepts in mudstone description and deposition: A synthesis for mudstone initiates, Sedimentologika",
+          "source_id": "biddle2025",
+          "reference_note_id": "microscopic_bioturbation"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_12",
+      "note_ids": [
+        "cross_bedding"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://opentextbc.ca/physicalgeology2ed/",
+          "excerpt": "Косая слоистость содержит наклонные слойки внутри более крупных слоёв. Она возникает при перемещении ряби или дюн, когда материал накапливается на их переднем склоне. Последующие формы могут частично срезать предыдущие отложения. Такая структура образуется как при движении воды, так и при ветровом переносе; одного её наличия недостаточно для выбора между ними.",
+          "kind": "geology_reference",
+          "title": "Steven Earle (2019), Physical Geology, 2nd Edition",
+          "source_id": "earle2019",
+          "reference_note_id": "cross_bedding"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_13",
+      "note_ids": [
+        "normal_grading"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://opentextbc.ca/physicalgeology2ed/",
+          "excerpt": "Градационная слоистость описывает изменение размера частиц по мощности одного слоя. При нормальной градации материал крупнее внизу и становится тоньше к верху. При обратной градации крупность, наоборот, растёт вверх. Для такого описания необходимы ориентировка слоя и сведения именно о размере частиц; изменение цвета само по себе не является измерением зернистости.",
+          "kind": "geology_reference",
+          "title": "Steven Earle (2019), Physical Geology, 2nd Edition",
+          "source_id": "earle2019",
+          "reference_note_id": "normal_grading"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_14",
+      "note_ids": [],
+      "context_added": false,
+      "source_hits": []
+    },
+    {
+      "id": "geo_v2_eval_15",
+      "note_ids": [
+        "carbonate_support"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://publications.iodp.org/proceedings/356/102/356_102.html",
+          "excerpt": "В карбонатной схеме Данэма mudstone имеет микритовую опору и менее 10% зёрен, а wackestone — микритовую опору и более 10% зёрен. У packstone опору создают зёрна, но между ними присутствует тонкий карбонатный материал. Grainstone имеет зерновую опору без такого материала. Главные признаки здесь — тип опоры и наличие микрита, а не только размер зёрен или цвет.",
+          "kind": "geology_reference",
+          "title": "Gallagher et al. (2017), Expedition 356 methods, Proceedings of the International Ocean Discovery Program",
+          "source_id": "iodp356",
+          "reference_note_id": "carbonate_support"
+        }
+      ]
+    },
+    {
+      "id": "geo_v2_eval_16",
+      "note_ids": [
+        "microscopic_bioturbation"
+      ],
+      "context_added": true,
+      "source_hits": [
+        {
+          "path": "https://oap.unige.ch/journals/sdk/article/view/1621",
+          "excerpt": "Тонкозернистая порода без заметных макроскопических ходов может содержать микроскопические следы биогенной переработки. В шлифе ищут нарушение слоек, ориентировку частиц по краю предполагаемого хода и отличие его заполнения от окружения. Малый размер и слабый контраст затрудняют уверенное определение ихнорода. Отсутствие различимых ходов на обычном фото не доказывает отсутствие биотурбации.",
+          "kind": "geology_reference",
+          "title": "Biddle, LaGrange, Harris, Egenhoff and Gingras (2025), Current concepts in mudstone description and deposition: A synthesis for mudstone initiates, Sedimentologika",
+          "source_id": "biddle2025",
+          "reference_note_id": "microscopic_bioturbation"
+        }
+      ]
+    }
+  ],
+  "partition_checks": {
+    "train_unique_normalized_questions": 344,
+    "holdout_unique_normalized_questions": 39,
+    "train_duplicate_question_excess_rows": 0,
+    "train_holdout_normalized_question_overlap": 0,
+    "duplicate_record_ids": 0
+  },
+  "raw_training_validation_question_overlap": 0,
+  "recipe": {
+    "fresh_base": true,
+    "epochs": 3,
+    "learning_rate": 0.0001,
+    "lora_targets": "all-text-linear",
+    "rank": 8,
+    "alpha": 16,
+    "dropout": 0.05,
+    "batch_size": 1,
+    "gradient_accumulation": 4,
+    "max_sequence_tokens": 1024,
+    "theory_max_new_tokens": 160,
+    "image_max_new_tokens": 24,
+    "seed": 20261027,
+    "precision": "FP16",
+    "gradient_checkpointing": "nonreentrant"
+  },
+  "source_sha256": {
+    "training_cards.json": "8187b2c867ab6351461db1030771778668c7070f20840b309226353c9dc136e2",
+    "source_registry.json": "30f9b24278c9467167aae91ac486dae23eadb11d268db72f2287b5e6a418a15a",
+    "evaluation_challenge.json": "31c0079b03c6e574833cab92a29cfec0d53748759682ea81120e34ff8cb30969"
+  },
+  "historical_holdout_sha256": {
+    "qwen_geology_dpo_v1_20261027\\holdout_conversation.jsonl": "6d5a00a5b1f315e05e91dd7a23cd2a06f7146beebc7ccdda95b880a9f6281ccf",
+    "qwen_geology_dpo_v1_20261027\\holdout_theory.jsonl": "335f3c58e5af774bc0edc1e6a4206674951e44d604e26f266365883d3d2b8bf6",
+    "qwen_grounded_v1_20261027\\holdout_conversation.jsonl": "6d5a00a5b1f315e05e91dd7a23cd2a06f7146beebc7ccdda95b880a9f6281ccf",
+    "qwen_grounded_v1_20261027\\holdout_theory.jsonl": "335f3c58e5af774bc0edc1e6a4206674951e44d604e26f266365883d3d2b8bf6",
+    "qwen_source_pilot_20261022\\holdout_conversation.jsonl": "87b1cf7ba8dbe975d43367b8558cb36cd047346e2f50bd01bec1d5967caaafe0",
+    "qwen_source_pilot_20261022\\holdout_theory.jsonl": "eb2a595e74e3b6e597a94ca5775a5cbfa6db373c110b10da27f9ca4f2fd9902a",
+    "qwen_theory_round2_20261025\\holdout_conversation.jsonl": "4540e028854a14c523d9557846c8ca66fbdc231c3a0e551149f1a3434e5fc945",
+    "qwen_theory_round2_20261025\\holdout_theory.jsonl": "e13466d7b936468c8cde1a5ad61fe69b88260086874e8b6f26031ed789e08ada",
+    "qwen_theory_round4_20261027\\holdout_conversation.jsonl": "6d5a00a5b1f315e05e91dd7a23cd2a06f7146beebc7ccdda95b880a9f6281ccf",
+    "qwen_theory_round4_20261027\\holdout_theory.jsonl": "a401d727950a91660ebe35a17adc3cb125ae1420a4c1c36bd4c2b560a05f8b48",
+    "qwen_visual_round2_20261025\\holdout_conversation.jsonl": "87b1cf7ba8dbe975d43367b8558cb36cd047346e2f50bd01bec1d5967caaafe0",
+    "qwen_visual_round2_20261025\\holdout_theory.jsonl": "eb2a595e74e3b6e597a94ca5775a5cbfa6db373c110b10da27f9ca4f2fd9902a"
+  },
+  "manifest_sha256": {
+    "mixed.jsonl": "f4dcd8bed3cc79d0f341fcc3e8ab35a73b1197c8c06dbc3788874b31a9bd442b",
+    "holdout_theory.jsonl": "f303581923e91e42461e72e60a29ae85f0ebc962b4bfacdd06cbb93a68ef0139",
+    "holdout_conversation.jsonl": "5e6aa535990da3696e31a71c780dbe838a2be86d4609e8b76d49a53742eaad52",
+    "val_visual.jsonl": "f0d3204208a086b9dcb9ec2155a16c888c8ea98d0e2ba0bc4a762e58bf8064ea",
+    "system_prompt.txt": "478a02ce9aab00bc0b7ef6ec574a78e653e51e9162f65020a8e3438e78b0e0bb"
+  },
+  "limitations": [
+    "New scenarios were authored separately before training, but concepts and sources overlap.",
+    "Two conditions per question are paired observations, not independent samples.",
+    "This is not an independent-well geological exam or evidence of 95% facies accuracy.",
+    "Assistant source checking is not geologist approval.",
+    "A reference miss remains a miss; the expected passage is never inserted by an oracle.",
+    "Recipe selected after previous experiments; one fixed final candidate, no validation checkpoint selection.",
+    "Train source questions appear with and without supplied context intentionally, never across train/validation.",
+    "Active application weights stay unchanged until candidate evaluation."
+  ]
+}

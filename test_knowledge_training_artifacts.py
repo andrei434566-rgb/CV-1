@@ -28,7 +28,7 @@ class KnowledgeTrainingArtifactTests(unittest.TestCase):
 
     def test_model_responses_are_not_geological_sources(self):
         for name in ("baseline_responses.jsonl", "candidate_responses.jsonl", "blind_review.json", "QUALITATIVE_REVIEW.json",
-                     "baseline_metrics.json", "candidate_metrics.json", "validation_questions.json",
+                     "baseline_metrics.json", "candidate_metrics.json", "validation_questions.json", "evaluation_challenge.json",
                      "holdout_theory.jsonl", "holdout_conversation.jsonl", "val_visual.jsonl"):
             with self.subTest(name=name):
                 path = self.put(name, {"response": "Модель может ошибаться"})

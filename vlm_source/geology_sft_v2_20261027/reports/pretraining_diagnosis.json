@@ -1,0 +1,96 @@
+{
+  "schema": "qwen_language_adapter_update_audit_v1",
+  "gpu_used": false,
+  "base_snapshot": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "base_config_sha256": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+  "method": "Frobenius norm of (alpha/r)BA divided by base matrix norm; rank products avoid materializing BA",
+  "base_loading": "Selected local safetensors tensors only; no model construction, torch or GPU",
+  "adapters": [
+    {
+      "adapter_name": "core_vlm_grounded_v1_20261027_lora",
+      "adapter_weights_sha256": "4940ed32a36e4a1531e7b7858f0215dc089dcf87689bd658fa76427ae21946f4",
+      "adapter_config_sha256": "36bebba27b7cc66fed2889cdd7ca0f66a61eae77b7b8ef41e8ed985380269675",
+      "targets": "qv",
+      "modules": 56,
+      "lora_scale": 2.0,
+      "relative_delta_min_median_max": [
+        0.00031716425341343866,
+        0.0005297388452429267,
+        0.0007603298271430433
+      ],
+      "lora_B_rms_median": 0.00023470891783607004
+    },
+    {
+      "adapter_name": "core_vlm_geology_dpo_v1_20261027_lora",
+      "adapter_weights_sha256": "389f59e26714eb40aa769bb4cd39f9fa15f81b0bf284ea3a7b0810554844f417",
+      "adapter_config_sha256": "1c81d1beccb8296b65c42801ee8aa5da70fcc0d390e33c4d6b979c936612ae59",
+      "targets": "qv",
+      "modules": 56,
+      "lora_scale": 2.0,
+      "relative_delta_min_median_max": [
+        5.361928350490761e-05,
+        6.549414989993248e-05,
+        9.475906932333607e-05
+      ],
+      "lora_B_rms_median": 3.0000361894438066e-05
+    }
+  ],
+  "limitations": [
+    "Weight ratios are descriptive, not proof of why responses did or did not change",
+    "The complete base model weight file is not rehashed by this audit",
+    "No model generation or geological accuracy is measured"
+  ],
+  "date": "2026-10-27",
+  "technical_findings": [
+    "Assistant-only masking, causal label shift and EOS supervision are present; no fatal mask/export error was identified.",
+    "LoRA targets are language-only, leaving visual encoder/projector frozen. These text experiments do not train image features.",
+    "Previous source-conditioned SFT had 62 optimizer steps; DPO had 36. Their small relative update norms are consistent with weak changes, but do not prove the cause of failed quality checks.",
+    "Source facts previously appeared mainly as supplied context; source-conditioned reading and closed-book recall must be evaluated separately."
+  ],
+  "next_recipe": {
+    "status": "selected_before_next_candidate_training",
+    "fresh_base": true,
+    "base_snapshot": "89644892e4d85e24eaac8bacfd4f463576704203",
+    "loss_mode": "sft",
+    "epochs": 3,
+    "learning_rate": 0.0001,
+    "lora_targets": "all-text-linear (language q/k/v/o and MLP gate/up/down)",
+    "trainable_parameters_expected": 8716288,
+    "rank": 8,
+    "alpha": 16,
+    "dropout": 0.05,
+    "batch_size": 1,
+    "gradient_accumulation": 4,
+    "max_sequence_tokens": 1024,
+    "precision": "FP16",
+    "attention": "SDPA",
+    "gradient_checkpointing": "nonreentrant",
+    "seed": 20261027,
+    "optimizer": "existing adamw_torch",
+    "learning_rate_schedule": "existing linear with 3% optimizer-step warmup",
+    "validation_selection": "one fixed final candidate; no validation-selected checkpoint"
+  },
+  "recommendation_basis": [
+    "Use expanded source-checked training questions in both closed-book and supplied-context forms; never use rejected false DPO answers as SFT targets.",
+    "LR1e-4 is a deliberate stronger single SFT experiment, not a measured Qwen-specific optimum. HF TRL general LoRA guidance lists SFT2e-4 and DPO5e-6; Qwen multimodal documentation has a different lower-rate recipe.",
+    "Freeze novel questions before training and retain dialogue/image regressions. Paired context conditions share scenarios and are not independent samples.",
+    "Data, target modules and learning rate change together, so an observed gain cannot be attributed to one factor alone."
+  ],
+  "technical_sources": [
+    {
+      "url": "https://github.com/huggingface/trl/blob/main/docs/source/peft_integration.md#learning-rate-considerations",
+      "inspected_date": "2026-10-27",
+      "scope": "General PEFT rate guidance, not a guarantee for this geological dataset"
+    },
+    {
+      "url": "https://github.com/QwenLM/Qwen3-VL/blob/main/qwen-vl-finetune/README.md",
+      "inspected_date": "2026-10-27",
+      "scope": "Official broader multimodal fine-tuning configuration; distinct from our proposed LoRA-only text trial"
+    },
+    {
+      "url": "https://huggingface.co/docs/peft/main/package_reference/lora",
+      "inspected_date": "2026-10-27",
+      "scope": "LoRA update formula and broad linear-layer targeting"
+    }
+  ]
+}

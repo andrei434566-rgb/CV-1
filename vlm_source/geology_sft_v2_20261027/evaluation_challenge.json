@@ -1,0 +1,439 @@
+{
+  "schema_version": 1,
+  "created_date": "2026-10-27",
+  "target_language": "ru",
+  "geologist_reviewed": false,
+  "record_role": "evaluation_only_never_train",
+  "freeze_status": "frozen_before_training_launch",
+  "provenance": {
+    "authoring_basis": "New scenario questions and original short Russian reference answers authored from grounded_theory_v1/source_notes.json only.",
+    "training_question_files_read": false,
+    "previous_evaluation_question_files_read": false,
+    "model_outputs_read": false,
+    "source_notes_path": "vlm_source/grounded_theory_v1/source_notes.json",
+    "source_notes_sha256": "09503ff0348e4b3ce106fa9d77861e0ec29854585525c72afca27a54fc802fdc",
+    "question_set_relationship": "Concepts and factual sources overlap with the learning experiment; questions were newly written independently of the training-question author.",
+    "limits": "This is a small authored conceptual challenge, not an independent well, image or geological sampling holdout. Its results do not establish 95% real-world accuracy. Source checked reference notes and these rubrics have not been reviewed by a geologist."
+  },
+  "answer_contract": {
+    "language": "ru",
+    "complete_sentences_min": 1,
+    "complete_sentences_max": 3,
+    "instruction": "Ответьте на вопрос по имеющимся сведениям в 1–3 полных предложениях на русском языке. Если для требуемого вывода не хватает данных, назовите недостающий признак и ограничьте вывод.",
+    "scoring": "Score geological content semantically, not by exact phrase matching. A content pass requires every required fact and no forbidden fact; assess the 1–3 complete Russian sentence constraint separately. Do not demand bibliographic citations in a model answer. Reference answers, evidence, rubrics and expected_note_ids are evaluator-only and must never enter training or inference prompts.",
+    "retrieval_policy": "expected_note_ids document evaluator evidence only. Retrieve inference context from the actual question with the configured retriever, without selecting notes using these IDs or the reference answer.",
+    "blind_review": "When reviewing two systems, shuffle and label answers A/B without exposing model identities; retain answer and retrieval provenance outside the blinded review material."
+  },
+  "counts": {
+    "total": 16,
+    "geological_supported": 12,
+    "insufficient_context": 4
+  },
+  "sources": {
+    "earle2019": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition",
+      "url": "https://opentextbc.ca/physicalgeology2ed/",
+      "license": "CC BY 4.0 except individually credited exceptions; no figures or exercises reproduced",
+      "attribution": "Original Russian adaptations of Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: new scenario wording, translation, selection and condensation of factual statements from the local source notes."
+    },
+    "iodp356": {
+      "title": "Gallagher et al. (2017), Expedition 356 methods, Proceedings of the International Ocean Discovery Program",
+      "url": "https://publications.iodp.org/proceedings/356/102/356_102.html",
+      "doi": "10.14379/iodp.proc.356.102.2017",
+      "license": "CC BY 4.0 except where otherwise noted; prose only",
+      "attribution": "Original Russian paraphrases of Gallagher et al., Expedition 356 methods (2017), IODP/JRSO, CC BY 4.0. Changes: new scenarios, translation and condensation of the carbonate classification statements recorded in the local source notes."
+    },
+    "usgs_coal": {
+      "title": "U.S. Geological Survey, What is coal?",
+      "url": "https://www.usgs.gov/faqs/what-coal",
+      "license": "USGS-authored information in the U.S. public domain; no third-party illustrations reproduced",
+      "attribution": "Source: U.S. Geological Survey, What is coal? New Russian scenarios and short paraphrases based on the local source note; mass and volume must not be substituted for one another."
+    },
+    "biddle2025": {
+      "title": "Biddle, LaGrange, Harris, Egenhoff and Gingras (2025), Current concepts in mudstone description and deposition: A synthesis for mudstone initiates, Sedimentologika",
+      "url": "https://oap.unige.ch/journals/sdk/article/view/1621",
+      "doi": "10.57035/journals/sdk.2025.e31.1621",
+      "source_type": "Author-written peer-reviewed synthesis/review",
+      "license": "CC BY 4.0",
+      "attribution": "Original short Russian adaptations of Biddle et al. (2025), Sedimentologika, DOI 10.57035/journals/sdk.2025.e31.1621, CC BY 4.0. Changes: new scenario wording, translation, condensation and explicit separation of observations from interpretations, using the local source notes."
+    }
+  },
+  "items": [
+    {
+      "id": "geo_v2_eval_01",
+      "scenario_type": "geological_supported",
+      "concept": "coarse_clast_roundness_separate_from_size",
+      "question": "В образце А преобладают обломки 6–18 мм со сглаженными углами, а в образце Б — обломки 3–8 мм с острыми углами. Оба образца осадочные и крупнообломочные; коллега назвал Б брекчией потому, что обломки в нём мельче. Исправьте его объяснение и предложите названия обоих образцов.",
+      "expected_note_ids": ["coarse_clasts"],
+      "reference_answer": "Образец А соответствует конгломерату с преимущественно окатанными обломками, а Б — осадочной брекчии с угловатыми обломками. В этой паре названия различаются по окатанности, а меньший размер обломков Б сам по себе не является признаком брекчии.",
+      "rubric": {
+        "required_facts": [
+          "А назван конгломератом на основании окатанности его крупных обломков.",
+          "Б назван осадочной брекчией на основании угловатости его крупных обломков.",
+          "Ключевое различие связано с окатанностью, а не с обязательным различием размеров."
+        ],
+        "forbidden_facts": [
+          "Брекчия определяется тем, что её обломки обязательно мельче обломков конгломерата.",
+          "Окатанность устанавливает минеральный состав или единственную обстановку накопления."
+        ]
+      },
+      "evidence": [
+        {"note_id": "coarse_clasts", "source_ids": ["earle2019"], "attribution": "Earle (2019), section 6.1 and glossary, CC BY 4.0; original Russian scenario and paraphrase from local note coarse_clasts."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_02",
+      "scenario_type": "geological_supported",
+      "concept": "fissility_is_not_primary_lamination",
+      "question": "Два тонкозернистых образца имеют одинаково заметные тонкие цветовые полосы. Первый при раскалывании даёт много близких параллельных пластинок, второй ломается блоками; лаборант записал shale для обоих только по полосам. Как уточнить запись в узком текстурном употреблении shale?",
+      "expected_note_ids": ["shale_fissility"],
+      "reference_answer": "В узком текстурном употреблении shale обоснован для первого образца с выраженной делимостью, тогда как второй по описанию соответствует блоковому mudstone. Видимые полосы не заменяют наблюдение делимости и сами по себе не делают породу shale; принятое значение терминов следует указать.",
+      "rubric": {
+        "required_facts": [
+          "Делимость первого образца поддерживает название shale в указанном узком смысле.",
+          "Блоковое раскалывание второго не показывает такой делимости и согласуется с mudstone.",
+          "Видимые полосы или первичная ламинация не тождественны делимости."
+        ],
+        "forbidden_facts": [
+          "Любая полосчатая тонкозернистая порода автоматически является shale.",
+          "Shale и mudstone во всех публикациях имеют только одно и то же строгое значение.",
+          "Для shale обязательно установлена видимая первичная ламинация."
+        ]
+      },
+      "evidence": [
+        {"note_id": "shale_fissility", "source_ids": ["biddle2025"], "attribution": "Biddle et al. (2025), sections 2.1–2.2, CC BY 4.0; original Russian scenario and paraphrase from local note shale_fissility."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_03",
+      "scenario_type": "geological_supported",
+      "concept": "terrigenous_and_carbonate_mudstone",
+      "question": "В сводной таблице два описания mudstone объединили в одну минеральную группу: терригенную тонкозернистую обломочную породу и известняк, в котором 95% микрита и 5% зёрен, опирающихся на микрит. Допустимо ли такое объединение только по английскому названию и означает ли микрит глинистые минералы?",
+      "expected_note_ids": ["mudstone_two_meanings"],
+      "reference_answer": "Объединять составы только по слову mudstone нельзя: в первом случае это терригенный тонкозернистый термин, во втором — карбонатное название по Данэму для породы с микритовой опорой и менее 10% зёрен. Микрит здесь представляет тонкий карбонатный материал и не означает, что установлены глинистые минералы.",
+      "rubric": {
+        "required_facts": [
+          "Одинаковое слово mudstone не устанавливает одинаковый минеральный состав.",
+          "Различены терригенное тонкозернистое значение и карбонатное значение по Данэму.",
+          "Карбонатный образец имеет микритовую опору и менее 10% зёрен.",
+          "Микрит назван тонким карбонатным материалом, а не синонимом глинистых минералов."
+        ],
+        "forbidden_facts": [
+          "Карбонатный mudstone обязательно сложен глинистыми минералами.",
+          "Название mudstone само по себе доказывает терригенный состав обоих образцов."
+        ]
+      },
+      "evidence": [
+        {"note_id": "mudstone_two_meanings", "source_ids": ["biddle2025", "iodp356"], "attribution": "Biddle et al. (2025), sections 2.1–2.3, and Gallagher et al. (2017), principal carbonate names, CC BY 4.0; original Russian scenario and paraphrase from local note mudstone_two_meanings."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_04",
+      "scenario_type": "geological_supported",
+      "concept": "coal_organic_material_vs_mineral_framework",
+      "question": "В чёрной тонкозернистой породе измерено 92% минерального материала и 8% углистого вещества по объёму. В журнал предлагают внести «уголь», ссылаясь на чёрный цвет. Какую поправку к названию и обоснованию следует сделать?",
+      "expected_note_ids": ["coal_carbonaceous"],
+      "reference_answer": "По приведённым данным это тонкозернистая порода с минеральной основой и органической примесью, для которой уместно описание «углистая тонкозернистая порода». Название «уголь» не обосновано: уголь преимущественно органический, а 8% углистого вещества по объёму не соответствует указанному USGS объёмному критерию более 70%; чёрного цвета недостаточно.",
+      "rubric": {
+        "required_facts": [
+          "Отмечено преобладание минерального материала и наличие углистой примеси.",
+          "Предложена углистая тонкозернистая порода либо равнозначное осторожное описание вместо уверенного названия уголь.",
+          "Уголь отличён как преимущественно органический материал, а цвет признан недостаточным основанием."
+        ],
+        "forbidden_facts": [
+          "Любая чёрная порода или любая порода с органической примесью является углём.",
+          "8% по объёму без дополнительных данных объявлены массовой долей.",
+          "Преимущественно минеральная основа названа обязательным признаком угля.",
+          "Критерий USGS ошибочно задан как более 70% по массе или более 50% по объёму вместо более 50% по массе и более 70% по объёму."
+        ]
+      },
+      "evidence": [
+        {"note_id": "coal_carbonaceous", "source_ids": ["usgs_coal", "biddle2025"], "attribution": "USGS, What is coal? (USGS-authored public-domain information), and Biddle et al. (2025), section 5, CC BY 4.0; original Russian scenario and paraphrase from local note coal_carbonaceous."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_05",
+      "scenario_type": "geological_supported",
+      "concept": "sorting_vs_roundness",
+      "question": "В пробе А песчинки почти одного размера, но с острыми углами; в пробе Б все обломки сглажены, однако рядом встречаются мелкие и гораздо более крупные частицы. Отчёт называет Б лучше отсортированной из-за округлости. Как исправить сравнение сортировки и окатанности?",
+      "expected_note_ids": ["sorting_roundness"],
+      "reference_answer": "Проба А лучше отсортирована по узкому диапазону размеров, хотя её частицы угловатые. У пробы Б окатанность выше, но широкий диапазон размеров указывает на худшую сортировку: сортировка и окатанность описывают разные признаки.",
+      "rubric": {
+        "required_facts": [
+          "А оценена как лучше отсортированная по близости размеров частиц.",
+          "Б оценена как более окатанная, но хуже отсортированная по разбросу размеров.",
+          "Размерная однородность отделена от сглаженности углов."
+        ],
+        "forbidden_facts": [
+          "Окатанные частицы автоматически означают хорошую сортировку.",
+          "Хорошая сортировка доказывает исключительно кварцевый состав.",
+          "Угловатость автоматически означает плохую сортировку."
+        ]
+      },
+      "evidence": [
+        {"note_id": "sorting_roundness", "source_ids": ["earle2019"], "attribution": "Earle (2019), section 6.4, grain characteristics, CC BY 4.0; original Russian scenario and paraphrase from local note sorting_roundness."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_06",
+      "scenario_type": "geological_supported",
+      "concept": "sand_silt_fraction_does_not_determine_mineralogy",
+      "question": "По принятой лабораторией размерной схеме проба А отнесена к песчаной фракции, а проба Б — к алевритовой; минералы ещё не определяли. В черновике уже написали «А — кварцевая, Б — из глинистых минералов». Какие сведения действительно установлены и как исправить такую запись?",
+      "expected_note_ids": ["grain_size_mineralogy", "sorting_roundness"],
+      "reference_answer": "Установлена размерная принадлежность: А относится к песчаной, Б — к алевритовой фракции в принятой схеме. Эти названия не устанавливают кварцевый или глинистый минеральный состав, который следует указать отдельно после определения минералов.",
+      "rubric": {
+        "required_facts": [
+          "Песчаная и алевритовая фракции истолкованы как категории размеров по указанной лабораторной схеме.",
+          "Кварцевый состав А не принят как установленный только из песчаного размера.",
+          "Состав Б из глинистых минералов не принят как установленный только из алевритового размера.",
+          "Минеральный состав предложено определять и описывать отдельно."
+        ],
+        "forbidden_facts": [
+          "Любой песчаный материал состоит только из кварца.",
+          "Алевритовая или глинистая размерная фракция тождественна определённому минеральному составу.",
+          "Глинистые минералы не могут иметь алевритовый размер.",
+          "Всем схемам приписана одна обязательная универсальная граница глинистой размерной фракции."
+        ]
+      },
+      "evidence": [
+        {"note_id": "grain_size_mineralogy", "source_ids": ["biddle2025"], "attribution": "Biddle et al. (2025), section 2.3, CC BY 4.0; original Russian application of the size/composition distinction in local note grain_size_mineralogy to sand and silt fraction labels."},
+        {"note_id": "sorting_roundness", "source_ids": ["earle2019"], "attribution": "Earle (2019), section 6.4, CC BY 4.0; local note sorting_roundness explicitly separates grain-size characteristics and mineral composition and rejects necessarily quartz-only sand."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_07",
+      "scenario_type": "geological_supported",
+      "concept": "matrix_vs_cement",
+      "question": "В шлифе песчаника между песчаными зёрнами виден тонкий обломочный алевритово-глинистый материал, а в оставшихся порах — кристаллы кальцита, выросшие после осаждения осадка. Автор описания сложил их вместе как «кальцитовый матрикс». Как разнести эти компоненты по корректным терминам?",
+      "expected_note_ids": ["matrix_cement"],
+      "reference_answer": "Тонкий обломочный алевритово-глинистый материал между песчаными зёрнами следует описать как матрикс, а кристаллы кальцита, образовавшиеся в порах, — как кальцитовый цемент. Долю матрикса и состав цемента нужно указывать раздельно.",
+      "rubric": {
+        "required_facts": [
+          "Тонкий обломочный материал правильно назван матриксом.",
+          "Выросший в порах кальцит правильно назван кальцитовым цементом.",
+          "Доля матрикса и состав цемента не подменяют друг друга."
+        ],
+        "forbidden_facts": [
+          "Весь материал между песчаными зёрнами автоматически является матриксом.",
+          "Цемент может быть только кварцевым, поэтому кальцит не может быть цементом.",
+          "Кристаллизация в порах названа осаждением исходного обломочного матрикса."
+        ]
+      },
+      "evidence": [
+        {"note_id": "matrix_cement", "source_ids": ["earle2019"], "attribution": "Earle (2019), section 6.1, sandstone matrix and cementation, CC BY 4.0; original Russian scenario and paraphrase from local note matrix_cement."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_08",
+      "scenario_type": "geological_supported",
+      "concept": "compaction_vs_cementation",
+      "question": "В экспериментальном описании осадка сначала отмечены сближение частиц и выход воды из пор, затем — рост новых минеральных кристаллов между зёрнами, связывающих их. Редактор предлагает назвать обе стадии просто уплотнением. Как назвать процессы и их связь с литификацией?",
+      "expected_note_ids": ["compaction_cementation"],
+      "reference_answer": "Сближение частиц с удалением части поровой воды описывает уплотнение, а рост связывающих зёрна минералов в межзерновом пространстве — цементацию. Это разные процессы, которые могут совместно участвовать в литификации одного осадка.",
+      "rubric": {
+        "required_facts": [
+          "Первая стадия названа уплотнением и связана со сближением частиц или удалением поровой воды.",
+          "Вторая стадия названа цементацией и связана с кристаллизацией минералов, связывающих зёрна.",
+          "Признано различие механизмов при возможном совместном участии в литификации."
+        ],
+        "forbidden_facts": [
+          "Рост цементирующих кристаллов назван тем же механизмом, что механическое сближение частиц.",
+          "Цементация и уплотнение объявлены взаимно исключающими процессами.",
+          "Литификация объявлена только уплотнением или только цементацией во всех случаях."
+        ]
+      },
+      "evidence": [
+        {"note_id": "compaction_cementation", "source_ids": ["earle2019"], "attribution": "Earle (2019), section 6.1, lithification, CC BY 4.0; original Russian scenario and paraphrase from local note compaction_cementation."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_09",
+      "scenario_type": "geological_supported",
+      "concept": "normal_and_reverse_grading_with_numeric_orientation",
+      "question": "Ориентировка двух слоёв достоверно известна. В слое А средний размер частиц последовательно меняется от подошвы к кровле как 1,20 → 0,45 → 0,12 мм, а в слое Б — как 0,08 → 0,20 → 0,60 мм. Назовите тип градации каждого слоя и объясните направление изменения крупности.",
+      "expected_note_ids": ["normal_grading"],
+      "reference_answer": "В слое А нормальная градация: от подошвы к кровле размер частиц уменьшается с 1,20 до 0,12 мм. В слое Б обратная градация: размер частиц вверх возрастает с 0,08 до 0,60 мм.",
+      "rubric": {
+        "required_facts": [
+          "А правильно назван слоем с нормальной градацией.",
+          "Б правильно назван слоем с обратной градацией.",
+          "Уменьшение размера для А и увеличение для Б явно привязаны к направлению от подошвы к кровле."
+        ],
+        "forbidden_facts": [
+          "Нормальная градация определена как укрупнение вверх или обратная как утонение вверх.",
+          "Рост численного размера в миллиметрах назван уменьшением частиц.",
+          "Из чисел выведена одна обязательная обстановка накопления, не заданная условием."
+        ]
+      },
+      "evidence": [
+        {"note_id": "normal_grading", "source_ids": ["earle2019"], "attribution": "Earle (2019), section 6.4, graded bedding, CC BY 4.0; original numeric scenarios and Russian paraphrase from local note normal_grading."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_10",
+      "scenario_type": "geological_supported",
+      "concept": "carbonate_grain_support_vs_mud_support",
+      "question": "В двух карбонатных шлифах присутствуют и зёрна, и микрит. В А зёрна образуют несущий каркас, а микрит занимает промежутки; в Б зёрна занимают 20% объёма и удерживаются микритовой основой. Какие названия по схеме Данэма подходят А и Б?",
+      "expected_note_ids": ["carbonate_support"],
+      "reference_answer": "Образец А соответствует packstone, поскольку имеет зерновую опору и сохраняет микрит между зёрнами. Образец Б соответствует wackestone: опора микритовая, а доля зёрен больше 10%.",
+      "rubric": {
+        "required_facts": [
+          "А правильно назван packstone на основании зерновой опоры при наличии микрита.",
+          "Б правильно назван wackestone на основании микритовой опоры при доле зёрен более 10%.",
+          "Опора использована как классификационный признак, а не подменена цветом или одним размером зёрен."
+        ],
+        "forbidden_facts": [
+          "А назван grainstone, несмотря на присутствие микрита.",
+          "Б назван carbonate mudstone при 20% зёрен.",
+          "Любое присутствие зёрен объявлено зерновой опорой.",
+          "Тип опоры и процент зёрен перепутаны как одно и то же измерение."
+        ]
+      },
+      "evidence": [
+        {"note_id": "carbonate_support", "source_ids": ["iodp356"], "attribution": "Gallagher et al. (2017), principal carbonate names, CC BY 4.0; original Russian scenario and paraphrase from local note carbonate_support."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_11",
+      "scenario_type": "geological_supported",
+      "concept": "microscopic_bioturbation_despite_macro_absence",
+      "question": "На общем фото тонкозернистого керна ходов не видно. В шлифе обнаружены локально нарушенные слойки, ориентировка частиц по краю предполагаемого хода и слабое отличие заполнения от окружения; геолог считает это кандидатами на биогенную переработку. Как согласовать эти наблюдения и можно ли уже уверенно назвать ихнород?",
+      "expected_note_ids": ["microscopic_bioturbation"],
+      "reference_answer": "Отсутствие видимых ходов на общем фото не исключает микроскопическую биотурбацию, а перечисленные признаки в шлифе поддерживают такую интерпретацию. При малом размере и слабом контрасте уверенное определение ихнорода по этому описанию не обосновано.",
+      "rubric": {
+        "required_facts": [
+          "Макроскопическое отсутствие различимых ходов не принято как доказательство отсутствия биотурбации.",
+          "Нарушение слоек, краевая ориентировка или отличие заполнения признаны признаками, поддерживающими микроскопическую биогенную переработку.",
+          "При данном размере, контрасте и кратком описании не заявлен установленный ихнород."
+        ],
+        "forbidden_facts": [
+          "Невидимость ходов на фото исключает биотурбацию даже при приведённых микропризнаках.",
+          "Назван уверенно установленный ихнород без дополнительных диагностических данных.",
+          "Одни микропризнаки объявлены доказательством единственной фации или полного перемешивания всего керна."
+        ]
+      },
+      "evidence": [
+        {"note_id": "microscopic_bioturbation", "source_ids": ["biddle2025"], "attribution": "Biddle et al. (2025), microscopic-bioturbation discussion and Table 3, CC BY 4.0; original Russian scenario and paraphrase from local note microscopic_bioturbation."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_12",
+      "scenario_type": "geological_supported",
+      "concept": "sedimentary_structures_do_not_uniquely_determine_facies",
+      "question": "На разрезе видны наклонные слойки внутри более крупных слоёв, причём следующие серии частично срезают предыдущие. По одному этому признаку в подписи поставили «однозначно ветровая пустынная фация». Как назвать структуру, объяснить её образование и оценить уверенность такой подписи?",
+      "expected_note_ids": ["cross_bedding", "bedding_parting"],
+      "reference_answer": "Описана косая слоистость, связанная с перемещением ряби или дюн и накоплением материала на их переднем склоне. Она может образовываться при водном и ветровом переносе, поэтому одной этой структуры недостаточно для однозначного вывода о пустынной фации.",
+      "rubric": {
+        "required_facts": [
+          "Структура названа косой слоистостью.",
+          "Образование связано с миграцией ряби или дюн и накоплением на переднем склоне.",
+          "Допущено образование при движении воды и при ветровом переносе.",
+          "Отвергнута однозначная пустынная фация только по этой структуре."
+        ],
+        "forbidden_facts": [
+          "Косая слоистость образуется исключительно ветром либо исключительно водой.",
+          "Одна косая слоистость доказывает конкретную фацию.",
+          "Наклонные слойки автоматически названы изменением размера зёрен или нормальной градацией без размерных данных."
+        ]
+      },
+      "evidence": [
+        {"note_id": "cross_bedding", "source_ids": ["earle2019"], "attribution": "Earle (2019), section 6.4, cross-bedding, CC BY 4.0; original Russian scenario and paraphrase from local note cross_bedding."},
+        {"note_id": "bedding_parting", "source_ids": ["earle2019"], "attribution": "Earle (2019), section 6.4, bedding, CC BY 4.0; local note bedding_parting supports the general limit that bedding alone does not identify one depositional environment."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_13",
+      "scenario_type": "insufficient_context",
+      "concept": "grading_requires_way_up_orientation",
+      "question": "Кусок керна поступил без меток верха и низа. В пределах одного слоя размер частиц плавно меняется от 0,10 мм у торца P до 0,80 мм у торца Q, но неизвестно, какой торец обращён к кровле. Можно ли записать в журнал нормальную или обратную градацию?",
+      "expected_note_ids": ["normal_grading"],
+      "reference_answer": "Изменение крупности установлено, но выбрать нормальную или обратную градацию без ориентировки подошвы и кровли нельзя. Если Q соответствует подошве, градация нормальная; если Q соответствует кровле, она обратная.",
+      "rubric": {
+        "required_facts": [
+          "Размерное изменение признано наблюдением, но ни нормальная, ни обратная градация не выбрана безусловно.",
+          "В качестве недостающего признака названа ориентировка подошвы и кровли.",
+          "Если приводятся условные варианты, Q в подошве означает нормальную градацию, а Q в кровле — обратную."
+        ],
+        "forbidden_facts": [
+          "Порядок обозначений P → Q автоматически принят как направление снизу вверх.",
+          "Числа сами по себе объявлены достаточными для однозначного выбора нормальной или обратной градации.",
+          "Неизвестная ориентировка восполнена выдуманной меткой, глубиной или положением керна."
+        ]
+      },
+      "evidence": [
+        {"note_id": "normal_grading", "source_ids": ["earle2019"], "attribution": "Earle (2019), section 6.4, graded bedding, CC BY 4.0; original unoriented numeric scenario and paraphrase from local note normal_grading."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_14",
+      "scenario_type": "insufficient_context",
+      "concept": "dark_colour_does_not_establish_coal",
+      "question": "От образца сохранилось только обычное фото: порода чёрная, зернистость на снимке неразличима. Состав, доли органического и минерального материала не измерялись, а заказчик просит выбрать между углём и углистой тонкозернистой породой. Какой вывод допустим?",
+      "expected_note_ids": ["coal_carbonaceous"],
+      "reference_answer": "По одному чёрному цвету выбрать между углём и углистой тонкозернистой породой нельзя. Для различения нужны данные о соотношении органического и минерального материала: уголь преимущественно органический, а углистая порода может сохранять минеральную основу.",
+      "rubric": {
+        "required_facts": [
+          "Не выбрана уверенно одна из двух пород по одному фото и чёрному цвету.",
+          "Недостающими данными названы доли или соотношение органического и минерального материала.",
+          "Уголь отделён как преимущественно органический материал от возможной минеральной основы углистой породы."
+        ],
+        "forbidden_facts": [
+          "Чёрный цвет сам по себе доказывает уголь или углистую тонкозернистую породу.",
+          "Из фото выдуманы проценты органики, минеральный состав или лабораторные результаты.",
+          "Слова «похоже» или «вероятно» сопровождают категорический выбор без признания нехватки данных."
+        ]
+      },
+      "evidence": [
+        {"note_id": "coal_carbonaceous", "source_ids": ["usgs_coal", "biddle2025"], "attribution": "USGS, What is coal? (USGS-authored public-domain information), and Biddle et al. (2025), section 5, CC BY 4.0; original insufficient-composition scenario and paraphrase from local note coal_carbonaceous."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_15",
+      "scenario_type": "insufficient_context",
+      "concept": "carbonate_percentage_alone_does_not_establish_support",
+      "question": "Для известняка в карточке указаны 40% зёрен и 60% микрита. Рисунок контактов зёрен утрачен, и не записано, что образует опору; требуется выбрать между wackestone и packstone. Достаточно ли этих процентов для выбора и что необходимо проверить?",
+      "expected_note_ids": ["carbonate_support"],
+      "reference_answer": "Одних процентов недостаточно, чтобы выбрать между wackestone и packstone: необходимо установить, создают опору зёрна или микрит. При микритовой опоре и указанных 40% зёрен это wackestone, а при зерновой опоре с присутствующим микритом — packstone.",
+      "rubric": {
+        "required_facts": [
+          "Однозначный выбор между wackestone и packstone по процентам отклонён.",
+          "Недостающим наблюдением назван тип опоры или рисунок контактов, показывающий несущий каркас.",
+          "Правильно соотнесены условные варианты: микритовая опора — wackestone, зерновая с микритом — packstone."
+        ],
+        "forbidden_facts": [
+          "60% микрита автоматически доказывают микритовую опору.",
+          "40% зёрен автоматически доказывают зерновую опору.",
+          "Название grainstone предложено при явно присутствующем микрите.",
+          "Образец назван карбонатным mudstone при 40% зёрен."
+        ]
+      },
+      "evidence": [
+        {"note_id": "carbonate_support", "source_ids": ["iodp356"], "attribution": "Gallagher et al. (2017), principal carbonate names, CC BY 4.0; original missing-support scenario and paraphrase from local note carbonate_support."}
+      ]
+    },
+    {
+      "id": "geo_v2_eval_16",
+      "scenario_type": "insufficient_context",
+      "concept": "unresolved_bioturbation_on_low_contrast_macrophoto",
+      "question": "На малоконтрастном общем снимке серого тонкозернистого керна отдельные ходы не различимы; шлифа и увеличенных изображений нет. В итоговом описании требуется поставить «биотурбация отсутствует» и назвать ихнород, если хоть что-то угадывается. Что можно обоснованно записать и какие данные нужны дальше?",
+      "expected_note_ids": ["microscopic_bioturbation"],
+      "reference_answer": "Можно записать, что на данном снимке различимые ходы не обнаружены, но отсутствие биотурбации и конкретный ихнород по нему не установлены. Для проверки нужна микроскопическая информация, например шлиф с оценкой нарушения слоек, ориентировки частиц по краям предполагаемых ходов и отличий их заполнения.",
+      "rubric": {
+        "required_facts": [
+          "Наблюдаемое отсутствие различимых ходов ограничено данным снимком.",
+          "Не утверждается отсутствие биотурбации вообще и не назначается ихнород.",
+          "Предложены микроскопические данные или шлиф, позволяющие проверить признаки биогенной переработки."
+        ],
+        "forbidden_facts": [
+          "Отсутствие видимых ходов на малоконтрастном макрофото доказывает полное отсутствие биотурбации.",
+          "Слабоконтрастная угадываемая форма принята как уверенное определение ихнорода.",
+          "Из фото выдуманы микроскопические признаки, будто они уже наблюдались.",
+          "Биотурбация уверенно объявлена присутствующей только потому, что отсутствие нельзя доказать."
+        ]
+      },
+      "evidence": [
+        {"note_id": "microscopic_bioturbation", "source_ids": ["biddle2025"], "attribution": "Biddle et al. (2025), microscopic-bioturbation discussion and Table 3, CC BY 4.0; original low-contrast-photo scenario and paraphrase from local note microscopic_bioturbation."}
+      ]
+    }
+  ]
+}

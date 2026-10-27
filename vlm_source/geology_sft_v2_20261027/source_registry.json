@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "created_date": "2026-10-27",
+  "target_language": "ru",
+  "geologist_reviewed": false,
+  "record_type": "source_registry_for_train_theory",
+  "sources": {
+    "earle14": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 1.4 Minerals and Rocks",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/1-4-minerals-and-rocks/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Definitions of mineral and rock; igneous, sedimentary, metamorphic origins"
+      ]
+    },
+    "earle34": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 3.4 Classification of Igneous Rock",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/3-4-classification-of-igneous-rock/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Composition and texture; visible crystals in intrusive rocks; limitations of estimating composition"
+      ]
+    },
+    "earle61": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.1 Clastic Sedimentary Rocks",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-1-clastic-sedimentary-rocks/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Table 6.1 grain sizes as printed in this book, including 2 micrometre clay cutoff, not asserted universal",
+        "Lithification and cementation",
+        "Sandstone fine material and coarse clast roundness"
+      ]
+    },
+    "earle63": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.3 Depositional Environments and Sedimentary Basins",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-3-depositional-environments-and-sedimentary-basins/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Tables 6.4 and 6.5 transport/processes and non-unique sediments in depositional environments"
+      ]
+    },
+    "earle64": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.4 Sedimentary Structures and Fossils",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-4-sedimentary-structures-and-fossils/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Bedding and partings",
+        "Cross-bedding",
+        "Normal and reverse grading",
+        "Independent grain characteristics"
+      ]
+    },
+    "earle72": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 7.2 Classification of Metamorphic Rocks",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/7-2-classification-of-metamorphic-rocks/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Foliation versus original bedding",
+        "Nonfoliated marble and quartzite; slate and schist"
+      ]
+    },
+    "iodp356": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Gallagher, Fulthorpe, Bogus et al. (2017), Expedition 356 methods, Proceedings of the International Ocean Discovery Program 356",
+      "url": "https://publications.iodp.org/proceedings/356/102/356_102.html",
+      "doi": "10.14379/iodp.proc.356.102.2017",
+      "license": "CC BY 4.0 except where otherwise noted",
+      "license_url": "https://iodp.tamu.edu/about/copyright.html",
+      "license_evidence": "Official Licensing Statement directly read: expedition publications licensed CC BY 4.0 unless otherwise noted. No third-party figure is reproduced.",
+      "attribution": "Adapted from Gallagher et al. (2017), Expedition 356 methods, IODP, DOI 10.14379/iodp.proc.356.102.2017, CC BY 4.0. Changes: short original Russian paraphrases.",
+      "access": "Directly read official full HTML and linked licensing statement.",
+      "sections": [
+        "Lithostratigraphy and sedimentology: complementary core/thin-section/XRD observations",
+        "Lithification mechanical criteria",
+        "Principal carbonate names: Dunham support and micrite",
+        "Drilling disturbance: fractured, fragmented, flow-in, mixed",
+        "Color and descriptive structures"
+      ]
+    },
+    "biddle25": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Biddle, LaGrange, Harris, Egenhoff and Gingras (2025), Current concepts in mudstone description and deposition: A synthesis for mudstone initiates",
+      "url": "https://oap.unige.ch/journals/sdk/article/view/1621",
+      "doi": "10.57035/journals/sdk.2025.e31.1621",
+      "source_type": "Author-written review/synthesis, not a new primary experiment",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "Official full article License explicitly states Copyright 2025 named authors, CC BY 4.0; directly read.",
+      "attribution": "Adapted from Biddle et al. (2025), Sedimentologika, DOI 10.57035/journals/sdk.2025.e31.1621, CC BY 4.0. Changes: Russian condensation and new questions.",
+      "access": "Full journal HTML directly read, including sections 2.2, 2.3 and microscopic-bioturbation discussion.",
+      "sections": [
+        "2.2 shale/fissility versus lamination and variable usage",
+        "2.3 size versus mineral composition and variable clay cutoffs",
+        "Microscopic bioturbation versus absent macroscopic traces and preparation scratches"
+      ]
+    },
+    "usgscoal": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "U.S. Geological Survey, What is coal?",
+      "url": "https://www.usgs.gov/faqs/what-coal",
+      "license": "U.S. public domain for USGS-authored text; no third-party media used",
+      "license_url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+      "license_evidence": "USGS Copyrights and Credits directly read; USGS-authored information is U.S. public domain, with third-party exceptions excluded.",
+      "attribution": "Source: U.S. Geological Survey, What is coal? Original Russian factual paraphrase; no image reused.",
+      "access": "Official FAQ definition and USGS copyrights page directly read.",
+      "sections": [
+        "Plant remains and geological transformation",
+        "More than50% byweight and70% byvolume carbonaceous material, including inherent moisture"
+      ]
+    }
+  },
+  "access_failures_not_used": [
+    "USGS /faqs/what-are-sedimentary-rocks and /what-are-igneous-rocks and /what-are-metamorphic-rocks timed out; none of their unseen contents is used.",
+    "Wrong Earle plural URL 3-4-classification-of-igneous-rocks inaccessible; corrected singular URL followed from official book navigation."
+  ],
+  "limits": [
+    "Only licensed/public-domain authored prose is adapted; no figures, photographs, proprietary data, login material or paywall bypass.",
+    "Biddle2025 is explicitly an author-written review rather than a new primary experiment."
+  ]
+}
