@@ -49,7 +49,8 @@ def _stems(value: str) -> set[str]:
     return result
 
 
-def _merge_reference_supplement(corpus: dict, supplement: dict) -> dict:
+def _merge_reference_supplement(corpus: dict, supplement: dict, *,
+                                expected_source_group: str = "theory_sources_20261025") -> dict:
     """Add checked train-only reference answers without changing fuzzy ranking."""
     if not isinstance(supplement, dict) or supplement.get("schema") != "kern_source_checked_reference_supplement_v1":
         return corpus
@@ -67,7 +68,7 @@ def _merge_reference_supplement(corpus: dict, supplement: dict) -> dict:
         if (not isinstance(meta, dict) or card.get("id") in known_ids or not card.get("id")
                 or card.get("holdout") is not False or card.get("exact_only") is not True
                 or card.get("aliases") or meta.get("origin_split") != "train"
-                or meta.get("origin_source_group") != "theory_sources_20261025"
+                or meta.get("origin_source_group") != expected_source_group
                 or meta.get("reference_scope") != "general_theory"
                 or meta.get("geology_approved") is not False
                 or not str(meta.get("review_status", "")).startswith(("source_checked", "user_requested_source_checked"))
@@ -100,13 +101,18 @@ def _load_cards(path: str) -> dict:
     cards_path = Path(path)
     corpus = json.loads(cards_path.read_text(encoding="utf-8"))
     if cards_path.name == "theory_cards_v5.json":
-        supplement = cards_path.with_name("theory_cards_round2.json")
-        if supplement.is_file():
-            try:
-                corpus = _merge_reference_supplement(corpus, json.loads(supplement.read_text(encoding="utf-8")))
-            except (OSError, ValueError, TypeError):
-                # An unavailable supplement must not break established answers.
-                pass
+        for name, source_group in (("theory_cards_round2.json", "theory_sources_20261025"),
+                                   ("theory_cards_round4.json", "theory_sources_20261027")):
+            supplement = cards_path.with_name(name)
+            if supplement.is_file():
+                try:
+                    corpus = _merge_reference_supplement(
+                        corpus, json.loads(supplement.read_text(encoding="utf-8")),
+                        expected_source_group=source_group,
+                    )
+                except (OSError, ValueError, TypeError):
+                    # An unavailable supplement must not break established answers.
+                    pass
     return corpus
 
 

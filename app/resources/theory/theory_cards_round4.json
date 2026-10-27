@@ -1,0 +1,1511 @@
+{
+  "schema": "kern_source_checked_reference_supplement_v1",
+  "delivery": "offline_reference_answers_not_model_weight_training",
+  "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+  "geologist_reviewed": false,
+  "scope": "Source-checked Russian theory reference; retrieval only. Does not certify any VLM or geological description.",
+  "source_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+  "counts": {
+    "cards": 33,
+    "sources": 7,
+    "validation_cards_included": 0
+  },
+  "sources": {
+    "earle_streams": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 13.3 Stream Erosion and Deposition",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/13-3-stream-erosion-and-deposition/",
+      "license": "CC BY 4.0; text only; separately credited media excluded",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The chapter footer explicitly licenses Physical Geology - 2nd Edition, Copyright 2019 Steven Earle, under CC BY 4.0 except where otherwise noted.",
+      "sections": [
+        "Stream velocity and channel geometry",
+        "Transportation modes",
+        "Hjulstrom-Sundborg diagram",
+        "Natural levees"
+      ],
+      "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+      "source_checked_date": "2026-10-27"
+    },
+    "earle_clastic": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.1 Clastic Sedimentary Rocks",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-1-clastic-sedimentary-rocks/",
+      "license": "CC BY 4.0; text only; separately credited media excluded",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "Chapter footer states CC BY 4.0; Media Attributions separately identifies figure licences.",
+      "sections": [
+        "Transportation",
+        "Lithification and cementation",
+        "Grain composition and matrix"
+      ],
+      "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+      "source_checked_date": "2026-10-27"
+    },
+    "earle_chemical": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.2 Chemical Sedimentary Rocks",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-2-chemical-sedimentary-rocks/",
+      "license": "CC BY 4.0; text only; separately credited media excluded",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+      "sections": [
+        "Chemical weathering and chemical sedimentary rocks",
+        "Limestone",
+        "Chert",
+        "Evaporites"
+      ],
+      "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+      "source_checked_date": "2026-10-27"
+    },
+    "earle_structures": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.4 Sedimentary Structures and Fossils",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-4-sedimentary-structures-and-fossils/",
+      "license": "CC BY 4.0; text only; separately credited media excluded",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+      "sections": [
+        "Principle of inclusions",
+        "Bedding and partings",
+        "Cross-bedding",
+        "Graded bedding",
+        "Imbrication",
+        "Mud cracks"
+      ],
+      "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+      "source_checked_date": "2026-10-27"
+    },
+    "earle_environments": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.3 Depositional Environments and Sedimentary Basins",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-3-depositional-environments-and-sedimentary-basins/",
+      "license": "CC BY 4.0 for text; Figure 6.3.1 CC BY-SA is excluded",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "Chapter footer states CC BY 4.0; the figure-specific attribution is kept separate and no figure is reproduced.",
+      "sections": [
+        "Table 6.4 terrestrial environments",
+        "Table 6.5 marine environments",
+        "Basin types"
+      ],
+      "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+      "source_checked_date": "2026-10-27"
+    },
+    "iodp398": {
+      "title": "Kutterolf et al. (2024), IODP Expedition 398 methods",
+      "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+      "license": "CC BY 4.0 except where otherwise noted; prose only, no third-party figures",
+      "license_url": "https://iodp.tamu.edu/scienceops/copyright.html",
+      "license_evidence": "Official IODP JRSO Copyright Statement licenses expedition photos and publications under CC BY 4.0 except where otherwise noted. The public 2024 methods chapter was inspected; no embargoed data used.",
+      "sections": [
+        "1.7 Drilling and handling core disturbance",
+        "2.1 GEODESC",
+        "2.4.1 Descriptive intervals",
+        "2.4.2 Lithostratigraphic units",
+        "2.5.1.1 Principal lithology",
+        "2.5.2.2 Monomictic versus polymictic",
+        "2.5.2.3 Clast-supported versus matrix-supported",
+        "2.5.2.5 Ooze versus calcareous mud",
+        "2.5.3.1 Structures"
+      ],
+      "attribution": "Adapted into original Russian theory QA from Kutterolf et al., Expedition 398 methods (2024), IODP/JRSO, DOI 10.14379/iodp.proc.398.102.2024, CC BY 4.0. Changes: translation, condensation, application scenarios.",
+      "prior_project_use": "This source was already present in theory_round2; these cards address other sections and are not claimed as a newly discovered source.",
+      "source_checked_date": "2026-10-27"
+    },
+    "usgs_monterey": {
+      "title": "Orzech, Dahl and Edwards (2001), Core Descriptions, Core Photographs, Physical Property Logs and Surface Textural Data of Sediment Cores, USGS Open-File Report 01-107",
+      "url": "https://pubs.usgs.gov/of/2001/0107/pdf/maintext.pdf",
+      "license": "USGS-authored information: U.S. public domain; exclude separately copyrighted third-party material",
+      "license_url": "https://www.usgs.gov/faqs/are-usgs-reportspublications-copyrighted?qt-news_science_products=0",
+      "license_evidence": "Official USGS policy permits free use of USGS-authored information with source credit and warns about separately credited third-party items. Only the report's Visual Descriptions prose was used; no photographs or commercial Munsell charts reproduced.",
+      "sections": [
+        "Visual Descriptions, printed page 13"
+      ],
+      "attribution": "Source: U.S. Geological Survey, Orzech, Dahl and Edwards (2001), Open-File Report 01-107. Short original Russian paraphrases of method descriptions.",
+      "access_note": "Official report excerpt was inspected through the web search index. Direct opening returned HTTP 403 during this session; no access controls were bypassed.",
+      "source_checked_date": "2026-10-27"
+    }
+  },
+  "cards": [
+    {
+      "id": "v6_t01",
+      "topic": "fluvial_transport",
+      "question": "Почему мелкие глинистые частицы не всегда легче размыть, чем песок?",
+      "answer": "Тонкие частицы могут сцепляться и образовывать связный осадок. Для его размыва бывает нужен более сильный поток, хотя уже взвешенные частицы долго не оседают.",
+      "sources": [
+        "earle_streams"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t01",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 13.3 Stream Erosion and Deposition",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/13-3-stream-erosion-and-deposition/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "The chapter footer explicitly licenses Physical Geology - 2nd Edition, Copyright 2019 Steven Earle, under CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Stream velocity and channel geometry",
+              "Transportation modes",
+              "Hjulstrom-Sundborg diagram",
+              "Natural levees"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t02",
+      "topic": "fluvial_transport",
+      "question": "Чем сальтация отличается от волочения донных частиц?",
+      "answer": "При сальтации частицы перемещаются скачками, при волочении — движутся вдоль дна под действием потока. Оба механизма относятся к переносу донного материала.",
+      "sources": [
+        "earle_streams"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t02",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 13.3 Stream Erosion and Deposition",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/13-3-stream-erosion-and-deposition/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "The chapter footer explicitly licenses Physical Geology - 2nd Edition, Copyright 2019 Steven Earle, under CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Stream velocity and channel geometry",
+              "Transportation modes",
+              "Hjulstrom-Sundborg diagram",
+              "Natural levees"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t03",
+      "topic": "fluvial_transport",
+      "question": "Почему порог начала размыва нельзя считать порогом осаждения?",
+      "answer": "Поднять лежащую частицу и удерживать уже движущуюся — разные задачи потока. Между порогами материал может переноситься без нового размыва дна.",
+      "sources": [
+        "earle_streams"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t03",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 13.3 Stream Erosion and Deposition",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/13-3-stream-erosion-and-deposition/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "The chapter footer explicitly licenses Physical Geology - 2nd Edition, Copyright 2019 Steven Earle, under CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Stream velocity and channel geometry",
+              "Transportation modes",
+              "Hjulstrom-Sundborg diagram",
+              "Natural levees"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t04",
+      "topic": "fluvial_transport",
+      "question": "Может ли река одновременно размывать и накапливать осадок?",
+      "answer": "Да: при одной скорости одни размерные фракции выносятся, другие осаждаются, а самые крупные остаются неподвижными. Поэтому запись «река размывает» не исключает локального накопления.",
+      "sources": [
+        "earle_streams"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t04",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 13.3 Stream Erosion and Deposition",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/13-3-stream-erosion-and-deposition/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "The chapter footer explicitly licenses Physical Geology - 2nd Edition, Copyright 2019 Steven Earle, under CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Stream velocity and channel geometry",
+              "Transportation modes",
+              "Hjulstrom-Sundborg diagram",
+              "Natural levees"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t05",
+      "topic": "fluvial_transport",
+      "question": "Откуда берётся осадок естественных прирусловых валов?",
+      "answer": "При выходе воды на пойму поток замедляется и теряет часть взвеси у русла. Более тонкий материал может переноситься дальше по пойме.",
+      "sources": [
+        "earle_streams"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t05",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 13.3 Stream Erosion and Deposition",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/13-3-stream-erosion-and-deposition/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "The chapter footer explicitly licenses Physical Geology - 2nd Edition, Copyright 2019 Steven Earle, under CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Stream velocity and channel geometry",
+              "Transportation modes",
+              "Hjulstrom-Sundborg diagram",
+              "Natural levees"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t06",
+      "topic": "terrigenous",
+      "question": "Одинаковы ли уплотнение осадка и цементация песчаника?",
+      "answer": "Уплотнение сближает частицы и уменьшает межзерновое пространство. Цементация связывает их минералами, кристаллизующимися в порах; это разные составляющие литификации.",
+      "sources": [
+        "earle_clastic"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t06",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.1 Clastic Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-1-clastic-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; Media Attributions separately identifies figure licences.",
+            "sections": [
+              "Transportation",
+              "Lithification and cementation",
+              "Grain composition and matrix"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t07",
+      "topic": "terrigenous",
+      "question": "Почему долю матрикса считают отдельно от состава песчаных зёрен?",
+      "answer": "Матрикс — более тонкий материал между крупными зёрнами. Состав песчаной фракции и содержание матрикса описывают разные части породы и не должны заменять друг друга.",
+      "sources": [
+        "earle_clastic"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t07",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.1 Clastic Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-1-clastic-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; Media Attributions separately identifies figure licences.",
+            "sections": [
+              "Transportation",
+              "Lithification and cementation",
+              "Grain composition and matrix"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t08",
+      "topic": "terrigenous",
+      "question": "Хорошая сортировка означает, что все зёрна состоят из кварца?",
+      "answer": "Нет, сортировка характеризует разброс размеров частиц. Минеральный состав определяется отдельно: одинаковые по размеру зёрна могут иметь разный состав.",
+      "sources": [
+        "earle_clastic"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t08",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.1 Clastic Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-1-clastic-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; Media Attributions separately identifies figure licences.",
+            "sections": [
+              "Transportation",
+              "Lithification and cementation",
+              "Grain composition and matrix"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t09",
+      "topic": "terrigenous",
+      "question": "Почему мелкий материал способен удаляться от места размыва дальше крупного?",
+      "answer": "Мелкие частицы медленнее оседают и дольше остаются во взвеси. Дальность переноса также зависит от движения воды, поэтому размер не задаёт единственное расстояние.",
+      "sources": [
+        "earle_clastic"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t09",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.1 Clastic Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-1-clastic-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; Media Attributions separately identifies figure licences.",
+            "sections": [
+              "Transportation",
+              "Lithification and cementation",
+              "Grain composition and matrix"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t10",
+      "topic": "terrigenous",
+      "question": "Можно ли считать каждый осевший песок будущим песчаником?",
+      "answer": "Нет, осадок может быть снова размыт до погребения. Для образования породы требуется сохранение накопления и последующая литификация.",
+      "sources": [
+        "earle_clastic",
+        "earle_environments"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t10",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.1 Clastic Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-1-clastic-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; Media Attributions separately identifies figure licences.",
+            "sections": [
+              "Transportation",
+              "Lithification and cementation",
+              "Grain composition and matrix"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          },
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.3 Depositional Environments and Sedimentary Basins",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-3-depositional-environments-and-sedimentary-basins/",
+            "license": "CC BY 4.0 for text; Figure 6.3.1 CC BY-SA is excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; the figure-specific attribution is kept separate and no figure is reproduced.",
+            "sections": [
+              "Table 6.4 terrestrial environments",
+              "Table 6.5 marine environments",
+              "Basin types"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t11",
+      "topic": "carbonates",
+      "question": "Химическое выветривание сразу создаёт химическую осадочную породу?",
+      "answer": "Нет, оно может лишь перевести компоненты в раствор. Осадок появляется позднее, когда минералы выделяются из раствора химическим или биологическим путём.",
+      "sources": [
+        "earle_chemical"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t11",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.2 Chemical Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-2-chemical-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Chemical weathering and chemical sedimentary rocks",
+              "Limestone",
+              "Chert",
+              "Evaporites"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t12",
+      "topic": "carbonates",
+      "question": "Может ли известняковый материал быть обломочным по форме частиц?",
+      "answer": "Да, волны и течения дробят карбонатные скелеты и переносят полученные обломки. Обломочная форма частиц совместима с карбонатным составом.",
+      "sources": [
+        "earle_chemical"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t12",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.2 Chemical Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-2-chemical-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Chemical weathering and chemical sedimentary rocks",
+              "Limestone",
+              "Chert",
+              "Evaporites"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t13",
+      "topic": "carbonates",
+      "question": "Известняки образуются только в морской воде?",
+      "answer": "Нет, карбонатный материал может осаждаться у источников и в пещерах. Травертин и известковый туф показывают, что карбонатная порода сама по себе не доказывает море.",
+      "sources": [
+        "earle_chemical"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t13",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.2 Chemical Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-2-chemical-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Chemical weathering and chemical sedimentary rocks",
+              "Limestone",
+              "Chert",
+              "Evaporites"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t14",
+      "topic": "carbonates",
+      "question": "Почему один карбонатный район может давать и крупные обломки, и известковый ил?",
+      "answer": "Разрушение скелетов создаёт частицы разных размеров, которые течения перераспределяют. Рядом могут накапливаться крупнообломочный материал и тонкий карбонатный осадок.",
+      "sources": [
+        "earle_chemical"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t14",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.2 Chemical Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-2-chemical-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Chemical weathering and chemical sedimentary rocks",
+              "Limestone",
+              "Chert",
+              "Evaporites"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t15",
+      "topic": "carbonates",
+      "question": "Кальцитовый цемент автоматически делает песчаник известняком?",
+      "answer": "Нет, название всей породы не определяется только цементом. Нужно учитывать основной каркас зёрен и соотношение карбонатных и других компонентов.",
+      "sources": [
+        "earle_clastic",
+        "earle_chemical"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t15",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.1 Clastic Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-1-clastic-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; Media Attributions separately identifies figure licences.",
+            "sections": [
+              "Transportation",
+              "Lithification and cementation",
+              "Grain composition and matrix"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          },
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.2 Chemical Sedimentary Rocks",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-2-chemical-sedimentary-rocks/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Chemical weathering and chemical sedimentary rocks",
+              "Limestone",
+              "Chert",
+              "Evaporites"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t16",
+      "topic": "structures",
+      "question": "Что может подчёркивать напластование, если крупность соседних слоёв похожа?",
+      "answer": "Слои могут различаться составом, цветом или характером выветривания; возможны и поверхности раздела. Размер зёрен — лишь один способ распознать напластование.",
+      "sources": [
+        "earle_structures"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t16",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.4 Sedimentary Structures and Fossils",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-4-sedimentary-structures-and-fossils/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Principle of inclusions",
+              "Bedding and partings",
+              "Cross-bedding",
+              "Graded bedding",
+              "Imbrication",
+              "Mud cracks"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t17",
+      "topic": "structures",
+      "question": "Как миграция ряби или дюны создаёт косые слойки?",
+      "answer": "Осадок откладывается на переднем склоне движущейся формы. Следующая форма может частично размыть предыдущую, оставляя набор наклонных слоек и поверхностей срезания.",
+      "sources": [
+        "earle_structures"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t17",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.4 Sedimentary Structures and Fossils",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-4-sedimentary-structures-and-fossils/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Principle of inclusions",
+              "Bedding and partings",
+              "Cross-bedding",
+              "Graded bedding",
+              "Imbrication",
+              "Mud cracks"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t18",
+      "topic": "structures",
+      "question": "Что означает имбрикация галек в описании осадка?",
+      "answer": "Так называют согласованное черепицеобразное положение наклонённых обломков. Это пространственная ориентировка, которую следует описывать отдельно от размера и состава галек.",
+      "sources": [
+        "earle_structures"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t18",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.4 Sedimentary Structures and Fossils",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-4-sedimentary-structures-and-fossils/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Principle of inclusions",
+              "Bedding and partings",
+              "Cross-bedding",
+              "Graded bedding",
+              "Imbrication",
+              "Mud cracks"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t19",
+      "topic": "structures",
+      "question": "Трещины усыхания обязательно означают древнюю пустыню?",
+      "answer": "Нет, глинистый осадок может высыхать в приливной зоне, пруду или небольшой луже. Признак указывает на высыхание поверхности, но не задаёт единственный климат.",
+      "sources": [
+        "earle_structures"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t19",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.4 Sedimentary Structures and Fossils",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-4-sedimentary-structures-and-fossils/",
+            "license": "CC BY 4.0; text only; separately credited media excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states the book is licensed CC BY 4.0 except where otherwise noted.",
+            "sections": [
+              "Principle of inclusions",
+              "Bedding and partings",
+              "Cross-bedding",
+              "Graded bedding",
+              "Imbrication",
+              "Mud cracks"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t20",
+      "topic": "environments",
+      "question": "Где в озере ожидаем песок, а где более тонкий материал?",
+      "answer": "Песок чаще накапливается у берегов и поступления потока. Алеврит, глина и органическое вещество могут накапливаться в более спокойных частях озёрного бассейна.",
+      "sources": [
+        "earle_environments"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t20",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.3 Depositional Environments and Sedimentary Basins",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-3-depositional-environments-and-sedimentary-basins/",
+            "license": "CC BY 4.0 for text; Figure 6.3.1 CC BY-SA is excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; the figure-specific attribution is kept separate and no figure is reproduced.",
+            "sections": [
+              "Table 6.4 terrestrial environments",
+              "Table 6.5 marine environments",
+              "Basin types"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t21",
+      "topic": "environments",
+      "question": "Гравий в морском разрезе исключает глубоководное накопление?",
+      "answer": "Нет, подводные гравитационные потоки способны доставлять грубый материал на склоны и подводные конусы выноса. Глубину нельзя определять только по максимальному размеру обломка.",
+      "sources": [
+        "earle_environments"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t21",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.3 Depositional Environments and Sedimentary Basins",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-3-depositional-environments-and-sedimentary-basins/",
+            "license": "CC BY 4.0 for text; Figure 6.3.1 CC BY-SA is excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; the figure-specific attribution is kept separate and no figure is reproduced.",
+            "sections": [
+              "Table 6.4 terrestrial environments",
+              "Table 6.5 marine environments",
+              "Basin types"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t22",
+      "topic": "environments",
+      "question": "Ледниковое накопление состоит только из валунов?",
+      "answer": "Нет, ледниковые системы включают материал от крупных обломков до песка, алеврита и глины. Важны также различия непосредственного ледникового и водного переноса.",
+      "sources": [
+        "earle_environments"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t22",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.3 Depositional Environments and Sedimentary Basins",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-3-depositional-environments-and-sedimentary-basins/",
+            "license": "CC BY 4.0 for text; Figure 6.3.1 CC BY-SA is excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; the figure-specific attribution is kept separate and no figure is reproduced.",
+            "sections": [
+              "Table 6.4 terrestrial environments",
+              "Table 6.5 marine environments",
+              "Basin types"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t23",
+      "topic": "environments",
+      "question": "Почему песок в дельте и на пляже нельзя различать одним названием породы?",
+      "answer": "Песок встречается в обеих обстановках. Для различения нужны сочетания структур, последовательность отложений и пространственный контекст.",
+      "sources": [
+        "earle_environments"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t23",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.3 Depositional Environments and Sedimentary Basins",
+            "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-3-depositional-environments-and-sedimentary-basins/",
+            "license": "CC BY 4.0 for text; Figure 6.3.1 CC BY-SA is excluded",
+            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_evidence": "Chapter footer states CC BY 4.0; the figure-specific attribution is kept separate and no figure is reproduced.",
+            "sections": [
+              "Table 6.4 terrestrial environments",
+              "Table 6.5 marine environments",
+              "Basin types"
+            ],
+            "attribution": "Adapted into short original Russian questions and answers from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t24",
+      "topic": "logging",
+      "question": "Граница секции керна обязательно завершает описательный интервал?",
+      "answer": "Нет, одинаковый по признакам интервал может продолжаться через границу секций. Техническое деление керна и изменение литологии фиксируют раздельно.",
+      "sources": [
+        "iodp398"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t24",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kutterolf et al. (2024), IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "license": "CC BY 4.0 except where otherwise noted; prose only, no third-party figures",
+            "license_url": "https://iodp.tamu.edu/scienceops/copyright.html",
+            "license_evidence": "Official IODP JRSO Copyright Statement licenses expedition photos and publications under CC BY 4.0 except where otherwise noted. The public 2024 methods chapter was inspected; no embargoed data used.",
+            "sections": [
+              "1.7 Drilling and handling core disturbance",
+              "2.1 GEODESC",
+              "2.4.1 Descriptive intervals",
+              "2.4.2 Lithostratigraphic units",
+              "2.5.1.1 Principal lithology",
+              "2.5.2.2 Monomictic versus polymictic",
+              "2.5.2.3 Clast-supported versus matrix-supported",
+              "2.5.2.5 Ooze versus calcareous mud",
+              "2.5.3.1 Structures"
+            ],
+            "attribution": "Adapted into original Russian theory QA from Kutterolf et al., Expedition 398 methods (2024), IODP/JRSO, DOI 10.14379/iodp.proc.398.102.2024, CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "prior_project_use": "This source was already present in theory_round2; these cards address other sections and are not claimed as a newly discovered source.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t25",
+      "topic": "logging",
+      "question": "Как различаются описания matrix-supported и clast-supported?",
+      "answer": "В первом случае крупные обломки разделены вмещающим материалом. Во втором они непосредственно контактируют; состав матрикса при этом указывают отдельно.",
+      "sources": [
+        "iodp398"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t25",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kutterolf et al. (2024), IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "license": "CC BY 4.0 except where otherwise noted; prose only, no third-party figures",
+            "license_url": "https://iodp.tamu.edu/scienceops/copyright.html",
+            "license_evidence": "Official IODP JRSO Copyright Statement licenses expedition photos and publications under CC BY 4.0 except where otherwise noted. The public 2024 methods chapter was inspected; no embargoed data used.",
+            "sections": [
+              "1.7 Drilling and handling core disturbance",
+              "2.1 GEODESC",
+              "2.4.1 Descriptive intervals",
+              "2.4.2 Lithostratigraphic units",
+              "2.5.1.1 Principal lithology",
+              "2.5.2.2 Monomictic versus polymictic",
+              "2.5.2.3 Clast-supported versus matrix-supported",
+              "2.5.2.5 Ooze versus calcareous mud",
+              "2.5.3.1 Structures"
+            ],
+            "attribution": "Adapted into original Russian theory QA from Kutterolf et al., Expedition 398 methods (2024), IODP/JRSO, DOI 10.14379/iodp.proc.398.102.2024, CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "prior_project_use": "This source was already present in theory_round2; these cards address other sections and are not claimed as a newly discovered source.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t26",
+      "topic": "logging",
+      "question": "Что значит «туфогенный» в классификации экспедиции IODP 398?",
+      "answer": "Это осадок с 25–75% вулканических частиц в принятой экспедицией схеме. Указывай методику: эти пороги не следует молча переносить на любой другой справочник.",
+      "sources": [
+        "iodp398"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t26",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kutterolf et al. (2024), IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "license": "CC BY 4.0 except where otherwise noted; prose only, no third-party figures",
+            "license_url": "https://iodp.tamu.edu/scienceops/copyright.html",
+            "license_evidence": "Official IODP JRSO Copyright Statement licenses expedition photos and publications under CC BY 4.0 except where otherwise noted. The public 2024 methods chapter was inspected; no embargoed data used.",
+            "sections": [
+              "1.7 Drilling and handling core disturbance",
+              "2.1 GEODESC",
+              "2.4.1 Descriptive intervals",
+              "2.4.2 Lithostratigraphic units",
+              "2.5.1.1 Principal lithology",
+              "2.5.2.2 Monomictic versus polymictic",
+              "2.5.2.3 Clast-supported versus matrix-supported",
+              "2.5.2.5 Ooze versus calcareous mud",
+              "2.5.3.1 Structures"
+            ],
+            "attribution": "Adapted into original Russian theory QA from Kutterolf et al., Expedition 398 methods (2024), IODP/JRSO, DOI 10.14379/iodp.proc.398.102.2024, CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "prior_project_use": "This source was already present in theory_round2; these cards address other sections and are not claimed as a newly discovered source.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t27",
+      "topic": "logging",
+      "question": "Какие свойства нижнего контакта слоя нельзя объединять в одно слово?",
+      "answer": "Раздельно описывают геометрию, резкость границы и её ориентировку. Например, плоский контакт может быть как резким, так и постепенным.",
+      "sources": [
+        "iodp398"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t27",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kutterolf et al. (2024), IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "license": "CC BY 4.0 except where otherwise noted; prose only, no third-party figures",
+            "license_url": "https://iodp.tamu.edu/scienceops/copyright.html",
+            "license_evidence": "Official IODP JRSO Copyright Statement licenses expedition photos and publications under CC BY 4.0 except where otherwise noted. The public 2024 methods chapter was inspected; no embargoed data used.",
+            "sections": [
+              "1.7 Drilling and handling core disturbance",
+              "2.1 GEODESC",
+              "2.4.1 Descriptive intervals",
+              "2.4.2 Lithostratigraphic units",
+              "2.5.1.1 Principal lithology",
+              "2.5.2.2 Monomictic versus polymictic",
+              "2.5.2.3 Clast-supported versus matrix-supported",
+              "2.5.2.5 Ooze versus calcareous mud",
+              "2.5.3.1 Structures"
+            ],
+            "attribution": "Adapted into original Russian theory QA from Kutterolf et al., Expedition 398 methods (2024), IODP/JRSO, DOI 10.14379/iodp.proc.398.102.2024, CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "prior_project_use": "This source was already present in theory_round2; these cards address other sections and are not claimed as a newly discovered source.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t28",
+      "topic": "drilling",
+      "question": "Откуда в нижней части мягкого керна может появиться затёк осадка?",
+      "answer": "Работа поршневого пробоотборника может вызвать разжижение и втягивание материала. Такой flow-in отмечают как нарушение отбора, а не автоматически как первичный осадочный слой.",
+      "sources": [
+        "iodp398"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t28",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kutterolf et al. (2024), IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "license": "CC BY 4.0 except where otherwise noted; prose only, no third-party figures",
+            "license_url": "https://iodp.tamu.edu/scienceops/copyright.html",
+            "license_evidence": "Official IODP JRSO Copyright Statement licenses expedition photos and publications under CC BY 4.0 except where otherwise noted. The public 2024 methods chapter was inspected; no embargoed data used.",
+            "sections": [
+              "1.7 Drilling and handling core disturbance",
+              "2.1 GEODESC",
+              "2.4.1 Descriptive intervals",
+              "2.4.2 Lithostratigraphic units",
+              "2.5.1.1 Principal lithology",
+              "2.5.2.2 Monomictic versus polymictic",
+              "2.5.2.3 Clast-supported versus matrix-supported",
+              "2.5.2.5 Ooze versus calcareous mud",
+              "2.5.3.1 Structures"
+            ],
+            "attribution": "Adapted into original Russian theory QA from Kutterolf et al., Expedition 398 methods (2024), IODP/JRSO, DOI 10.14379/iodp.proc.398.102.2024, CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "prior_project_use": "This source was already present in theory_round2; these cards address other sections and are not claimed as a newly discovered source.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t29",
+      "topic": "drilling",
+      "question": "Почему соседние куски керна могут иметь разный поворот слоистости?",
+      "answer": "Вращательное бурение способно повернуть куски относительно друг друга. Разницу ориентировки сначала проверяют на нарушение отбора, прежде чем связывать её с природной складкой.",
+      "sources": [
+        "iodp398"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t29",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kutterolf et al. (2024), IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "license": "CC BY 4.0 except where otherwise noted; prose only, no third-party figures",
+            "license_url": "https://iodp.tamu.edu/scienceops/copyright.html",
+            "license_evidence": "Official IODP JRSO Copyright Statement licenses expedition photos and publications under CC BY 4.0 except where otherwise noted. The public 2024 methods chapter was inspected; no embargoed data used.",
+            "sections": [
+              "1.7 Drilling and handling core disturbance",
+              "2.1 GEODESC",
+              "2.4.1 Descriptive intervals",
+              "2.4.2 Lithostratigraphic units",
+              "2.5.1.1 Principal lithology",
+              "2.5.2.2 Monomictic versus polymictic",
+              "2.5.2.3 Clast-supported versus matrix-supported",
+              "2.5.2.5 Ooze versus calcareous mud",
+              "2.5.3.1 Structures"
+            ],
+            "attribution": "Adapted into original Russian theory QA from Kutterolf et al., Expedition 398 methods (2024), IODP/JRSO, DOI 10.14379/iodp.proc.398.102.2024, CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "prior_project_use": "This source was already present in theory_round2; these cards address other sections and are not claimed as a newly discovered source.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t30",
+      "topic": "drilling",
+      "question": "Почему газонасыщенный мягкий керн может раздвигаться после подъёма?",
+      "answer": "При снижении давления растворённый газ выделяется и раздвигает материал в трубке. Полученные промежутки нельзя без проверки считать исходной мощностью природных пустот.",
+      "sources": [
+        "iodp398"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t30",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Kutterolf et al. (2024), IODP Expedition 398 methods",
+            "url": "https://publications.iodp.org/proceedings/398/102/398_102.html",
+            "license": "CC BY 4.0 except where otherwise noted; prose only, no third-party figures",
+            "license_url": "https://iodp.tamu.edu/scienceops/copyright.html",
+            "license_evidence": "Official IODP JRSO Copyright Statement licenses expedition photos and publications under CC BY 4.0 except where otherwise noted. The public 2024 methods chapter was inspected; no embargoed data used.",
+            "sections": [
+              "1.7 Drilling and handling core disturbance",
+              "2.1 GEODESC",
+              "2.4.1 Descriptive intervals",
+              "2.4.2 Lithostratigraphic units",
+              "2.5.1.1 Principal lithology",
+              "2.5.2.2 Monomictic versus polymictic",
+              "2.5.2.3 Clast-supported versus matrix-supported",
+              "2.5.2.5 Ooze versus calcareous mud",
+              "2.5.3.1 Structures"
+            ],
+            "attribution": "Adapted into original Russian theory QA from Kutterolf et al., Expedition 398 methods (2024), IODP/JRSO, DOI 10.14379/iodp.proc.398.102.2024, CC BY 4.0. Changes: translation, condensation, application scenarios.",
+            "prior_project_use": "This source was already present in theory_round2; these cards address other sections and are not claimed as a newly discovered source.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t31",
+      "topic": "bioturbation",
+      "question": "Как USGS OFR 01-107 проверял биотурбацию помимо первичного осмотра распила?",
+      "answer": "Поверхность дополнительно сглаживали и осматривали, а для части кернов использовали рентгенограммы. Отсутствие явного рисунка на одном снимке не равно отсутствию внутренних структур.",
+      "sources": [
+        "usgs_monterey"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t31",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Orzech, Dahl and Edwards (2001), Core Descriptions, Core Photographs, Physical Property Logs and Surface Textural Data of Sediment Cores, USGS Open-File Report 01-107",
+            "url": "https://pubs.usgs.gov/of/2001/0107/pdf/maintext.pdf",
+            "license": "USGS-authored information: U.S. public domain; exclude separately copyrighted third-party material",
+            "license_url": "https://www.usgs.gov/faqs/are-usgs-reportspublications-copyrighted?qt-news_science_products=0",
+            "license_evidence": "Official USGS policy permits free use of USGS-authored information with source credit and warns about separately credited third-party items. Only the report's Visual Descriptions prose was used; no photographs or commercial Munsell charts reproduced.",
+            "sections": [
+              "Visual Descriptions, printed page 13"
+            ],
+            "attribution": "Source: U.S. Geological Survey, Orzech, Dahl and Edwards (2001), Open-File Report 01-107. Short original Russian paraphrases of method descriptions.",
+            "access_note": "Official report excerpt was inspected through the web search index. Direct opening returned HTTP 403 during this session; no access controls were bypassed.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t32",
+      "topic": "bioturbation",
+      "question": "Что значила категория Common в оценке биотурбации USGS OFR 01-107?",
+      "answer": "В этом отчёте Common соответствовала 30–60% видимо нарушенного осадка. Это категория конкретной методики, а не универсальный номер ихнофабричного индекса.",
+      "sources": [
+        "usgs_monterey"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t32",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Orzech, Dahl and Edwards (2001), Core Descriptions, Core Photographs, Physical Property Logs and Surface Textural Data of Sediment Cores, USGS Open-File Report 01-107",
+            "url": "https://pubs.usgs.gov/of/2001/0107/pdf/maintext.pdf",
+            "license": "USGS-authored information: U.S. public domain; exclude separately copyrighted third-party material",
+            "license_url": "https://www.usgs.gov/faqs/are-usgs-reportspublications-copyrighted?qt-news_science_products=0",
+            "license_evidence": "Official USGS policy permits free use of USGS-authored information with source credit and warns about separately credited third-party items. Only the report's Visual Descriptions prose was used; no photographs or commercial Munsell charts reproduced.",
+            "sections": [
+              "Visual Descriptions, printed page 13"
+            ],
+            "attribution": "Source: U.S. Geological Survey, Orzech, Dahl and Edwards (2001), Open-File Report 01-107. Short original Russian paraphrases of method descriptions.",
+            "access_note": "Official report excerpt was inspected through the web search index. Direct opening returned HTTP 403 during this session; no access controls were bypassed.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v6_t33",
+      "topic": "method",
+      "question": "Визуальная сортировка по лупе равна лабораторному гранулометрическому распределению?",
+      "answer": "Нет, визуальное описание — оценка выбранного образца. В USGS OFR 01-107 её прямо отделяли от подробных измерений текстуры и не определяли для части глинистых осадков.",
+      "sources": [
+        "usgs_monterey"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "reference_scope": "general_theory",
+        "origin_manifest": "vlm_source/theory_round4/new_source_cards.json",
+        "origin_manifest_sha256": "0f0aebbaae8bafb122f4c0e63b3dd350eb400d4266d17ca9ced15a765e1398bd",
+        "origin_record_id": "v6_t33",
+        "origin_source_group": "theory_sources_20261027",
+        "origin_split": "train",
+        "origin_record_type": "text_only_knowledge",
+        "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+        "geology_approved": false,
+        "source_evidence": [
+          {
+            "title": "Orzech, Dahl and Edwards (2001), Core Descriptions, Core Photographs, Physical Property Logs and Surface Textural Data of Sediment Cores, USGS Open-File Report 01-107",
+            "url": "https://pubs.usgs.gov/of/2001/0107/pdf/maintext.pdf",
+            "license": "USGS-authored information: U.S. public domain; exclude separately copyrighted third-party material",
+            "license_url": "https://www.usgs.gov/faqs/are-usgs-reportspublications-copyrighted?qt-news_science_products=0",
+            "license_evidence": "Official USGS policy permits free use of USGS-authored information with source credit and warns about separately credited third-party items. Only the report's Visual Descriptions prose was used; no photographs or commercial Munsell charts reproduced.",
+            "sections": [
+              "Visual Descriptions, printed page 13"
+            ],
+            "attribution": "Source: U.S. Geological Survey, Orzech, Dahl and Edwards (2001), Open-File Report 01-107. Short original Russian paraphrases of method descriptions.",
+            "access_note": "Official report excerpt was inspected through the web search index. Direct opening returned HTTP 403 during this session; no access controls were bypassed.",
+            "source_checked_date": "2026-10-27"
+          }
+        ]
+      }
+    }
+  ]
+}

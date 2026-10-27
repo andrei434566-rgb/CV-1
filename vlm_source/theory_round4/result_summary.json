@@ -1,0 +1,162 @@
+{
+  "schema": "qwen_theory_round4_result_v1",
+  "date": "2026-10-27",
+  "status": "trained_evaluated_rejected_for_general_assistant",
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_snapshot": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "model_source_fingerprint": {
+    "algorithm": "sha256",
+    "digest": "2cdd8c6ae57793d9192ad471bfdd0758d03b4e36596c4e92e389580ffca34478",
+    "files": {
+      "chat_template.json": "6f8a6a55027e3da5160105556cda5dd69f6423f1c32645f6730d32de7773d0c4",
+      "config.json": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+      "generation_config.json": "1e241830b48b397cb0900101421df5450baddc7adf01e5fc86b5615865f3bae4",
+      "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+      "model.safetensors": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+      "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "tokenizer.json": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7",
+      "tokenizer_config.json": "c2da771801886ad9ae98181793ffd3dfb7f1af30f6f7c6a4e15d7dbba52e2399",
+      "video_preprocessor_config.json": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    }
+  },
+  "data": {
+    "training_rows": 325,
+    "theory_training_rows": 265,
+    "conversation_training_rows": 60,
+    "new_source_checked_training_cards": 33,
+    "new_validation_scenarios": 8,
+    "theory_validation": 12,
+    "conversation_validation": 4,
+    "image_regression": 8,
+    "new_image_labels": 0,
+    "geologist_reviewed": false,
+    "manifest_sha256": {
+      "mixed.jsonl": "c92e873cf53c3077ac1d2f3be92ed035a694acb5137e5e6dda44e754fbf0166c",
+      "holdout_theory.jsonl": "a401d727950a91660ebe35a17adc3cb125ae1420a4c1c36bd4c2b560a05f8b48",
+      "holdout_conversation.jsonl": "6d5a00a5b1f315e05e91dd7a23cd2a06f7146beebc7ccdda95b880a9f6281ccf",
+      "val_visual.jsonl": "3ae3f14470ad90bb5ae3da26a9ccc5d7bb4c28cef8696e90b5ff765e02d53986",
+      "system_prompt.txt": "478a02ce9aab00bc0b7ef6ec574a78e653e51e9162f65020a8e3438e78b0e0bb",
+      "sources.json": "ff499984c6a1353b0c4bca2a9ad89097422db4e009bca50db0e8a817151f4678"
+    }
+  },
+  "recipe": {
+    "epochs": 2,
+    "learning_rate": 2e-05,
+    "seed": 20261027,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "targets": "all-text-linear; frozen visual encoder",
+    "batch_size": 1,
+    "gradient_accumulation": 4,
+    "precision": "FP16",
+    "generation_max_new_tokens_theory": 200,
+    "generation_max_new_tokens_image": 24,
+    "network_disabled_during_training": true
+  },
+  "training": {
+    "train_runtime": 540.3161,
+    "train_samples_per_second": 1.203,
+    "train_steps_per_second": 0.304,
+    "train_loss": 2.1257175003610005,
+    "epoch": 2.0
+  },
+  "preflight": {
+    "checked_rows": 325,
+    "max_observed_tokens": 513,
+    "max_sequence_tokens": 1024,
+    "truncated_rows": 0
+  },
+  "adapter": {
+    "file": "../vlm_core_v1/outputs/core_vlm_theory_round4_20261027_lora/adapter/adapter_model.safetensors",
+    "bytes": 34922600,
+    "sha256": "d3fabcf42dee86a2c6427d31f6f4783825c6eee411e53e6c9286d101664766c6"
+  },
+  "theory_qualitative_categories": {
+    "baseline": {
+      "incorrect": 8,
+      "correct": 1,
+      "partial": 2,
+      "uncertain": 1
+    },
+    "candidate": {
+      "incorrect": 8,
+      "correct": 1,
+      "partial": 3
+    }
+  },
+  "dialogue_qualitative_categories": {
+    "baseline": {
+      "correct": 4
+    },
+    "candidate": {
+      "correct": 3,
+      "incorrect": 1
+    }
+  },
+  "theory_token_limit_truncations": {
+    "baseline": 10,
+    "candidate": 0
+  },
+  "source_class_image_guard": {
+    "baseline": {
+      "dcid": {
+        "rows": 4,
+        "correct": 1,
+        "unknown_output": 2,
+        "truncated": 0
+      },
+      "mendeley": {
+        "rows": 4,
+        "correct": 1,
+        "unknown_output": 1,
+        "truncated": 0
+      }
+    },
+    "candidate": {
+      "dcid": {
+        "rows": 4,
+        "correct": 2,
+        "unknown_output": 0,
+        "truncated": 0
+      },
+      "mendeley": {
+        "rows": 4,
+        "correct": 1,
+        "unknown_output": 2,
+        "truncated": 0
+      }
+    }
+  },
+  "review": {
+    "method": "A/B responses independently randomized per question; assistant reviewer did not read key; second assistant checked major factual errors",
+    "geologist_reviewed": false,
+    "geology_accuracy": null,
+    "rubric_counts_are_accuracy": false,
+    "raw_responses_preserved": true,
+    "recipe_selected_before_this_run": true,
+    "prepared_test_split_used": false
+  },
+  "reason_codes": [
+    "major_geological_errors",
+    "gratitude_regression",
+    "insufficient_visual_quality"
+  ],
+  "observed_failures": [
+    "Conglomerate/breccia contrast still misses clast roundness",
+    "Shale/mudstone contrast still misses fissility",
+    "Coal and carbonate mudstone descriptions include invented diagnostic properties",
+    "Polymictic and rift-basin terms remain incorrect",
+    "One answer fails to acknowledge ordinary thanks"
+  ],
+  "installed_in_application": false,
+  "application_reference_change": "33 source-checked train cards delivered separately as exact-match offline reference; no validation answers shipped",
+  "limitations": [
+    "Small development/regression subsets, not independent wells or an expert final exam",
+    "New scenarios overlap training concepts/sources; old guards were repeatedly used in development",
+    "Text-only training does not establish photo descriptions or facies accuracy",
+    "Lower loss and fewer token-limit truncations do not establish geological correctness"
+  ],
+  "base_config_sha256": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b"
+}

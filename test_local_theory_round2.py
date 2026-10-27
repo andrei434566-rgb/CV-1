@@ -48,7 +48,9 @@ class LocalTheoryRound2Tests(unittest.TestCase):
             with self.subTest(record_id=row["metadata"]["record_id"]):
                 self.assertEqual(lookup.lookup_theory_answer(question, BASE), answer)
         loaded = lookup._load_cards(str(BASE))
-        self.assertEqual(len(loaded["cards"]), 175)
+        established_ids = {card["id"] for card in [*self.base["cards"], *self.supplement["cards"]]}
+        self.assertEqual(len(established_ids), 175)
+        self.assertTrue(established_ids.issubset({card["id"] for card in loaded["cards"]}))
 
     def test_supplement_has_no_holdout_case_study_or_invented_aliases(self):
         expected = {row["metadata"]["record_id"] for row in self.source_rows}

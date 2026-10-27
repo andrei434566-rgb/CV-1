@@ -1,0 +1,17 @@
+{
+  "schema": "qwen_acceptance_review_v1",
+  "reviewed_date": "2026-10-27",
+  "status": "rejected_for_general_assistant",
+  "geologist_approved": false,
+  "installed_in_application": false,
+  "reason_codes": [
+    "major_geological_errors",
+    "gratitude_regression",
+    "insufficient_visual_quality"
+  ],
+  "raw_metrics_preserved": true,
+  "geology_accuracy": null,
+  "qualitative_review": "QUALITATIVE_REVIEW.json",
+  "candidate_theory_truncated": 0,
+  "review_scope": "12 theory questions, 4 dialogue guards, 8 source-class image guards"
+}

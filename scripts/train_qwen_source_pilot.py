@@ -38,6 +38,52 @@ def _deny_network(event, args):
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from scripts.prepare_qwen_turbo_local import source_fingerprint
+
+
+def select_lora_targets(named_modules, recipe: str = "qv") -> list[str]:
+    """Choose exact language-module paths without adapting the vision tower."""
+    recipes = {
+        "qv": {"q_proj", "v_proj"},
+        "all-text-linear": {"q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"},
+    }
+    if recipe not in recipes:
+        raise ValueError(f"Unknown LoRA target recipe: {recipe}")
+    targets = []
+    for name, _module in named_modules:
+        parts = name.split(".")
+        if ("language_model" in parts and parts[-1] in recipes[recipe]
+                and not {"visual", "vision_model", "vision_encoder", "vision_tower"}.intersection(parts)):
+            targets.append(name)
+    if not targets:
+        raise ValueError(f"No language-only targets found for {recipe}; refusing implicit visual LoRA")
+    return targets
+
+
+def validate_training_tokens(full_ids: list[int], prompt_ids: list[int], labels: list[int], *,
+                             max_sequence_tokens: int, identity: str) -> dict:
+    """Reject invalid/oversize supervision; never silently truncate targets."""
+    if max_sequence_tokens <= 0:
+        raise ValueError("max_sequence_tokens must be positive")
+    size, prefix_size = len(full_ids), len(prompt_ids)
+    if size > max_sequence_tokens:
+        raise ValueError(f"Training sequence exceeds {max_sequence_tokens} tokens ({size}): {identity}")
+    if not prompt_ids or full_ids[:prefix_size] != prompt_ids:
+        raise ValueError(f"Chat template token prefix mismatch: {identity}")
+    if len(labels) != size:
+        raise ValueError(f"Label/token length mismatch: {identity}")
+    if any(value != -100 for value in labels[:prefix_size]):
+        raise ValueError(f"Prompt tokens must be masked from loss: {identity}")
+    supervised = sum(value != -100 for value in labels)
+    if not supervised:
+        raise ValueError(f"No supervised assistant tokens: {identity}")
+    if any(label != -100 and label != token for label, token in zip(labels, full_ids)):
+        raise ValueError(f"Supervised labels differ from assistant tokens: {identity}")
+    if labels[-1] == -100:
+        raise ValueError(f"Final assistant token is not supervised: {identity}")
+    return {"sequence_tokens": size, "prompt_tokens": prefix_size,
+            "supervised_tokens": supervised, "final_token_supervised": True}
+
 
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -170,7 +216,7 @@ def load_reusable_baseline(folder: Path, settings: dict, eval_rows: list[dict]) 
     config_path = folder / "run_config.json"
     responses_path = folder / "baseline_responses.jsonl"
     previous = json.loads(config_path.read_text(encoding="utf-8-sig"))
-    fields = ("schema", "model", "model_config_sha256", "max_image_side", "seed", "generation",
+    fields = ("schema", "model", "model_config_sha256", "model_source_fingerprint", "max_image_side", "seed", "generation",
               "theory_evaluated_ids", "image_validation_rows", "torch", "transformers", "peft", "cuda")
     for field in fields:
         if previous.get(field) != settings.get(field):
@@ -282,6 +328,10 @@ def main() -> None:
     parser.add_argument("--epochs", type=float, default=1.0)
     parser.add_argument("--learning-rate", type=float, default=5e-5)
     parser.add_argument("--max-image-side", type=int, default=280)
+    parser.add_argument("--lora-targets", choices=("qv", "all-text-linear"), default="qv",
+                        help="Language-only LoRA recipe; qv preserves the original pilot targets")
+    parser.add_argument("--max-sequence-tokens", type=int, default=1024,
+                        help="Reject longer training sequences without truncation, including visual tokens")
     parser.add_argument("--theory-limit", type=int, default=8)
     parser.add_argument("--theory-max-new-tokens", type=int, default=260)
     parser.add_argument("--classification-max-new-tokens", type=int, default=24)
@@ -293,7 +343,7 @@ def main() -> None:
         raise FileExistsError(f"Refusing to overwrite an existing run: {args.output_dir}")
     if not (args.model / "config.json").is_file():
         raise FileNotFoundError("A complete local Qwen3-VL model folder is required")
-    if args.epochs <= 0 or args.learning_rate <= 0 or args.max_image_side < 56:
+    if args.epochs <= 0 or args.learning_rate <= 0 or args.max_image_side < 56 or args.max_sequence_tokens <= 0:
         raise ValueError("Invalid training parameters")
     train_rows = read_records(args.manifest, training=True)
     image_eval = read_records(args.eval_manifest, training=False)
@@ -350,12 +400,14 @@ def main() -> None:
         settings = {
             "schema": "qwen_source_pilot_v1", "status": "running", "network_disabled": True,
             "model": str(args.model.resolve()), "model_config_sha256": sha256(args.model / "config.json"),
+            "model_source_fingerprint": source_fingerprint(args.model),
             "manifests": manifest_info, "train_rows": len(train_rows), "image_validation_rows": len(image_eval),
             "theory_validation_rows_total": len(all_theory), "theory_evaluated_ids": [record_id(row) for row in theory_eval],
             "theory_selection": "seed42 topic round robin, identical before and after; qualitative inspection only",
             "seed": args.seed, "epochs": args.epochs, "learning_rate": args.learning_rate,
             "max_image_side": args.max_image_side, "batch_size": 1, "gradient_accumulation": 4,
             "lora_rank": 8, "lora_alpha": 16, "lora_dropout": 0.05,
+            "lora_targets_recipe": args.lora_targets, "max_sequence_tokens": args.max_sequence_tokens,
             "torch": torch.__version__, "transformers": transformers.__version__, "peft": peft.__version__,
             "cuda": torch.version.cuda, "gpu": torch.cuda.get_device_name(0),
             "generation": {"do_sample": False, "repetition_penalty": 1.05,
@@ -375,11 +427,8 @@ def main() -> None:
             shutil.copyfile(args.reuse_baseline_dir / "baseline_responses.jsonl", args.output_dir / "baseline_responses.jsonl")
             (args.output_dir / "run_config.json").write_text(json.dumps(settings, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             progress("baseline_reuse_validated", **reuse)
-        progress("loading_model", model=str(args.model), train_rows=len(train_rows), validation_rows=len(eval_rows))
+        progress("loading_processor", model=str(args.model), train_rows=len(train_rows), validation_rows=len(eval_rows))
         processor = AutoProcessor.from_pretrained(str(args.model), local_files_only=True)
-        model = Qwen3VLForConditionalGeneration.from_pretrained(
-            str(args.model), dtype=torch.float16, attn_implementation="sdpa", local_files_only=True,
-        ).to("cuda")
 
         def messages(row, *, target=False):
             question = row["conversations"][0]["value"].replace("<image>", "", 1).strip()
@@ -407,26 +456,37 @@ def main() -> None:
                 full = encode(row, target=True)
                 prompt = encode(row)
                 prefix_size = prompt["input_ids"].shape[1]
-                if not torch.equal(full["input_ids"][:, :prefix_size], prompt["input_ids"]):
-                    raise ValueError(f"Chat template token prefix mismatch: {record_id(row)}")
                 labels = full["input_ids"].clone()
                 labels[:, :prefix_size] = -100
                 labels[full["attention_mask"] == 0] = -100
-                if not torch.any(labels != -100):
-                    raise ValueError(f"No supervised assistant tokens: {record_id(row)}")
+                validate_training_tokens(full["input_ids"][0].tolist(), prompt["input_ids"][0].tolist(),
+                                         labels[0].tolist(), max_sequence_tokens=args.max_sequence_tokens,
+                                         identity=record_id(row))
                 full["labels"] = labels
                 return {key: value.squeeze(0) if key in {"input_ids", "attention_mask", "labels"} else value
                         for key, value in full.items()}
 
         dataset = CheckedDataset(train_rows, processor, args.max_image_side, system_prompt)
-        # Preflight each modality, including explicit terminal token supervision.
-        for kind in (False, True):
-            index = next((i for i, row in enumerate(train_rows) if bool(row.get("image")) == kind), None)
-            if index is not None:
-                item = dataset[index]
-                progress("training_preflight", modality="image" if kind else "text", record_id=record_id(train_rows[index]),
-                         supervised_tokens=int((item["labels"] != -100).sum()),
-                         final_token_supervised=bool(item["labels"][-1] != -100))
+        # Check every row before model allocation, baseline generation or training.
+        max_observed_tokens = 0
+        for index, row in enumerate(train_rows):
+            item = dataset[index]
+            size = int(item["input_ids"].shape[-1])
+            max_observed_tokens = max(max_observed_tokens, size)
+            progress("training_preflight", index=index + 1, total=len(train_rows),
+                     modality="image" if row.get("image") else "text", record_id=record_id(row),
+                     sequence_tokens=size, supervised_tokens=int((item["labels"] != -100).sum()),
+                     final_token_supervised=bool(item["labels"][-1] != -100))
+            del item
+        settings["training_preflight"] = {"checked_rows": len(train_rows), "max_observed_tokens": max_observed_tokens,
+                                          "max_sequence_tokens": args.max_sequence_tokens, "truncated_rows": 0}
+        progress("loading_model", model=str(args.model), train_rows=len(train_rows), validation_rows=len(eval_rows))
+        model = Qwen3VLForConditionalGeneration.from_pretrained(
+            str(args.model), dtype=torch.float16, attn_implementation="sdpa", local_files_only=True,
+        ).to("cuda")
+        targets = select_lora_targets(model.named_modules(), args.lora_targets)
+        settings["target_modules"] = targets
+        (args.output_dir / "run_config.json").write_text(json.dumps(settings, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
         def evaluate(stage):
             model.eval()
@@ -473,16 +533,13 @@ def main() -> None:
             baseline_metrics["reuse_provenance"] = settings["baseline_reuse"]
             (args.output_dir / "baseline_metrics.json").write_text(json.dumps(baseline_metrics, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             progress("evaluation_finished", stage="baseline", reused=True, metrics=baseline_metrics)
-        targets = [name for name, _module in model.named_modules()
-                   if "language_model" in name and name.endswith((".q_proj", ".v_proj"))]
-        if not targets:
-            raise ValueError("No language-only q_proj/v_proj targets found; refusing implicit visual LoRA")
         model = get_peft_model(model, LoraConfig(r=8, lora_alpha=16, lora_dropout=0.05,
                                                 target_modules=targets, bias="none", task_type="CAUSAL_LM"))
         model.config.use_cache = False
         model.print_trainable_parameters()
         trainable = sum(param.numel() for param in model.parameters() if param.requires_grad)
-        progress("training_started", trainable_parameters=trainable, target_modules=targets)
+        progress("training_started", trainable_parameters=trainable, target_modules=targets,
+                 lora_targets_recipe=args.lora_targets, lora_rank=8, lora_alpha=16, lora_dropout=0.05)
 
         class LogCallback(TrainerCallback):
             def on_log(self, arguments, state, control, logs=None, **kwargs):

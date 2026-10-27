@@ -1,0 +1,2 @@
+# Keep source-card evidence byte-identical across Windows and Linux checkouts.
+/vlm_source/theory_round4/new_source_cards.json text eol=lf
