@@ -1,0 +1,13 @@
+{
+  "schema": "qwen_acceptance_review_v1",
+  "status": "rejected_for_general_assistant",
+  "reason": "На малой слепой проверке ответы стали полнее, но надёжного улучшения геологических рассуждений не показано; обнаружены ошибки в базовых определениях и ухудшение контрольной классификации изображений. Требуются проверенные геологом примеры и отдельная проверка на скважинах.",
+  "reason_codes": [
+    "conceptual_geology_errors",
+    "image_guard_regression"
+  ],
+  "geologist_approved": false,
+  "installed_in_application": false,
+  "geology_accuracy": null,
+  "review_scope": "11 formal and 1 exploratory facies scenarios; 4 geology, 4 dialogue, 8 image-class guards"
+}

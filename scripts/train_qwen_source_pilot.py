@@ -42,7 +42,7 @@ from scripts.prepare_qwen_turbo_local import source_fingerprint
 
 
 def sft_supervised_token_loss(model, inputs: dict, *, num_items_in_batch=None):
-    """Causal CE only at supervised positions; preserves HF token weighting.
+    """Causal CE only at supervised positions; preserves HF loss weighting.
 
     Qwen's ``logits_to_keep`` selects hidden positions before the vocabulary
     projection.  Label j is predicted from hidden position j-1. This avoids
@@ -50,6 +50,8 @@ def sft_supervised_token_loss(model, inputs: dict, *, num_items_in_batch=None):
     or any supervised answer/EOS tokens. ``num_items_in_batch`` is the total
     supervised-token count across gradient-accumulation microbatches, as in
     Transformers' ForCausalLMLoss; when absent the loss is a token mean.
+    The current Qwen3-VL Trainer supplies no count, so its usual accumulation
+    averages these per-microbatch means instead of globally weighting tokens.
     """
     import torch
     import torch.nn.functional as functional
@@ -709,17 +711,27 @@ def main() -> None:
                           data_collator=collator,
                           processing_class=processor, callbacks=[LogCallback()])
         train_result = trainer.train()
-        if args.offload_text_only_vision:
-            if not trainer.vision_offloaded:
-                raise RuntimeError("Expected visual encoder offload did not occur")
-            self_visual = trainer.accelerator.unwrap_model(model).get_base_model().model.visual
-            self_visual.to("cuda")
-            progress("vision_restored", device="cuda", reason="image validation")
         adapter_dir = args.output_dir / "adapter"
         trainer.save_model(str(adapter_dir))
         processor.save_pretrained(str(adapter_dir))
         model.gradient_checkpointing_disable()
         progress("adapter_saved", path=str(adapter_dir), training_metrics=train_result.metrics)
+        if args.offload_text_only_vision:
+            if not trainer.vision_offloaded:
+                raise RuntimeError("Expected visual encoder offload did not occur")
+            # The PEFT weights above are now durable.  The next stage is
+            # inference only: release accumulated gradients and Adam moments
+            # before bringing the frozen vision tower back onto the GPU.
+            # Training cannot be resumed from this inference-only state.
+            model.zero_grad(set_to_none=True)
+            if trainer.optimizer is not None:
+                trainer.optimizer.state.clear()
+            torch.cuda.empty_cache()
+            progress("training_memory_released", gradients=True, optimizer_state=True,
+                     reason="training finished; candidate image evaluation only")
+            self_visual = trainer.accelerator.unwrap_model(model).get_base_model().model.visual
+            self_visual.to("cuda")
+            progress("vision_restored", device="cuda", reason="image validation")
         candidate_metrics = evaluate("candidate")
         metrics = {
             **settings, "status": "candidate_requires_geological_validation", "adapter": str(adapter_dir.resolve()),

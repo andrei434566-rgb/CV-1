@@ -1,0 +1,327 @@
+{
+  "reviewer": "Codex; blinded qualitative review, no geologist validation",
+  "rows": [
+    {
+      "record_id": "source_pilot_friendly_holdout_01",
+      "A": {
+        "category": "correct",
+        "completed": true,
+        "reason": "Отвечает на вопрос прямо.",
+        "flags": []
+      },
+      "B": {
+        "category": "correct",
+        "completed": true,
+        "reason": "Отвечает на вопрос прямо.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-10__new_facies_reasoning",
+      "A": {
+        "category": "incorrect",
+        "completed": false,
+        "reason": "Упоминает турбидит и озеро, но добавляет необоснованную биотурбацию и вулканизм; ответ оборван.",
+        "flags": [
+          "truncated"
+        ]
+      },
+      "B": {
+        "category": "partial",
+        "completed": true,
+        "reason": "Слой увязан с турбидитом и отвергнута обязательная морская среда, но не сохранён прямо озёрный контекст; формулировка слишком определённая.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-03__new_facies_reasoning",
+      "A": {
+        "category": "incorrect",
+        "completed": false,
+        "reason": "Отсутствие подошвы ошибочно трактуется как отсутствие транспортировки; ответ оборван.",
+        "flags": [
+          "truncated"
+        ]
+      },
+      "B": {
+        "category": "partial",
+        "completed": true,
+        "reason": "Связывает косую слоистость с течением, но не объясняет, почему среда не установлена, и что проверить.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "v3_carbonate_mudstone",
+      "A": {
+        "category": "incorrect",
+        "completed": true,
+        "reason": "Мрамор ошибочно назван компонентом породы; не объяснён терригенный состав.",
+        "flags": []
+      },
+      "B": {
+        "category": "incorrect",
+        "completed": false,
+        "reason": "Ложные связи с высокой температурой и вулканизмом; ответ оборван.",
+        "flags": [
+          "truncated"
+        ]
+      }
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_02",
+      "A": {
+        "category": "correct",
+        "completed": true,
+        "reason": "Естественно отвечает на благодарность.",
+        "flags": []
+      },
+      "B": {
+        "category": "correct",
+        "completed": true,
+        "reason": "Естественно отвечает на благодарность.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-02__new_facies_reasoning",
+      "A": {
+        "category": "incorrect",
+        "completed": false,
+        "reason": "Добавлены неподтверждённые биотурбация и вулканизм; ответ оборван.",
+        "flags": [
+          "truncated"
+        ]
+      },
+      "B": {
+        "category": "correct",
+        "completed": true,
+        "reason": "Сочетание признаков поддерживает речную гипотезу с оговоркой альтернатив.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-09__new_facies_reasoning",
+      "A": {
+        "category": "partial",
+        "completed": true,
+        "reason": "Признаёт недостаток данных, но не рассматривает гравитационный поток; только исследовательская оценка.",
+        "flags": []
+      },
+      "B": {
+        "category": "partial",
+        "completed": false,
+        "reason": "Приводит данные и ограничение, но не формулирует обоснованную гипотезу; ответ оборван; только исследовательская оценка.",
+        "flags": [
+          "truncated"
+        ]
+      }
+    },
+    {
+      "record_id": "v3_conglomerate_breccia",
+      "A": {
+        "category": "incorrect",
+        "completed": false,
+        "reason": "Не названо различие по окатанности обломков; ошибочно описана брекчия; ответ оборван.",
+        "flags": [
+          "truncated"
+        ]
+      },
+      "B": {
+        "category": "incorrect",
+        "completed": true,
+        "reason": "Ошибка: брекчия не определяется мелкостью обломков, важна угловатость.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-08__new_facies_reasoning",
+      "A": {
+        "category": "partial",
+        "completed": false,
+        "reason": "Описывает наблюдения и не выводит глубину, но не называет мутьевой поток и вводит сомнительные процессы; ответ оборван.",
+        "flags": [
+          "truncated"
+        ]
+      },
+      "B": {
+        "category": "partial",
+        "completed": true,
+        "reason": "Приводит отдельные наблюдения и ограничение по глубине, но не называет мутьевой поток.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-06__new_facies_reasoning",
+      "A": {
+        "category": "incorrect",
+        "completed": false,
+        "reason": "Верно повторяет признаки, но добавляет неподтверждённые детали и не формулирует береговой склон или штормы; ответ оборван.",
+        "flags": [
+          "truncated"
+        ]
+      },
+      "B": {
+        "category": "incorrect",
+        "completed": true,
+        "reason": "Нет интерпретации берегового склона и штормов; термин о нормализации ряби не объясняет последовательность.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_04",
+      "A": {
+        "category": "correct",
+        "completed": true,
+        "reason": "Прямо подтверждает язык.",
+        "flags": []
+      },
+      "B": {
+        "category": "correct",
+        "completed": true,
+        "reason": "Прямо подтверждает язык.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-11__new_facies_reasoning",
+      "A": {
+        "category": "correct",
+        "completed": true,
+        "reason": "Не выбирает русло вместо турбидита, указывает ограничения и дополнительные данные.",
+        "flags": []
+      },
+      "B": {
+        "category": "incorrect",
+        "completed": true,
+        "reason": "Ошибочно утверждает, что мельчание вверх не характерно для турбидита.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "v3_mud_shale",
+      "A": {
+        "category": "incorrect",
+        "completed": false,
+        "reason": "Mudstone ошибочно назван песчаником, диагностическая расщепляемость не объяснена; ответ оборван.",
+        "flags": [
+          "truncated"
+        ]
+      },
+      "B": {
+        "category": "incorrect",
+        "completed": true,
+        "reason": "Не указана расщепляемость shale, различие по плотности и размеру зерна не является определяющим.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-12__new_facies_reasoning",
+      "A": {
+        "category": "incorrect",
+        "completed": true,
+        "reason": "Признаки драпировок ошибочно связываются с биотурбацией; приливная гипотеза отсутствует.",
+        "flags": []
+      },
+      "B": {
+        "category": "partial",
+        "completed": true,
+        "reason": "Назван возможный речной процесс, но приливное влияние не интерпретировано.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "v4_coal_vs_carbonaceous",
+      "A": {
+        "category": "incorrect",
+        "completed": true,
+        "reason": "Зелёный цвет ошибочно выдан за характерный признак угля.",
+        "flags": []
+      },
+      "B": {
+        "category": "incorrect",
+        "completed": false,
+        "reason": "Ошибки в происхождении и свойствах угля; ответ оборван.",
+        "flags": [
+          "truncated"
+        ]
+      }
+    },
+    {
+      "record_id": "FRV1-04__new_facies_reasoning",
+      "A": {
+        "category": "incorrect",
+        "completed": true,
+        "reason": "Не названа приливная гипотеза, вместо неё необоснованная биотурбация.",
+        "flags": []
+      },
+      "B": {
+        "category": "incorrect",
+        "completed": true,
+        "reason": "Не названа приливная гипотеза, вместо неё необоснованная биотурбация.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-01__new_facies_reasoning",
+      "A": {
+        "category": "partial",
+        "completed": true,
+        "reason": "Названы наблюдение и дальнейшая проверка, но недостаточность для выбора среды не сказана прямо.",
+        "flags": []
+      },
+      "B": {
+        "category": "correct",
+        "completed": true,
+        "reason": "Отделяет наблюдение, ограничение и дополнительные данные.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_03",
+      "A": {
+        "category": "partial",
+        "completed": true,
+        "reason": "Кратко описывает назначение, но не представляется.",
+        "flags": []
+      },
+      "B": {
+        "category": "correct",
+        "completed": true,
+        "reason": "Представляется кратко.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-07__new_facies_reasoning",
+      "A": {
+        "category": "partial",
+        "completed": true,
+        "reason": "Верно указывает недостаточность, но не предлагает волновой или штормовой процесс; упоминает неподтверждённые тектонические движения.",
+        "flags": []
+      },
+      "B": {
+        "category": "partial",
+        "completed": true,
+        "reason": "Отмечает недостаток данных, но не предлагает волновое или штормовое влияние; эоловая альтернатива не обоснована.",
+        "flags": []
+      }
+    },
+    {
+      "record_id": "FRV1-05__new_facies_reasoning",
+      "A": {
+        "category": "partial",
+        "completed": false,
+        "reason": "Переданы цикличность и ограниченность данных, но нет приливной гипотезы; ответ оборван.",
+        "flags": [
+          "truncated"
+        ]
+      },
+      "B": {
+        "category": "incorrect",
+        "completed": true,
+        "reason": "Не названы приливные пучки, вводится необоснованная переносная эрозия.",
+        "flags": []
+      }
+    }
+  ]
+}

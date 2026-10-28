@@ -1,0 +1,18 @@
+{
+  "schema": "qwen_facies_reasoning_v1_evidence_provenance",
+  "record_type": "audit_evidence_not_training_truth",
+  "copied_without_changes": {
+    "baseline_responses.jsonl": "b31adfaf6802cf58bbbfe289cfeef53c971cd1c243ac6624efa8ef765242a985",
+    "candidate_responses.jsonl": "c91f0959ec2974681df4d924fcd45dc5c589d1d96c0977e294e3446851c2e4c0",
+    "candidate_metrics.json": "b6299fdcb9eee95821f4eb47628612a14189895a4f2ddef6889582e026f35756",
+    "blind_review.json": "089ee0c4e202c91c2b48df1e1ae0ae49ac0dd8fcec69fd6f30f24abe5303fad0",
+    "review_key.json": "725c52e45012a8067408a9461c3baf05d0d833d8117474178a98bf3797a6ab37",
+    "review_blind_ratings.json": "d34317219b37c2053ffa553a29534795360f0402a578ffa612ec0426bd780d6a"
+  },
+  "baseline_metrics_original_sha256": "a165495ee3d2e291a717fe37a046189bbd2cd876cb34d85e42382b35bed5517c",
+  "baseline_metrics_publication": "Removed local absolute source directory; content otherwise unchanged.",
+  "protocol_sha256": "384184d7be259bb6b333a8d5eb2ca1018ab28bafe6520cee8b8316cb98f0397e",
+  "raw_model_outputs_contain_errors": true,
+  "raw_images_included": false,
+  "model_weights_included": false
+}

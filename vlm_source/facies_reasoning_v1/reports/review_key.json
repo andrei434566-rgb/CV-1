@@ -1,0 +1,82 @@
+{
+  "FRV1-01__new_facies_reasoning": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "FRV1-02__new_facies_reasoning": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "FRV1-03__new_facies_reasoning": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "FRV1-04__new_facies_reasoning": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "FRV1-05__new_facies_reasoning": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "FRV1-06__new_facies_reasoning": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "FRV1-07__new_facies_reasoning": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "FRV1-08__new_facies_reasoning": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "FRV1-09__new_facies_reasoning": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "FRV1-10__new_facies_reasoning": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "FRV1-11__new_facies_reasoning": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "FRV1-12__new_facies_reasoning": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "v3_conglomerate_breccia": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "v3_mud_shale": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "v3_carbonate_mudstone": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "v4_coal_vs_carbonaceous": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "source_pilot_friendly_holdout_01": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "source_pilot_friendly_holdout_02": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "source_pilot_friendly_holdout_03": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "source_pilot_friendly_holdout_04": {
+    "A": "candidate",
+    "B": "baseline"
+  }
+}

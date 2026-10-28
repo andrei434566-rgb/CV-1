@@ -1,0 +1,101 @@
+{
+  "image_classification": {
+    "dcid": {
+      "rows": 4,
+      "correct": 1,
+      "accuracy": 0.25,
+      "macro_f1": 0.25,
+      "confusion_matrix": {
+        "Базальт.": {
+          "Базальт.": 0,
+          "Глинистая порода (mudstone).": 1,
+          "Гранит.": 0,
+          "Красный песчаник.": 0,
+          "__unknown__": 0
+        },
+        "Глинистая порода (mudstone).": {
+          "Базальт.": 0,
+          "Глинистая порода (mudstone).": 0,
+          "Гранит.": 0,
+          "Красный песчаник.": 0,
+          "__unknown__": 1
+        },
+        "Гранит.": {
+          "Базальт.": 0,
+          "Глинистая порода (mudstone).": 0,
+          "Гранит.": 0,
+          "Красный песчаник.": 0,
+          "__unknown__": 1
+        },
+        "Красный песчаник.": {
+          "Базальт.": 0,
+          "Глинистая порода (mudstone).": 0,
+          "Гранит.": 0,
+          "Красный песчаник.": 1,
+          "__unknown__": 0
+        }
+      },
+      "unknown_output": 2,
+      "truncated": 0
+    },
+    "mendeley": {
+      "rows": 4,
+      "correct": 1,
+      "accuracy": 0.25,
+      "macro_f1": 0.16666666666666666,
+      "confusion_matrix": {
+        "Глинистая порода (shale).": {
+          "Глинистая порода (shale).": 0,
+          "Известняк.": 0,
+          "Не керн: помехи или пустой лоток.": 0,
+          "Песчаник.": 0,
+          "__unknown__": 1
+        },
+        "Известняк.": {
+          "Глинистая порода (shale).": 1,
+          "Известняк.": 0,
+          "Не керн: помехи или пустой лоток.": 0,
+          "Песчаник.": 0,
+          "__unknown__": 0
+        },
+        "Не керн: помехи или пустой лоток.": {
+          "Глинистая порода (shale).": 0,
+          "Известняк.": 0,
+          "Не керн: помехи или пустой лоток.": 0,
+          "Песчаник.": 1,
+          "__unknown__": 0
+        },
+        "Песчаник.": {
+          "Глинистая порода (shale).": 0,
+          "Известняк.": 0,
+          "Не керн: помехи или пустой лоток.": 0,
+          "Песчаник.": 1,
+          "__unknown__": 0
+        }
+      },
+      "unknown_output": 1,
+      "truncated": 0
+    }
+  },
+  "theory": {
+    "rows": 16,
+    "accuracy": null,
+    "evaluation": "qualitative; raw responses and references saved",
+    "truncated": 11
+  },
+  "casual_guard": {
+    "rows": 4,
+    "accuracy": null,
+    "evaluation": "qualitative conversation regression guard",
+    "empty_answers": 0
+  },
+  "seconds": 323.268,
+  "reuse_provenance": {
+    "source_directory": "previous_failed_run_with_complete_baseline",
+    "run_config_sha256": "33287b62d59aba691f64f849a4fb7546ebcfd3ffa4c20ebe2331b6abb973c5ec",
+    "baseline_responses_sha256": "b31adfaf6802cf58bbbfe289cfeef53c971cd1c243ac6624efa8ef765242a985",
+    "rows": 28,
+    "validation": "exact model/config, manifest hashes, generation, image size, seed, versions, IDs, kinds, questions and references",
+    "metrics_recomputed_from_raw_responses": true
+  }
+}

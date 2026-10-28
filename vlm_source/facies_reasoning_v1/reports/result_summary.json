@@ -1,0 +1,739 @@
+{
+  "schema": "qwen_facies_reasoning_v1_result",
+  "record_type": "model_evaluation_audit_not_geological_reference",
+  "reviewed_utc": "2026-10-28T18:50:56.824595+00:00",
+  "status": "rejected_for_general_assistant",
+  "decision": "rejected",
+  "reason": "На малой слепой проверке ответы стали полнее, но надёжного улучшения геологических рассуждений не показано; обнаружены ошибки в базовых определениях и ухудшение контрольной классификации изображений. Требуются проверенные геологом примеры и отдельная проверка на скважинах.",
+  "reason_codes": [
+    "conceptual_geology_errors",
+    "image_guard_regression"
+  ],
+  "installed_in_application": false,
+  "geologist_approved": false,
+  "geology_accuracy": null,
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "model_source_fingerprint": {
+    "algorithm": "sha256",
+    "digest": "2cdd8c6ae57793d9192ad471bfdd0758d03b4e36596c4e92e389580ffca34478",
+    "files": {
+      "chat_template.json": "6f8a6a55027e3da5160105556cda5dd69f6423f1c32645f6730d32de7773d0c4",
+      "config.json": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+      "generation_config.json": "1e241830b48b397cb0900101421df5450baddc7adf01e5fc86b5615865f3bae4",
+      "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+      "model.safetensors": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+      "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "tokenizer.json": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7",
+      "tokenizer_config.json": "c2da771801886ad9ae98181793ffd3dfb7f1af30f6f7c6a4e15d7dbba52e2399",
+      "video_preprocessor_config.json": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    }
+  },
+  "data": {
+    "training_rows": 484,
+    "new_train_cards": 70,
+    "positive_extension_cards": 20,
+    "new_scenarios": 12,
+    "excluded_from_formal_scoring": [
+      "FRV1-09"
+    ]
+  },
+  "training": {
+    "train_runtime": 781.5381,
+    "train_samples_per_second": 1.239,
+    "train_steps_per_second": 0.31,
+    "train_loss": 1.155238566812405,
+    "epoch": 2.0,
+    "optimizer_steps": 242
+  },
+  "recipe": {
+    "base": "fresh Qwen3-VL-2B-Instruct snapshot 89644892e4d85e24eaac8bacfd4f463576704203",
+    "epochs": 2,
+    "learning_rate": 0.0001,
+    "targets": "all-text-linear",
+    "rank": 8,
+    "alpha": 16,
+    "seed": 20261028,
+    "max_tokens": 1024,
+    "theory_max_new_tokens": 256,
+    "classification_max_new_tokens": 24
+  },
+  "qualitative_counts": {
+    "new_facies_formal": {
+      "baseline": {
+        "rows": 11,
+        "correct": 2,
+        "partial": 3,
+        "incorrect": 6,
+        "uncertain": 0,
+        "completed": 5
+      },
+      "candidate": {
+        "rows": 11,
+        "correct": 1,
+        "partial": 6,
+        "incorrect": 4,
+        "uncertain": 0,
+        "completed": 11
+      }
+    },
+    "new_facies_exploratory": {
+      "baseline": {
+        "rows": 1,
+        "correct": 0,
+        "partial": 1,
+        "incorrect": 0,
+        "uncertain": 0,
+        "completed": 0
+      },
+      "candidate": {
+        "rows": 1,
+        "correct": 0,
+        "partial": 1,
+        "incorrect": 0,
+        "uncertain": 0,
+        "completed": 1
+      }
+    },
+    "closed_book_regression": {
+      "baseline": {
+        "rows": 4,
+        "correct": 0,
+        "partial": 0,
+        "incorrect": 4,
+        "uncertain": 0,
+        "completed": 0
+      },
+      "candidate": {
+        "rows": 4,
+        "correct": 0,
+        "partial": 0,
+        "incorrect": 4,
+        "uncertain": 0,
+        "completed": 4
+      }
+    },
+    "conversation": {
+      "baseline": {
+        "rows": 4,
+        "correct": 4,
+        "partial": 0,
+        "incorrect": 0,
+        "uncertain": 0,
+        "completed": 4
+      },
+      "candidate": {
+        "rows": 4,
+        "correct": 3,
+        "partial": 1,
+        "incorrect": 0,
+        "uncertain": 0,
+        "completed": 4
+      }
+    }
+  },
+  "review_flags": {
+    "new_facies_formal": {
+      "baseline": {
+        "truncated": 6
+      },
+      "candidate": {}
+    },
+    "new_facies_exploratory": {
+      "baseline": {
+        "truncated": 1
+      },
+      "candidate": {}
+    },
+    "closed_book_regression": {
+      "baseline": {
+        "truncated": 4
+      },
+      "candidate": {}
+    },
+    "conversation": {
+      "baseline": {},
+      "candidate": {}
+    }
+  },
+  "decoded_review": [
+    {
+      "record_id": "source_pilot_friendly_holdout_01",
+      "condition": "baseline",
+      "group": "conversation",
+      "category": "correct",
+      "completed": true,
+      "reason": "Отвечает на вопрос прямо.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_01",
+      "condition": "candidate",
+      "group": "conversation",
+      "category": "correct",
+      "completed": true,
+      "reason": "Отвечает на вопрос прямо.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-10__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Упоминает турбидит и озеро, но добавляет необоснованную биотурбацию и вулканизм; ответ оборван.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "FRV1-10__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "partial",
+      "completed": true,
+      "reason": "Слой увязан с турбидитом и отвергнута обязательная морская среда, но не сохранён прямо озёрный контекст; формулировка слишком определённая.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-03__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Отсутствие подошвы ошибочно трактуется как отсутствие транспортировки; ответ оборван.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "FRV1-03__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "partial",
+      "completed": true,
+      "reason": "Связывает косую слоистость с течением, но не объясняет, почему среда не установлена, и что проверить.",
+      "flags": []
+    },
+    {
+      "record_id": "v3_carbonate_mudstone",
+      "condition": "candidate",
+      "group": "closed_book_regression",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Мрамор ошибочно назван компонентом породы; не объяснён терригенный состав.",
+      "flags": []
+    },
+    {
+      "record_id": "v3_carbonate_mudstone",
+      "condition": "baseline",
+      "group": "closed_book_regression",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Ложные связи с высокой температурой и вулканизмом; ответ оборван.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_02",
+      "condition": "baseline",
+      "group": "conversation",
+      "category": "correct",
+      "completed": true,
+      "reason": "Естественно отвечает на благодарность.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_02",
+      "condition": "candidate",
+      "group": "conversation",
+      "category": "correct",
+      "completed": true,
+      "reason": "Естественно отвечает на благодарность.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-02__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Добавлены неподтверждённые биотурбация и вулканизм; ответ оборван.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "FRV1-02__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "correct",
+      "completed": true,
+      "reason": "Сочетание признаков поддерживает речную гипотезу с оговоркой альтернатив.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-09__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_exploratory",
+      "category": "partial",
+      "completed": true,
+      "reason": "Признаёт недостаток данных, но не рассматривает гравитационный поток; только исследовательская оценка.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-09__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_exploratory",
+      "category": "partial",
+      "completed": false,
+      "reason": "Приводит данные и ограничение, но не формулирует обоснованную гипотезу; ответ оборван; только исследовательская оценка.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "v3_conglomerate_breccia",
+      "condition": "baseline",
+      "group": "closed_book_regression",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Не названо различие по окатанности обломков; ошибочно описана брекчия; ответ оборван.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "v3_conglomerate_breccia",
+      "condition": "candidate",
+      "group": "closed_book_regression",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Ошибка: брекчия не определяется мелкостью обломков, важна угловатость.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-08__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "partial",
+      "completed": false,
+      "reason": "Описывает наблюдения и не выводит глубину, но не называет мутьевой поток и вводит сомнительные процессы; ответ оборван.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "FRV1-08__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "partial",
+      "completed": true,
+      "reason": "Приводит отдельные наблюдения и ограничение по глубине, но не называет мутьевой поток.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-06__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Верно повторяет признаки, но добавляет неподтверждённые детали и не формулирует береговой склон или штормы; ответ оборван.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "FRV1-06__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Нет интерпретации берегового склона и штормов; термин о нормализации ряби не объясняет последовательность.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_04",
+      "condition": "candidate",
+      "group": "conversation",
+      "category": "correct",
+      "completed": true,
+      "reason": "Прямо подтверждает язык.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_04",
+      "condition": "baseline",
+      "group": "conversation",
+      "category": "correct",
+      "completed": true,
+      "reason": "Прямо подтверждает язык.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-11__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "correct",
+      "completed": true,
+      "reason": "Не выбирает русло вместо турбидита, указывает ограничения и дополнительные данные.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-11__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Ошибочно утверждает, что мельчание вверх не характерно для турбидита.",
+      "flags": []
+    },
+    {
+      "record_id": "v3_mud_shale",
+      "condition": "baseline",
+      "group": "closed_book_regression",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Mudstone ошибочно назван песчаником, диагностическая расщепляемость не объяснена; ответ оборван.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "v3_mud_shale",
+      "condition": "candidate",
+      "group": "closed_book_regression",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Не указана расщепляемость shale, различие по плотности и размеру зерна не является определяющим.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-12__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Признаки драпировок ошибочно связываются с биотурбацией; приливная гипотеза отсутствует.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-12__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "partial",
+      "completed": true,
+      "reason": "Назван возможный речной процесс, но приливное влияние не интерпретировано.",
+      "flags": []
+    },
+    {
+      "record_id": "v4_coal_vs_carbonaceous",
+      "condition": "candidate",
+      "group": "closed_book_regression",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Зелёный цвет ошибочно выдан за характерный признак угля.",
+      "flags": []
+    },
+    {
+      "record_id": "v4_coal_vs_carbonaceous",
+      "condition": "baseline",
+      "group": "closed_book_regression",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Ошибки в происхождении и свойствах угля; ответ оборван.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "FRV1-04__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Не названа приливная гипотеза, вместо неё необоснованная биотурбация.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-04__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Не названа приливная гипотеза, вместо неё необоснованная биотурбация.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-01__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "partial",
+      "completed": true,
+      "reason": "Названы наблюдение и дальнейшая проверка, но недостаточность для выбора среды не сказана прямо.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-01__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "correct",
+      "completed": true,
+      "reason": "Отделяет наблюдение, ограничение и дополнительные данные.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_03",
+      "condition": "candidate",
+      "group": "conversation",
+      "category": "partial",
+      "completed": true,
+      "reason": "Кратко описывает назначение, но не представляется.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_03",
+      "condition": "baseline",
+      "group": "conversation",
+      "category": "correct",
+      "completed": true,
+      "reason": "Представляется кратко.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-07__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно указывает недостаточность, но не предлагает волновой или штормовой процесс; упоминает неподтверждённые тектонические движения.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-07__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "partial",
+      "completed": true,
+      "reason": "Отмечает недостаток данных, но не предлагает волновое или штормовое влияние; эоловая альтернатива не обоснована.",
+      "flags": []
+    },
+    {
+      "record_id": "FRV1-05__new_facies_reasoning",
+      "condition": "baseline",
+      "group": "new_facies_formal",
+      "category": "partial",
+      "completed": false,
+      "reason": "Переданы цикличность и ограниченность данных, но нет приливной гипотезы; ответ оборван.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "FRV1-05__new_facies_reasoning",
+      "condition": "candidate",
+      "group": "new_facies_formal",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Не названы приливные пучки, вводится необоснованная переносная эрозия.",
+      "flags": []
+    }
+  ],
+  "source_class_image_guard": {
+    "baseline": {
+      "rows": 8,
+      "correct": 2,
+      "unknown_output": 3,
+      "truncated": 0,
+      "by_source": {
+        "dcid": {
+          "rows": 4,
+          "correct": 1,
+          "accuracy": 0.25,
+          "macro_f1": 0.25,
+          "confusion_matrix": {
+            "Базальт.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 1,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 0
+            },
+            "Глинистая порода (mudstone).": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Гранит.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Красный песчаник.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 1,
+              "__unknown__": 0
+            }
+          },
+          "unknown_output": 2,
+          "truncated": 0
+        },
+        "mendeley": {
+          "rows": 4,
+          "correct": 1,
+          "accuracy": 0.25,
+          "macro_f1": 0.16666666666666666,
+          "confusion_matrix": {
+            "Глинистая порода (shale).": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Известняк.": {
+              "Глинистая порода (shale).": 1,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 0,
+              "__unknown__": 0
+            },
+            "Не керн: помехи или пустой лоток.": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 1,
+              "__unknown__": 0
+            },
+            "Песчаник.": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 1,
+              "__unknown__": 0
+            }
+          },
+          "unknown_output": 1,
+          "truncated": 0
+        }
+      }
+    },
+    "candidate": {
+      "rows": 8,
+      "correct": 1,
+      "unknown_output": 3,
+      "truncated": 0,
+      "by_source": {
+        "dcid": {
+          "rows": 4,
+          "correct": 0,
+          "accuracy": 0.0,
+          "macro_f1": 0.0,
+          "confusion_matrix": {
+            "Базальт.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 1,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 0
+            },
+            "Глинистая порода (mudstone).": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Гранит.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Красный песчаник.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 1
+            }
+          },
+          "unknown_output": 3,
+          "truncated": 0
+        },
+        "mendeley": {
+          "rows": 4,
+          "correct": 1,
+          "accuracy": 0.25,
+          "macro_f1": 0.1,
+          "confusion_matrix": {
+            "Глинистая порода (shale).": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 1,
+              "__unknown__": 0
+            },
+            "Известняк.": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 1,
+              "__unknown__": 0
+            },
+            "Не керн: помехи или пустой лоток.": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 1,
+              "__unknown__": 0
+            },
+            "Песчаник.": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 1,
+              "__unknown__": 0
+            }
+          },
+          "unknown_output": 0,
+          "truncated": 0
+        }
+      }
+    }
+  },
+  "theory_token_limit_truncations": {
+    "baseline": 11,
+    "candidate": 0
+  },
+  "evaluation_seconds": {
+    "baseline": 323.268,
+    "candidate": 156.626
+  },
+  "adapter": {
+    "relative_local_directory": "vlm_core_v1/outputs/core_vlm_facies_reasoning_v1_v2_retry_lora/adapter",
+    "sha256": "467985c813ad99211d25dfb1734b1976c2f89f27293a56405c44219fef27859e",
+    "bytes": 34922600,
+    "binary_uploaded_to_git": false
+  },
+  "protocol_sha256": "384184d7be259bb6b333a8d5eb2ca1018ab28bafe6520cee8b8316cb98f0397e",
+  "limitations": [
+    "Assistant blind evaluation is not approval by a geologist.",
+    "Eleven conceptual cases share concepts with training and do not represent independent wells.",
+    "FRV1-09 is exploratory because the source audit found insufficient support for its combined features.",
+    "Four old geology and four conversation guards, and the eight image guards, were used before.",
+    "Text-only training does not establish visual facies or complete-description accuracy.",
+    "Transformers FP16 results do not establish the quality of the application's native Q8 runtime.",
+    "Raw model outputs include errors and must not be used as geological references or training targets.",
+    "No app settings or selected model are changed by this utility."
+  ]
+}
