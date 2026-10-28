@@ -6,7 +6,7 @@ from datetime import datetime
 import math
 from pathlib import Path
 
-from PySide6.QtCore import QSize, QTimer, Qt, QUrl, Signal
+from PySide6.QtCore import QEvent, QSize, QTimer, Qt, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices, QImageReader, QPainter, QPen, QPixmap
 from PySide6.QtWidgets import QDialog, QFrame, QHBoxLayout, QLabel, QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy, QVBoxLayout, QWidget
 
@@ -109,6 +109,12 @@ class AssistantPanel(QFrame):
         self.composer.setFixedHeight(82)
         self.composer.submitted.connect(self._send)
         layout.addWidget(self.composer)
+        # Drops over text controls otherwise disappear into child widgets on
+        # some Qt/Windows versions. Route local files back to the same panel.
+        for surface in (self.transcript, self.transcript.viewport(), self._messages_widget,
+                        self.composer, self.composer.viewport()):
+            surface.setAcceptDrops(True)
+            surface.installEventFilter(self)
         bottom = QHBoxLayout()
         self.attach_file_button = QPushButton("＋ Добавить файл")
         self.attach_file_button.setObjectName("assistantAction")
@@ -368,6 +374,17 @@ class AssistantPanel(QFrame):
             event.acceptProposedAction()
         else:
             super().dragEnterEvent(event)
+
+    def eventFilter(self, watched, event) -> bool:
+        if event.type() in (QEvent.Type.DragEnter, QEvent.Type.DragMove, QEvent.Type.Drop):
+            mime = event.mimeData()
+            paths = [url.toLocalFile() for url in mime.urls() if url.isLocalFile()] if mime.hasUrls() else []
+            if paths:
+                if event.type() == QEvent.Type.Drop:
+                    self.files_dropped.emit(paths)
+                event.acceptProposedAction()
+                return True
+        return super().eventFilter(watched, event)
 
     def dropEvent(self, event) -> None:
         paths = [url.toLocalFile() for url in event.mimeData().urls() if url.isLocalFile()]

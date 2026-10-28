@@ -192,7 +192,7 @@ class TrainingCenterDialog(QDialog):
         root = user_data_root() / "vlm_training" / "photo_excel"
         destination = root / f"{datetime.now():%Y%m%d_%H%M%S}_{uuid4().hex[:6]}"
         try:
-            result = export_reviewed_pairs(self.main._records, destination)
+            result = export_reviewed_pairs(self.main._records, destination, include_facies=True)
         except Exception as exc:
             QMessageBox.warning(self, "Пары не собраны", str(exc))
             return

@@ -81,9 +81,20 @@ def prepare_geology_reference_chat(request: dict, hits: list[dict]) -> tuple[str
     question = str(request.get("question") or "")[:3000]
     if (request.get("operation") != "chat" or request.get("image")
             or request.get("use_geology_reference") is False
+            or ("Фация, сохранённая специалистом для этого интервала:" in str(request.get("context") or "")
+                and re.search(r"\b(?:эт\w*|выбранн\w*|данн\w*|интервал\w*|сло[йяеи]\w*|скважин\w*|yolo)\b", question, re.I))
             or re.search(r"скважин|месторожд|папк|файл|проект|интервал|\b(?:скв|well|project|folder|file|interval)\b",
                          question, flags=re.IGNORECASE)):
         return question, hits, []
+    # If the user uploaded a theory document and the search actually found a
+    # readable excerpt there, keep it as context instead of replacing it with
+    # a generic bundled reference. A filename-only hit is not evidence.
+    for hit in hits:
+        if (hit.get("kind") == "document"
+                and "theory_index" in {part.casefold() for part in Path(str(hit.get("path") or "")).parts}
+                and str(hit.get("excerpt") or "").strip()
+                and "текст не извлечён" not in str(hit.get("excerpt") or "").casefold()):
+            return question, hits, []
     notes = retrieve_notes(question, max_notes=2)
     # Only attributable public source URLs are returned as UI source hits.
     notes = [note for note in notes if note.get("source_records") and all(

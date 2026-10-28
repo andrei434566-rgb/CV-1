@@ -364,6 +364,10 @@ def search_folders(query: str, folders: list[str], limit: int = 5,
                     score += 30
                 if is_theory and not numeric_terms:
                     score += 100
+                # Uploaded specialist documents are deliberate, local context
+                # and should not be displaced by generic bundled references.
+                if root.name.casefold() == "theory_index" and content_matches:
+                    score += 150
                 positions = [lowered.find(term) for term in terms if term in lowered]
                 start = 0 if is_theory else max(0, min(positions) - 130) if positions else 0
                 excerpt = " ".join(best_section[start:start + 650].split()) or "Совпадение в названии файла или папки; текст не извлечён."

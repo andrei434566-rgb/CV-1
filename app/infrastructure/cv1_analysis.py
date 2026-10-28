@@ -54,6 +54,7 @@ class IntervalJob:
             return (
                 not self.detection.training_ready
                 and self.detection.attributes.get("__manual_contour") != "1"
+                and self.detection.attributes.get("__manual_interval_edited") != "1"
                 and geometry_signature(self.detection) == self.geometry_sha256
                 and _input_signature(self.detection) == self.input_sha256
             )

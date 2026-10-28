@@ -31,7 +31,11 @@ from app.infrastructure.excel_core_description import (
     suggest_photo_intervals_from_excel,
     workbook_import_summary,
 )
-from app.infrastructure.expert_corrections import exact_correction, reassign_project, related_text_corrections, save_correction
+from app.infrastructure.expert_corrections import (
+    exact_correction, exact_interval_edit, expert_memory_digest, expert_memory_is_confirmed,
+    reassign_project, related_text_corrections, save_correction, save_interval_edit,
+)
+from app.infrastructure.facies_mapping import facies_mapping_context, save_expert_facies_mapping
 from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES, has_complete_core_column_coverage, postprocess_detections
 from app.infrastructure.image_loading import load_working_pixmap
 from app.infrastructure.lithology_attribute_service import LithologyAttributeService
@@ -95,6 +99,11 @@ class MainWindow(QMainWindow):
         super().__init__()
         self._records: list[PhotoRecord] = []
         self._expert_session_id = uuid4().hex
+        self._edit_autosave = QTimer(self)
+        self._edit_unsaved = False
+        self._edit_autosave.setSingleShot(True)
+        self._edit_autosave.setInterval(1200)
+        self._edit_autosave.timeout.connect(self._flush_edit_autosave)
         self._segmentation_thread: QThread | None = None
         self._segmentation_worker: SegmentationWorker | None = None
         self._segmentation_failed = False
@@ -165,6 +174,8 @@ class MainWindow(QMainWindow):
         self._chat_photo_thread: QThread | None = None
         self._chat_photo_worker: ChatPhotoColumnWorker | None = None
         self._local_search_worker: LocalSearchWorker | None = None
+        self._theory_import_thread = None
+        self._theory_import_queue: list[str] = []
 
         self.setWindowTitle("Kern Analyzer")
         self.setMinimumSize(960, 640)
@@ -194,12 +205,25 @@ class MainWindow(QMainWindow):
         self._show_remembered_model_status()
 
     def closeEvent(self, event) -> None:
+        if self._theory_import_queue or (self._theory_import_thread is not None and self._theory_import_thread.isRunning()):
+            self.assistant_panel.append_message("system", "Дождитесь окончания чтения документов перед закрытием приложения.")
+            event.ignore()
+            return
+        for name in ("_segmentation_thread", "_training_thread", "_column_training_thread"):
+            thread = getattr(self, name, None)
+            if thread is not None and thread.isRunning():
+                self.assistant_panel.append_message("system", "Дождитесь окончания обработки или обучения перед закрытием приложения.")
+                event.ignore()
+                return
         if self._chat_photo_thread is not None and self._chat_photo_thread.isRunning():
             self.assistant_panel.append_message("system", "Дождитесь завершения поиска столбиков перед закрытием приложения.")
             event.ignore()
             return
         if self._local_search_worker is not None and self._local_search_worker.isRunning():
             self.assistant_panel.append_message("system", "Дождитесь завершения поиска в папках перед закрытием приложения.")
+            event.ignore()
+            return
+        if (self._edit_autosave.isActive() or self._edit_unsaved) and not self._flush_edit_autosave():
             event.ignore()
             return
         if hasattr(self, "_vlm_client"):
@@ -913,6 +937,11 @@ class MainWindow(QMainWindow):
                 seen.add(key)
                 folders.append(folder)
 
+        # The user's imported theory remains available after a restart and
+        # takes priority over unrelated folder searches.
+        theory_index = user_data_root() / "chat_materials" / "theory_index"
+        if theory_index.is_dir():
+            add(theory_index)
         archive_search = include_archive or bool(re.search(r"\b(?:скваж\w*|месторожд\w*)\b", question.casefold()))
         if archive_search:
             archives = [Path(drive.absoluteFilePath()) / "Керн фото" for drive in QDir.drives()]
@@ -1072,7 +1101,17 @@ class MainWindow(QMainWindow):
             if any(item is record for item in self._records):
                 context += f"Выбранное фото: {Path(record.path).name}. "
                 if any(item is detection for item in record.detections):
-                    context += f"Класс фации модели: {detection.label}. "
+                    mapping = facies_mapping_context(record, detection)
+                    if mapping:
+                        context += mapping + " "
+                    else:
+                        context += f"Текущая метка интервала (требует проверки): {detection.label}. "
+                    remembered = exact_interval_edit(record, detection, project=self._expert_project_key(), well=record.well_name)
+                    if remembered:
+                        attributes = remembered.get("attributes") or {}
+                        description = str(attributes.get("__vlm_description") or attributes.get("Краткое описание") or "").strip()
+                        if description:
+                            context += "Проверенное специалистом описание этого же интервала: " + description[:700] + ". "
                     if detection.depth_from is not None and detection.depth_to is not None:
                         context += f"Интервал фации: {detection.depth_from:g}–{detection.depth_to:g} м. "
         rows = []
@@ -1140,7 +1179,9 @@ class MainWindow(QMainWindow):
             self.select_detection_model(filename_override=path)
         if len(models) > 1:
             self.assistant_panel.append_message("system", "Для границ используется один best.pt. Добавьте нужный файл отдельно.")
-        for path in documents + excels + archives:
+        if documents:
+            self._queue_chat_theory_documents(documents)
+        for path in excels + archives:
             self._add_chat_document(path)
         if len(excels) > 1:
             self.assistant_panel.append_message("system", f"Таблиц добавлено: {len(excels)}. Они доступны для вопросов в чате; сопоставление с проектом запускается отдельно.")
@@ -1180,9 +1221,47 @@ class MainWindow(QMainWindow):
                 self._settings.sync()
             self._chat_document_path = destination
             self.assistant_panel.append_message("user", f"📎 {source.name}")
-            self.assistant_panel.append_message("system", f"Добавлен файл «{source.name}». Теперь можно спрашивать о его содержимом в чате.")
+            if source.suffix.casefold() == ".zip":
+                self.assistant_panel.append_message("system", f"Добавлен архив «{source.name}»: доступен поиск имён файлов. Для чтения документов распакуйте архив и добавьте их в чат.")
+            else:
+                self.assistant_panel.append_message("system", f"Добавлена таблица «{source.name}»: помощник может искать текст в первых пяти листах. Для сопоставления с фото используйте обработку проекта.")
         except OSError as exc:
             self.assistant_panel.append_message("system", f"Не удалось добавить «{source.name}»: {exc}")
+
+    def _queue_chat_theory_documents(self, paths: list[Path]) -> None:
+        self._theory_import_queue.extend(str(path) for path in paths)
+        self.assistant_panel.append_message("system", f"Читаю документы: {len(paths)}. Это может занять время; продолжайте работу.")
+        self._start_next_theory_import()
+
+    def _start_next_theory_import(self) -> None:
+        if self._theory_import_thread is not None or not self._theory_import_queue:
+            return
+        from app.infrastructure.theory_chat_import import TheoryImportThread
+        batch, self._theory_import_queue = self._theory_import_queue, []
+        thread = TheoryImportThread(batch, user_data_root() / "chat_materials", self)
+        self._theory_import_thread = thread
+        thread.document_result.connect(self._theory_import_finished_document)
+        thread.finished.connect(self._theory_import_finished_batch)
+        thread.finished.connect(thread.deleteLater)
+        thread.start()
+
+    def _theory_import_finished_document(self, result: dict) -> None:
+        name = str(result.get("name") or "документ")
+        if not result.get("ok"):
+            self.assistant_panel.append_message("system", f"Не удалось прочитать «{name}»: {result.get('error', 'неизвестная ошибка')}")
+            return
+        self._chat_document_path = Path(str(result["original"]))
+        self.assistant_panel.append_message("user", f"📎 {name}")
+        message = (f"Текст «{name}» сохранён локально: фрагментов {result['chunks']}. "
+                   "Можно задавать вопросы; помощник будет искать в документе. "
+                   "Веса модели при добавлении файла не изменяются.")
+        if result.get("warnings"):
+            message += " " + " ".join(result["warnings"])
+        self.assistant_panel.append_message("system", message)
+
+    def _theory_import_finished_batch(self) -> None:
+        self._theory_import_thread = None
+        self._start_next_theory_import()
 
     def _clear_chat_photo(self) -> None:
         self._chat_photo_path = None
@@ -1351,7 +1430,10 @@ class MainWindow(QMainWindow):
         temporary_image = ""
         try:
             use_image = operation in {"describe", "photo_chat"} or (operation == "chat" and needs_selected_image(question))
-            use_knowledge = operation == "search" or (operation in {"chat", "photo_chat"} and (needs_local_knowledge(question) or wants_sources(question))) or (operation == "chat" and self._chat_document_path is not None)
+            has_imported_theory = (user_data_root() / "chat_materials" / "theory_index").is_dir()
+            use_knowledge = (operation == "search" or
+                             (operation in {"chat", "photo_chat"} and (needs_local_knowledge(question) or wants_sources(question))) or
+                             (operation == "chat" and (self._chat_document_path is not None or has_imported_theory)))
             image = image_override or (self._vlm_image_path(crop_facies=operation == "describe") if use_image else "")
             temporary_image = image if image and not image_override else ""
             if operation == "describe" and not image:
@@ -1954,6 +2036,8 @@ class MainWindow(QMainWindow):
         if self._analysis_active or self._segmentation_thread is not None or self._vlm_pending is not None:
             self.assistant_panel.append_message("system", "Дождитесь завершения текущего анализа перед сменой проекта.")
             return
+        if (self._edit_autosave.isActive() or self._edit_unsaved) and not self._flush_edit_autosave():
+            return
         if self._records:
             answer = QMessageBox.question(
                 self,
@@ -2014,6 +2098,8 @@ class MainWindow(QMainWindow):
         if self._analysis_active or self._vlm_pending is not None or self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
             QMessageBox.information(self, "Подождите", "Дождитесь окончания сегментации перед открытием проекта.")
             return
+        if (self._edit_autosave.isActive() or self._edit_unsaved) and not self._flush_edit_autosave():
+            return
         try:
             title, records, positions, missing, wells = load_project(folder)
         except Exception as exc:
@@ -2049,6 +2135,8 @@ class MainWindow(QMainWindow):
                 record.detections = postprocess_detections(record, [])
         self._deleted_records.clear()
         self._project_folder = folder
+        self._edit_unsaved = False
+        self._edit_autosave.stop()
         self._project_title = title
         # Keep the explicitly selected global model. Opening a project never
         # promotes an old training run implicitly.
@@ -2141,7 +2229,7 @@ class MainWindow(QMainWindow):
         self._project_title = title.strip()
         self._save_current_project(folder)
 
-    def _save_current_project(self, folder: Path) -> None:
+    def _save_current_project(self, folder: Path) -> bool:
         previous_feedback_key = self._expert_project_key()
         try:
             save_project(folder, self._project_title, self._records, self.workspace.photo_positions(), self._project_well_metadata())
@@ -2149,8 +2237,10 @@ class MainWindow(QMainWindow):
                 save_catalog_snapshot(folder / SNAPSHOT_NAME, self._primary_facies_catalog)
         except Exception as exc:
             QMessageBox.critical(self, "Не удалось сохранить проект", str(exc))
-            return
+            return False
         self._project_folder = folder
+        self._edit_unsaved = False
+        self._edit_autosave.stop()
         feedback_warning = ""
         try:
             reassign_project(previous_feedback_key, self._expert_project_key())
@@ -2161,6 +2251,28 @@ class MainWindow(QMainWindow):
             self._save_indicator.setText("●  Только что сохранено")
         self._refresh_project_tree()
         self.statusBar().showMessage(f"Проект сохранён: {folder.name}{feedback_warning}")
+        return True
+
+    def _schedule_edit_autosave(self) -> None:
+        if not self._records:
+            return
+        self._edit_unsaved = True
+        if hasattr(self, "_save_indicator"):
+            self._save_indicator.setText("●  Сохранение изменений…")
+        self._edit_autosave.start()
+
+    def _flush_edit_autosave(self) -> bool:
+        self._edit_autosave.stop()
+        if not self._records:
+            self._edit_unsaved = False
+            return True
+        folder = self._project_folder
+        if folder is None:
+            folder = self._projects_root() / f"Черновик-{self._expert_session_id}.kern_analyzer"
+        saved = self._save_current_project(folder)
+        if not saved and hasattr(self, "_save_indicator"):
+            self._save_indicator.setText("●  Изменения не сохранены")
+        return saved
 
     def open_images(self) -> None:
         paths, _ = QFileDialog.getOpenFileNames(
@@ -3380,6 +3492,7 @@ class MainWindow(QMainWindow):
             and detection.attributes.get("__geometry_only") == "1"
             and detection.attributes.get("__interpretation_status", "waiting") == "waiting"
             and not detection.training_ready
+            and detection.attributes.get("__manual_interval_edited") != "1"
             for record in self._records for detection in record.detections
         )
 
@@ -5232,7 +5345,7 @@ class MainWindow(QMainWindow):
             self,
             training_ready=detection.training_ready,
             primary_catalog=self._primary_facies_catalog,
-            description_confirmed=expert_description_is_confirmed(detection),
+            description_confirmed=expert_memory_is_confirmed(detection) or expert_description_is_confirmed(detection),
         )
         dialog.setModal(False)
         dialog.accepted.connect(lambda: self._save_lithology(record, detection, dialog))
@@ -5343,6 +5456,7 @@ class MainWindow(QMainWindow):
         manually_drawn = detection.label == "Новый контур" or detection.attributes.get("__manual_contour") == "1"
         detection.label = selected_label
         detection.attributes = selected_attributes
+        detection.attributes["__manual_interval_edited"] = "1"
         if manually_drawn:
             detection.attributes["__manual_contour"] = "1"
         detection.depth_from = depth_from
@@ -5351,6 +5465,8 @@ class MainWindow(QMainWindow):
         detection.training_ready = dialog.training_confirmed.isChecked()
         detection.attributes.pop("__expert_description_confirmed", None)
         detection.attributes.pop("__expert_description_sha256", None)
+        detection.attributes["__expert_memory_confirmed"] = "0"
+        detection.attributes.pop("__expert_memory_sha256", None)
         if detection.attributes.get("__geometry_only") == "1":
             if dialog.description_confirmed.isChecked() and detection.training_ready and detection.attributes.get("__vlm_description", "").strip():
                 detection.attributes["__interpretation_status"] = "reviewed"
@@ -5360,6 +5476,20 @@ class MainWindow(QMainWindow):
             else:
                 detection.attributes["__interpretation_status"] = "draft"
                 detection.attributes["Статус интерпретации"] = "черновик, требуется проверка геолога"
+        if dialog.description_confirmed.isChecked() and detection.attributes.get("__vlm_description", "").strip():
+            detection.attributes["__expert_memory_confirmed"] = "1"
+            detection.attributes["__expert_memory_sha256"] = expert_memory_digest(detection)
+        memory_errors = []
+        try:
+            save_expert_facies_mapping(record, detection, confirmed=True)
+        except (OSError, ValueError, TypeError) as exc:
+            memory_errors.append("привязка фации: " + str(exc))
+        try:
+            save_interval_edit(record, detection, project=self._expert_project_key(), well=record.well_name)
+        except (OSError, ValueError, TypeError) as exc:
+            memory_errors.append("журнал поправок: " + str(exc))
+        if memory_errors:
+            QMessageBox.warning(self, "Память правок", "Не всё удалось запомнить: " + "; ".join(memory_errors) + ". Проверьте доступ к фото и сохраните проект.")
         if record.core_columns:
             record.detections = postprocess_detections(record, record.detections)
         self._refresh_facies_views(record)
@@ -5502,3 +5632,4 @@ class MainWindow(QMainWindow):
             self._show_stack()
         self._refresh_project_tree()
         self._refresh_training_bar()
+        self._schedule_edit_autosave()

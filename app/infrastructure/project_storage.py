@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import shutil
 from pathlib import Path
+from uuid import uuid4
 
 from PySide6.QtCore import QPointF
 from PySide6.QtGui import QPixmap
@@ -29,6 +30,11 @@ def save_project(
         source = Path(record.path)
         if not source.is_file():
             raise FileNotFoundError(f"Не найдено фото проекта: {source}")
+        # Images already copied into this project's images directory must
+        # stay in place. Prefixing their names again on every autosave creates
+        # unbounded duplicate copies (id_id_id_...).
+        if source.resolve().parent == images_folder.resolve():
+            continue
         target = images_folder / f"{record.identifier}_{source.name}"
         try:
             same_file = source.resolve() == target.resolve()
@@ -74,7 +80,14 @@ def save_project(
         ],
     }
     manifest = folder / MANIFEST_NAME
-    manifest.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    # A crash during serialisation or disk write must not truncate the last
+    # successfully saved project. The temporary file is on the same volume.
+    temporary = folder / f".{MANIFEST_NAME}.{uuid4().hex}.tmp"
+    try:
+        temporary.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        temporary.replace(manifest)
+    finally:
+        temporary.unlink(missing_ok=True)
     return manifest
 
 

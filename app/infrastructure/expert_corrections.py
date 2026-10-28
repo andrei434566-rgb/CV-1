@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import shutil
 from datetime import datetime
@@ -47,21 +48,32 @@ def read_corrections() -> list[dict]:
 
 def reassign_project(previous: str, current: str) -> None:
     """Keep local project-scoped memory when an unsaved project is first saved."""
-    if not previous or previous == current:
+    if not previous or not current or previous == current:
         return
-    rows = read_corrections()
-    changed = False
-    for row in rows:
-        if row.get("scope") == "project" and row.get("project") == previous:
-            row["project"] = current
-            changed = True
-    if changed:
-        path = _root() / "corrections.jsonl"
-        temporary = path.with_suffix(".tmp")
-        temporary.write_text(
-            "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows), encoding="utf-8",
-        )
-        temporary.replace(path)
+    # Do not discard malformed/unapproved rows when changing a project key.
+    # Earlier versions rewrote only read_corrections(), losing those records.
+    for name in ("corrections.jsonl", "interval_edits.jsonl"):
+        path = _root() / name
+        if not path.is_file():
+            continue
+        lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+        changed = False
+        for index, line in enumerate(lines):
+            try:
+                row = json.loads(line)
+            except ValueError:
+                continue
+            if isinstance(row, dict) and row.get("scope") == "project" and row.get("project") == previous:
+                row["project"] = current
+                lines[index] = json.dumps(row, ensure_ascii=False) + "\n"
+                changed = True
+        if changed:
+            temporary = path.with_name(path.name + "." + uuid4().hex + ".tmp")
+            try:
+                temporary.write_text("".join(lines), encoding="utf-8")
+                temporary.replace(path)
+            finally:
+                temporary.unlink(missing_ok=True)
 
 
 def save_correction(
@@ -84,6 +96,10 @@ def save_correction(
         raise ValueError("Исправленный ответ совпадает с исходным; внесите поправку перед сохранением.")
     if operation not in {"chat", "photo_chat"}:
         raise ValueError("Поправки сохраняются для текстового чата или ответа по фото.")
+    if general and operation == "photo_chat":
+        raise ValueError("Поправка по фото не может быть общей для других проектов и скважин.")
+    if not general and (not str(project).strip() or not str(well).strip()):
+        raise ValueError("Для поправки укажите проект и скважину.")
     root = _root()
     root.mkdir(parents=True, exist_ok=True)
     identifier = uuid4().hex
@@ -118,6 +134,8 @@ def save_correction(
     }
     with (root / "corrections.jsonl").open("a", encoding="utf-8") as stream:
         stream.write(json.dumps(row, ensure_ascii=False) + "\n")
+        stream.flush()
+        os.fsync(stream.fileno())
     return row
 
 
@@ -127,8 +145,11 @@ def exact_correction(question: str, *, operation: str = "chat", image_path: str 
         row for row in reversed(read_corrections())
         if row.get("operation") == operation
         and _normalized(str(row.get("question") or "")) == key
-        and (row.get("scope") == "global" or str(row.get("project") or "") == project)
-        and (operation != "chat" or row.get("scope") == "global" or str(row.get("well") or "") == well)
+        and ((operation == "chat" and row.get("scope") == "global") or (
+            bool(project and well) and row.get("scope") == "project"
+            and str(row.get("project") or "") == project
+            and str(row.get("well") or "") == well
+        ))
     ]
     if not matches:
         return None
@@ -155,9 +176,11 @@ def related_text_corrections(question: str, *, project: str = "", well: str = ""
     for row in reversed(read_corrections()):
         if row.get("operation") != "chat":
             continue
-        if row.get("scope") != "global" and str(row.get("project") or "") != project:
+        if row.get("scope") not in {"project", "global"}:
             continue
-        if row.get("scope") != "global" and str(row.get("well") or "") != well:
+        if row.get("scope") != "global" and (not project or str(row.get("project") or "") != project):
+            continue
+        if row.get("scope") != "global" and (not well or str(row.get("well") or "") != well):
             continue
         key = (str(row.get("scope") or "project"), str(row.get("project") or "") + "|" + str(row.get("well") or ""), _normalized(str(row.get("question") or "")))
         if key in seen:
@@ -183,6 +206,123 @@ def correction_counts() -> dict[str, int]:
         "text_global": sum(row.get("operation") == "chat" and row.get("scope") == "global" for row in rows),
         "photo": sum(row.get("operation") == "photo_chat" for row in rows),
     }
+
+
+def _interval_identity(record, detection, *, project: str, well: str) -> dict[str, str]:
+    """Bind an edit to one project, well, original photo and interval geometry."""
+    project, well = str(project or "").strip(), str(well or "").strip()
+    if not project or not well or str(record.well_name or "").strip() != well:
+        raise ValueError("Для памяти интервала нужны совпадающие проект и скважина.")
+    path = Path(record.path)
+    if not path.is_file():
+        raise FileNotFoundError("Исходное фото интервала недоступно.")
+    width, height = record.pixmap.width(), record.pixmap.height()
+    if width <= 0 or height <= 0 or len(detection.polygon) < 3:
+        raise ValueError("Для памяти интервала нужен корректный контур на исходном фото.")
+    geometry = {
+        "polygon_relative": [[round(float(p.x()) / width, 6), round(float(p.y()) / height, 6)]
+                             for p in detection.polygon],
+        "depth_from": detection.depth_from,
+        "depth_to": detection.depth_to,
+    }
+    data = json.dumps(geometry, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False)
+    return {"project": project, "well": well, "image_sha256": _image_hash(path),
+            "interval_sha256": hashlib.sha256(data.encode("utf-8")).hexdigest()}
+
+
+def expert_memory_digest(detection) -> str:
+    """Bind a memory confirmation to the exact text, facies, depth and geometry.
+
+    This stamp is deliberately separate from the stricter training approval.
+    It does not change which examples are exportable for model training.
+    """
+    from app.infrastructure.vlm_training_data import expert_description_digest
+    return expert_description_digest(detection)
+
+
+def expert_memory_is_confirmed(detection) -> bool:
+    """Whether a specialist confirmed this unchanged description for memory."""
+    attrs = detection.attributes or {}
+    if not (attrs.get("__expert_memory_confirmed") == "1"
+            and attrs.get("__expert_memory_sha256")
+            and any(str(attrs.get(key) or "").strip() for key in (
+                "__vlm_description", "Краткое описание", "Литологическое описание (16 параметров)"))):
+        return False
+    try:
+        return attrs["__expert_memory_sha256"] == expert_memory_digest(detection)
+    except (TypeError, ValueError):
+        return False
+
+
+def save_interval_edit(record, detection, *, project: str, well: str) -> dict:
+    """Append a specialist's explicit edit, preserving its review state.
+
+    The UI must call this only when the specialist saves a manual edit, not
+    when applying model output. Unverified edits are persisted for the same
+    interval but never promoted to approved training data by this function.
+    """
+    from app.infrastructure.vlm_training_data import expert_description_is_confirmed
+
+    identity = _interval_identity(record, detection, project=project, well=well)
+    attributes = {str(k): str(v) for k, v in (detection.attributes or {}).items()}
+    row = {
+        "schema": "kern-expert-interval-edit-v1", "id": uuid4().hex,
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "scope": "project", **identity, "photo_name": Path(record.path).name,
+        "facies": str(detection.label), "attributes": attributes,
+        "depth_from": detection.depth_from, "depth_to": detection.depth_to,
+        "training_ready": bool(detection.training_ready),
+        # An explicit memory uncheck takes precedence over an older training
+        # confirmation; older projects without the new stamp retain compatibility.
+        "description_expert_confirmed": bool(
+            expert_memory_is_confirmed(detection) if "__expert_memory_confirmed" in attributes
+            else expert_description_is_confirmed(detection)
+        ),
+        "source": "explicit_manual_interval_edit",
+    }
+    # Validate before opening the append target, so failed serialization cannot
+    # create an incomplete training record.
+    line = json.dumps(row, ensure_ascii=False, allow_nan=False) + "\n"
+    root = _root()
+    root.mkdir(parents=True, exist_ok=True)
+    with (root / "interval_edits.jsonl").open("a", encoding="utf-8") as stream:
+        stream.write(line)
+        stream.flush()
+        os.fsync(stream.fileno())
+    return row
+
+
+def exact_interval_edit(record, detection, *, project: str, well: str, require_confirmed: bool = True) -> dict | None:
+    """Return only the latest explicit edit for this exact project/well/photo/interval.
+
+    By default only a separately confirmed description can be supplied as
+    context for the assistant. Editing a different interval or an unreviewed
+    draft must never be silently recycled as an expert answer.
+    """
+    path = _root() / "interval_edits.jsonl"
+    if not path.is_file():
+        return None
+    try:
+        identity = _interval_identity(record, detection, project=project, well=well)
+    except (OSError, TypeError, ValueError):
+        return None
+    rows = []
+    with path.open(encoding="utf-8") as stream:
+        for line in stream:
+            try:
+                row = json.loads(line)
+            except ValueError:
+                continue
+            if isinstance(row, dict) and row.get("schema") == "kern-expert-interval-edit-v1" and all(
+                row.get(key) == value for key, value in identity.items()
+            ):
+                rows.append(row)
+    if not rows:
+        return None
+    # A newer unchecked edit revokes an earlier approval; never fall back to
+    # a stale approved version when the specialist changes the text.
+    latest = rows[-1]
+    return latest if not require_confirmed or latest.get("description_expert_confirmed") is True else None
 
 
 def export_correction_manifest(kind: str, destination: Path) -> dict:

@@ -30,6 +30,7 @@ tools/tesseract/
 excel_photo_model_studio/tools/
 excel_photo_model_studio/.build_artifacts/
 vlm_temp/
+chat_materials/
 third_party/
 **/node_modules/
 **/.env

@@ -14,6 +14,7 @@ from PySide6.QtGui import QPainterPath, QPolygonF
 from app.domain.facies_catalog import FACIES_REFERENCE_FIELDS, facies_identity, resolve_facies_class
 from app.domain.models import FaciesDetection
 from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES, complete_core_column_coverage
+from app.infrastructure.facies_mapping import source_checkpoint_identity
 from app.infrastructure.ml.core_column_service import CoreColumnRecognizer, normalize_columns
 from app.infrastructure.ml.rule_based_facies import RuleBasedFaciesDetector, TextureInterval
 
@@ -36,6 +37,7 @@ class YoloModelService:
         from ultralytics import YOLO
 
         self.model = YOLO(str(model_path))
+        self._source_checkpoint = source_checkpoint_identity(model_path)
         self.geometry_only = bool(geometry_only)
         self.geometry_issues: list[dict[str, object]] = []
         task = str(getattr(self.model, "task", "") or "")
@@ -125,6 +127,13 @@ class YoloModelService:
                     continue
 
                 attributes = self._facies_attributes(label)
+                checkpoint = getattr(self, "_source_checkpoint", {})
+                attributes.update({
+                    "__source_model_class": label,
+                    "__source_model_class_id": str(class_id),
+                    "__source_model_name": str(checkpoint.get("name") or ""),
+                    "__source_model_sha256": str(checkpoint.get("sha256") or ""),
+                })
                 detections.append(
                     FaciesDetection(
                         label=attributes.get("Код фации", label),
@@ -228,6 +237,8 @@ class YoloModelService:
                         "__geometry_id": f"yolo:{len(detections) + 1}",
                         "__source_model_class": label,
                         "__source_model_class_id": str(class_id),
+                        "__source_model_name": str(getattr(self, "_source_checkpoint", {}).get("name") or ""),
+                        "__source_model_sha256": str(getattr(self, "_source_checkpoint", {}).get("sha256") or ""),
                         "__source_mask_index": str(index),
                         "__source_mask_fragment": str(part),
                         "Источник геометрии": "YOLO masks.xy",

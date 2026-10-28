@@ -99,6 +99,19 @@ class YoloGeometryContractTests(unittest.TestCase):
         self.assertTrue(all(QPolygonF(item.polygon).boundingRect().width() <= 20 for item in output))
         self.assertEqual(2000, sum(service._path_area(service._polygon_path(item.polygon)) for item in output))
 
+    def test_geometry_retains_source_checkpoint_identity_without_promoting_class_to_facies(self):
+        service = self._service([_result([[(10, 10), (40, 10), (10, 40)]])])
+        service._source_checkpoint = {"name": "best.pt", "sha256": "a" * 64}
+        output = service.predict("unused.png", (100, 100), [])
+        self.assertEqual(len(output), 1)
+        attributes = output[0].attributes
+        self.assertEqual(attributes["__source_model_class"], "DWCh@80")
+        self.assertEqual(attributes["__source_model_class_id"], "0")
+        self.assertEqual(attributes["__source_model_name"], "best.pt")
+        self.assertEqual(attributes["__source_model_sha256"], "a" * 64)
+        self.assertEqual(output[0].label, "Интервал YOLO")
+        self.assertFalse(output[0].training_ready)
+
     def test_overlap_reported_without_erasing_either_real_mask(self):
         service = self._service([_result([
             [(10, 10), (40, 10), (40, 50), (10, 50)],

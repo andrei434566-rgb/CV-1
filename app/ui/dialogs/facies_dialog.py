@@ -73,6 +73,18 @@ class FaciesDialog(QDialog):
         confidence_label = QLabel(confidence_text)
         confidence_label.setStyleSheet("color: #687087;")
         layout.addWidget(confidence_label)
+        source_class = str(attributes.get("__source_model_class") or "").strip()
+        if source_class:
+            source_id = str(attributes.get("__source_model_class_id") or "").strip()
+            source_text = "Предложение YOLO: " + source_class
+            if source_id:
+                source_text += " (класс " + source_id + ")"
+            if attributes.get("__geometry_only") == "1":
+                source_text += ". Модель может выделять только геометрию; фацию укажите ниже."
+            source_label = QLabel(source_text)
+            source_label.setObjectName("yoloSourceClass")
+            source_label.setWordWrap(True)
+            layout.addWidget(source_label)
 
         form_container = QWidget()
         form = QFormLayout(form_container)
@@ -170,10 +182,10 @@ class FaciesDialog(QDialog):
         self.training_confirmed.setToolTip("Отметьте после проверки класса и контура. Сохранить черновик можно без этой отметки.")
         self.training_confirmed.setVisible(not is_whole_column)
         layout.addWidget(self.training_confirmed)
-        self.description_confirmed = QCheckBox("Описание проверено — использовать при обучении ИИ")
+        self.description_confirmed = QCheckBox("Описание проверено — запомнить для ИИ")
         self.description_confirmed.setChecked(description_confirmed)
-        self.description_confirmed.setToolTip("Подтвердите текст отдельно от класса и границ. Непроверенные ответы ИИ в обучение не попадут.")
-        self.description_confirmed.setVisible(attributes.get("__geometry_only") == "1" and not is_whole_column)
+        self.description_confirmed.setToolTip("Подтвердите текст отдельно от класса и границ. Для обучения модели фаций также нужна проверка контура и класса.")
+        self.description_confirmed.setVisible(True)
         layout.addWidget(self.description_confirmed)
         try:
             suggestions = json.loads(str(attributes.get("__attribute_suggestions") or "{}"))

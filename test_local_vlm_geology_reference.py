@@ -18,6 +18,15 @@ OLD_HITS = [{"path": "C:/unrelated/project.txt", "excerpt": "Посторонн�
 
 
 class GeologyReferenceWorkerTests(unittest.TestCase):
+    def test_specific_confirmed_interval_context_is_not_discarded(self):
+        request = {"operation": "chat", "question": "Расскажи об этом слое",
+                   "context": "Фация, сохранённая специалистом для этого интервала: русловая."}
+        with patch.object(worker, "retrieve_notes") as retrieve:
+            prompt, hits, ids = worker.prepare_geology_reference_chat(request, OLD_HITS)
+        retrieve.assert_not_called()
+        self.assertEqual(prompt, request["question"])
+        self.assertEqual(ids, [])
+
     def test_general_question_uses_at_most_two_notes_and_replaces_folder_hits(self):
         request = {"operation": "chat", "question": QUESTION, "context": "Посторонний проектный контекст"}
         original = copy.deepcopy(request)

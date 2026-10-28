@@ -58,6 +58,23 @@ class Cv1ReviewedPairsTests(unittest.TestCase):
         self.assertEqual((1, 0), reviewed_pair_counts([record]))
         self.assertFalse(expert_description_is_confirmed(record.detections[0]))
 
+    def test_confirmed_facies_is_part_of_optional_vlm_training_target(self):
+        record = self._record(confirmed=True)
+        record.detections[0].attributes["__source_model_class"] = "core"
+        record.detections[0].attributes["__source_model_class_id"] = "0"
+        with tempfile.TemporaryDirectory() as directory:
+            result = export_reviewed_pairs([record], Path(directory) / "pairs", include_facies=True)
+            row = json.loads(result["manifest"].read_text(encoding="utf-8").splitlines()[0])
+        self.assertIn("Фация: Песчаник", row["conversations"][1]["value"])
+        self.assertIn("Предположительно русловая", row["conversations"][1]["value"])
+        self.assertEqual(row["metadata"]["source_model_class"], "core")
+        self.assertTrue(row["metadata"]["facies_in_target"])
+
+    def test_unapproved_text_is_not_exported_as_facies_training(self):
+        record = self._record(confirmed=False)
+        with tempfile.TemporaryDirectory() as directory, self.assertRaises(ValueError):
+            export_reviewed_pairs([record], Path(directory) / "pairs", include_facies=True)
+
     def test_explicit_stamp_without_matching_digest_is_not_enough(self):
         record = self._record()
         item = record.detections[0]

@@ -94,7 +94,7 @@ def _write_jsonl(path: Path, rows: list[dict]) -> None:
     path.write_text("".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows), encoding="utf-8")
 
 
-def export_reviewed_pairs(records, destination: Path) -> dict:
+def export_reviewed_pairs(records, destination: Path, *, include_facies: bool = False) -> dict:
     """Save direct Excel or separately expert-confirmed CV-1 image/text pairs."""
     destination = Path(destination)
     if destination.exists():
@@ -133,11 +133,24 @@ def export_reviewed_pairs(records, destination: Path) -> dict:
             name = f"pair_{len(rows)+1:06d}.jpg"
             if not crop.save(str(crops / name), "JPG", 94):
                 raise OSError(f"Не удалось сохранить вырезку: {name}")
+            question = "<image>Опиши видимые признаки породы на русском языке. Не выдумывай невидимые детали."
+            target = description
+            if include_facies and provenance == "expert_cv1_reviewed_mask":
+                # Both the facies/contour and the text have independent,
+                # current specialist approvals in _pair_provenance above.
+                question = ("<image>Опиши видимые признаки породы и предложи фацию по-русски. "
+                            "Отделяй наблюдения от интерпретации, не выдумывай невидимые признаки.")
+                target += "\nФация: " + str(detection.label).strip()
+                for field, caption in (("__vlm_facies_association", "Ассоциация фаций"),
+                                       ("__vlm_depositional_environment", "Обстановка осадконакопления")):
+                    value = str(attrs.get(field) or "").strip()
+                    if value:
+                        target += "\n" + caption + ": " + value
             rows.append({
                 "image": f"crops/{name}",
                 "conversations": [
-                    {"from": "human", "value": "<image>Опиши видимые признаки породы на русском языке. Не выдумывай невидимые детали."},
-                    {"from": "gpt", "value": description},
+                    {"from": "human", "value": question},
+                    {"from": "gpt", "value": target},
                 ],
                 "metadata": {
                     "training_approved": True,
@@ -149,6 +162,10 @@ def export_reviewed_pairs(records, destination: Path) -> dict:
                     "source_row": attrs.get("Источник описания", ""),
                     "source_geometry": attrs.get("Источник геометрии", ""),
                     "source_geometry_id": attrs.get("__geometry_id", ""),
+                    "source_model_class": attrs.get("__source_model_class", ""),
+                    "source_model_class_id": attrs.get("__source_model_class_id", ""),
+                    "source_model_sha256": attrs.get("__source_model_sha256", ""),
+                    "facies_in_target": bool(include_facies and provenance == "expert_cv1_reviewed_mask"),
                     "expert_description_sha256": attrs.get("__expert_description_sha256", "") if provenance == "expert_cv1_reviewed_mask" else "",
                     "expert_reviewed_fields": _expert_description_fields(detection) if provenance == "expert_cv1_reviewed_mask" else {},
                     "facies": detection.label,
