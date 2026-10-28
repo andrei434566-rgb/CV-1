@@ -22,11 +22,13 @@ os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ["HF_DATASETS_OFFLINE"] = "1"
 
 if __package__:
+    from .core_color_hint import estimate_core_color
     from .geology_reference import format_grounded_question, retrieve_notes
     from .local_knowledge_search import search_folders
     from .local_vlm_modes import adapter_for_operation, normalize_model_request, validate_local_models
     from .local_llama_runtime import DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, available_runtime
 else:
+    from core_color_hint import estimate_core_color
     from geology_reference import format_grounded_question, retrieve_notes
     from local_knowledge_search import search_folders
     from local_vlm_modes import adapter_for_operation, normalize_model_request, validate_local_models
@@ -45,6 +47,33 @@ PHOTO_REFERENCE_FIELDS = (
     "Ориентация контакта",
     "Целостность",
 )
+
+
+def _color_hint_text(hint) -> str:
+    if hint is None:
+        return ""
+    return ("\nОриентировочная оценка цвета по внутренней части вырезки: " + hint.label
+            + ". Сравни с изображением, не считай это подтверждённым фактом. "
+            "Не принимай цвет ящика, белого фона и этикеток за цвет породы. " + hint.limitation)
+
+
+def _add_color_review(result: dict, hint) -> None:
+    """Flag a strong contradiction without rewriting the model's answer."""
+    fields = result.get("fields")
+    if hint is None or not isinstance(fields, dict):
+        return
+    description = fields.get("description")
+    if not isinstance(description, str):
+        return
+    brown = bool(re.search(r"коричнев|буроват|\bбур(?:ый|ая|ое|ые|ого|ой|ых)\b", description, re.I))
+    grey = bool(re.search(r"сер(?:ый|ая|ое|ые|ого|ой|ых|ую|ым|ом)\b", description, re.I))
+    mismatch = ("сер" in hint.label and brown and not grey) or (hint.label == "коричневый" and grey and not brown)
+    if mismatch:
+        fields["description"] = description.rstrip() + (
+            "\nПроверка цвета: по внутренней части фото предварительно «" + hint.label
+            + "», что не совпадает с описанием модели. Уточните цвет вручную; освещение может влиять на оценку."
+        )
+        result["color_review_required"] = True
 
 
 def prepare_geology_reference_chat(request: dict, hits: list[dict]) -> tuple[str, list[dict], list[str]]:
@@ -249,9 +278,16 @@ class LocalModel:
         content = [{"type": "text", "text": question}]
         image_path = str(request.get("image") or "")
         image = None
+        color_hint = None
         if image_path:
             with Image.open(image_path) as opened:
                 image = opened.convert("RGB")
+                # Only describe receives an original photo crop of one core
+                # polygon/column. Whole photos or rendered columns are not
+                # reliable inputs to this simple colour estimator.
+                if operation == "describe":
+                    color_hint = estimate_core_color(image)
+                    question += _color_hint_text(color_hint)
                 if operation == "photo_chat" and image.height > image.width * 2.5:
                     # A full metre-long strip becomes only a few dozen pixels
                     # wide at 448 px. Show top/middle/bottom as three adjacent
@@ -319,7 +355,7 @@ class LocalModel:
         reference_info = ({"reference_note_ids": reference_note_ids, "scope": "general_geology_reference"}
                           if reference_note_ids else {})
         if turbo_runtime is not None:
-            result = self._turbo_reply(request, messages, hits, effective, started, load_seconds)
+            result = self._turbo_reply(request, messages, hits, effective, started, load_seconds, color_hint)
             result["model_info"].update(reference_info)
             return result
         rendered = self.processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
@@ -411,9 +447,10 @@ class LocalModel:
                 result["fields"] = {
                     key: parsed[key].strip() for key in field_names
                 }
+                _add_color_review(result, color_hint)
         return result
 
-    def _turbo_reply(self, request, messages, hits, effective, started, load_seconds):
+    def _turbo_reply(self, request, messages, hits, effective, started, load_seconds, color_hint=None):
         operation = request.get("operation")
         if operation == "describe":
             images = [part for part in messages[-1]["content"] if part.get("type") == "image"]
@@ -435,6 +472,7 @@ class LocalModel:
                 "Все поля должны содержать содержательные фразы. Не выдавай гипотезы за наблюдения. "
                 "Не определяй минералогию, флюид, цемент и точный размер зерна без данных.\n"
                 + _photo_reference_vocabulary(("Цвет", "Название породы", "Зернистость", "Слоистость", "Текстура", "Контакт"))
+                + _color_hint_text(color_hint)
                 + "\nКонтекст: " + str(request.get("context") or "")[:700]
             )
             if request.get("whole_column"):
@@ -480,6 +518,7 @@ class LocalModel:
                     if "низкая" not in value.casefold():
                         value += " (уверенность низкая)"
                     result["fields"][key] = value
+                _add_color_review(result, color_hint)
         return result
 
     def _answer_batch(self, request: dict) -> dict:
