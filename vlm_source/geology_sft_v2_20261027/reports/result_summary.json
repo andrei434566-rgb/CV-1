@@ -1,0 +1,1452 @@
+{
+  "schema": "qwen_geology_sft_v2_result",
+  "reviewed_date": "2026-10-28",
+  "record_type": "model_evaluation_audit_not_geological_reference",
+  "status": "rejected_for_general_assistant",
+  "decision": "rejected",
+  "reason": "Нет достаточного прироста фактической правильности; в корректном нативном сравнении кандидат дал 7 верных ответов из 16 против 8 у базы. Сохраняются основные ошибки геологической интерпретации.",
+  "reason_codes": [
+    "native_correctness_regression",
+    "unresolved_core_geology_errors",
+    "insufficient_visual_validation"
+  ],
+  "installed_in_application": false,
+  "geologist_approved": false,
+  "geology_accuracy": null,
+  "base_model": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "model_source_fingerprint": {
+    "algorithm": "sha256",
+    "digest": "2cdd8c6ae57793d9192ad471bfdd0758d03b4e36596c4e92e389580ffca34478",
+    "files": {
+      "chat_template.json": "6f8a6a55027e3da5160105556cda5dd69f6423f1c32645f6730d32de7773d0c4",
+      "config.json": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+      "generation_config.json": "1e241830b48b397cb0900101421df5450baddc7adf01e5fc86b5615865f3bae4",
+      "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+      "model.safetensors": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+      "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "tokenizer.json": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7",
+      "tokenizer_config.json": "c2da771801886ad9ae98181793ffd3dfb7f1af30f6f7c6a4e15d7dbba52e2399",
+      "video_preprocessor_config.json": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    }
+  },
+  "data": {
+    "training_rows": 344,
+    "new_source_cards_used": 110,
+    "previous_training_rows": 124,
+    "training_modes": {
+      "training": 64,
+      "previous_train": 60,
+      "closed_book_train": 110,
+      "supplied_context_train": 110
+    },
+    "new_scenarios": 16,
+    "new_reference_rows": 15,
+    "partition_checks": {
+      "train_unique_normalized_questions": 344,
+      "holdout_unique_normalized_questions": 39,
+      "train_duplicate_question_excess_rows": 0,
+      "train_holdout_normalized_question_overlap": 0,
+      "duplicate_record_ids": 0
+    },
+    "raw_training_validation_question_overlap": 0
+  },
+  "recipe": {
+    "loss_mode": "sft",
+    "seed": 20261027,
+    "epochs": 3.0,
+    "learning_rate": 0.0001,
+    "batch_size": 1,
+    "gradient_accumulation": 4,
+    "lora_rank": 8,
+    "lora_alpha": 16,
+    "lora_dropout": 0.05,
+    "lora_targets_recipe": "all-text-linear",
+    "max_sequence_tokens": 1024,
+    "generation": {
+      "do_sample": false,
+      "repetition_penalty": 1.05,
+      "classification_max_new_tokens": 24,
+      "theory_max_new_tokens": 160
+    }
+  },
+  "training": {
+    "train_runtime": 1109.7785,
+    "train_samples_per_second": 0.93,
+    "train_steps_per_second": 0.232,
+    "train_loss": 0.9100557685822479,
+    "epoch": 3.0,
+    "optimizer_steps": 258
+  },
+  "preflight": {
+    "checked_rows": 344,
+    "max_observed_tokens": 717,
+    "max_sequence_tokens": 1024,
+    "truncated_rows": 0
+  },
+  "qualitative_counts": {
+    "new_closed_book": {
+      "baseline": {
+        "rows": 16,
+        "correct": 0,
+        "partial": 11,
+        "incorrect": 5,
+        "uncertain": 0,
+        "completed": 0
+      },
+      "candidate": {
+        "rows": 16,
+        "correct": 2,
+        "partial": 9,
+        "incorrect": 5,
+        "uncertain": 0,
+        "completed": 16
+      }
+    },
+    "new_application_reference": {
+      "baseline": {
+        "rows": 15,
+        "correct": 5,
+        "partial": 6,
+        "incorrect": 4,
+        "uncertain": 0,
+        "completed": 10
+      },
+      "candidate": {
+        "rows": 15,
+        "correct": 5,
+        "partial": 7,
+        "incorrect": 3,
+        "uncertain": 0,
+        "completed": 15
+      }
+    },
+    "closed_book_regression": {
+      "baseline": {
+        "rows": 4,
+        "correct": 0,
+        "partial": 1,
+        "incorrect": 3,
+        "uncertain": 0,
+        "completed": 0
+      },
+      "candidate": {
+        "rows": 4,
+        "correct": 0,
+        "partial": 2,
+        "incorrect": 2,
+        "uncertain": 0,
+        "completed": 4
+      }
+    },
+    "conversation": {
+      "baseline": {
+        "rows": 4,
+        "correct": 4,
+        "partial": 0,
+        "incorrect": 0,
+        "uncertain": 0,
+        "completed": 4
+      },
+      "candidate": {
+        "rows": 4,
+        "correct": 4,
+        "partial": 0,
+        "incorrect": 0,
+        "uncertain": 0,
+        "completed": 4
+      }
+    }
+  },
+  "review_flags": {
+    "new_closed_book": {
+      "baseline": {
+        "truncated": 16,
+        "unsupported_classification": 2,
+        "conflated_rock_types": 1,
+        "incomplete_answer": 10,
+        "missing_classification": 1,
+        "nonstandard_terms": 3,
+        "unsupported_observations": 1,
+        "confused_terminology": 1,
+        "incorrect_water_process": 1,
+        "contradictory_answer": 1,
+        "reversed_roundness_criterion": 2,
+        "incorrect_classification": 1,
+        "reversed_sorting_criterion": 1,
+        "unsupported_porosity": 1,
+        "unspecified_diagnostic_criteria": 1,
+        "invented_genesis": 1,
+        "missing_matrix_cement_distinction": 1,
+        "incorrect_coal_definition": 1,
+        "incorrect_reasoning": 1,
+        "incorrect_shale_definition": 1,
+        "unsupported_facies": 1
+      },
+      "candidate": {
+        "incomplete_answer": 8,
+        "unsupported_distinguishing_criterion": 1,
+        "incorrect_structure": 1,
+        "incorrect_mechanism": 2,
+        "missing_classification": 1,
+        "unclear_wording": 2,
+        "incorrect_lithification_relation": 1,
+        "unsupported_orientation": 1,
+        "unsupported_classification": 1,
+        "incorrect_grading_label": 1,
+        "incorrect_classification": 1,
+        "invented_composition": 1,
+        "matrix_cement_confusion": 1
+      }
+    },
+    "new_application_reference": {
+      "baseline": {
+        "numeric_direction_error": 1,
+        "grading_definition_error": 2,
+        "truncated": 5,
+        "absence_of_evidence_as_evidence_of_absence": 1,
+        "invented_observations": 1,
+        "self_contradiction": 3,
+        "numeric_threshold_error": 1,
+        "missing_mudstone_replacement": 1,
+        "sentence_count_exceeds_limit": 1,
+        "carbonate_support_classification_error": 1,
+        "grainstone_with_micrite": 1,
+        "invented_classification_thresholds": 1,
+        "grain_size_category_conflation": 1,
+        "unsupported_explanation": 1,
+        "inconsistent_correction": 1,
+        "ambiguous_size_criterion": 1,
+        "unsupported_orientation": 1,
+        "missing_corrected_name": 1,
+        "ignores_supplied_composition": 1
+      },
+      "candidate": {
+        "incomplete_reconciliation": 1,
+        "ambiguous_confidence_scope": 1,
+        "missing_lithification_relation": 1,
+        "missing_micrite_definition": 1,
+        "incomplete_classification_explanation": 1,
+        "missing_sample_classifications": 1,
+        "sorting_roundness_conflation": 1,
+        "missing_sample_comparison": 1,
+        "carbonate_support_classification_error": 1,
+        "incomplete_support_criterion": 1,
+        "missing_conditional_classifications": 1,
+        "size_roundness_conflation": 1,
+        "incorrect_classification_rationale": 1,
+        "grading_definition_error": 1,
+        "unsupported_orientation": 1,
+        "ambiguous_color_based_naming": 1,
+        "missing_corrected_name": 1,
+        "ignores_supplied_composition": 1
+      }
+    },
+    "closed_book_regression": {
+      "baseline": {
+        "truncated": 4,
+        "incomplete_answer": 1,
+        "confused_terminology": 1,
+        "incorrect_rock_class": 2,
+        "incorrect_mineralogy": 1,
+        "missing_fissility": 1,
+        "incorrect_genesis": 1,
+        "unsupported_universal_properties": 1,
+        "invented_formation_conditions": 1
+      },
+      "candidate": {
+        "incorrect_distinguishing_criterion": 2,
+        "missing_fissility": 1,
+        "incomplete_answer": 2,
+        "imprecise_composition_term": 1,
+        "unsupported_distinguishing_criterion": 1
+      }
+    },
+    "conversation": {
+      "baseline": {},
+      "candidate": {}
+    }
+  },
+  "decoded_review": [
+    {
+      "record_id": "geo_v2_eval_14__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "По чёрному цвету и неразличимой зернистости сделан выбор в пользу угольной породы. Уголь смешан с углистой тонкозернистой породой; необходимое соотношение органического и минерального материала не названо.",
+      "flags": [
+        "truncated",
+        "unsupported_classification",
+        "conflated_rock_types"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_14__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно отказано в однозначном выборе по имеющимся данным. Не объяснено, что нужны доли органического и минерального материала и что уголь преимущественно органический, тогда как углистая порода может иметь минеральную основу.",
+      "flags": [
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_03__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно сказано, что слово mudstone не определяет минеральный состав. Не разделены терригенное и карбонатное значения, не указаны микритовая опора и менее 10% зёрен; не объяснено, что микрит карбонатный, а не обязательно глинистый. Степень дробления не раскрывает нужного различия.",
+      "flags": [
+        "incomplete_answer",
+        "unsupported_distinguishing_criterion"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_03__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Верно отвергнуто объединение как одинаковых по составу пород и различены терригенная порода и известняк. Фрагмент обрывается до объяснения карбонатного mudstone по Данэму и природы микрита; ключевой вопрос о глинистых минералах остаётся без ответа.",
+      "flags": [
+        "truncated",
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_12__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Верно отвергнута однозначная пустынная фация по одному признаку. В доступном фрагменте нет названия косой слоистости, миграции ряби или дюн, накопления на переднем склоне и явно допущенного водного переноса.",
+      "flags": [
+        "truncated",
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_12__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Отказ от однозначной пустынной интерпретации правилен, но сама структура ошибочно названа дислоцированной и объяснена резкой сменой направления эрозии. Косая слоистость и её образование при миграции ряби или дюн в воде либо под действием ветра не распознаны.",
+      "flags": [
+        "incorrect_structure",
+        "incorrect_mechanism"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_10__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Правильно воспроизведено различие зерновой опоры А и микритовой опоры Б. Однако вместо названий packstone и wackestone даны общие описания, ошибочно представленные как названия по Данэму; роль порога более 10% зёрен для Б не объяснена.",
+      "flags": [
+        "truncated",
+        "missing_classification",
+        "nonstandard_terms"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_10__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Общие слова о каркасе и матрице передают различие опоры, но не дают запрошенных названий пород. Для А нужен packstone при зерновой опоре с микритом, для Б — wackestone при микритовой опоре и 20% зёрен.",
+      "flags": [
+        "missing_classification",
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_16__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Неразличимость деталей ограничена данным общим снимком, отсутствие биотурбации не объявлено установленным и ихнород не назначен. Предложено микроскопическое наблюдение для проверки биотурбации. Конечное слово «нераздельности» неясно, но основной вывод о пределах данных и следующем исследовании верен.",
+      "flags": [
+        "unclear_wording"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_16__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Верно отмечено, что на снимке ходы не различимы и биотурбация не установлена; начато предложение получить увеличение. Однако без данных добавлены отсутствие резких изменений текстуры и вывод об относительной стабильности керна; проверка микроскопических признаков и предел определения ихнорода не раскрыты.",
+      "flags": [
+        "truncated",
+        "unsupported_observations",
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "v3_conglomerate_breccia",
+      "condition": "baseline",
+      "group": "closed_book_regression",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Конгломерат хотя бы отнесён к породе с крупными обломочными частицами. Главного различия по преимущественно окатанным либо угловатым обломкам нет, брекчия в доступном фрагменте не объяснена; «капли» как характеристика обломочного состава неуместны.",
+      "flags": [
+        "truncated",
+        "incomplete_answer",
+        "confused_terminology"
+      ]
+    },
+    {
+      "record_id": "v3_conglomerate_breccia",
+      "condition": "candidate",
+      "group": "closed_book_regression",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Различие ошибочно сведено к более крупным валунам и прочности связи у конгломерата против мелких, слабо связанных обломков у брекчии. Диагностична преимущественная окатанность либо угловатость крупных обломков, а не это противопоставление размеров и прочности матрикса.",
+      "flags": [
+        "incorrect_distinguishing_criterion"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_06__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно сохранены песчаная и алевритовая размерные категории и предложено убрать кварцевое определение А. Но явно не исправлено утверждение о глинистых минералах Б и не предложено отдельно определять минеральный состав обеих проб.",
+      "flags": [
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_06__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Верно отвергнуто исходное утверждение и признано, что песчаный материал не обязан быть кварцевым. Доступный фрагмент не доходит до независимости алевритового размера от глинистого минерального состава и до раздельного определения минералов; выражение «кварцевая фракция может быть не только кварцом» терминологически сбивает смысл.",
+      "flags": [
+        "truncated",
+        "incomplete_answer",
+        "confused_terminology"
+      ]
+    },
+    {
+      "record_id": "v3_mud_shale",
+      "condition": "candidate",
+      "group": "closed_book_regression",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Различие ошибочно объяснено более мелкими частицами и неопределённым «стратиграфическим следом». Не назван главный текстурный признак shale — делимость параллельно напластованию, в отличие от массивного либо слабоделимого mudstone.",
+      "flags": [
+        "incorrect_distinguishing_criterion",
+        "missing_fissility"
+      ]
+    },
+    {
+      "record_id": "v3_mud_shale",
+      "condition": "baseline",
+      "group": "closed_book_regression",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Mudstone ошибочно назван песчаником, а кварц и доломит включены в перечень глинистых минералов. Приписанные shale высокая пластичность и вязкость не раскрывают различие делимости и массивности; основной текстурный критерий отсутствует.",
+      "flags": [
+        "truncated",
+        "incorrect_rock_class",
+        "incorrect_mineralogy",
+        "missing_fissility"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_08__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Описанные уплотнение и цементация ошибочно отнесены к метаморфизму и исключены из первичной литификации. Выход поровой воды назван десорбцией, а рост цемента не назван цементацией; связь процессов с литификацией дана наоборот.",
+      "flags": [
+        "incorrect_mechanism",
+        "incorrect_lithification_relation"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_08__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Первая стадия правильно связана с уплотнением, обе стадии отнесены к литификации. Но удаление воды необоснованно названо также увлажнением; в доступном фрагменте вторая стадия не названа цементацией и различие механизмов не завершено.",
+      "flags": [
+        "truncated",
+        "incorrect_water_process",
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_13__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Без известной ориентировки выбран тип нормальной градации и выдумано направление снизу вверх. Замечание о необходимости уточнить торцы не отменяет необоснованную запись; изменение размеров само по себе не задаёт подошву и кровлю.",
+      "flags": [
+        "unsupported_orientation",
+        "unsupported_classification"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_13__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Во фрагменте верно признано, что без верха и низа направление градации однозначно не определить. Однако начало категорически разрешает записать обратную градацию, противореча этому ограничению; кровля ошибочно смешана с направлением движения частиц. Условные варианты по положению Q не приведены.",
+      "flags": [
+        "truncated",
+        "contradictory_answer",
+        "unsupported_classification",
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_09__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно указаны уменьшение крупности вверх в А и увеличение вверх в Б, и обозначение обратной градации подходит Б. Но оба слоя ошибочно названы обратно градуированными: для А при уменьшении размеров от подошвы к кровле нужна нормальная градация.",
+      "flags": [
+        "incorrect_grading_label"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_09__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Для А правильно описано уменьшение размера от подошвы к кровле. Вместо названия нормальной градации даны неопределённые «гравитационная градация» и «гравитационное смещение»; ответ обрывается до классификации Б, поэтому обе требуемые классификации не получены.",
+      "flags": [
+        "truncated",
+        "nonstandard_terms",
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "v4_coal_vs_carbonaceous",
+      "condition": "baseline",
+      "group": "closed_book_regression",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Уголь ошибочно описан как продукт углеводородов преимущественно в магматических либо метаморфических условиях; плотность, непроницаемость и низкая пористость поданы как универсальное отличие. Нужного различения по преобладанию органики и сохранению минеральной основы углистой породы нет.",
+      "flags": [
+        "truncated",
+        "incorrect_genesis",
+        "unsupported_universal_properties"
+      ]
+    },
+    {
+      "record_id": "v4_coal_vs_carbonaceous",
+      "condition": "candidate",
+      "group": "closed_book_regression",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "В целом верно противопоставлены преимущественно углеродистый материал угля и глинистая порода с углистой примесью. Не пояснены недостаточность чёрного цвета и необходимость данных о составе; «углеродное соотношение» менее точно, чем преобладание органического вещества.",
+      "flags": [
+        "incomplete_answer",
+        "imprecise_composition_term"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_01__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Брекчии ошибочно приписаны малые сглаженные обломки, а образцу Б с угловатыми крупными обломками отказано в названии брекчии. Критерий окатанности дан наоборот; правильных названий конгломерат для А и осадочная брекчия для Б нет.",
+      "flags": [
+        "truncated",
+        "reversed_roundness_criterion",
+        "incorrect_classification"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_01__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Хотя размерный диапазон справедливо не принят как единственный критерий, образец А с обломками 6–18 мм ошибочно назван песчаником и без данных о составе — гранитоидным. Ни конгломерат по окатанности А, ни брекчия по угловатости Б не установлены.",
+      "flags": [
+        "incorrect_classification",
+        "invented_composition"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_05__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно сказано, что сортировка и окатанность независимы. Но не дано требуемое сравнение: А лучше отсортирована при угловатости, Б более окатана, но хуже отсортирована. Вторая фраза не заменяет оценку проб и не объясняет признаки достаточно ясно.",
+      "flags": [
+        "incomplete_answer",
+        "unclear_wording"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_05__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Почти одинаковые размеры А ошибочно истолкованы как плохая сортировка, а острые углы — как высокая окатанность. Оба ключевых диагностических признака для А прочитаны наоборот; правильного сравнения с Б нет.",
+      "flags": [
+        "truncated",
+        "reversed_sorting_criterion",
+        "reversed_roundness_criterion"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_15__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Верно указана необходимость проверить структуру контактов, то есть одних процентов для различения недостаточно. Но микропористость из 40% зёрен и 60% микрита не следует; отсутствует условное сопоставление микритовой опоры с wackestone и зерновой опоры с packstone.",
+      "flags": [
+        "truncated",
+        "unsupported_porosity",
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_15__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Правильно отклонён однозначный выбор по процентам и предложена проверка контактов зёрен. Не завершено объяснение: следует установить тип опоры и назвать wackestone при микритовой опоре либо packstone при зерновой опоре с микритом.",
+      "flags": [
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_11__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Микропризнаки верно признаны возможным проявлением биогенной переработки. Но не объяснено согласование с отсутствием различимых ходов на общем фото и не дан ответ, что уверенное название ихнорода по этим данным не обосновано.",
+      "flags": [
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_11__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Верно признана возможная биогенная переработка по перечисленным признакам, без объявления её доказанной. Фрагмент не завершает согласование масштаба фото и шлифа и не отвечает на вопрос об уверенном ихнороде; ссылка на неназванные обязательные критерии не объясняет диагностические ограничения.",
+      "flags": [
+        "truncated",
+        "incomplete_answer",
+        "unspecified_diagnostic_criteria"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_07__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Выросший в порах кальцит ошибочно назван матриксом, хотя это кальцитовый цемент. Тонкий обломочный алевритово-глинистый материал не выделен как матрикс; требуемое различие происхождения двух межзерновых компонентов потеряно.",
+      "flags": [
+        "matrix_cement_confusion"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_07__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Для исходного тонкого обломочного материала выдумано вторичное осаждение и предложены «вторичный осадок» и «вторичный алеврот» вместо матрикса. Название кальцитового цемента в доступном фрагменте не дано, поэтому корректного разделения компонентов нет.",
+      "flags": [
+        "truncated",
+        "invented_genesis",
+        "nonstandard_terms",
+        "missing_matrix_cement_distinction"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_04__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Корректно отвергнуто название уголь из-за отсутствия преобладания углистого материала и сохранено допустимое осторожное описание чёрной тонкозернистой породы. Решение опирается на состав, а не на цвет; значимых выдумок нет.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_04__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Отказ от названия уголь сопровождается неверным объяснением, что уголь не является породой, а представляет субстрат. Противопоставление объёмной доли «содержанию» также ошибочно; верный отказ по результату не исправляет ложного основания.",
+      "flags": [
+        "truncated",
+        "incorrect_coal_definition",
+        "incorrect_reasoning"
+      ]
+    },
+    {
+      "record_id": "v3_carbonate_mudstone",
+      "condition": "baseline",
+      "group": "closed_book_regression",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Терригенный mudstone ошибочно назван глинистым известняком, что разрушает требуемое различие состава. Для карбонатного mudstone выдуманы обязательные высокие температуры и концентрация кислорода; микритовая опора и менее 10% зёрен не указаны.",
+      "flags": [
+        "truncated",
+        "incorrect_rock_class",
+        "invented_formation_conditions"
+      ]
+    },
+    {
+      "record_id": "v3_carbonate_mudstone",
+      "condition": "candidate",
+      "group": "closed_book_regression",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно лишь общее утверждение о различии состава. Сглаживание частиц не является нужным различительным критерием; не объяснены карбонатная микритовая опора с менее 10% зёрен и терригенная тонкозернистая обломочная порода.",
+      "flags": [
+        "incomplete_answer",
+        "unsupported_distinguishing_criterion"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_02__new_closed_book",
+      "condition": "baseline",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Первый образец соотнесён с shale, что согласуется с пластинчатым раскалыванием. Но shale ошибочно определён через тонкие слоистые или плёнчатые зёрна, различие раскалывания необоснованно превращено в разные фации; второй образец не исправлен на mudstone и ламинация не отделена от делимости.",
+      "flags": [
+        "truncated",
+        "incorrect_shale_definition",
+        "unsupported_facies",
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_02__new_closed_book",
+      "condition": "candidate",
+      "group": "new_closed_book",
+      "reviewer": "assistant_blind_closed_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно отделены текстурные признаки от цветовых полос и предложено наблюдать характер распада. Но конкретная запись не исправлена: не указаны shale для делимого первого образца и блоковый mudstone для второго, не раскрыто различие делимости и видимой ламинации.",
+      "flags": [
+        "incomplete_answer"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_09__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "А правильно назван нормально градуированным слоем с уменьшением размера к кровле, Б — обратно градуированным с увеличением размера к кровле.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_09__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Снижение размера 1,20 → 0,45 → 0,12 мм в слое А ошибочно названо увеличением и обратной градацией; верное определение слоя Б этого не исправляет.",
+      "flags": [
+        "numeric_direction_error",
+        "grading_definition_error"
+      ]
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_03",
+      "condition": "baseline",
+      "group": "conversation",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Краткое уместное представление по-русски с названием Kern Analyzer.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_03",
+      "condition": "candidate",
+      "group": "conversation",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Кратко и уместно представляется помощником Kern Analyzer.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_11__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Микропризнаки правильно связаны с возможной биотурбацией и названы ограничения уверенности. Однако не объяснено согласование с отсутствием ходов на общем фото, а выражение «однозначный вывод» не уточняет, относится ли ограничение именно к определению ихнорода.",
+      "flags": [
+        "incomplete_reconciliation",
+        "ambiguous_confidence_scope"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_11__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": false,
+      "reason": "До обрыва даны все основные выводы: микропризнаки поддерживают биотурбацию, невидимость макроходов её не исключает, уверенно назвать ихнород нельзя.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_16__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Предлагается ограниченная запись о невыявленных различимых ходах и запрос шлифа с увеличением; отсутствие биотурбации и определённый ихнород не объявлены установленными.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_16__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Отсутствие биотурбации объявлено установленным по невидимости ходов. Дополнительно приписано отсутствие микропризнаков, хотя шлифа и увеличенных изображений вообще нет.",
+      "flags": [
+        "absence_of_evidence_as_evidence_of_absence",
+        "invented_observations",
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_01",
+      "condition": "baseline",
+      "group": "conversation",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Нормальный уместный ответ по-русски на проверку присутствия.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_01",
+      "condition": "candidate",
+      "group": "conversation",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Уместно подтверждает присутствие и готовность помочь по-русски.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_08__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Стадии правильно соотнесены с уплотнением и цементацией, оба процесса связаны с превращением осадка в породу при литификации.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_08__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Названия обеих стадий верны и допускается их совместное действие, но запрошенная связь с литификацией не объяснена.",
+      "flags": [
+        "missing_lithification_relation"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_03__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно отвергнуто равенство состава по одному слову mudstone и различены обломочный и карбонатный материал. Не раскрыто значение микрита и не дан прямой ответ, означает ли он глинистые минералы.",
+      "flags": [
+        "missing_micrite_definition",
+        "incomplete_classification_explanation"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_03__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "incorrect",
+      "completed": false,
+      "reason": "Ответ одновременно разрешает и запрещает объединение по названию, а известняк с 5% зёрен ошибочно объявляет не соответствующим условию менее 10%. Правильное определение микрита не устраняет этих противоречий.",
+      "flags": [
+        "self_contradiction",
+        "numeric_threshold_error",
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_02__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно указано, что делимость проверяют раскалыванием, а не полосами. Но названия первого и второго образцов не предложены, поэтому запись в журнале фактически не исправлена.",
+      "flags": [
+        "missing_sample_classifications"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_02__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Первый образец правильно отнесён к shale по делимости, а второй обоснованно исключён из shale в узком смысле. Для второго не предложен блоковый mudstone, и различие полосчатости и делимости выражено лишь косвенно.",
+      "flags": [
+        "missing_mudstone_replacement"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_07__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Обломочный алевритово-глинистый материал назван матриксом, выросший в порах кальцит — цементом; компоненты корректно разделены.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_07__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Оба компонента правильно названы и разделены: тонкий обломочный матрикс и кальцитовые кристаллы цемента, сформировавшиеся в порах.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_05__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Самостоятельные признаки ошибочно названы взаимозависимыми. Требуемое сравнение А и Б по сортировке и окатанности не выполнено.",
+      "flags": [
+        "sorting_roundness_conflation",
+        "missing_sample_comparison"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_05__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "А правильно оценена как лучше отсортированная, но угловатая; Б — как более окатанная, но хуже отсортированная из-за разброса размеров. Различие признаков объяснено.",
+      "flags": [
+        "sentence_count_exceeds_limit"
+      ]
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_02",
+      "condition": "baseline",
+      "group": "conversation",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Уместная дружелюбная реакция по-русски на благодарность.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_02",
+      "condition": "candidate",
+      "group": "conversation",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Уместно отвечает на благодарность и желает успеха.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_10__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Названия обоих образцов перепутаны: зерновой каркас с микритом требует packstone для А, а микритовая опора с 20% зёрен — wackestone для Б.",
+      "flags": [
+        "carbonate_support_classification_error"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_10__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "А правильно назван packstone с зерновой опорой и микритом. Б ошибочно назван grainstone, хотя для него прямо заданы микритовая опора и присутствие микрита; нужен wackestone.",
+      "flags": [
+        "carbonate_support_classification_error",
+        "grainstone_with_micrite"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_15__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Итоговая необходимость проверить опору верна. Однако начало утверждает достаточность процентов и выдумывает пороги содержания микрита более или менее 10% для wackestone и packstone, противореча справке и собственному выводу.",
+      "flags": [
+        "invented_classification_thresholds",
+        "self_contradiction"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_15__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно отвергнут однозначный выбор по процентам. Проверка опоры упомянута неточно как поиск части зёрен, образующей опору; не объяснён выбор между микритовой и зерновой опорой и соответствующими названиями.",
+      "flags": [
+        "incomplete_support_criterion",
+        "missing_conditional_classifications"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_06__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": false,
+      "reason": "Сначала правильно указаны размерные фракции и отсутствие установленного минерального состава. Затем ошибочно объясняется исправление черновика и смешиваются размерные категории в утверждении, что алевритовая фракция может быть песчаной.",
+      "flags": [
+        "grain_size_category_conflation",
+        "unsupported_explanation",
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_06__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Зафиксированы только установленные песчаная и алевритовая размерные фракции; минеральный состав признан неизвестным, а неподтверждённые названия минералов предложено заменить размерными данными.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_01__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Названия конгломерата и осадочной брекчии верны. Но размер по-прежнему назван первичным различием вместе с окатанностью, поэтому ошибочное объяснение коллеги не исправлено.",
+      "flags": [
+        "size_roundness_conflation",
+        "incorrect_classification_rationale"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_01__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Оба образца правильно названы по сглаженности и угловатости обломков. Последняя фраза, однако, противоречиво называет само название Б ошибкой и оставляет неясное утверждение о мелком размере как одном из признаков; корректная поправка к объяснению коллеги не доведена.",
+      "flags": [
+        "inconsistent_correction",
+        "ambiguous_size_criterion"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_12__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": false,
+      "reason": "До обрыва правильно названа косая слоистость, объяснено накопление на переднем склоне мигрирующей ряби или дюн и отвергнут обязательный вывод о ветровой пустынной фации.",
+      "flags": [
+        "truncated"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_12__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Правильно названа структура, её образование связано с движением ряби или дюн; отмечено, что одного признака недостаточно для выбора водного либо ветрового процесса. Деталь накопления на переднем склоне опущена, но основной вывод сохранён.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_04",
+      "condition": "candidate",
+      "group": "conversation",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Прямой и уместный ответ на русском языке.",
+      "flags": []
+    },
+    {
+      "record_id": "source_pilot_friendly_holdout_04",
+      "condition": "baseline",
+      "group": "conversation",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "correct",
+      "completed": true,
+      "reason": "Прямо подтверждает возможность общения по-русски.",
+      "flags": []
+    },
+    {
+      "record_id": "geo_v2_eval_13__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Несмотря на последующее признание неизвестной ориентировки, сначала разрешается записать нормальную градацию и она неверно обосновывается ростом крупности вверх. Ответ противоречит и определению, и самому себе.",
+      "flags": [
+        "grading_definition_error",
+        "unsupported_orientation",
+        "self_contradiction"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_13__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "incorrect",
+      "completed": true,
+      "reason": "Рост крупности к верху ошибочно связан с нормальной градацией, а само направление к верху не установлено. Верный запрос ориентировки не устраняет ложного определения.",
+      "flags": [
+        "grading_definition_error",
+        "unsupported_orientation"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_04__new_application_reference",
+      "condition": "baseline",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Уголь обоснованно отвергнут по объёмной доле углистого вещества, пороги приведены верно и цвет не принят достаточным основанием. Однако не предложено исправленное название, а соотношение органического и минерального материала ошибочно названо недостающим при уже данных 8% и 92% по объёму.",
+      "flags": [
+        "missing_corrected_name",
+        "ignores_supplied_composition"
+      ]
+    },
+    {
+      "record_id": "geo_v2_eval_04__new_application_reference",
+      "condition": "candidate",
+      "group": "new_application_reference",
+      "reviewer": "assistant_blind_reference_v2",
+      "category": "partial",
+      "completed": true,
+      "reason": "Верно замечено несоответствие состава определению USGS. Но связь названия «уголь» с чёрным цветом оставлена как допустимая, нужное название не предложено, а уже измеренное соотношение запрашивается повторно.",
+      "flags": [
+        "ambiguous_color_based_naming",
+        "missing_corrected_name",
+        "ignores_supplied_composition"
+      ]
+    }
+  ],
+  "source_class_image_guard": {
+    "baseline": {
+      "rows": 8,
+      "correct": 2,
+      "unknown_output": 3,
+      "truncated": 0,
+      "by_source": {
+        "dcid": {
+          "rows": 4,
+          "correct": 1,
+          "accuracy": 0.25,
+          "macro_f1": 0.25,
+          "confusion_matrix": {
+            "Базальт.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 1,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 0
+            },
+            "Глинистая порода (mudstone).": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Гранит.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Красный песчаник.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 1,
+              "__unknown__": 0
+            }
+          },
+          "unknown_output": 2,
+          "truncated": 0
+        },
+        "mendeley": {
+          "rows": 4,
+          "correct": 1,
+          "accuracy": 0.25,
+          "macro_f1": 0.16666666666666666,
+          "confusion_matrix": {
+            "Глинистая порода (shale).": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Известняк.": {
+              "Глинистая порода (shale).": 1,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 0,
+              "__unknown__": 0
+            },
+            "Не керн: помехи или пустой лоток.": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 1,
+              "__unknown__": 0
+            },
+            "Песчаник.": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 1,
+              "__unknown__": 0
+            }
+          },
+          "unknown_output": 1,
+          "truncated": 0
+        }
+      }
+    },
+    "candidate": {
+      "rows": 8,
+      "correct": 2,
+      "unknown_output": 4,
+      "truncated": 1,
+      "by_source": {
+        "dcid": {
+          "rows": 4,
+          "correct": 1,
+          "accuracy": 0.25,
+          "macro_f1": 0.25,
+          "confusion_matrix": {
+            "Базальт.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 1,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 0
+            },
+            "Глинистая порода (mudstone).": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Гранит.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Красный песчаник.": {
+              "Базальт.": 0,
+              "Глинистая порода (mudstone).": 0,
+              "Гранит.": 0,
+              "Красный песчаник.": 1,
+              "__unknown__": 0
+            }
+          },
+          "unknown_output": 2,
+          "truncated": 0
+        },
+        "mendeley": {
+          "rows": 4,
+          "correct": 1,
+          "accuracy": 0.25,
+          "macro_f1": 0.16666666666666666,
+          "confusion_matrix": {
+            "Глинистая порода (shale).": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Известняк.": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 1,
+              "__unknown__": 0
+            },
+            "Не керн: помехи или пустой лоток.": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 0,
+              "__unknown__": 1
+            },
+            "Песчаник.": {
+              "Глинистая порода (shale).": 0,
+              "Известняк.": 0,
+              "Не керн: помехи или пустой лоток.": 0,
+              "Песчаник.": 1,
+              "__unknown__": 0
+            }
+          },
+          "unknown_output": 2,
+          "truncated": 1
+        }
+      }
+    }
+  },
+  "theory_token_limit_truncations": {
+    "baseline": 25,
+    "candidate": 0
+  },
+  "evaluation_seconds": {
+    "baseline": 433.323,
+    "candidate": 370.107
+  },
+  "adapter": {
+    "relative_local_directory": "vlm_core_v1/outputs/core_vlm_geology_sft_v2_20261027_lora/adapter",
+    "sha256": "73d97421dba1c9bba6e115bfcf8334099ae7cb6d51e3e437f75460bbe945f175",
+    "bytes": 34922600,
+    "binary_uploaded_to_git": false
+  },
+  "protocol_sha256": "6da4e0dadbe12c2aa3d04a2277f16a5d29085a12fbd181573aaa4c1a8eef8b24",
+  "source_sha256": {
+    "training_cards.json": "8187b2c867ab6351461db1030771778668c7070f20840b309226353c9dc136e2",
+    "source_registry.json": "30f9b24278c9467167aae91ac486dae23eadb11d268db72f2287b5e6a418a15a",
+    "evaluation_challenge.json": "31c0079b03c6e574833cab92a29cfec0d53748759682ea81120e34ff8cb30969"
+  },
+  "limitations": [
+    "Assistant blind reviews are not independent expert geologist approval.",
+    "Sixteen newly authored scenarios were frozen before training and authored separately from train cards.",
+    "Sources and concepts overlap; this is not an independent-well or image holdout and does not establish 95% facies accuracy.",
+    "Fifteen reference conditions are paired variants of the same scenarios, not fifteen extra independent scenarios.",
+    "One actual retrieval miss is retained; no oracle-selected source is inserted.",
+    "Old closed-book, dialogue and source-class image guards have been used previously in development.",
+    "This comparison uses Transformers FP16 and 160 text tokens; it does not establish native GGUF deployment quality.",
+    "Text-only training is not new photo-label training; loss, shorter answers and fewer truncations are not factual accuracy.",
+    "Raw model answers contain errors and must never become geological references or positive training targets.",
+    "No application settings, selected model, base weights or segmentation models are changed by this report utility."
+  ]
+}

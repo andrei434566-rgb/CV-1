@@ -1,0 +1,16 @@
+{
+  "schema": "qwen_geology_sft_v2_native_evidence_provenance",
+  "record_type": "audit_evidence_not_training_truth",
+  "copied_without_changes": {
+    "runtime_blind_review.json": "c1bdcd0478b42ecba58622951be1cd22a200b69ed65997b3d96390e927940b41",
+    "runtime_review_key.json": "ed894c4fa77be7b5c0c4a7d8a705d036ded15d07abd676d3ed009e0221b521b2",
+    "runtime_blind_ratings.json": "9026c3db67582fb54f4f8d141a61aad17e590bb586e89b3152335a1f37a36090"
+  },
+  "conversion_manifest_sha256": "02034f299faf47725f9573e8cdbb5f2f8059564ed04ccf9e76bf5838007819dc",
+  "original_runtime_sha256": "e89290b38984c265f0e4df562265d5f7c73a30b69381b440ae7067b41f891446",
+  "portable_runtime_sha256": "b6abcdbb6a1a5870ae5e9f8e2c63afb51cf3b461cf2bd0174211b938223894ce",
+  "candidate_gguf_sha256": "77c4643060301a36f8431705ca00332fd951dede77202f9b89a239562a7b88cb",
+  "raw_model_outputs_contain_errors": true,
+  "raw_images_included": false,
+  "model_weights_included": false
+}

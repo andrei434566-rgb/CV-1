@@ -1,0 +1,66 @@
+{
+  "geo_v2_eval_01": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "geo_v2_eval_02": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "geo_v2_eval_03": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "geo_v2_eval_04": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "geo_v2_eval_05": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "geo_v2_eval_06": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "geo_v2_eval_07": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "geo_v2_eval_08": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "geo_v2_eval_09": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "geo_v2_eval_10": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "geo_v2_eval_11": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "geo_v2_eval_12": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "geo_v2_eval_13": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "geo_v2_eval_14": {
+    "A": "baseline",
+    "B": "candidate"
+  },
+  "geo_v2_eval_15": {
+    "A": "candidate",
+    "B": "baseline"
+  },
+  "geo_v2_eval_16": {
+    "A": "candidate",
+    "B": "baseline"
+  }
+}

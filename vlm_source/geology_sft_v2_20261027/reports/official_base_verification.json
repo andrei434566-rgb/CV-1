@@ -1,0 +1,58 @@
+{
+  "schema": "qwen_official_base_file_verification_v2",
+  "source_url": "https://huggingface.co/api/models/Qwen/Qwen3-VL-2B-Instruct/revision/89644892e4d85e24eaac8bacfd4f463576704203?blobs=true",
+  "revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "checks": [
+    {
+      "file": "chat_template.json",
+      "verified": true,
+      "method": "Git blob SHA1 of local bytes vs official blobId"
+    },
+    {
+      "file": "config.json",
+      "verified": true,
+      "method": "Git blob SHA1 of local bytes vs official blobId"
+    },
+    {
+      "file": "generation_config.json",
+      "verified": true,
+      "method": "Git blob SHA1 of local bytes vs official blobId"
+    },
+    {
+      "file": "merges.txt",
+      "verified": true,
+      "method": "Git blob SHA1 of local bytes vs official blobId"
+    },
+    {
+      "file": "model.safetensors",
+      "verified": true,
+      "method": "LFS SHA256 vs full training fingerprint"
+    },
+    {
+      "file": "preprocessor_config.json",
+      "verified": true,
+      "method": "Git blob SHA1 of local bytes vs official blobId"
+    },
+    {
+      "file": "tokenizer.json",
+      "verified": true,
+      "method": "Git blob SHA1 of local bytes vs official blobId"
+    },
+    {
+      "file": "tokenizer_config.json",
+      "verified": true,
+      "method": "Git blob SHA1 of local bytes vs official blobId"
+    },
+    {
+      "file": "video_preprocessor_config.json",
+      "verified": true,
+      "method": "Git blob SHA1 of local bytes vs official blobId"
+    },
+    {
+      "file": "vocab.json",
+      "verified": true,
+      "method": "Git blob SHA1 of local bytes vs official blobId"
+    }
+  ],
+  "all_verified": true
+}

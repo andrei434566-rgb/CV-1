@@ -1,0 +1,19 @@
+{
+  "schema": "qwen_sft_v2_native_invalid_control_provenance",
+  "valid_for_model_comparison": false,
+  "qualitative_quality_counts_published": false,
+  "original_runtime_sha256": "eae5aaf6d8a80c1291e90c067c3f6da08da7f67f2900412399b1c82fd82f8d20",
+  "portable_runtime_sha256": "91cc486b7b0e25efd784eccca218eb1b4b32ab6e39c90f1f5396463c24205b75",
+  "copied_without_changes": {
+    "runtime_blind_review.json": "3b355ab247192d3bec3e42a39f99fa54d696bdfce7b2743ac21dbf8c7ffa726f",
+    "runtime_review_key.json": "d7a33b20d526d8abfcd4aefafb6153ef18b43cf6e8eaddcc3082383b422dd32c",
+    "runtime_blind_ratings.json": "5d34846b7afedbdfbd1e22845ca9b295ddbe1f6c8f4fa5bb8f83de024e216b24"
+  },
+  "primary_source_evidence": [
+    "https://github.com/ggml-org/llama.cpp/blob/b11913/tools/server/server-context.cpp#L1764-L1778",
+    "https://github.com/ggml-org/llama.cpp/blob/b11913/common/common.cpp#L1392"
+  ],
+  "raw_model_outputs_contain_errors": true,
+  "raw_images_included": false,
+  "model_weights_included": false
+}

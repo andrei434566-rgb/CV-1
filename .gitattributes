@@ -7,3 +7,4 @@
 /vlm_source/geology_sft_v2_20261027/*.json text eol=lf
 /vlm_source/geology_sft_v2_20261027/reports/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 /scripts/llama_lora_converter_b11913.lock.json text eol=lf
+/app/resources/theory/theory_cards_sft_v2.json text eol=lf

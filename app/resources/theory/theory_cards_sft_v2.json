@@ -1,0 +1,2303 @@
+{
+  "schema": "kern_source_checked_reference_supplement_v1",
+  "delivery": "offline_reference_answers_not_model_weight_training",
+  "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+  "geologist_reviewed": false,
+  "scope": "Exact TRAIN question lookup only; does not certify VLM weights, photo descriptions or facies.",
+  "source_manifest_sha256": "8187b2c867ab6351461db1030771778668c7070f20840b309226353c9dc136e2",
+  "source_registry_sha256": "30f9b24278c9467167aae91ac486dae23eadb11d268db72f2287b5e6a418a15a",
+  "counts": {
+    "cards": 110,
+    "sources": 9,
+    "validation_cards_included": 0
+  },
+  "sources": {
+    "geo_sft_v2_earle14": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 1.4 Minerals and Rocks",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/1-4-minerals-and-rocks/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Definitions of mineral and rock; igneous, sedimentary, metamorphic origins"
+      ]
+    },
+    "geo_sft_v2_earle34": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 3.4 Classification of Igneous Rock",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/3-4-classification-of-igneous-rock/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Composition and texture; visible crystals in intrusive rocks; limitations of estimating composition"
+      ]
+    },
+    "geo_sft_v2_earle72": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 7.2 Classification of Metamorphic Rocks",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/7-2-classification-of-metamorphic-rocks/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Foliation versus original bedding",
+        "Nonfoliated marble and quartzite; slate and schist"
+      ]
+    },
+    "geo_sft_v2_earle61": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.1 Clastic Sedimentary Rocks",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-1-clastic-sedimentary-rocks/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Table 6.1 grain sizes as printed in this book, including 2 micrometre clay cutoff, not asserted universal",
+        "Lithification and cementation",
+        "Sandstone fine material and coarse clast roundness"
+      ]
+    },
+    "geo_sft_v2_biddle25": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Biddle, LaGrange, Harris, Egenhoff and Gingras (2025), Current concepts in mudstone description and deposition: A synthesis for mudstone initiates",
+      "url": "https://oap.unige.ch/journals/sdk/article/view/1621",
+      "doi": "10.57035/journals/sdk.2025.e31.1621",
+      "source_type": "Author-written review/synthesis, not a new primary experiment",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "Official full article License explicitly states Copyright 2025 named authors, CC BY 4.0; directly read.",
+      "attribution": "Adapted from Biddle et al. (2025), Sedimentologika, DOI 10.57035/journals/sdk.2025.e31.1621, CC BY 4.0. Changes: Russian condensation and new questions.",
+      "access": "Full journal HTML directly read, including sections 2.2, 2.3 and microscopic-bioturbation discussion.",
+      "sections": [
+        "2.2 shale/fissility versus lamination and variable usage",
+        "2.3 size versus mineral composition and variable clay cutoffs",
+        "Microscopic bioturbation versus absent macroscopic traces and preparation scratches"
+      ]
+    },
+    "geo_sft_v2_earle64": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.4 Sedimentary Structures and Fossils",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-4-sedimentary-structures-and-fossils/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Bedding and partings",
+        "Cross-bedding",
+        "Normal and reverse grading",
+        "Independent grain characteristics"
+      ]
+    },
+    "geo_sft_v2_iodp356": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Gallagher, Fulthorpe, Bogus et al. (2017), Expedition 356 methods, Proceedings of the International Ocean Discovery Program 356",
+      "url": "https://publications.iodp.org/proceedings/356/102/356_102.html",
+      "doi": "10.14379/iodp.proc.356.102.2017",
+      "license": "CC BY 4.0 except where otherwise noted",
+      "license_url": "https://iodp.tamu.edu/about/copyright.html",
+      "license_evidence": "Official Licensing Statement directly read: expedition publications licensed CC BY 4.0 unless otherwise noted. No third-party figure is reproduced.",
+      "attribution": "Adapted from Gallagher et al. (2017), Expedition 356 methods, IODP, DOI 10.14379/iodp.proc.356.102.2017, CC BY 4.0. Changes: short original Russian paraphrases.",
+      "access": "Directly read official full HTML and linked licensing statement.",
+      "sections": [
+        "Lithostratigraphy and sedimentology: complementary core/thin-section/XRD observations",
+        "Lithification mechanical criteria",
+        "Principal carbonate names: Dunham support and micrite",
+        "Drilling disturbance: fractured, fragmented, flow-in, mixed",
+        "Color and descriptive structures"
+      ]
+    },
+    "geo_sft_v2_usgscoal": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "U.S. Geological Survey, What is coal?",
+      "url": "https://www.usgs.gov/faqs/what-coal",
+      "license": "U.S. public domain for USGS-authored text; no third-party media used",
+      "license_url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+      "license_evidence": "USGS Copyrights and Credits directly read; USGS-authored information is U.S. public domain, with third-party exceptions excluded.",
+      "attribution": "Source: U.S. Geological Survey, What is coal? Original Russian factual paraphrase; no image reused.",
+      "access": "Official FAQ definition and USGS copyrights page directly read.",
+      "sections": [
+        "Plant remains and geological transformation",
+        "More than50% byweight and70% byvolume carbonaceous material, including inherent moisture"
+      ]
+    },
+    "geo_sft_v2_earle63": {
+      "source_checked_date": "2026-10-27",
+      "source_checked": true,
+      "geologist_reviewed": false,
+      "transformation": "Original concise Russian adaptation; new authored training questions, not copied exercises; no figures or photographs reproduced.",
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition: 6.3 Depositional Environments and Sedimentary Basins",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-3-depositional-environments-and-sedimentary-basins/",
+      "license": "CC BY 4.0 except individually credited exceptions; only original prose and factual classification are adapted",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_evidence": "The inspected chapter footer explicitly states Copyright 2019 Steven Earle and CC BY 4.0 except where otherwise noted. No third-party figure/exercise is reproduced.",
+      "attribution": "Adapted from Steven Earle, Physical Geology, 2nd Edition (2019), CC BY 4.0. Changes: original Russian condensation and newly written questions.",
+      "access": "Official full HTML directly read on 2026-10-27.",
+      "sections": [
+        "Tables 6.4 and 6.5 transport/processes and non-unique sediments in depositional environments"
+      ]
+    }
+  },
+  "cards": [
+    {
+      "id": "sft2_rock_mineral_01",
+      "question": "Кварц и гранит относятся к одному уровню названий?",
+      "answer": "Нет. Кварц — минерал, а гранит — горная порода, обычно состоящая из нескольких минералов.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_rock_mineral_02",
+      "question": "Если известняк преимущественно кальцитовый, он перестаёт быть породой?",
+      "answer": "Нет. Порода может состоять преимущественно из одного минерала; кальцит — минерал, а известняк — название породы.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_rock_mineral_03",
+      "question": "В описании нужно назвать породу; допустимо ответить только «полевой шпат»?",
+      "answer": "Полевой шпат — название минерала, поэтому такой ответ не заменяет определение породы.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_rock_mineral_04",
+      "question": "Какая разница между минеральным составом и названием породы?",
+      "answer": "Минеральный состав перечисляет компоненты, а название породы характеризует их совокупность и принятый тип породы.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_rock_mineral_05",
+      "question": "Назови два минерала и две породы без смешения терминов.",
+      "answer": "Минералы: кварц и кальцит. Породы: гранит и песчаник.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_genetic_groups_01",
+      "question": "Что объединяет гранит и базальт по происхождению?",
+      "answer": "Оба относятся к магматическим породам и образуются при остывании расплава.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_genetic_groups_02",
+      "question": "Песчаник образуется непосредственно при застывании лавы?",
+      "answer": "Нет. Песчаник — осадочная порода, образованная из накопившегося песчаного материала.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_genetic_groups_03",
+      "question": "Метаморфическая порода обязательно произошла только из осадочной?",
+      "answer": "Нет. Метаморфизм может преобразовывать как осадочные, так и магматические породы.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_genetic_groups_04",
+      "question": "Перечисли главные генетические группы горных пород.",
+      "answer": "Главные группы — магматические, осадочные и метаморфические; они различаются происхождением.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_genetic_groups_05",
+      "question": "Почему по одному светлому цвету нельзя отнести породу к осадочной группе?",
+      "answer": "Цвет не устанавливает способ образования. Для генетической группы нужны признаки состава, строения и происхождения породы.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_igneous_texture_01",
+      "question": "Почему у гранита часто различимы отдельные кристаллы?",
+      "answer": "Медленное остывание расплава в глубине способствует росту различимых кристаллов.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14",
+        "geo_sft_v2_earle34"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_igneous_texture_02",
+      "question": "Чем обычно различается история охлаждения гранита и базальта?",
+      "answer": "Гранит обычно остывает медленнее в глубине, а базальт образуется при более быстром остывании лавы у поверхности.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14",
+        "geo_sft_v2_earle34"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_igneous_texture_03",
+      "question": "Любая тёмная порода на снимке — точно базальт?",
+      "answer": "Нет. Для определения базальта нужны признаки состава и строения; тёмный цвет сам по себе недостаточен.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14",
+        "geo_sft_v2_earle34"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_igneous_texture_04",
+      "question": "Достаточно видимых кристаллов, чтобы назвать образец именно гранитом?",
+      "answer": "Нет. Видимые кристаллы характеризуют строение, а для названия гранит необходим соответствующий минеральный состав.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14",
+        "geo_sft_v2_earle34"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_igneous_texture_05",
+      "question": "Какие два типа признаков используют при классификации магматических пород?",
+      "answer": "Учитывают минеральный состав и текстуру, включая размеры и взаимное расположение кристаллов.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle14",
+        "geo_sft_v2_earle34"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_metamorphic_foliation_01",
+      "question": "Любая полосчатость метаморфической породы является первичной осадочной слоистостью?",
+      "answer": "Нет. Полосчатость или фолиация может возникать при метаморфизме и отличаться от исходного напластования.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle72"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_metamorphic_foliation_02",
+      "question": "Отсутствие сланцеватости позволяет исключить все метаморфические породы?",
+      "answer": "Нет. Мрамор и кварцит обычно не имеют выраженной фолиации.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle72"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_metamorphic_foliation_03",
+      "question": "С чем связана ориентировка пластинчатых минералов при метаморфизме?",
+      "answer": "Она связана с деформацией и ростом минералов в условиях направленного напряжения.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle72"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_metamorphic_foliation_04",
+      "question": "Если в образце заметны две системы плоскостей, можно сразу объединить их в один тип слоистости?",
+      "answer": "Не следует. Первичное напластование и метаморфическая фолиация могут различаться и требуют отдельного описания.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle72"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_metamorphic_foliation_05",
+      "question": "Мрамор и кварцит обязательно должны раскалываться как сланец?",
+      "answer": "Нет. Их минералы обычно не формируют такую выраженную параллельную ориентировку, как у сланцев.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle72"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_grain_scale_01",
+      "question": "По таблице 6.1 Earle частица 0,2 мм относится к песку или алевриту?",
+      "answer": "По этой таблице 0,2 мм относится к песчаной фракции.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61",
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_grain_scale_02",
+      "question": "Как классифицировать частицу 20 мкм по таблице 6.1 Earle?",
+      "answer": "По этой таблице 20 мкм относится к алевритовой фракции.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61",
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_grain_scale_03",
+      "question": "Частица 1 мкм по таблице Earle — глинистой размерности?",
+      "answer": "Да. В указанной таблице глинистая размерная фракция имеет размер менее 2 мкм.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61",
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_grain_scale_04",
+      "question": "Можно ли без указания схемы утверждать, что граница глинистой фракции везде одна?",
+      "answer": "Нет. В литературе используют разные границы, поэтому принятую размерную шкалу нужно явно назвать.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61",
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_grain_scale_05",
+      "question": "В чём ошибка записи «частицы 30, мелкие», если требуется сравнение зернистости?",
+      "answer": "Не указаны единицы измерения и размерная шкала. Число без них не позволяет однозначно классифицировать частицы.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61",
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_fraction_mineralogy_01",
+      "question": "Все частицы глинистой размерности состоят из глинистых минералов?",
+      "answer": "Нет. К глинистой размерной фракции могут относиться очень мелкие частицы кварца и полевых шпатов.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_fraction_mineralogy_02",
+      "question": "Если зерно кварца очень мелкое, меняется ли его минеральное название на глину?",
+      "answer": "Нет. Размерная категория не меняет минеральный состав: частица остаётся кварцем.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_fraction_mineralogy_03",
+      "question": "Можно ли по доле глинистой размерной фракции точно получить долю глинистых минералов?",
+      "answer": "Нет. Размер и минеральный состав описывают разные свойства и определяются отдельно.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_fraction_mineralogy_04",
+      "question": "Пластинка глинистого минерала обязательно мельче любого алевритового зерна?",
+      "answer": "Нет. Пластинки глинистых минералов могут иметь алевритовый размер.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_fraction_mineralogy_05",
+      "question": "Как правильно разделить сведения «60% частиц мельче принятой границы» и «есть кварц»?",
+      "answer": "Первое относится к гранулометрии, второе — к минеральному составу. Эти сведения следует записывать раздельно.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_clast_shape_01",
+      "question": "Какой признак важнее для различения конгломерата и осадочной брекчии при одинаковой крупности?",
+      "answer": "Преобладающая окатанность крупных обломков: у конгломерата они окатанные, у осадочной брекчии угловатые.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_clast_shape_02",
+      "question": "Обломки размером 8 мм преимущественно угловатые; какое предварительное название крупнообломочной породы подходит?",
+      "answer": "По этим признакам подходит осадочная брекчия; основание — угловатая форма крупных обломков.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_clast_shape_03",
+      "question": "В породе преобладают окатанные гальки 15 мм; какое название соответствует признакам?",
+      "answer": "Этим признакам соответствует конгломерат.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_clast_shape_04",
+      "question": "Брекчия обязательно мельче конгломерата?",
+      "answer": "Нет. Различие этой пары связано прежде всего с угловатостью или окатанностью крупных обломков.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_clast_shape_05",
+      "question": "Можно ли заменить запись об окатанности словами «обломки гранитные»?",
+      "answer": "Нет. «Гранитные» характеризует состав обломков, а окатанность описывает их форму.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_sorting_roundness_01",
+      "question": "У всех зёрен примерно одинаковый размер, но острые края. Как разделить два признака?",
+      "answer": "Сортировка хорошая, а окатанность низкая: однородный размер не означает сглаженные края.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_sorting_roundness_02",
+      "question": "Смесь очень разных по размеру, но сглаженных обломков хорошо отсортирована?",
+      "answer": "Нет. Разброс размеров указывает на плохую сортировку, хотя обломки могут быть хорошо окатанными.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_sorting_roundness_03",
+      "question": "Что оценивают при сортировке осадка?",
+      "answer": "Оценивают однородность размеров частиц, а не их минеральный состав или степень сглаживания углов.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_sorting_roundness_04",
+      "question": "Высокая окатанность гарантирует одинаковый размер всех зёрен?",
+      "answer": "Нет. Окатанность и размерная сортировка — независимые признаки.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_sorting_roundness_05",
+      "question": "Как записать различие между узким и широким диапазоном размеров частиц?",
+      "answer": "Узкий диапазон соответствует лучшей сортировке, широкий — худшей; форму обломков нужно описать отдельно.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_matrix_cement_01",
+      "question": "Тонкий обломочный материал между песчаными зёрнами и выросший в порах кальцит — одно и то же?",
+      "answer": "Нет. Тонкий обломочный материал относится к матриксу, а кристаллизовавшийся в порах кальцит — к цементу.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_matrix_cement_02",
+      "question": "Что означает слово «цемент» при описании песчаника?",
+      "answer": "Это минералы, кристаллизовавшиеся в порах и у контактов зёрен и связывающие обломки.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_matrix_cement_03",
+      "question": "Любое вещество между зёрнами автоматически является цементом?",
+      "answer": "Нет. Между зёрнами может находиться тонкий обломочный матрикс; происхождение вещества нужно различать.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_matrix_cement_04",
+      "question": "Можно ли считать содержание матрикса точным названием минерала цемента?",
+      "answer": "Нет. Доля матрикса и минеральный состав цемента — разные характеристики.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_matrix_cement_05",
+      "question": "Если кварц кристаллизовался в порах после накопления осадка, какую роль он может выполнять?",
+      "answer": "Такой кварц может выполнять роль цемента, связывающего обломочные зёрна.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_lithification_01",
+      "question": "Литификация и цементация — полностью одинаковые понятия?",
+      "answer": "Нет. Литификация включает несколько процессов превращения осадка в породу, а цементация является одним из них.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61",
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_lithification_02",
+      "question": "Чем уплотнение отличается от образования цемента?",
+      "answer": "При уплотнении частицы сближаются, а при цементации минералы кристаллизуются в порах и связывают зёрна.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61",
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_lithification_03",
+      "question": "Можно ли по общему фото точно установить, царапается ли порода ногтем?",
+      "answer": "Нет. Это механическое свойство требует соответствующей проверки образца.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61",
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_lithification_04",
+      "question": "Если осадок стал плотнее, обязательно ли весь эффект вызван новым цементом?",
+      "answer": "Нет. Сближение частиц при уплотнении также изменяет осадок.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61",
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_lithification_05",
+      "question": "Какие процессы чаще всего нужно различать при объяснении превращения осадка в породу?",
+      "answer": "Следует различать уплотнение и цементацию; они имеют разные механизмы и могут действовать совместно.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle61",
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_bedding_01",
+      "question": "Может ли слоистость быть видна только по изменению окраски при одинаковой крупности?",
+      "answer": "Да. Слои могут различаться цветом или составом, а не только размером частиц.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_bedding_02",
+      "question": "Наличие слоёв само по себе доказывает морское происхождение?",
+      "answer": "Нет. Напластование встречается во многих обстановках осадконакопления.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_bedding_03",
+      "question": "Что сначала фиксировать: видимое чередование полос или единственную обстановку?",
+      "answer": "Сначала фиксируют наблюдаемое чередование и признаки слоёв; интерпретацию обстановки обосновывают отдельно.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_bedding_04",
+      "question": "Если соседние слои кажутся одинаковыми, могут ли их выделять поверхности раздела?",
+      "answer": "Да. Поверхности или узкие промежутки раздела могут обозначать границы внешне сходных слоёв.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_bedding_05",
+      "question": "Какие признаки, кроме зернистости, могут обозначать напластование?",
+      "answer": "Напластование может быть выражено изменением состава, цвета, текстуры или особенностей выветривания.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_cross_bedding_01",
+      "question": "Наклонные слойки внутри ограниченной серии обязательно являются тектоническим наклоном всей толщи?",
+      "answer": "Нет. Они могут представлять косую слоистость, сформированную при миграции ряби или дюн.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_cross_bedding_02",
+      "question": "Косая слоистость бывает только в водных отложениях?",
+      "answer": "Нет. Она может формироваться при переносе материала как водой, так и ветром.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_cross_bedding_03",
+      "question": "Почему в косослоистом песке одни слойки срезают другие?",
+      "answer": "При миграции ряби или дюн последующие формы могут частично размывать ранее накопленный материал.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_cross_bedding_04",
+      "question": "Что нужно отметить при описании косослоистой серии?",
+      "answer": "Следует отметить наклон внутренних слоек, границы серии и характер срезания предыдущих отложений.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_cross_bedding_05",
+      "question": "Одного признака косой слоистости достаточно для уверенного выбора «река» вместо «дюны»?",
+      "answer": "Нет. Для выбора между водным и эоловым происхождением нужны дополнительные признаки.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_normal_grading_01",
+      "question": "От подошвы к кровле размеры уменьшаются: 1,2 мм, 0,3 мм, 0,08 мм. Как назвать градацию?",
+      "answer": "Это нормальная градация: крупность последовательно уменьшается снизу вверх.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_normal_grading_02",
+      "question": "У основания слоя песок крупнее, у кровли тоньше. Это обратная градация?",
+      "answer": "Нет. Уменьшение размера зёрен к кровле соответствует нормальной градации.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_normal_grading_03",
+      "question": "Что означает нормальная градационная слоистость простыми словами?",
+      "answer": "В пределах слоя крупные частицы преобладают внизу, а вверх размер частиц уменьшается.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_normal_grading_04",
+      "question": "Верх слоя содержит частицы 0,1 мм, низ — 0,9 мм. Каково изменение снизу вверх?",
+      "answer": "Размер уменьшается от 0,9 до 0,1 мм, поэтому градация нормальная.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_normal_grading_05",
+      "question": "Если 0,7 мм внизу сменяется 0,2 мм наверху, можно сказать «размер увеличивается вверх»?",
+      "answer": "Нет. Размер уменьшается вверх; это нормальная, а не обратная градация.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_reverse_grading_01",
+      "question": "От низа к верху частицы становятся крупнее: 0,04 мм, 0,2 мм, 0,8 мм. Какой это тип градации?",
+      "answer": "Это обратная градация: размер частиц увеличивается снизу вверх.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_reverse_grading_02",
+      "question": "В подошве размер 0,15 мм, в кровле 1,1 мм. Это нормальная градация?",
+      "answer": "Нет. Увеличение крупности к кровле означает обратную градацию.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_reverse_grading_03",
+      "question": "Что нужно уточнить, если прислали только ряд размеров 0,1; 0,4; 0,9 мм?",
+      "answer": "Нужно уточнить, в каком направлении по слою дан ряд и где его кровля и подошва.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_reverse_grading_04",
+      "question": "Можно ли классифицировать градацию только по переходу от серого цвета к тёмному?",
+      "answer": "Нет. Градация определяется изменением размера частиц, а не одним изменением окраски.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_reverse_grading_05",
+      "question": "Как описать слой, если верх крупнее основания, не объявляя единственную обстановку?",
+      "answer": "Укажите обратную градационную слоистость: крупность увеличивается к кровле. Обстановку нужно обосновывать дополнительными признаками.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_dunham_01",
+      "question": "У карбонатной породы микритовая опора и 3% зёрен. Какое название подходит по Данэму?",
+      "answer": "По указанным признакам подходит карбонатный mudstone: микритовая опора и менее 10% зёрен.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_dunham_02",
+      "question": "При микритовой опоре подсчитано 25% зёрен. Это mudstone или wackestone?",
+      "answer": "Это wackestone, поскольку опора микритовая, а доля зёрен превышает 10%.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_dunham_03",
+      "question": "Зёрна образуют каркас, в промежутках есть карбонатный ил. Какой вариант: packstone или grainstone?",
+      "answer": "Подходит packstone: зерновая опора сочетается с межзерновым карбонатным илом.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_dunham_04",
+      "question": "Какое условие отличает grainstone от packstone при зерновой опоре?",
+      "answer": "Для grainstone характерно отсутствие межзернового карбонатного ила; в packstone он присутствует.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_dunham_05",
+      "question": "Почему светлый оттенок не позволяет выбрать название grainstone?",
+      "answer": "Grainstone определяется зерновой опорой и отсутствием карбонатного ила, а не светлой окраской.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_mudstone_terms_01",
+      "question": "В обоих описаниях написано mudstone; значит ли это одинаковый состав пород?",
+      "answer": "Нет. Терригенный mudstone и карбонатный mudstone по Данэму относятся к разным номенклатурным значениям.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25",
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_mudstone_terms_02",
+      "question": "Карбонатный mudstone обязательно сложен глинистыми минералами из-за части слова mud?",
+      "answer": "Нет. В классификации Данэма опору даёт тонкий карбонатный микрит, а не обязательно глинистые минералы.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25",
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_mudstone_terms_03",
+      "question": "Какой признак соответствует узкому текстурному употреблению shale?",
+      "answer": "Предпочтительное раскалывание по близким параллельным поверхностям, то есть делимость.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25",
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_mudstone_terms_04",
+      "question": "Видимые тонкие полосы и способность раскалываться на пластины — один признак?",
+      "answer": "Нет. Первичная ламинация описывает строение отложения, а делимость — характер раскалывания породы.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25",
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_mudstone_terms_05",
+      "question": "Отсутствие видимой ламинации само по себе доказывает, что образец shale?",
+      "answer": "Нет. Для узкого текстурного употребления shale требуется наблюдение делимости, а не просто отсутствие ламинации.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25",
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_coal_01",
+      "question": "Из какого исходного материала образуется уголь?",
+      "answer": "Уголь образуется при длительном преобразовании растительных остатков.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_usgscoal",
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_coal_02",
+      "question": "Чёрный цвет гарантирует, что тонкозернистая порода является углём?",
+      "answer": "Нет. Для различения нужны данные о соотношении органического и минерального материала.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_usgscoal",
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_coal_03",
+      "question": "Порог более 50% по массе в определении USGS относится к чистому элементарному углероду?",
+      "answer": "Нет. Он относится к углистому веществу и учитывает собственную влагу.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_usgscoal",
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_coal_04",
+      "question": "Какое содержательное различие искать между углём и углистой тонкозернистой породой?",
+      "answer": "Следует оценить преобладание органического материала и долю сохраняющейся минеральной основы.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_usgscoal",
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_coal_05",
+      "question": "Можно ли всем углям автоматически приписать одинаковую плотность, пористость и проницаемость?",
+      "answer": "Нет. Определение угля не задаёт единых значений этих свойств для всех образцов.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_usgscoal",
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_bioturbation_01",
+      "question": "Что в осадочной породе называют биотурбацией?",
+      "answer": "Биотурбация — переработка осадка организмами, способная изменять его первичную текстуру.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_bioturbation_02",
+      "question": "Если на общем фото не видно ходов, можно установить нулевую биотурбацию?",
+      "answer": "Нет. Микроскопические или слабо контрастные следы могут быть неразличимы на общем фото.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_bioturbation_03",
+      "question": "Почему заполнение хода трудно заметить при сходстве с окружающей породой?",
+      "answer": "Слабый литологический контраст затрудняет распознавание даже реально существующего следа.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_bioturbation_04",
+      "question": "Любая тонкая прямая линия на шлифе является следом организма?",
+      "answer": "Нет. Линия может быть царапиной подготовки; нужно проверить её отношение к первичной текстуре.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_bioturbation_05",
+      "question": "Как уточнить подозрение на мелкую биогенную переработку тонкозернистой породы?",
+      "answer": "Нужно исследовать внутреннюю текстуру в подходящем масштабе, в том числе в шлифе, и проверить признаки её нарушения.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_biddle25"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_drilling_disturbance_01",
+      "question": "Разбитые куски керна обязательно свидетельствуют об осадочной брекчии?",
+      "answer": "Нет. Раздробленность может возникнуть при бурении и отборе; происхождение обломков нужно проверять отдельно.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_drilling_disturbance_02",
+      "question": "Как в методике IODP различаются fractured и fragmented?",
+      "answer": "Fractured обычно сохраняет положение разбитых частей, а при fragmented части часто смещены или повёрнуты.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_drilling_disturbance_03",
+      "question": "Что означает flow-in при описании нарушения керна?",
+      "answer": "Это деформация мягкого осадка при отборе, включая растяжение или сдвиговое перемещение.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_drilling_disturbance_04",
+      "question": "Если материал перемешан вдоль керна, можно сразу назвать это биотурбацией?",
+      "answer": "Нет. Перемешивание может быть нарушением при бурении; в методике IODP его отдельно описывают как mixed.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_drilling_disturbance_05",
+      "question": "Почему буровые нарушения нужно отмечать отдельно от слоистости?",
+      "answer": "Они могут изменять или разрушать исходное строение и поэтому не должны подменять описание первичных структур.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_photo_limits_01",
+      "question": "Можно ли по цветной фотографии точно получить минеральные проценты без анализа?",
+      "answer": "Нет. Фото даёт видимые признаки, а точный минеральный состав требует соответствующего исследования.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356",
+        "geo_sft_v2_earle34"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_photo_limits_02",
+      "question": "Фото показывает серые полосы; как записать это без выдуманного минерала?",
+      "answer": "Запишите наблюдаемую серую полосчатость. Минеральный состав полос следует уточнять отдельным исследованием.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356",
+        "geo_sft_v2_earle34"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_photo_limits_03",
+      "question": "След распила может мешать распознаванию тонкой структуры керна?",
+      "answer": "Да. Подготовка поверхности способна изменять её вид и скрывать тонкие детали.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356",
+        "geo_sft_v2_earle34"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_photo_limits_04",
+      "question": "Можно ли приписать точную прочность образцу только по его внешнему виду?",
+      "answer": "Нет. Фото не заменяет механическое испытание прочности.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356",
+        "geo_sft_v2_earle34"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_photo_limits_05",
+      "question": "Что делать, если общий снимок позволяет видеть слои, но не различать отдельные мелкие зёрна?",
+      "answer": "Опишите видимое напластование, а крупность мелких частиц уточните при большем увеличении или соответствующем анализе.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356",
+        "geo_sft_v2_earle34"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_depositional_context_01",
+      "question": "Наличие песчаника однозначно доказывает речное русло?",
+      "answer": "Нет. Песок может накапливаться в речных, пляжевых и эоловых условиях; нужны дополнительные признаки.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle63",
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_depositional_context_02",
+      "question": "Мелкий осадок обязательно глубоководный?",
+      "answer": "Нет. Тонкий материал встречается в разных обстановках, включая озёра и морские бассейны.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle63",
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_depositional_context_03",
+      "question": "Почему фациальную интерпретацию нельзя свести только к названию породы?",
+      "answer": "Одни и те же типы осадка встречаются в разных средах; интерпретация требует совокупности признаков.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle63",
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_depositional_context_04",
+      "question": "Какие данные сопоставить перед выбором обстановки осадконакопления?",
+      "answer": "Сопоставляют состав, зернистость, осадочные структуры и другие независимые наблюдения.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle63",
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_depositional_context_05",
+      "question": "Если справочник перечисляет реки среди мест накопления песка, значит ли это, что любой песчаный керн русловой?",
+      "answer": "Нет. Перечень возможных сред не устанавливает обстановку конкретного образца.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_earle63",
+        "geo_sft_v2_earle64"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_description_workflow_01",
+      "question": "Зачем указывать глубину образца, для которого изготовили шлиф?",
+      "answer": "Чтобы результат микроскопического исследования можно было связать с конкретным интервалом керна.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_description_workflow_02",
+      "question": "Если лабораторный состав уточнён для одного образца, можно молча перенести его на весь ящик?",
+      "answer": "Нет. Подтверждённый результат должен сохранять привязку к исследованному образцу и интервалу.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_description_workflow_03",
+      "question": "Литология и степень литификации являются одним полем описания?",
+      "answer": "Это разные признаки: литология характеризует состав и текстуру, а степень литификации — состояние превращения осадка в породу.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_description_workflow_04",
+      "question": "Для чего сочетать визуальное описание с микроскопическими исследованиями?",
+      "answer": "Они дают взаимодополняющие наблюдения и помогают проверять состав и текстуру, неразличимые на общем виде.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    },
+    {
+      "id": "sft2_description_workflow_05",
+      "question": "Как сделать описание проверяемым специалистом?",
+      "answer": "Сохраните привязку наблюдений и анализов к интервалу, отдельно укажите видимые признаки и их интерпретацию.",
+      "aliases": [],
+      "sources": [
+        "geo_sft_v2_iodp356"
+      ],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/geology_sft_v2_20261027/training_cards.json",
+        "origin_split": "train",
+        "origin_source_group": "geology_sft_v2_20261027",
+        "review_status": "source_checked_original_russian_paraphrase_not_geologist_reviewed",
+        "geology_approved": false,
+        "reference_scope": "general_theory"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "qwen_acceptance_review_v1",
+  "reviewed_date": "2026-10-28",
+  "status": "rejected_for_general_assistant",
+  "geologist_approved": false,
+  "installed_in_application": false,
+  "reason": "Нет достаточного прироста фактической правильности; в корректном нативном сравнении кандидат дал 7 верных ответов из 16 против 8 у базы. Сохраняются основные ошибки геологической интерпретации.",
+  "reason_codes": [
+    "native_correctness_regression",
+    "unresolved_core_geology_errors",
+    "insufficient_visual_validation"
+  ],
+  "geology_accuracy": null,
+  "raw_metrics_preserved": true,
+  "qualitative_review": "result_summary.json",
+  "review_scope": "16 new closed, 15 paired reference, 4 prior closed, 4 dialogue and 8 source-class image guards"
+}
