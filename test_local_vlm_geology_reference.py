@@ -18,6 +18,20 @@ OLD_HITS = [{"path": "C:/unrelated/project.txt", "excerpt": "Посторонн�
 
 
 class GeologyReferenceWorkerTests(unittest.TestCase):
+    def test_observed_chinese_word_is_translated_in_russian_sentence(self):
+        answer, changed = worker._sanitize_model_language(
+            "породы подвергаются воздействию水流, эрозии и биотурбации."
+        )
+        self.assertTrue(changed)
+        self.assertEqual(answer, "породы подвергаются воздействию водного потока, эрозии и биотурбации.")
+        self.assertNotRegex(answer, r"[\u3400-\u4dbf\u4e00-\u9fff]")
+
+    def test_unknown_chinese_fragment_is_removed_and_flagged(self):
+        answer, changed = worker._sanitize_model_language("Слоистость 水平 bedding.")
+        self.assertTrue(changed)
+        self.assertIn("[фрагмент на другом языке удалён]", answer)
+        self.assertNotRegex(answer, r"[\u3400-\u4dbf\u4e00-\u9fff]")
+
     def test_specific_confirmed_interval_context_is_not_discarded(self):
         request = {"operation": "chat", "question": "Расскажи об этом слое",
                    "context": "Фация, сохранённая специалистом для этого интервала: русловая."}
@@ -99,7 +113,7 @@ class GeologyReferenceWorkerTests(unittest.TestCase):
         model = worker.LocalModel()
         model.turbo = SimpleNamespace(
             start=Mock(return_value=0), manifest={"release": "test", "gpu_backend": "fake"},
-            complete=Mock(return_value={"choices": [{"message": {"content": "Различаются преобладающей окатанностью обломков."},
+            complete=Mock(return_value={"choices": [{"message": {"content": "Породы подвергаются воздействию水流, эрозии и биотурбации."},
                                                       "finish_reason": "stop"}]}),
         )
         request = {"operation": "chat", "question": QUESTION, "base": "base", "model_mode": "base",
@@ -117,6 +131,8 @@ class GeologyReferenceWorkerTests(unittest.TestCase):
         self.assertEqual(result["model_info"]["reference_note_ids"], ["coarse_clasts"])
         self.assertEqual(result["model_info"]["model_mode"], "base")
         self.assertEqual(result["model_info"]["adapter"], "")
+        self.assertEqual(result["answer"], "Породы подвергаются воздействию водного потока, эрозии и биотурбации.")
+        self.assertTrue(result["language_sanitized"])
         self.assertTrue(all(hit["path"].startswith("https://") for hit in result["hits"]))
 
     def test_closed_book_turbo_request_keeps_original_context_and_metadata(self):

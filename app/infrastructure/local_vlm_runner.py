@@ -48,6 +48,20 @@ PHOTO_REFERENCE_FIELDS = (
     "Целостность",
 )
 
+_CJK_CHARACTERS = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]+")
+
+
+def _sanitize_model_language(text: str) -> tuple[str, bool]:
+    """Keep accidental CJK token leakage out of Russian user-facing answers."""
+    answer = str(text or "")
+    original = answer
+    # Translate the observed Qwen leak with the appropriate Russian case.
+    answer = re.sub(r"воздействию\s*水流", "воздействию водного потока", answer, flags=re.IGNORECASE)
+    answer = answer.replace("水流", "поток воды")
+    # Unknown fragments are marked rather than translated without evidence.
+    answer = _CJK_CHARACTERS.sub("[фрагмент на другом языке удалён]", answer)
+    return answer, answer != original
+
 
 def _color_hint_text(hint) -> str:
     if hint is None:
@@ -333,6 +347,7 @@ class LocalModel:
             content.insert(0, {"type": "image", "image": image})
         system_text = (
             "Ты локальный ИИ-помощник Kern Analyzer. Общайся с человеком естественно и всегда по-русски. "
+            "Пиши только по-русски; не вставляй китайские иероглифы или фрагменты на другом языке. "
             "На обычные вопросы, приветствия и просьбы объяснить отвечай прямо и кратко; "
             "не переводи разговор на геологию без повода. "
             "Для вопросов о керне действуй как помощник геолога-седиментолога: "
@@ -423,6 +438,7 @@ class LocalModel:
         generation_seconds = perf_counter() - generation_started
         final_tokens = generated[:, inputs["input_ids"].shape[1]:]
         answer = self.processor.batch_decode(final_tokens, skip_special_tokens=True)[0].strip()
+        answer, language_sanitized = _sanitize_model_language(answer)
         incomplete = final_tokens.shape[1] >= final_limit and int(final_tokens[0, -1]) not in end_ids
         if operation == "photo_chat" and answer:
             final_character = answer.rstrip(' \t\n\r\"\'»”)]')[-1:]
@@ -447,6 +463,8 @@ class LocalModel:
                 "retried": retried,
             },
         }
+        if language_sanitized:
+            result["language_sanitized"] = True
         if operation == "describe":
             cleaned = answer.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
             try:
@@ -488,7 +506,7 @@ class LocalModel:
             )
             if request.get("whole_column"):
                 prompt += " Показан целый столбик тремя частями: слева верх, в центре середина, справа низ. Опиши вертикальные изменения, это не три отдельные фации."
-            messages = [{"role": "system", "content": "Ты помощник геолога-седиментолога. Пиши предметно по фотографии, различай наблюдение и предположение."},
+            messages = [{"role": "system", "content": "Ты помощник геолога-седиментолога. Пиши только по-русски, не вставляй китайские иероглифы или другие языки. Пиши предметно по фотографии, различай наблюдение и предположение."},
                         {"role": "user", "content": [{"type": "text", "text": prompt}, *images]}]
         response = self.turbo.complete(
             messages, max_tokens=650,
@@ -496,6 +514,7 @@ class LocalModel:
         )
         choice = response["choices"][0]
         answer = str(choice["message"].get("content") or "").strip()
+        answer, language_sanitized = _sanitize_model_language(answer)
         usage, timing = response.get("usage", {}), response.get("timings", {})
         result = {
             "answer": answer, "hits": hits, "incomplete": choice.get("finish_reason") == "length",
@@ -507,6 +526,8 @@ class LocalModel:
                        "input_tokens": usage.get("prompt_tokens"), "output_tokens": usage.get("completion_tokens"),
                        "tokens_per_second": timing.get("predicted_per_second"), "retried": False},
         }
+        if language_sanitized:
+            result["language_sanitized"] = True
         if operation == "describe":
             try:
                 parsed = json.loads(answer)
