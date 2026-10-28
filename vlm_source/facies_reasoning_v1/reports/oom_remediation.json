@@ -1,0 +1,9 @@
+{
+  "schema": "qwen_facies_reasoning_oom_remediation_v1",
+  "previous_run": "core_vlm_facies_reasoning_v1_v2_lora",
+  "previous_status": "failed: CUDA out of memory on first backward pass; no optimizer steps or adapter saved",
+  "retry_run": "core_vlm_facies_reasoning_v1_v2_retry_lora",
+  "change": "Compute SFT logits only at supervised answer positions; keep the frozen visual encoder on CPU for text-only training and restore it for image evaluation.",
+  "data_or_recipe_changes": "None: same base revision, 484 training rows, 2 epochs, seed, optimizer and LoRA settings; no truncation. Reuse completed baseline only after strict validation.",
+  "validation": "CPU unit tests compare loss and gradients to standard causal cross entropy including gradient accumulation normalization."
+}

@@ -45,7 +45,7 @@ class KnowledgeTrainingArtifactTests(unittest.TestCase):
         self.assertIn("corrected", _document_text(fixed))
 
     def test_model_responses_are_not_geological_sources(self):
-        for name in ("baseline_responses.jsonl", "candidate_responses.jsonl", "blind_review.json", "QUALITATIVE_REVIEW.json",
+        for name in ("baseline_responses.jsonl", "candidate_responses.jsonl", "blind_review.json", "review_key.json", "QUALITATIVE_REVIEW.json",
                      "baseline_metrics.json", "candidate_metrics.json", "validation_questions.json", "evaluation_challenge.json",
                      "holdout_theory.jsonl", "holdout_conversation.jsonl", "val_visual.jsonl"):
             with self.subTest(name=name):

@@ -41,6 +41,40 @@ sys.path.insert(0, str(ROOT))
 from scripts.prepare_qwen_turbo_local import source_fingerprint
 
 
+def sft_supervised_token_loss(model, inputs: dict, *, num_items_in_batch=None):
+    """Causal CE only at supervised positions; preserves HF token weighting.
+
+    Qwen's ``logits_to_keep`` selects hidden positions before the vocabulary
+    projection.  Label j is predicted from hidden position j-1. This avoids
+    allocating prompt-position vocab logits, without dropping prompt context
+    or any supervised answer/EOS tokens. ``num_items_in_batch`` is the total
+    supervised-token count across gradient-accumulation microbatches, as in
+    Transformers' ForCausalLMLoss; when absent the loss is a token mean.
+    """
+    import torch
+    import torch.nn.functional as functional
+    from app.infrastructure.preference_loss import assistant_positions
+
+    labels = inputs["labels"]
+    positions = assistant_positions(labels)
+    targets = labels[:, 1:].index_select(1, positions)
+    kwargs = {key: value for key, value in inputs.items() if key != "labels"}
+    outputs = model(**kwargs, logits_to_keep=positions, use_cache=False)
+    logits = outputs.logits
+    if logits.ndim != 3 or logits.shape[:2] != targets.shape:
+        raise ValueError("Selected SFT logits and shifted supervised labels differ")
+    if num_items_in_batch is None:
+        loss = functional.cross_entropy(logits.float().reshape(-1, logits.shape[-1]),
+                                        targets.reshape(-1), ignore_index=-100, reduction="mean")
+    else:
+        loss = functional.cross_entropy(logits.float().reshape(-1, logits.shape[-1]),
+                                        targets.reshape(-1), ignore_index=-100, reduction="sum")
+        if torch.is_tensor(num_items_in_batch):
+            num_items_in_batch = num_items_in_batch.to(loss.device)
+        loss = loss / num_items_in_batch
+    return loss, outputs
+
+
 def select_lora_targets(named_modules, recipe: str = "qv") -> list[str]:
     """Choose exact language-module paths without adapting the vision tower."""
     recipes = {
@@ -352,6 +386,10 @@ def main() -> None:
     parser.add_argument("--max-sequence-tokens", type=int, default=1024,
                         help="Reject longer training sequences without truncation, including visual tokens")
     parser.add_argument("--loss-mode", choices=("sft", "dpo"), default="sft")
+    parser.add_argument("--sft-supervised-logits", action="store_true",
+                        help="Compute logits only for supervised SFT targets to reduce CUDA memory")
+    parser.add_argument("--offload-text-only-vision", action="store_true",
+                        help="Keep frozen visual encoder on CPU during text-only SFT, restore for evaluation")
     parser.add_argument("--dpo-beta", type=float, default=0.1)
     parser.add_argument("--theory-limit", type=int, default=8)
     parser.add_argument("--theory-max-new-tokens", type=int, default=260)
@@ -360,6 +398,10 @@ def main() -> None:
     parser.add_argument("--reuse-baseline-dir", type=Path,
                         help="Reuse a complete baseline only when inputs, settings and every response identity match exactly")
     args = parser.parse_args()
+    if args.sft_supervised_logits and args.loss_mode != "sft":
+        raise ValueError("--sft-supervised-logits is only valid for SFT")
+    if args.offload_text_only_vision and args.loss_mode != "sft":
+        raise ValueError("--offload-text-only-vision is only valid for SFT")
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
         raise FileExistsError(f"Refusing to overwrite an existing run: {args.output_dir}")
     if not (args.model / "config.json").is_file():
@@ -367,6 +409,8 @@ def main() -> None:
     if args.epochs <= 0 or args.learning_rate <= 0 or args.max_image_side < 56 or args.max_sequence_tokens <= 0:
         raise ValueError("Invalid training parameters")
     train_rows = read_records(args.manifest, training=True)
+    if args.offload_text_only_vision and any(row.get("image") for row in train_rows):
+        raise ValueError("Visual encoder offload requires a fully text-only training manifest")
     validate_loss_records(train_rows, args.loss_mode)
     if args.loss_mode == "dpo" and (not math.isfinite(args.dpo_beta) or args.dpo_beta <= 0):
         raise ValueError("DPO beta must be finite and positive")
@@ -433,6 +477,8 @@ def main() -> None:
             "lora_rank": 8, "lora_alpha": 16, "lora_dropout": 0.05,
             "lora_targets_recipe": args.lora_targets, "max_sequence_tokens": args.max_sequence_tokens,
             "loss_mode": args.loss_mode, "dpo_beta": args.dpo_beta,
+            "sft_supervised_logits": args.sft_supervised_logits,
+            "offload_text_only_vision": args.offload_text_only_vision,
             "torch": torch.__version__, "transformers": transformers.__version__, "peft": peft.__version__,
             "cuda": torch.version.cuda, "gpu": torch.cuda.get_device_name(0),
             "generation": {"do_sample": False, "repetition_penalty": 1.05,
@@ -615,6 +661,37 @@ def main() -> None:
                 progress("training_log", step=state.global_step, **values)
 
         trainer_type = Trainer
+        if args.sft_supervised_logits or args.offload_text_only_vision:
+            from app.infrastructure.preference_loss import supports_target_logits
+            if args.sft_supervised_logits and not supports_target_logits(model):
+                raise ValueError("Model does not support selective logits; refusing unsafe SFT fallback")
+
+            class SupervisedLogitsTrainer(Trainer):
+                vision_offloaded = False
+
+                def training_step(self, model, inputs, num_items_in_batch=None):
+                    if args.offload_text_only_vision:
+                        if any(key in inputs for key in ("pixel_values", "pixel_values_videos", "image_grid_thw", "video_grid_thw")):
+                            raise ValueError("Image or video inputs cannot be used with visual encoder offload")
+                        if not self.vision_offloaded:
+                            owner = self.accelerator.unwrap_model(model).get_base_model()
+                            visual = owner.model.visual
+                            if any(parameter.requires_grad for parameter in visual.parameters()):
+                                raise ValueError("Refusing to offload trainable visual encoder")
+                            visual.to("cpu")
+                            torch.cuda.empty_cache()
+                            self.vision_offloaded = True
+                            progress("vision_offloaded", device="cpu", reason="all training rows text-only")
+                    return super().training_step(model, inputs, num_items_in_batch=num_items_in_batch)
+
+                def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+                    if not args.sft_supervised_logits:
+                        return super().compute_loss(model, inputs, return_outputs=return_outputs,
+                                                    num_items_in_batch=num_items_in_batch)
+                    loss, outputs = sft_supervised_token_loss(model, inputs, num_items_in_batch=num_items_in_batch)
+                    return (loss, outputs) if return_outputs else loss
+
+            trainer_type = SupervisedLogitsTrainer
         if args.loss_mode == "dpo":
             class PreferenceTrainer(Trainer):
                 def __init__(self, *values, **kwargs):
@@ -632,6 +709,12 @@ def main() -> None:
                           data_collator=collator,
                           processing_class=processor, callbacks=[LogCallback()])
         train_result = trainer.train()
+        if args.offload_text_only_vision:
+            if not trainer.vision_offloaded:
+                raise RuntimeError("Expected visual encoder offload did not occur")
+            self_visual = trainer.accelerator.unwrap_model(model).get_base_model().model.visual
+            self_visual.to("cuda")
+            progress("vision_restored", device="cuda", reason="image validation")
         adapter_dir = args.output_dir / "adapter"
         trainer.save_model(str(adapter_dir))
         processor.save_pretrained(str(adapter_dir))

@@ -22,7 +22,7 @@ MAX_BYTES = 25 * 1024 * 1024
 MAX_CHARS = 120_000
 MODEL_EVALUATION_FILES = {
     "baseline_responses.jsonl", "candidate_responses.jsonl", "blind_review.json",
-    "review_blind_ratings.json", "runtime_blind_review.json", "runtime_blind_ratings.json",
+    "review_blind_ratings.json", "review_key.json", "runtime_blind_review.json", "runtime_blind_ratings.json",
     "application_runtime_comparison.json", "qualitative_review.json", "acceptance_review.json",
     "baseline_metrics.json", "candidate_metrics.json", "validation_questions.json", "evaluation_challenge.json",
     "holdout_theory.jsonl", "holdout_conversation.jsonl", "val_visual.jsonl",
