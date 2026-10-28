@@ -1,6 +1,8 @@
 """CPU-only worker integration; references do not change selected model weights."""
 from contextlib import nullcontext
 import copy
+import threading
+import time
 from pathlib import Path
 import runpy
 import sys
@@ -31,6 +33,41 @@ class GeologyReferenceWorkerTests(unittest.TestCase):
         self.assertTrue(changed)
         self.assertIn("[фрагмент на другом языке удалён]", answer)
         self.assertNotRegex(answer, r"[\u3400-\u4dbf\u4e00-\u9fff]")
+
+    def test_vlm_image_batch_uses_only_one_gpu_generation_at_a_time(self):
+        state = {"active": 0, "maximum": 0}
+        lock = threading.Lock()
+        fields = (
+            '{"facies_name":"Предположительно русловая фация",'
+            '"lithology":"Песчаник","texture":"Слоистая",'
+            '"facies_association":"Предположительно русловая",'
+            '"depositional_environment":"Предположительно русло",'
+            '"description":"Серый слоистый песчаник."}'
+        )
+
+        def complete(*_args, **_kwargs):
+            with lock:
+                state["active"] += 1
+                state["maximum"] = max(state["maximum"], state["active"])
+            time.sleep(0.01)
+            with lock:
+                state["active"] -= 1
+            return {"choices": [{"message": {"content": fields}, "finish_reason": "stop"}]}
+
+        model = worker.LocalModel()
+        model.turbo = SimpleNamespace(
+            start=Mock(return_value=0), complete=Mock(side_effect=complete),
+            manifest={"release": "test", "gpu_backend": "fake"},
+        )
+        request = {
+            "operation": "describe_batch", "base": "base", "model_mode": "base",
+            "items": [{"id": str(index), "context": "Тест"} for index in range(4)],
+        }
+        with patch.object(worker, "available_runtime", return_value=(Path("runtime"), {})):
+            result = model.answer(request, [])
+        self.assertEqual(1, state["maximum"])
+        self.assertEqual(4, model.turbo.complete.call_count)
+        self.assertEqual(4, len(result["items"]))
 
     def test_specific_confirmed_interval_context_is_not_discarded(self):
         request = {"operation": "chat", "question": "Расскажи об этом слое",

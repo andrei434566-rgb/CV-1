@@ -8,7 +8,6 @@ import re
 import sys
 from time import perf_counter
 from contextlib import nullcontext
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 # QProcess sends UTF-8 JSON lines. Windows Python may otherwise use the
@@ -576,12 +575,10 @@ class LocalModel:
                 return self.answer(payload, [])
             except Exception as exc:
                 return {"ok": False, "error": f"{type(exc).__name__}: {exc}"}
-        if turbo:
-            # Four decoder slots share one model, rather than loading four copies.
-            with ThreadPoolExecutor(max_workers=len(items)) as pool:
-                replies = list(pool.map(describe, items))
-        else:
-            replies = [describe(item) for item in items]
+        # The local VLM shares one GPU-backed decoder. Concurrent image prompts
+        # multiply visual-context memory and can terminate llama.cpp on 8 GB
+        # cards, so keep the batch API but decode each image in turn.
+        replies = [describe(item) for item in items]
         return {"items": {item_id: dict(reply, ok=reply.get("ok", True)) for item_id, reply in zip(ids, replies)},
                 "answer": "", "hits": [], "incomplete": False,
                 "timing": {"load_seconds": round(load_seconds, 3), "total_seconds": round(perf_counter() - started + load_seconds, 3)}}

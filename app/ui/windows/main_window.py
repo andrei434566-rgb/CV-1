@@ -1302,34 +1302,20 @@ class MainWindow(QMainWindow):
         return
 
     def _import_chat_analysis_photos(self, paths: list[Path]) -> None:
-        records: list[PhotoRecord] = []
-        new_records: list[PhotoRecord] = []
+        """Queue chat photos through the same bounded importer as project photos."""
+        queued_paths = {str(item[0].resolve()) for item in self._pending_photo_imports}
         for path in paths:
-            existing = self._record_for_chat_photo(path)
-            if existing is not None:
-                if not any(item is existing for item in records):
-                    records.append(existing)
-                continue
-            pixmap = load_working_pixmap(path)
-            if pixmap.isNull():
-                self.assistant_panel.append_message("system", f"Не удалось прочитать фото «{path.name}».")
+            resolved = str(path.resolve())
+            if resolved in queued_paths:
                 continue
             top, base = self._photo_interval_from_path(path)
-            record = PhotoRecord(
-                uuid4().hex, str(path), pixmap, well_name=self._active_well_name,
-                photo_depth_from=top, photo_depth_to=base, analysis_mode=PIPELINE_MODE,
+            self._pending_photo_imports.append((path, self._active_well_name, top, base))
+            queued_paths.add(resolved)
+        if self._pending_photo_imports:
+            self.assistant_panel.append_message(
+                "system", f"Поставлено в очередь фото: {len(paths)}. Загружаю и обрабатываю небольшими партиями."
             )
-            self._records.append(record)
-            self._chat_record_ids[str(path.resolve())] = record.identifier
-            records.append(record)
-            new_records.append(record)
-        if new_records:
-            self.workspace.add_photos(new_records)
-        if records:
-            self._vlm_target = (records[-1], None)
-            self._update_header_context()
-            self._refresh_project_tree()
-            self.run_segmentation(records)
+            self._load_next_photo_batch()
 
     def _record_for_chat_photo(self, path: Path) -> PhotoRecord | None:
         resolved = path.resolve()
@@ -2328,10 +2314,22 @@ class MainWindow(QMainWindow):
         if self._segmentation_thread is not None or not self._pending_photo_imports:
             return
         records: list[PhotoRecord] = []
+        new_records: list[PhotoRecord] = []
+        failed_paths: list[str] = []
         while self._pending_photo_imports and len(records) < self.PHOTO_LOAD_BATCH_SIZE:
             image_path, well_name, photo_depth_from, photo_depth_to = self._pending_photo_imports.popleft()
-            pixmap = load_working_pixmap(image_path)
+            existing = self._record_for_chat_photo(image_path)
+            if existing is not None:
+                if not any(item.identifier == existing.identifier for item in records):
+                    records.append(existing)
+                continue
+            try:
+                pixmap = load_working_pixmap(image_path)
+            except Exception:
+                failed_paths.append(image_path.name)
+                continue
             if pixmap.isNull():
+                failed_paths.append(image_path.name)
                 continue
             record = PhotoRecord(
                 identifier=str(uuid4()), path=str(image_path), pixmap=pixmap, well_name=well_name,
@@ -2339,11 +2337,22 @@ class MainWindow(QMainWindow):
                 analysis_mode=PIPELINE_MODE,
             )
             self._records.append(record)
+            self._chat_record_ids[str(image_path.resolve())] = record.identifier
             records.append(record)
+            new_records.append(record)
+        if failed_paths:
+            names = ", ".join(failed_paths[:5])
+            suffix = f" и ещё {len(failed_paths) - 5}" if len(failed_paths) > 5 else ""
+            self.assistant_panel.append_message(
+                "system", f"Не удалось прочитать фото ({len(failed_paths)}): {names}{suffix}. Остальные файлы продолжат обрабатываться."
+            )
         if not records:
-            self._load_next_photo_batch()
+            self.statusBar().showMessage("Не удалось прочитать фото из очереди.")
             return
-        self.workspace.add_photos(records)
+        if new_records:
+            self.workspace.add_photos(new_records)
+        self._vlm_target = (records[-1], None)
+        self._update_header_context()
         self._deleted_records.clear()
         self._refresh_project_tree()
         self._refresh_training_bar()

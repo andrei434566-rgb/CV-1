@@ -168,6 +168,9 @@ class Cv1MainFlowTests(unittest.TestCase):
             patch.object(self.window.workspace, "add_photos") as add,
             patch.object(self.window, "_update_header_context"),
             patch.object(self.window, "_refresh_project_tree"),
+            patch.object(self.window, "_refresh_training_bar"),
+            patch.object(self.window, "_resolve_model_path", return_value=self.root / "best.pt"),
+            patch.object(self.window, "_show_activity"),
             patch.object(self.window, "run_segmentation") as run,
         ):
             self.window._import_chat_analysis_photos([Path(existing.path), new, new])
@@ -176,6 +179,30 @@ class Cv1MainFlowTests(unittest.TestCase):
         self.assertEqual(1, len(add.call_args.args[0]))
         self.assertEqual(2, len(run.call_args.args[0]))
         self.assertTrue(all(record.analysis_mode == PIPELINE_MODE for record in self.window._records))
+
+    def test_importing_fifty_chat_photos_keeps_only_six_new_pixmaps_in_each_batch(self):
+        self.window.PHOTO_LOAD_BATCH_SIZE = 6
+        paths = [self.root / f"photo-{index:02}.jpg" for index in range(50)]
+        with (
+            patch(_MODULE + ".load_working_pixmap", return_value=QPixmap(40, 100)) as load,
+            patch.object(self.window.workspace, "add_photos"),
+            patch.object(self.window, "_photo_interval_from_path", return_value=(None, None)),
+            patch.object(self.window, "_update_header_context"),
+            patch.object(self.window, "_refresh_project_tree"),
+            patch.object(self.window, "_refresh_training_bar"),
+            patch.object(self.window, "_resolve_model_path", return_value=self.root / "best.pt"),
+            patch.object(self.window, "_show_activity"),
+            patch.object(self.window, "run_segmentation") as run,
+        ):
+            self.window._import_chat_analysis_photos(paths)
+            self.assertEqual(6, len(self.window._records))
+            self.assertEqual(44, len(self.window._pending_photo_imports))
+            while self.window._pending_photo_imports:
+                self.window._load_next_photo_batch()
+        self.assertEqual(50, len(self.window._records))
+        self.assertFalse(self.window._pending_photo_imports)
+        self.assertEqual(50, load.call_count)
+        self.assertEqual([6] * 8 + [2], [len(call.args[0]) for call in run.call_args_list])
 
     def test_existing_strict_chat_photo_does_not_launch_duplicate_segmentation(self):
         record = self.record(interpreted=True)
