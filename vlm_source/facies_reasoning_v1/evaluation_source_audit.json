@@ -1,0 +1,516 @@
+{
+  "record_role": "evaluation_source_audit",
+  "frozen_evaluation_sha256": "d5afc9d83e67a0c905e5c7c263101be93d06a68888fce21e5f31a33e94b10c63",
+  "geologist_reviewed": false,
+  "method": "Открыты перечисленные HTML-страницы; полнотекстовые статьи прочитаны в отмеченных релевантных разделах, страницы USGS — аннотации. Наблюдения в синтетических условиях установлены самим условием, а осторожные выводы и запрос дополнительного контекста обозначены как методологические, не как прямые цитаты. Не проводилась геологическая экспертиза.",
+  "sources": {
+    "salt": {
+      "url": "https://www.usgs.gov/publications/sandstone-body-and-shale-body-dimensions-a-braided-fluvial-system-salt-wash-sandstone",
+      "access": "direct_html_abstract",
+      "section": "Аннотация: русловые и пойменные толщи, косая слоистость, мельчание вверх, глинистые внутриформационные обломки."
+    },
+    "tapeats": {
+      "url": "https://www.usgs.gov/publications/deposition-tapeats-sandstone-cambrian-central-arizona",
+      "access": "direct_html_abstract",
+      "section": "Аннотация: песчаные фации приливных каналов, пляжа и потоков, в том числе двунаправленная и косая слоистость."
+    },
+    "jordan": {
+      "url": "https://www.usgs.gov/publications/tidal-bundle-sequences-jordan-sandstone-upper-cambrian-southeastern-minnesota-usa",
+      "access": "direct_html_abstract",
+      "section": "Аннотация: ритмика утолщения и утонения серий, глинистые покровы, измерения циклов."
+    },
+    "cape": {
+      "url": "https://www.usgs.gov/publications/cyclic-deposits-and-hummocky-cross-stratification-probable-storm-origins-upper",
+      "access": "direct_html_abstract",
+      "section": "Аннотация: бугристая слоистость и штормовая интерпретация в мелководной морской толще."
+    },
+    "anya": {
+      "url": "https://www.usgs.gov/publications/trace-fossils-jurassic-lacustrine-turbidites-anyao-formation-central-china-and-their",
+      "access": "direct_html_abstract",
+      "section": "Аннотация: озерные турбидиты, полные и неполные последовательности Боума."
+    },
+    "baker": {
+      "url": "https://onlinelibrary.wiley.com/doi/10.1111/sed.12714",
+      "access": "direct_full_text",
+      "section": "Massive sandstone; Structured sandstone; Facies association 3: наблюдения, гравитационные потоки, рябь, неполные последовательности Боума."
+    },
+    "jablonski": {
+      "url": "https://onlinelibrary.wiley.com/doi/10.1111/sed.12228",
+      "access": "direct_full_text",
+      "section": "Depositional interpretation / Sedimentary structures: речной пойнт-бар с приливными признаками."
+    },
+    "eide": {
+      "url": "https://onlinelibrary.wiley.com/doi/full/10.1111/sed.12270",
+      "access": "direct_full_text",
+      "section": "Описания FA6: косая слоистость, одиночные и двойные глинистые драпировки и противоположные ряби."
+    },
+    "usman": {
+      "url": "https://onlinelibrary.wiley.com/doi/full/10.1002/dep2.260",
+      "access": "direct_full_text",
+      "section": "4.1.4 FA4 и 4.1.5 FA5: русловые и shoreface ассоциации, HCS и огрубление вверх."
+    },
+    "deschamps": {
+      "url": "https://onlinelibrary.wiley.com/doi/10.1002/dep2.116",
+      "access": "direct_full_text",
+      "section": "FA4 Shoreface deposits: HCS и огрубление вверх в озерном береговом склоне; важный неморской контрпример."
+    }
+  },
+  "original_sources_unavailable_directly": [
+    {
+      "url": "https://pubs.usgs.gov/of/1993/0270/report.pdf",
+      "status": "HTTP 403",
+      "used_for_audit": false
+    },
+    {
+      "url": "https://pubs.usgs.gov/dds/dds-069/dds-069-g/REPORT/Report.pdf",
+      "status": "HTTP 403",
+      "used_for_audit": false
+    },
+    {
+      "url": "https://pubs.usgs.gov/of/1994/0573/report.pdf",
+      "status": "HTTP 403",
+      "used_for_audit": false
+    },
+    {
+      "url": "https://pubs.usgs.gov/of/1974/0338/report.pdf",
+      "status": "HTTP 403",
+      "used_for_audit": false
+    },
+    {
+      "url": "https://pubs.usgs.gov/of/2001/ofr-01-0249/TRIPLOG.HTM",
+      "status": "HTTP 403",
+      "used_for_audit": false
+    },
+    {
+      "url": "https://pubs.usgs.gov/publication/70025734",
+      "status": "HTTP 403; альтернативная HTML-аннотация USGS доступна",
+      "used_for_audit": false
+    },
+    {
+      "url": "https://pubs.usgs.gov/publication/70011848",
+      "status": "HTTP 403; альтернативная HTML-аннотация USGS доступна",
+      "used_for_audit": false
+    },
+    {
+      "url": "https://pubs.usgs.gov/publication/70207347",
+      "status": "HTTP 403; альтернативная HTML-аннотация USGS доступна",
+      "used_for_audit": false
+    }
+  ],
+  "items": [
+    {
+      "id": "FRV1-01",
+      "required_facts_audit": [
+        {
+          "required_fact": "Назвать единственным наблюдением мелкозернистый песчаник",
+          "status": "supported_by_given_scenario"
+        },
+        {
+          "required_fact": "Признать недостаточность данных для выбора среды",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Предложить дополнительные диагностические наблюдения",
+          "status": "reasoned_caution_not_directly_verified"
+        }
+      ],
+      "supported_required_facts": [
+        "Назвать единственным наблюдением мелкозернистый песчаник",
+        "Признать недостаточность данных для выбора среды"
+      ],
+      "unsupported_as_direct_source_claims": [
+        "Предложить дополнительные диагностические наблюдения"
+      ],
+      "source_keys": [
+        "salt",
+        "tapeats",
+        "anya"
+      ],
+      "source_urls": [
+        "https://www.usgs.gov/publications/sandstone-body-and-shale-body-dimensions-a-braided-fluvial-system-salt-wash-sandstone",
+        "https://www.usgs.gov/publications/deposition-tapeats-sandstone-cambrian-central-arizona",
+        "https://www.usgs.gov/publications/trace-fossils-jurassic-lacustrine-turbidites-anyao-formation-central-china-and-their"
+      ],
+      "limitations": [],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    },
+    {
+      "id": "FRV1-02",
+      "required_facts_audit": [
+        {
+          "required_fact": "Перечислить наблюдаемую эрозионную подошву, мельчание вверх и косую слоистость",
+          "status": "supported_by_given_scenario"
+        },
+        {
+          "required_fact": "Предложить речное русло как вероятную интерпретацию совокупности",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Указать неуникальность отдельных признаков и необходимость дополнительной проверки",
+          "status": "reasoned_caution_not_directly_verified"
+        }
+      ],
+      "supported_required_facts": [
+        "Перечислить наблюдаемую эрозионную подошву, мельчание вверх и косую слоистость",
+        "Предложить речное русло как вероятную интерпретацию совокупности"
+      ],
+      "unsupported_as_direct_source_claims": [
+        "Указать неуникальность отдельных признаков и необходимость дополнительной проверки"
+      ],
+      "source_keys": [
+        "salt",
+        "jablonski"
+      ],
+      "source_urls": [
+        "https://www.usgs.gov/publications/sandstone-body-and-shale-body-dimensions-a-braided-fluvial-system-salt-wash-sandstone",
+        "https://onlinelibrary.wiley.com/doi/10.1111/sed.12228"
+      ],
+      "limitations": [],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    },
+    {
+      "id": "FRV1-03",
+      "required_facts_audit": [
+        {
+          "required_fact": "Различить наблюдение и интерпретацию миграции форм рельефа",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Отметить, что косая слоистость не определяет среду",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Назвать дополнительные данные",
+          "status": "reasoned_caution_not_directly_verified"
+        }
+      ],
+      "supported_required_facts": [
+        "Различить наблюдение и интерпретацию миграции форм рельефа",
+        "Отметить, что косая слоистость не определяет среду"
+      ],
+      "unsupported_as_direct_source_claims": [
+        "Назвать дополнительные данные"
+      ],
+      "source_keys": [
+        "salt",
+        "tapeats"
+      ],
+      "source_urls": [
+        "https://www.usgs.gov/publications/sandstone-body-and-shale-body-dimensions-a-braided-fluvial-system-salt-wash-sandstone",
+        "https://www.usgs.gov/publications/deposition-tapeats-sandstone-cambrian-central-arizona"
+      ],
+      "limitations": [],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    },
+    {
+      "id": "FRV1-04",
+      "required_facts_audit": [
+        {
+          "required_fact": "Назвать двойные глинистые драпировки и противоположные направления наблюдениями",
+          "status": "supported_by_given_scenario"
+        },
+        {
+          "required_fact": "Предложить приливное влияние как обоснованную гипотезу",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Не отождествлять приливный процесс с единственной конкретной средой",
+          "status": "reasoned_caution_not_directly_verified"
+        }
+      ],
+      "supported_required_facts": [
+        "Назвать двойные глинистые драпировки и противоположные направления наблюдениями",
+        "Предложить приливное влияние как обоснованную гипотезу"
+      ],
+      "unsupported_as_direct_source_claims": [
+        "Не отождествлять приливный процесс с единственной конкретной средой"
+      ],
+      "source_keys": [
+        "eide",
+        "jablonski"
+      ],
+      "source_urls": [
+        "https://onlinelibrary.wiley.com/doi/full/10.1111/sed.12270",
+        "https://onlinelibrary.wiley.com/doi/10.1111/sed.12228"
+      ],
+      "limitations": [],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    },
+    {
+      "id": "FRV1-05",
+      "required_facts_audit": [
+        {
+          "required_fact": "Описать утолщение и утонение пакетов и пленки как наблюдения",
+          "status": "supported_by_given_scenario"
+        },
+        {
+          "required_fact": "Допустить приливные пучки как проверяемую интерпретацию",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Ограничить точность периодичности и места при неполных данных",
+          "status": "reasoned_caution_not_directly_verified"
+        }
+      ],
+      "supported_required_facts": [
+        "Описать утолщение и утонение пакетов и пленки как наблюдения",
+        "Допустить приливные пучки как проверяемую интерпретацию"
+      ],
+      "unsupported_as_direct_source_claims": [
+        "Ограничить точность периодичности и места при неполных данных"
+      ],
+      "source_keys": [
+        "jordan",
+        "jablonski"
+      ],
+      "source_urls": [
+        "https://www.usgs.gov/publications/tidal-bundle-sequences-jordan-sandstone-upper-cambrian-southeastern-minnesota-usa",
+        "https://onlinelibrary.wiley.com/doi/10.1111/sed.12228"
+      ],
+      "limitations": [
+        "Прямо просмотренная аннотация подтверждает измеренные приливные циклы, но не анализирует все возможные неприливные причины цикличности; этот пункт ответа остается методологическим выводом."
+      ],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    },
+    {
+      "id": "FRV1-06",
+      "required_facts_audit": [
+        {
+          "required_fact": "Назвать огрубление вверх и морские ископаемые наблюдениями",
+          "status": "supported_by_given_scenario"
+        },
+        {
+          "required_fact": "Связать совокупность с вероятным переходом к береговому склону и штормовыми процессами",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Не давать точную глубину без независимых данных",
+          "status": "reasoned_caution_not_directly_verified"
+        }
+      ],
+      "supported_required_facts": [
+        "Назвать огрубление вверх и морские ископаемые наблюдениями",
+        "Связать совокупность с вероятным переходом к береговому склону и штормовыми процессами"
+      ],
+      "unsupported_as_direct_source_claims": [
+        "Не давать точную глубину без независимых данных"
+      ],
+      "source_keys": [
+        "usman",
+        "cape"
+      ],
+      "source_urls": [
+        "https://onlinelibrary.wiley.com/doi/full/10.1002/dep2.260",
+        "https://www.usgs.gov/publications/cyclic-deposits-and-hummocky-cross-stratification-probable-storm-origins-upper"
+      ],
+      "limitations": [],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    },
+    {
+      "id": "FRV1-07",
+      "required_facts_audit": [
+        {
+          "required_fact": "Сохранить предварительный статус определения структуры",
+          "status": "supported_by_given_scenario"
+        },
+        {
+          "required_fact": "Допустить волновое или штормовое влияние как гипотезу",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Отметить недостаточность данных для уверенного выбора морского берегового склона",
+          "status": "supported_by_direct_source_or_combination"
+        }
+      ],
+      "supported_required_facts": [
+        "Сохранить предварительный статус определения структуры",
+        "Допустить волновое или штормовое влияние как гипотезу",
+        "Отметить недостаточность данных для уверенного выбора морского берегового склона"
+      ],
+      "unsupported_as_direct_source_claims": [],
+      "source_keys": [
+        "cape",
+        "deschamps"
+      ],
+      "source_urls": [
+        "https://www.usgs.gov/publications/cyclic-deposits-and-hummocky-cross-stratification-probable-storm-origins-upper",
+        "https://onlinelibrary.wiley.com/doi/10.1002/dep2.116"
+      ],
+      "limitations": [],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    },
+    {
+      "id": "FRV1-08",
+      "required_facts_audit": [
+        {
+          "required_fact": "Назвать порядок наблюдаемых интервалов",
+          "status": "supported_by_given_scenario"
+        },
+        {
+          "required_fact": "Связать их с вероятным мутьевым потоком или последовательностью Боума",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Не выводить глубину или морскую среду автоматически",
+          "status": "supported_by_direct_source_or_combination"
+        }
+      ],
+      "supported_required_facts": [
+        "Назвать порядок наблюдаемых интервалов",
+        "Связать их с вероятным мутьевым потоком или последовательностью Боума",
+        "Не выводить глубину или морскую среду автоматически"
+      ],
+      "unsupported_as_direct_source_claims": [],
+      "source_keys": [
+        "baker",
+        "anya"
+      ],
+      "source_urls": [
+        "https://onlinelibrary.wiley.com/doi/10.1111/sed.12714",
+        "https://www.usgs.gov/publications/trace-fossils-jurassic-lacustrine-turbidites-anyao-formation-central-china-and-their"
+      ],
+      "limitations": [],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    },
+    {
+      "id": "FRV1-09",
+      "required_facts_audit": [
+        {
+          "required_fact": "Указать наблюдаемые сортировку, включения и градацию",
+          "status": "supported_by_given_scenario"
+        },
+        {
+          "required_fact": "Предложить высококонцентрированный гравитационный поток как гипотезу",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Отметить ограничение и отсутствие обязательности полного цикла Боума",
+          "status": "supported_by_direct_source_or_combination"
+        }
+      ],
+      "supported_required_facts": [
+        "Указать наблюдаемые сортировку, включения и градацию",
+        "Предложить высококонцентрированный гравитационный поток как гипотезу",
+        "Отметить ограничение и отсутствие обязательности полного цикла Боума"
+      ],
+      "unsupported_as_direct_source_claims": [],
+      "source_keys": [
+        "baker",
+        "anya"
+      ],
+      "source_urls": [
+        "https://onlinelibrary.wiley.com/doi/10.1111/sed.12714",
+        "https://www.usgs.gov/publications/trace-fossils-jurassic-lacustrine-turbidites-anyao-formation-central-china-and-their"
+      ],
+      "limitations": [
+        "В прямо просмотренных разделах нет примера той же полной комбинации плохой сортировки, крупных обломков и обратной градации у подошвы: аналогия с высококонцентрированным потоком подтверждена частично; связь именно обратной градации с этим процессом здесь не проверена."
+      ],
+      "formal_scoring_recommendation": "exclude_pending_geologist_review"
+    },
+    {
+      "id": "FRV1-10",
+      "required_facts_audit": [
+        {
+          "required_fact": "Признать турбидит правдоподобной процессной интерпретацией",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Сохранить заданный независимый озерный контекст",
+          "status": "supported_by_given_scenario"
+        },
+        {
+          "required_fact": "Отвергнуть обязательный вывод о глубоководной морской среде",
+          "status": "supported_by_direct_source_or_combination"
+        }
+      ],
+      "supported_required_facts": [
+        "Признать турбидит правдоподобной процессной интерпретацией",
+        "Сохранить заданный независимый озерный контекст",
+        "Отвергнуть обязательный вывод о глубоководной морской среде"
+      ],
+      "unsupported_as_direct_source_claims": [],
+      "source_keys": [
+        "anya",
+        "baker"
+      ],
+      "source_urls": [
+        "https://www.usgs.gov/publications/trace-fossils-jurassic-lacustrine-turbidites-anyao-formation-central-china-and-their",
+        "https://onlinelibrary.wiley.com/doi/10.1111/sed.12714"
+      ],
+      "limitations": [],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    },
+    {
+      "id": "FRV1-11",
+      "required_facts_audit": [
+        {
+          "required_fact": "Отделить наблюдаемое мельчание от гипотез",
+          "status": "supported_by_given_scenario"
+        },
+        {
+          "required_fact": "Назвать как минимум две правдоподобные альтернативы",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Сказать, что имеющихся данных для выбора недостаточно",
+          "status": "reasoned_caution_not_directly_verified"
+        }
+      ],
+      "supported_required_facts": [
+        "Отделить наблюдаемое мельчание от гипотез",
+        "Назвать как минимум две правдоподобные альтернативы"
+      ],
+      "unsupported_as_direct_source_claims": [
+        "Сказать, что имеющихся данных для выбора недостаточно"
+      ],
+      "source_keys": [
+        "salt",
+        "anya",
+        "baker"
+      ],
+      "source_urls": [
+        "https://www.usgs.gov/publications/sandstone-body-and-shale-body-dimensions-a-braided-fluvial-system-salt-wash-sandstone",
+        "https://www.usgs.gov/publications/trace-fossils-jurassic-lacustrine-turbidites-anyao-formation-central-china-and-their",
+        "https://onlinelibrary.wiley.com/doi/10.1111/sed.12714"
+      ],
+      "limitations": [],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    },
+    {
+      "id": "FRV1-12",
+      "required_facts_audit": [
+        {
+          "required_fact": "Назвать признаки руслового заполнения и возможного приливного влияния",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Допустить сочетание руслового и приливного процессов",
+          "status": "supported_by_direct_source_or_combination"
+        },
+        {
+          "required_fact": "Сохранить неопределенность конкретной среды",
+          "status": "reasoned_caution_not_directly_verified"
+        }
+      ],
+      "supported_required_facts": [
+        "Назвать признаки руслового заполнения и возможного приливного влияния",
+        "Допустить сочетание руслового и приливного процессов"
+      ],
+      "unsupported_as_direct_source_claims": [
+        "Сохранить неопределенность конкретной среды"
+      ],
+      "source_keys": [
+        "eide",
+        "jablonski",
+        "salt"
+      ],
+      "source_urls": [
+        "https://onlinelibrary.wiley.com/doi/full/10.1111/sed.12270",
+        "https://onlinelibrary.wiley.com/doi/10.1111/sed.12228",
+        "https://www.usgs.gov/publications/sandstone-body-and-shale-body-dimensions-a-braided-fluvial-system-salt-wash-sandstone"
+      ],
+      "limitations": [],
+      "formal_scoring_recommendation": "eligible_with_geologist_review"
+    }
+  ]
+}

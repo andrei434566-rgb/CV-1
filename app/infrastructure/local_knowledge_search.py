@@ -137,12 +137,19 @@ def search_photo_files(
 def _document_text(path: Path) -> str:
     suffix = path.suffix.casefold()
     if suffix in TEXT_SUFFIXES:
+        # Early facies drafts contain known unsupported sample observations.
+        # Retain them for audit, but never feed them to the assistant as facts.
+        if (path.parent.name.casefold() == "facies_reasoning_v1"
+                and path.name.casefold() in {"training_cards.json", "training_reasoned_cards.json", "training_reasoned_cards_v2.json",
+                                            "training_positive_extension.json", "training_positive_extension_v2.json"}):
+            return ""
         if path.name.casefold() in MODEL_EVALUATION_FILES:
             return ""
         content = path.read_text(encoding="utf-8-sig", errors="replace")[:MAX_CHARS]
         if suffix in {".json", ".jsonl"} and (
             "rejected_false_statement_not_ground_truth" in content
             or re.search(r'"preference_rejected"\s*:', content)
+            or re.search(r'"record_role"\s*:\s*"(?:evaluation_only_never_train|evaluation_source_audit)"', content)
             or re.search(r'"schema"\s*:\s*"(?:qwen_|grounded_geology_|geology_preference_)', content)
         ):
             # Deliberately false preference examples and raw model evaluations

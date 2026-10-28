@@ -103,7 +103,8 @@ def _load_cards(path: str) -> dict:
     if cards_path.name == "theory_cards_v5.json":
         for name, source_group in (("theory_cards_round2.json", "theory_sources_20261025"),
                                    ("theory_cards_round4.json", "theory_sources_20261027"),
-                                   ("theory_cards_sft_v2.json", "geology_sft_v2_20261027")):
+                                   ("theory_cards_sft_v2.json", "geology_sft_v2_20261027"),
+                                   ("theory_cards_facies_v1.json", "facies_reasoning_v1")):
             supplement = cards_path.with_name(name)
             if supplement.is_file():
                 try:

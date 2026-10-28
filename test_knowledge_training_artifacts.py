@@ -26,6 +26,24 @@ class KnowledgeTrainingArtifactTests(unittest.TestCase):
         path = self.put("geology_train.jsonl", {"conversations": [], "preference_rejected": "Ложное объяснение"})
         self.assertEqual(_document_text(path), "")
 
+    def test_evaluation_only_cards_are_never_used_as_reference(self):
+        for role in ("evaluation_only_never_train", "evaluation_source_audit"):
+            path = self.put("unknown_evaluation.json", {"record_role": role,
+                                                         "items": [{"question": "Q", "answer": "A"}]})
+            self.assertEqual(_document_text(path), "")
+
+    def test_known_facies_drafts_with_errors_are_quarantined(self):
+        folder = self.root / "facies_reasoning_v1"
+        folder.mkdir()
+        for name in ("training_cards.json", "training_reasoned_cards.json", "training_reasoned_cards_v2.json",
+                     "training_positive_extension.json", "training_positive_extension_v2.json"):
+            path = folder / name
+            path.write_text('{"answer":"unsupported observation"}', encoding="utf-8")
+            self.assertEqual(_document_text(path), "")
+        fixed = folder / "training_reasoned_cards_v3.json"
+        fixed.write_text('{"answer":"corrected"}', encoding="utf-8")
+        self.assertIn("corrected", _document_text(fixed))
+
     def test_model_responses_are_not_geological_sources(self):
         for name in ("baseline_responses.jsonl", "candidate_responses.jsonl", "blind_review.json", "QUALITATIVE_REVIEW.json",
                      "baseline_metrics.json", "candidate_metrics.json", "validation_questions.json", "evaluation_challenge.json",

@@ -1,0 +1,1466 @@
+{
+  "schema": "kern_source_checked_reference_supplement_v1",
+  "delivery": "offline_reference_answers_not_model_weight_training",
+  "review_status": "source_checked_original_russian_paraphrases_not_geologist_reviewed",
+  "geologist_reviewed": false,
+  "scope": "Exact TRAIN question lookup only; does not certify neural weights or photo analysis.",
+  "input_sha256": {
+    "training_reasoned_cards_v3.json": "4b365938146ee247f942c16e5d9a6c2b601da81af35aed02beeb44b19602093f",
+    "training_positive_extension_v3.json": "9e987c967267a6b7b27a34f7f917d9741190b1c4f7d6d39ff001fe2944936128",
+    "source_registry.json": "34ebb45b0f3766c924a77bce038736c29caa1557cea1dfad5712588a46c5bac9"
+  },
+  "counts": {
+    "cards": 70,
+    "sources": 5,
+    "validation_cards_included": 0
+  },
+  "sources": {
+    "facies_v1_earle63": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition, section 6.3: Depositional Environments and Sedimentary Basins",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-3-depositional-environments-and-sedimentary-basins/",
+      "license": "CC BY 4.0, excluding individually credited exceptions",
+      "attribution": "Original Russian paraphrases and new questions based on Earle (2019), Physical Geology 2nd ed., section 6.3, CC BY 4.0. No illustrations reproduced.",
+      "access": "Full official HTML, environment tables and license footer directly read; 2026-10-28.",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "facies_v1_earle64": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition, section 6.4: Sedimentary Structures and Fossils",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-4-sedimentary-structures-and-fossils/",
+      "license": "CC BY 4.0, excluding individually credited exceptions",
+      "attribution": "Original Russian paraphrases and new questions based on Earle (2019), Physical Geology 2nd ed., section 6.4, CC BY 4.0. No illustrations reproduced.",
+      "access": "Full official HTML and license footer directly read; 2026-10-28.",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "facies_v1_atlas2023": {
+      "title": "Atlas, Morris, Johnson and Wroblewski (2023), New approaches to the architectural analysis of deltaic outcrops",
+      "url": "https://oap.unige.ch/journals/sdk/article/view/1051",
+      "license": "CC BY 4.0",
+      "doi": "10.57035/journals/sdk.2023.e11.1051",
+      "attribution": "Original concise Russian interpretations of Atlas et al. (2023), Sedimentologika, CC BY 4.0; translation and new hypothetical questions. No photographs or figures reproduced.",
+      "access": "Full journal HTML sections 4.1 and license directly read; 2026-10-28.",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "facies_v1_noto2025": {
+      "title": "Noto, Flaig and Lorente (2025), Multiproxy synthesis at the Arlington Archosaur Site",
+      "url": "https://oap.unige.ch/journals/sdk/article/view/1435",
+      "license": "CC BY 4.0",
+      "doi": "10.57035/journals/sdk.2025.e31.1435",
+      "attribution": "Original short Russian paraphrases from Noto et al. (2025), Sedimentologika, CC BY 4.0; translation and new hypothetical questions. No figures reproduced.",
+      "access": "Official full journal HTML sections 4.1 and license directly read; 2026-10-28.",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "facies_v1_iodp2019": {
+      "title": "Saffer et al. (2019), Site U1518, Proceedings of the International Ocean Discovery Program 372B/375",
+      "url": "https://publications.iodp.org/proceedings/372B_375/103/372B375_103.html",
+      "license": "CC BY 4.0",
+      "doi": "10.14379/iodp.proc.372B375.103.2019",
+      "attribution": "Original concise Russian paraphrases of Saffer et al. (2019), IODP Proceedings 372B/375, Site U1518, CC BY 4.0; new hypothetical questions. No figures reproduced.",
+      "access": "Official full HTML lithostratigraphy/IIIB and license footer directly read; 2026-10-28.",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "cards": [
+    {
+      "id": "facies_train_sandstone_ambiguity_01",
+      "question": "В керне виден только песчаник без различимых структур. Это точно речное русло?",
+      "answer": "Нет, один песчаник позволяет назвать литологию, но не установить речное русло. Песок накапливается и на пляжах, в дельтах, пустынях или при подводных потоках. Нужны структуры, контакты и соседние слои.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_sandstone_ambiguity_02",
+      "question": "Песчаник сам по себе доказывает пляжное накопление?",
+      "answer": "Нет. Песчаник совместим с пляжным накоплением, но песок встречается также в речных, дельтовых и эоловых системах. Для выбора проверьте структуры, контакты и окружающую ассоциацию.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_sandstone_ambiguity_03",
+      "question": "Почему нельзя назначить единственную фацию только по названию песчаника?",
+      "answer": "Песчаник описывает материал, а не уникальный процесс или среду его накопления. Аналогичная литология встречается в разных системах; фациальную гипотезу проверяют по контактам, структурам и соседним слоям.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_sandstone_ambiguity_04",
+      "question": "Известен песчаник, но не видны его границы и текстура. Как записать среду?",
+      "answer": "Среду следует оставить неопределённой: известна только литология, а диагностические структуры и контакты не наблюдаются. Для рабочей гипотезы нужны доступные границы и соседние интервалы.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_sandstone_ambiguity_05",
+      "question": "Песчаник есть в реке и в дельте. Означает ли это, что их всегда можно отличить по цвету?",
+      "answer": "Нет. Наличие песчаника и в речной, и в дельтовой системе показывает неоднозначность одной литологии. Цвет отдельно не решает различие; сопоставляют структуры, контакты и соседние фации.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_cross_bedding_01",
+      "question": "Что означает косая слоистость в песчанике для интерпретации?",
+      "answer": "Наклонные слойки согласуются с миграцией ряби или дюн и последующим накоплением песка. Такую структуру формируют вода и ветер, поэтому среду уточняют по геометрии и окружению.",
+      "sources": [
+        "facies_v1_earle64",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_cross_bedding_02",
+      "question": "Косослоистый песчаник обязательно образовался в реке?",
+      "answer": "Нет. Косая слоистость показывает миграцию песчаных форм, но они могут переноситься водой или ветром. Речную гипотезу следует проверять по соседним фациям и контактам.",
+      "sources": [
+        "facies_v1_earle64",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_cross_bedding_03",
+      "question": "На фото видны наклонные слойки в песчанике. Доказывают ли они прилив?",
+      "answer": "Нет. Наклонные слойки совместимы с миграцией песчаных форм под действием течения или ветра. Для приливной интерпретации требуются дополнительные признаки и геологический контекст.",
+      "sources": [
+        "facies_v1_earle64",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_cross_bedding_04",
+      "question": "Как отличить описание косой слоистости от вывода о среде?",
+      "answer": "Наклонные слойки в песчанике — наблюдаемая структура. Миграция ряби или дюн и её водное либо ветровое происхождение — интерпретации, которые сопоставляют с другими признаками.",
+      "sources": [
+        "facies_v1_earle64",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_cross_bedding_05",
+      "question": "Какие сведения уточнят происхождение косослоистого песчаника?",
+      "answer": "Следует проверить геометрию и направление слоек, контакты и соседние фации. Это поможет сопоставить водный и ветровой перенос, поскольку одна косая слоистость неоднозначна.",
+      "sources": [
+        "facies_v1_earle64",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_channel_01",
+      "question": "У песчаного интервала видны размыв в основании и косая слоистость. Какая гипотеза возможна?",
+      "answer": "Размыв в основании и косая слоистость совместимы с заполнением канала текущей водой. Возможен речной или дельтовый канал; для выбора нужны соседние фации и геометрия тела.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_channel_02",
+      "question": "Почему размыв и косослоистый песчаник ещё не доказывают именно речное русло?",
+      "answer": "Размыв и косая слоистость поддерживают действие потока и последующее накопление песка. Такие признаки встречаются в разных водных системах, поэтому нужны геометрия и соседние фации.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_channel_03",
+      "question": "Песчаник с размывом может быть дельтовым каналом?",
+      "answer": "Да, песчаник с размывом допускает гипотезу дельтового канала. Возможны и другие водные системы; слоистость, ассоциацию, геометрию и региональный контекст нужно проверить.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_channel_04",
+      "question": "Как связать эрозионный контакт и песок в рабочей интерпретации?",
+      "answer": "Если песок перекрывает эрозионную поверхность, контакт фиксирует размыв, а песок — последующее накопление. Русловое заполнение возможно, но не единственно; проверьте слоистость и окружение.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_channel_05",
+      "question": "Можно ли по единственной вертикальной колонке доказать форму руслового тела?",
+      "answer": "Нет. Одна вертикальная колонка показывает последовательность по глубине, но не устанавливает боковую форму песчаного тела. Геометрию уточняют по соседним скважинам или обнажениям.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_tide_01",
+      "question": "Чередование песчаных и алевритовых слоёв с размывом может указывать на приливный канал?",
+      "answer": "Да, такое переслаивание вместе с размывом совместимо с приливным каналом. Возможны также речные и дельтовые системы; необходимы соседние фации и независимые признаки морского влияния.",
+      "sources": [
+        "facies_v1_noto2025",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_tide_02",
+      "question": "Переслаивание песка и алеврита всегда доказывает прилив?",
+      "answer": "Нет. Чередование песка и алеврита описывает изменение осадка, но встречается в разных средах. Приливную гипотезу следует проверять по ассоциации и независимым данным.",
+      "sources": [
+        "facies_v1_noto2025",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_tide_03",
+      "question": "Как сравнить приливную отмель и пойму при переслаивании тонких пород?",
+      "answer": "Сначала сопоставьте структуру переслаивания и контакты с соседними фациями. Приливная отмель и пойма могут содержать тонкие отложения; различить их помогут независимые признаки морского или наземного влияния.",
+      "sources": [
+        "facies_v1_noto2025",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_tide_04",
+      "question": "Размыв и измельчение вверх однозначно означают приливный канал?",
+      "answer": "Нет. Размыв и измельчение вверх совместимы с заполнением канала, но сами не различают приливный и речной режимы. Требуются окружающая ассоциация и дополнительные признаки.",
+      "sources": [
+        "facies_v1_noto2025",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_tide_05",
+      "question": "Почему морское влияние в переходной зоне может сочетаться с речными признаками?",
+      "answer": "Переходная область может находиться под влиянием речного потока и прилива одновременно. Поэтому речные признаки не исключают приливную гипотезу; необходимо оценить их сочетание в разрезе.",
+      "sources": [
+        "facies_v1_noto2025",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_wave_01",
+      "question": "Хорошо отсортированный песчаник всегда относится к пляжу?",
+      "answer": "Нет. Хорошая сортировка совместима с пляжной переработкой, но не уникальна для пляжа. Сопоставьте структуры, контакты и окружающие фации с альтернативными обстановками.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_earle64",
+        "facies_v1_noto2025"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_wave_02",
+      "question": "Что предположить для песчаного тела, связанного с мелководно-морской ассоциацией?",
+      "answer": "Если песчаное тело действительно связано с мелководно-морской ассоциацией, возможна соответствующая фация. Уточнить её положение помогут структуры, соседние слои и независимые признаки.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_earle64",
+        "facies_v1_noto2025"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_wave_03",
+      "question": "Цвет и песчаная зернистость достаточны для указания пляжа в отчёте?",
+      "answer": "Нет. Цвет и песчаная зернистость не уникальны для пляжного накопления. Пляжную гипотезу нужно проверять по структурам, признакам волновой переработки и окружению.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_earle64",
+        "facies_v1_noto2025"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_wave_04",
+      "question": "Какие процессы стоит проверить при гипотезе пляжного песка?",
+      "answer": "При пляжной гипотезе следует проверить признаки волновой переработки и возможного вдольберегового переноса. Одной песчаной литологии недостаточно; важны структуры и окружающая ассоциация.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_earle64",
+        "facies_v1_noto2025"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_wave_05",
+      "question": "Одинаковый песчаник в пляже и реке исключён?",
+      "answer": "Нет. Песок накапливается и в речных системах, и на пляжах, поэтому одинаковое название породы возможно в обеих обстановках. Различие устанавливают по комплексу признаков.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_earle64",
+        "facies_v1_noto2025"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_delta_01",
+      "question": "Вверх по разрезу песчаные слои становятся толще и крупнее. Можно ли предположить дельту?",
+      "answer": "Да, утолщение и укрупнение песчаных слоёв вверх совместимо с дельтовой гипотезой. Такой тренд не уникален; проверьте структуры, контакты, соседние фации и альтернативные модели.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_delta_02",
+      "question": "Увеличение крупности вверх автоматически доказывает дельтовый фронт?",
+      "answer": "Нет. Укрупнение вверх может поддержать гипотезу дельтового фронта, но не устанавливает её однозначно. Нужны контакты, структуры и соседние фации в контексте разреза.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_delta_03",
+      "question": "Как в одном дельтовом аналоге различались удалённые и близкие к источнику части?",
+      "answer": "В изученной дельте более близкие к источнику части характеризовались большей долей и мощностью песчаных тел. Это наблюдение конкретного аналога, а не универсальный критерий для любого керна.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_delta_04",
+      "question": "Почему глинистые и песчаные интервалы могут входить в одну дельтовую систему?",
+      "answer": "Дельтовая система включает участки с разными процессами и составом осадка, поэтому в ней могут сочетаться песчаные и глинистые интервалы. Их связь проверяют по последовательности фаций.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_delta_05",
+      "question": "По одному тонкому песчаному прослою можно определить положение в дельте?",
+      "answer": "Нет. Один тонкий прослой не показывает всю последовательность или боковую геометрию дельты. Для гипотезы нужны соседние интервалы, структуры и контакты.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_turbidite_01",
+      "question": "Резкое основание, измельчение вверх и переход алеврита в глину: какую гипотезу проверить?",
+      "answer": "Резкое основание, измельчение вверх и переход в глинистую породу совместимы с осадком затухающего потока, включая турбидит. Это гипотеза; её проверяют по окружающему разрезу.",
+      "sources": [
+        "facies_v1_iodp2019",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_turbidite_02",
+      "question": "Нормальная градация сама по себе доказывает глубоководный турбидит?",
+      "answer": "Нет. Нормальная градация показывает уменьшение размера частиц вверх, но сама не задаёт глубину и единственную среду. Турбидитную гипотезу проверяют по контактам и ассоциации.",
+      "sources": [
+        "facies_v1_iodp2019",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_turbidite_03",
+      "question": "В пласте размер частиц уменьшается к кровле. Какой это тип градации?",
+      "answer": "Это нормальная градация: более крупные частицы расположены у основания слоя, более мелкие — к кровле. Для определения среды требуется дополнительный контекст.",
+      "sources": [
+        "facies_v1_iodp2019",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_turbidite_04",
+      "question": "Что означает последовательность крупный алеврит снизу — мелкий сверху?",
+      "answer": "Наблюдается нормальная градация: размер уменьшается вверх от крупного к мелкому алевриту. Затухающий турбидный поток возможен, но один тренд не доказывает такую среду.",
+      "sources": [
+        "facies_v1_iodp2019",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_turbidite_05",
+      "question": "Есть резкий контакт и параллельные слойки, но соседние слои не видны. Среда известна точно?",
+      "answer": "Нет. Резкий контакт и параллельные слойки помогают описать структуру и предположить процесс, но без окружающих слоёв не позволяют надёжно выбрать единственную среду.",
+      "sources": [
+        "facies_v1_iodp2019",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_bioturbation_01",
+      "question": "Нарушение слоистости рядом со стенкой лайнера доказывает первичное оползание?",
+      "answer": "Нет. Нарушение около стенки лайнера может возникнуть при бурении, а не обязательно при первичном оползании. Сравните деформацию по ширине керна и независимые данные.",
+      "sources": [
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_bioturbation_02",
+      "question": "Если слой пересечён ходами организмов, можно ли назвать одну фацию без других данных?",
+      "answer": "Нет. Ходы являются наблюдаемым признаком биотурбации, но сами не задают единственную фацию. Сопоставьте их с литологией, контактами и соседними слоями.",
+      "sources": [
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_bioturbation_03",
+      "question": "Перемешанный участок у края керна: какие альтернативы учесть?",
+      "answer": "Возможны биотурбация, первичная деформация осадка или нарушение при бурении. Проверьте форму нарушения, его положение относительно края и распространение по ширине керна.",
+      "sources": [
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_bioturbation_04",
+      "question": "Видимые биогенные ходы сами по себе доказывают речное русло?",
+      "answer": "Нет. Биогенные ходы описывают переработку осадка организмами, но не являются уникальным признаком речного русла. Для среды нужна ассоциация структур и пород.",
+      "sources": [
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_bioturbation_05",
+      "question": "Почему важно отдельно отмечать видимые ходы и предполагаемую среду?",
+      "answer": "Ходы организмов — наблюдаемый признак, а среда накопления — интерпретация по нескольким данным. Раздельная запись позволяет пересмотреть гипотезу без изменения исходного описания.",
+      "sources": [
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_orientation_01",
+      "question": "Видна смена крупного и мелкого материала, но верх керна не известен. Градация нормальная?",
+      "answer": "Пока определить нельзя: без установленного верха и низа слоя неизвестно изменение крупности именно вверх. Сначала проверьте ориентировку, затем определяйте тип градации.",
+      "sources": [
+        "facies_v1_earle64",
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_orientation_02",
+      "question": "Как проверить направление градации перед назначением фации?",
+      "answer": "Установите основание и кровлю слоя, после чего сравните размеры частиц в направлении вверх. Уменьшение соответствует нормальной градации, увеличение — обратной.",
+      "sources": [
+        "facies_v1_earle64",
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_orientation_03",
+      "question": "Почему изменение цвета не заменяет оценку градации зернистости?",
+      "answer": "Градация зернистости определяется изменением размера частиц, тогда как цвет может меняться по другим причинам. Поэтому нужно оценить сами зёрна и ориентировку слоя.",
+      "sources": [
+        "facies_v1_earle64",
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_orientation_04",
+      "question": "Пласт ориентирован: снизу 0,6 мм, сверху 0,2 мм. Что наблюдается?",
+      "answer": "Размер частиц уменьшается от 0,6 мм у основания до 0,2 мм у кровли. В ориентированном слое это нормальная градация; одной градации недостаточно для определения среды.",
+      "sources": [
+        "facies_v1_earle64",
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_orientation_05",
+      "question": "В ориентированном слое снизу 0,1 мм, сверху 0,5 мм. Какая градация?",
+      "answer": "Размер частиц увеличивается от 0,1 мм снизу до 0,5 мм сверху. Это обратная градация; её происхождение уточняется по другим признакам разреза.",
+      "sources": [
+        "facies_v1_earle64",
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_facies_method_01",
+      "question": "Как описать песчаник и предложить фацию, не выдавая гипотезу за наблюдение?",
+      "answer": "Сначала запишите видимые литологию, структуры и контакты, если они различимы. Затем предложите вероятную фацию с обоснованием и обозначьте альтернативу или недостающие признаки.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_noto2025",
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_facies_method_02",
+      "question": "Чем название породы отличается от обстановки осадконакопления?",
+      "answer": "Название породы характеризует материал, например песчаник. Обстановка осадконакопления — геологический вывод, который проверяют по структурам, контактам и ассоциации соседних фаций.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_noto2025",
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_facies_method_03",
+      "question": "Можно ли считать литофацию и единственную среду синонимами?",
+      "answer": "Нет. Литофация описывает набор признаков отложения, а похожие признаки могут возникать в разных средах. Обстановку уточняют по ассоциации фаций и геологическому контексту.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_noto2025",
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_facies_method_04",
+      "question": "Как поступить, если фото показывает только небольшой кусок без контактов?",
+      "answer": "Опишите только различимые литологию и структуры. При отсутствии контактов и соседних интервалов фациальную гипотезу следует считать предварительной и запросить дополнительный разрез.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_noto2025",
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_train_facies_method_05",
+      "question": "Зачем сопоставлять керн соседних интервалов и ГИС при выделении фаций?",
+      "answer": "Соседний керн показывает последовательность и контакты, а ГИС может дополнить интервалы между образцами. Вместе они помогают проверить масштаб и ассоциацию, которые не видны на одном фрагменте.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_noto2025",
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_reasoned_cards_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_channel_01",
+      "question": "В песчанике видны наклонные слойки, а основание тела размывает подстилающий слой. Какую фацию предположить?",
+      "answer": "Возможна фация руслового песчаного заполнения: размыв указывает на эрозию, а косые слойки — на перенос осадка. Похожие признаки возможны и в других водных системах; нужны геометрия тела и соседние фации.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_channel_02",
+      "question": "Песчаное тело с эрозионным основанием и косой слоистостью находится среди дельтовых отложений. Как его интерпретировать?",
+      "answer": "Можно предположить заполнение дельтового канала: размыв и косая слоистость согласуются с переносом и накоплением песка потоком. Другие дельтовые песчаные тела также возможны; уточнят интерпретацию геометрия и соседние фации.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_channel_03",
+      "question": "Гравий и песок залегают в углублении с размытым основанием; регионально известны речные отложения. Что вероятно?",
+      "answer": "Русловое заполнение является рабочей гипотезой: эрозионное углубление и песчано-гравийный материал согласуются с деятельностью течения. Другие водные потоки также способны создавать подобные тела; проверьте геометрию и соседние отложения.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_channel_04",
+      "question": "Известны размыв подошвы и косая слоистость песчаника, но положение в системе не известно. Река или дельта?",
+      "answer": "Предварительно подходит русловая фация: размыв и косые слойки согласуются с эрозией и переносом песка потоком. Речный и дельтовый канал остаются альтернативами; для выбора нужны соседние фации и региональный контекст.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_delta_01",
+      "question": "В регионально установленной дельтовой системе от глинистых слоёв вверх возрастает доля песчаных прослоев. Что предположить?",
+      "answer": "Можно предположить приближение дельтового фронта: увеличение доли песка согласуется с переходом к более песчаным участкам дельты. Возможны и другие причины вертикальной смены; проверьте соседние фации и протяжённость тренда.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_delta_02",
+      "question": "На разрезе дельты от тонкозернистых слоёв к более песчаным мощность песчаных тел увеличивается. Как связать это с фациями?",
+      "answer": "Гипотеза — переход от более удалённой части дельты к более близкому дельтовому фронту: в изученном аналоге песчаные тела там мощнее. Для выбора положения нужны архитектура и сопоставление соседних интервалов.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_delta_03",
+      "question": "Песчаные тела с размывом и косой слоистостью перекрывают отложения установленного дельтового фронта. Какой вариант рассмотреть?",
+      "answer": "Можно рассмотреть дистрибутивный канал: песчаное тело с размывом и косыми слойками согласуется с переносом осадка потоком. Дельтовый контекст поддерживает гипотезу, но нужны геометрия и соседние фации для проверки.",
+      "sources": [
+        "facies_v1_atlas2023",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_tide_01",
+      "question": "Тонкий песчаник переслаивается с алевролитом; в том же интервале песчаник с размытым основанием измельчается вверх. Какую среду проверить?",
+      "answer": "Возможна приливная отмель с каналом: сходный комплекс описан в опубликованном аналоге. Чередование и размыв также встречаются в других системах; для проверки нужны окружающие фации и дополнительные признаки прилива.",
+      "sources": [
+        "facies_v1_noto2025",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_tide_02",
+      "question": "В переходном разрезе чередуются песчаные и алевритовые прослои, рядом находится канал с эрозионным основанием. Что предположить?",
+      "answer": "Приливная отмель с каналом — одна из рабочих гипотез для такого сочетания. Пойменная или дельтовая интерпретация тоже возможна; отличить их помогут расположение соседних фаций и дополнительные признаки приливного влияния.",
+      "sources": [
+        "facies_v1_noto2025",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_tide_03",
+      "question": "Размытый песчаный слой измельчается вверх и окружён переслаиванием песчаника с алевролитом. Допустима ли приливная интерпретация?",
+      "answer": "Да, возможны приливный канал и прилегающая отмель: комплекс похож на описанный переходный разрез. Признаки не уникальны для прилива; проверьте соседние фации и независимые признаки приливного влияния.",
+      "sources": [
+        "facies_v1_noto2025",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_tide_04",
+      "question": "В керне установлены перемежающиеся песчаник и алевролит и песчаное тело с эрозионным основанием. Как объяснить смену осадка?",
+      "answer": "Можно предположить смену условий накопления и проверить модель отмели с каналом, в том числе приливной. Речные и дельтовые варианты остаются возможными; для различения нужны дополнительные признаки и контекст разреза.",
+      "sources": [
+        "facies_v1_noto2025",
+        "facies_v1_earle63"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_turbidite_01",
+      "question": "Ориентированный алевритовый пласт имеет резкое основание, параллельные слойки, уменьшается по крупности вверх и переходит в глину. Какая гипотеза?",
+      "answer": "Возможен турбидит: резкое основание и нормальная градация с переходом в глину напоминают интервал IODP U1518. Иные потоки тоже могут давать градацию; проверьте соседние пласты и региональную обстановку.",
+      "sources": [
+        "facies_v1_iodp2019",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_turbidite_02",
+      "question": "В известном морском бассейне резкобазальный алевритовый слой с параллельными слойками мельчает кверху и завершается глиной. Что это может быть?",
+      "answer": "Можно предположить отложение турбидного потока: резкое основание, слойки и измельчение вверх согласуются с опубликованным аналогом. Это рабочая гипотеза; соседние слои и обстановка нужны для исключения других процессов.",
+      "sources": [
+        "facies_v1_iodp2019",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_turbidite_03",
+      "question": "В керне несколько ориентированных алевритовых пластов с резким основанием и нормальной градацией переходят в глинистые прослои. Что проверить?",
+      "answer": "Стоит проверить серию турбидитов: повторение резкобазальных градационных пластов с глинистыми завершениями согласуется с турбидным переносом. Градация встречается и при других процессах, поэтому нужен контекст всего разреза.",
+      "sources": [
+        "facies_v1_iodp2019",
+        "facies_v1_earle64"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_shore_01",
+      "question": "В регионально установленной прибрежной зоне найден песчано-гравийный интервал. Какую фацию можно рассмотреть?",
+      "answer": "Можно рассмотреть пляжную фацию: песок и гравий встречаются на берегу при переработке осадка волнами и вдольбереговыми течениями. Речное происхождение тоже возможно; проверьте соседние отложения и береговой контекст.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_shore_02",
+      "question": "Разрез с песком и гравием расположен рядом с установленными прибрежными отложениями. Что предположить о среде?",
+      "answer": "Прибрежное или пляжное накопление допустимо: песок и гравий согласуются с береговым аналогом, а соседние отложения дают контекст. Это не доказательство; речные отложения остаются альтернативой и требуют сопоставления.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_shore_03",
+      "question": "Песчаник входит в установленный региональный комплекс береговых отложений. Можно ли предложить береговую фацию?",
+      "answer": "Можно предложить береговую фацию как предварительную: принадлежность к береговому комплексу даёт больше оснований, чем название песчаника отдельно. Следует проверить структуры и соседние интервалы, поскольку песок встречается и в других системах.",
+      "sources": [
+        "facies_v1_earle63",
+        "facies_v1_atlas2023"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_bio_01",
+      "question": "Внутри керна заметны ходы, пересекающие первальные слойки и нарушающие их. Как описать процесс?",
+      "answer": "Вероятна биогенная переработка: ходы, пересекающие слойки, согласуются с деятельностью организмов. Степень нарушения следует описать отдельно; по одним ходам нельзя надёжно выбрать единственную среду осадконакопления.",
+      "sources": [
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_bio_02",
+      "question": "Участок слоя пересечён ходами, а первичная слоистость частично разрушена. Какую интерпретацию предложить?",
+      "answer": "Биотурбация — обоснованная гипотеза: наблюдаемые ходы и нарушенная слоистость согласуются с переработкой осадка организмами. Конкретную обстановку нужно проверять по сопутствующим структурам и соседним фациям.",
+      "sources": [
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    },
+    {
+      "id": "facies_positive_bio_03",
+      "question": "Перемешанный интервал содержит видимые ходы и частично сохранившиеся слойки. Биогенный или механический процесс?",
+      "answer": "Можно предположить биогенное перемешивание, поскольку видимые ходы сопровождаются нарушением слоистости. При этом механическое повреждение также следует проверить, особенно у края керна; сравните распределение нарушений по ширине.",
+      "sources": [
+        "facies_v1_iodp2019"
+      ],
+      "aliases": [],
+      "holdout": false,
+      "exact_only": true,
+      "metadata": {
+        "origin_manifest": "vlm_source/facies_reasoning_v1/training_positive_extension_v3.json",
+        "origin_split": "train",
+        "origin_source_group": "facies_reasoning_v1",
+        "geology_approved": false,
+        "reference_scope": "general_theory",
+        "review_status": "source_checked_not_geologist_reviewed"
+      }
+    }
+  ]
+}

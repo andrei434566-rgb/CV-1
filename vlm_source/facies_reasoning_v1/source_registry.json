@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "source_checked": true,
+  "geologist_reviewed": false,
+  "sources": {
+    "earle63": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition, section 6.3: Depositional Environments and Sedimentary Basins",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-3-depositional-environments-and-sedimentary-basins/",
+      "license": "CC BY 4.0, excluding individually credited exceptions",
+      "attribution": "Original Russian paraphrases and new questions based on Earle (2019), Physical Geology 2nd ed., section 6.3, CC BY 4.0. No illustrations reproduced.",
+      "access": "Full official HTML, environment tables and license footer directly read; 2026-10-28."
+    },
+    "earle64": {
+      "title": "Steven Earle (2019), Physical Geology, 2nd Edition, section 6.4: Sedimentary Structures and Fossils",
+      "url": "https://opentextbc.ca/physicalgeology2ed/chapter/6-4-sedimentary-structures-and-fossils/",
+      "license": "CC BY 4.0, excluding individually credited exceptions",
+      "attribution": "Original Russian paraphrases and new questions based on Earle (2019), Physical Geology 2nd ed., section 6.4, CC BY 4.0. No illustrations reproduced.",
+      "access": "Full official HTML and license footer directly read; 2026-10-28."
+    },
+    "atlas2023": {
+      "title": "Atlas, Morris, Johnson and Wroblewski (2023), New approaches to the architectural analysis of deltaic outcrops",
+      "url": "https://oap.unige.ch/journals/sdk/article/view/1051",
+      "license": "CC BY 4.0",
+      "doi": "10.57035/journals/sdk.2023.e11.1051",
+      "attribution": "Original concise Russian interpretations of Atlas et al. (2023), Sedimentologika, CC BY 4.0; translation and new hypothetical questions. No photographs or figures reproduced.",
+      "access": "Full journal HTML sections 4.1 and license directly read; 2026-10-28."
+    },
+    "noto2025": {
+      "title": "Noto, Flaig and Lorente (2025), Multiproxy synthesis at the Arlington Archosaur Site",
+      "url": "https://oap.unige.ch/journals/sdk/article/view/1435",
+      "license": "CC BY 4.0",
+      "doi": "10.57035/journals/sdk.2025.e31.1435",
+      "attribution": "Original short Russian paraphrases from Noto et al. (2025), Sedimentologika, CC BY 4.0; translation and new hypothetical questions. No figures reproduced.",
+      "access": "Official full journal HTML sections 4.1 and license directly read; 2026-10-28."
+    },
+    "iodp2019": {
+      "title": "Saffer et al. (2019), Site U1518, Proceedings of the International Ocean Discovery Program 372B/375",
+      "url": "https://publications.iodp.org/proceedings/372B_375/103/372B375_103.html",
+      "license": "CC BY 4.0",
+      "doi": "10.14379/iodp.proc.372B375.103.2019",
+      "attribution": "Original concise Russian paraphrases of Saffer et al. (2019), IODP Proceedings 372B/375, Site U1518, CC BY 4.0; new hypothetical questions. No figures reproduced.",
+      "access": "Official full HTML lithostratigraphy/IIIB and license footer directly read; 2026-10-28."
+    }
+  },
+  "scope": "Original short paraphrases and hypothetical QA; no figures, source images or well-specific labels.",
+  "excluded_access_failures": [
+    "USGS PDF sources returned HTTP 403 and were not used."
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "qwen_facies_cpu_token_audit_v1",
+  "rows": 484,
+  "device": "CPU only",
+  "network_disabled": true,
+  "truncation_applied": false,
+  "manifest_sha256": "3a903a177c85bac48e096b68c3840bef6a01420b07dd245c8c1fcb2dcc978be4",
+  "system_prompt_sha256": "478a02ce9aab00bc0b7ef6ec574a78e653e51e9162f65020a8e3438e78b0e0bb",
+  "base_config_sha256": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+  "base_snapshot": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "max_sequence_tokens": 1024,
+  "prior_observed_tokens": 717,
+  "max_observed_tokens": 741,
+  "ratio_to_previous_max": 1.0335,
+  "over_previous_max_rows": 5,
+  "over_limit_rows": 0,
+  "longest_five": [
+    {
+      "record_id": "facies_positive_turbidite_02__context_train",
+      "sequence_tokens": 741,
+      "prompt_tokens": 664,
+      "supervised_tokens": 77,
+      "assistant_eos_supervised": true
+    },
+    {
+      "record_id": "facies_positive_turbidite_01__context_train",
+      "sequence_tokens": 739,
+      "prompt_tokens": 666,
+      "supervised_tokens": 73,
+      "assistant_eos_supervised": true
+    },
+    {
+      "record_id": "facies_positive_turbidite_03__context_train",
+      "sequence_tokens": 735,
+      "prompt_tokens": 659,
+      "supervised_tokens": 76,
+      "assistant_eos_supervised": true
+    },
+    {
+      "record_id": "facies_positive_channel_02__context_train",
+      "sequence_tokens": 719,
+      "prompt_tokens": 633,
+      "supervised_tokens": 86,
+      "assistant_eos_supervised": true
+    },
+    {
+      "record_id": "facies_positive_channel_03__context_train",
+      "sequence_tokens": 719,
+      "prompt_tokens": 635,
+      "supervised_tokens": 84,
+      "assistant_eos_supervised": true
+    }
+  ],
+  "limitations": [
+    "717 tokens is a previous observed maximum, not a guaranteed 8 GB memory limit.",
+    "Input length and source audit do not establish geological accuracy or GPU memory fit."
+  ]
+}

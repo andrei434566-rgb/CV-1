@@ -1,0 +1,61 @@
+{
+  "schema": "qwen_facies_reasoning_v1",
+  "status": "frozen_before_training",
+  "training_rows": 484,
+  "new_train_cards": 70,
+  "positive_extension_cards": 20,
+  "omitted_ids": [],
+  "new_scenarios": 12,
+  "excluded_from_formal_scoring": [
+    "FRV1-09"
+  ],
+  "old_closed_guards": 4,
+  "dialogue_guards": 4,
+  "image_guards": 8,
+  "partitions": {
+    "train_unique_normalized_questions": 484,
+    "holdout_unique_normalized_questions": 20,
+    "train_duplicate_question_excess_rows": 0,
+    "train_holdout_normalized_question_overlap": 0,
+    "duplicate_record_ids": 0
+  },
+  "input_sha256": {
+    "training_reasoned_cards_v3.json": "4b365938146ee247f942c16e5d9a6c2b601da81af35aed02beeb44b19602093f",
+    "training_positive_extension_v3.json": "9e987c967267a6b7b27a34f7f917d9741190b1c4f7d6d39ff001fe2944936128",
+    "training_positive_extension_v2.json": "15af61a4ea1f2fe9c43410f2c6704979aff99758c858b162d250b204c36019a9",
+    "training_reasoned_cards_v2.json": "2125201f232abad60cdd50b4a898accc19fed9c8921496eef3ed20cad9a1e847",
+    "training_positive_extension.json": "5e944b1f866449ca8795af0f0f8ae585f0c394656f57b0f9e89d683c3a036e48",
+    "training_reasoned_cards.json": "7bf31ad78599384e3e9d3890c56c36460371d5066eae7153ce3ea5bb64fdf901",
+    "training_cards.json": "5d0e38a3704356f2ea1c51fb0c212d35ab7382abad657e08a443903c483577aa",
+    "source_registry.json": "34ebb45b0f3766c924a77bce038736c29caa1557cea1dfad5712588a46c5bac9",
+    "evaluation.json": "d5afc9d83e67a0c905e5c7c263101be93d06a68888fce21e5f31a33e94b10c63",
+    "evaluation_source_audit.json": "118e7f165a2101622254679b0d0cca48be8d0b5fa7471fad424a53a72634f71f"
+  },
+  "manifest_sha256": {
+    "mixed.jsonl": "3a903a177c85bac48e096b68c3840bef6a01420b07dd245c8c1fcb2dcc978be4",
+    "holdout_theory.jsonl": "13d0fb87cbbeb04aa51275d5f8a178c81c4d05dc445f24a49bdda78393928b17",
+    "holdout_conversation.jsonl": "5e6aa535990da3696e31a71c780dbe838a2be86d4609e8b76d49a53742eaad52",
+    "val_visual.jsonl": "f0d3204208a086b9dcb9ec2155a16c888c8ea98d0e2ba0bc4a762e58bf8064ea",
+    "system_prompt.txt": "478a02ce9aab00bc0b7ef6ec574a78e653e51e9162f65020a8e3438e78b0e0bb"
+  },
+  "recipe": {
+    "base": "fresh Qwen3-VL-2B-Instruct snapshot 89644892e4d85e24eaac8bacfd4f463576704203",
+    "epochs": 2,
+    "learning_rate": 0.0001,
+    "targets": "all-text-linear",
+    "rank": 8,
+    "alpha": 16,
+    "seed": 20261028,
+    "max_tokens": 1024,
+    "theory_max_new_tokens": 256,
+    "classification_max_new_tokens": 24
+  },
+  "prior_untrained_dataset": "qwen_facies_reasoning_v1 was assembled before three source-review corrections and was not used for training.",
+  "limitations": [
+    "Examples are assistant-authored and source checked, not geologist approved.",
+    "New evaluation shares concepts with training, not independent well data.",
+    "A rock name alone cannot prove a facies or environment.",
+    "Text-only training does not establish visual or facies recognition accuracy.",
+    "No automatic activation of candidate weights."
+  ]
+}
