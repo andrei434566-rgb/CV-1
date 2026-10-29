@@ -31,6 +31,10 @@ DESCRIPTION_SCHEMA = {
 }
 
 
+class LocalLoopbackBlocked(RuntimeError):
+    """The OS denied the application's connection to its own local runtime."""
+
+
 def available_runtime(request: dict) -> tuple[Path, dict] | None:
     if str(request.get("inference_backend") or "auto") == "transformers":
         return None
@@ -158,19 +162,48 @@ class LocalLlamaRuntime:
                 raise
         self.root, self.manifest = root, manifest
         self._loaded_lora_identity = candidate_identity
+        last_health_result = "ответа от локального сервера ещё не было"
         while monotonic() - started < 120:
             if self.process.poll() is not None:
                 code = self.process.returncode
                 self.close()
                 raise RuntimeError(f"Локальный GPU runtime завершился с кодом {code}. Проверьте журнал runtime/logs.")
             try:
-                with self.opener.open(self.endpoint + "/health", timeout=1) as response:
+                # Health is public in the pinned llama.cpp release. Sending the
+                # worker's bearer token as well accommodates packaged builds
+                # that apply API-key middleware to this route.
+                health_request = Request(
+                    self.endpoint + "/health",
+                    headers={"Authorization": "Bearer " + self.api_key},
+                )
+                with self.opener.open(health_request, timeout=1) as response:
                     if response.status == 200:
                         return monotonic() - started
-            except (OSError, URLError):
+                    last_health_result = f"/health вернул HTTP {response.status}"
+            except HTTPError as exc:
+                detail = exc.read(240).decode("utf-8", errors="replace").replace("\r", " ").replace("\n", " ")
+                last_health_result = f"/health вернул HTTP {exc.code}: {detail}"[:320]
+            except (OSError, URLError) as exc:
+                reason = getattr(exc, "reason", exc)
+                if getattr(reason, "winerror", None) == 10013 or getattr(exc, "winerror", None) == 10013:
+                    self.close()
+                    raise LocalLoopbackBlocked(
+                        "Windows запретила приложению доступ к локальному runtime; переключаюсь на прямой CUDA-режим."
+                    ) from exc
+                last_health_result = f"не удалось обратиться к /health: {reason}"[:320]
+            except Exception as exc:
+                last_health_result = f"ошибка проверки /health: {type(exc).__name__}: {exc}"[:320]
+            if self.process is None or self.process.poll() is not None:
+                code = self.process.returncode if self.process is not None else "неизвестен"
+                self.close()
+                raise RuntimeError(f"Локальный GPU runtime завершился с кодом {code}. Проверьте журнал runtime/logs.")
+            else:
                 sleep(0.2)
         self.close()
-        raise RuntimeError("Локальная Qwen не загрузилась в ускоренном runtime за 2 минуты.")
+        raise RuntimeError(
+            "Локальный сервер Qwen не подтвердил готовность за 2 минуты. "
+            f"Последняя проверка: {last_health_result}. Подробности в runtime/logs."
+        )
 
     def complete(self, messages: list[dict], *, max_tokens: int, schema: dict | None = None,
                  lora: list[dict] | None = None) -> dict:

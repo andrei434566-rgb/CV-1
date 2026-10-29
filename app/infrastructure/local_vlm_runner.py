@@ -25,13 +25,17 @@ if __package__:
     from .geology_reference import format_grounded_question, retrieve_notes
     from .local_knowledge_search import search_folders
     from .local_vlm_modes import adapter_for_operation, normalize_model_request, validate_local_models
-    from .local_llama_runtime import DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, available_runtime
+    from .local_llama_runtime import (
+        DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, LocalLoopbackBlocked, available_runtime,
+    )
 else:
     from core_color_hint import estimate_core_color
     from geology_reference import format_grounded_question, retrieve_notes
     from local_knowledge_search import search_folders
     from local_vlm_modes import adapter_for_operation, normalize_model_request, validate_local_models
-    from local_llama_runtime import DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, available_runtime
+    from local_llama_runtime import (
+        DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, LocalLoopbackBlocked, available_runtime,
+    )
 
 
 PHOTO_REFERENCE_FIELDS = (
@@ -174,6 +178,12 @@ class LocalModel:
         self.processor = None
         self.loaded_config = None
         self.turbo = LocalLlamaRuntime()
+        # Windows may deny this application access to its own 127.0.0.1
+        # llama.cpp endpoint (WinError 10013). Use the same local checkpoint
+        # directly through CUDA on Windows so chat never waits for a server
+        # health timeout. This remains fully offline and does not weaken the
+        # Windows firewall or expose a network port.
+        self._turbo_disabled = os.name == "nt"
 
     def load(self, base: str, adapter: str, theory_adapter: str, model_mode: str = ""):
         effective = normalize_model_request({
@@ -225,14 +235,20 @@ class LocalModel:
         reference_note_ids = []
         effective = normalize_model_request(request)
         load_started = perf_counter()
-        turbo_runtime = available_runtime(request)
+        turbo_runtime = None if self._turbo_disabled else available_runtime(request)
         if turbo_runtime is not None:
             if self.model is not None:
                 import torch
                 self.model = self.processor = self.loaded_config = None
                 torch.cuda.empty_cache()
-            load_seconds = self.turbo.start(*turbo_runtime)
-        else:
+            try:
+                load_seconds = self.turbo.start(*turbo_runtime)
+            except LocalLoopbackBlocked:
+                # Keep inference fully local without asking Windows to open
+                # loopback access: load the same local checkpoint in CUDA.
+                self._turbo_disabled = True
+                turbo_runtime = None
+        if turbo_runtime is None:
             self.turbo.close()
             import torch
             self.load(
@@ -559,12 +575,20 @@ class LocalModel:
         ids = [str(item.get("id") or "") for item in items if isinstance(item, dict)]
         if len(ids) != len(items) or any(not value for value in ids) or len(set(ids)) != len(ids):
             raise ValueError("В пакете VLM требуются уникальные id фрагментов.")
-        turbo = available_runtime(request)
+        turbo = None if self._turbo_disabled else available_runtime(request)
         if turbo and self.model is not None:
             import torch
             self.model = self.processor = self.loaded_config = None
             torch.cuda.empty_cache()
-        load_seconds = self.turbo.start(*turbo) if turbo else 0.0
+        if turbo:
+            try:
+                load_seconds = self.turbo.start(*turbo)
+            except LocalLoopbackBlocked:
+                self._turbo_disabled = True
+                self.turbo.close()
+                load_seconds = 0.0
+        else:
+            load_seconds = 0.0
         started = perf_counter()
         def describe(item):
             try:
