@@ -95,6 +95,66 @@ class Cv1MainFlowTests(unittest.TestCase):
         self.assertEqual(config["adapter"], "")
         self.assertEqual(config["theory_adapter"], "")
 
+    def test_normal_layer_click_opens_manual_depth_and_texture_form(self):
+        record = self.record(interpreted=True)
+        row = record.detections[0]
+        row.attributes.update({"__core_column_description": "1", "Цвет": "Серый",
+                               "Текстура": "Массивная", "Краткое описание": "Текст специалиста."})
+        row.depth_from, row.depth_to = 100.0, 101.5
+        self.window._records = [record]
+        with patch("app.ui.dialogs.facies_dialog.QSettings", return_value=self.settings):
+            self.window.workspace.facies_selected.emit(record, row)
+            dialog = self.window._facies_dialogs[-1]
+            self.assertEqual(dialog.selected_depth_range(), (100.0, 101.5))
+            self.assertEqual(dialog.attribute_combos["Цвет"].currentData(), "Серый")
+            self.assertEqual(dialog.attribute_combos["Текстура"].currentData(), "Массивная")
+            self.assertEqual(dialog.vlm_description.toPlainText(), "Текст специалиста.")
+            # Rare terms remain available to the expert in the manual guide.
+            self.assertGreaterEqual(dialog.attribute_combos["Текстура"].findData('Песчаные "роллы"'), 0)
+            dialog.reject()
+
+    def test_cuda_batch_contains_five_intervals_from_one_photo_only(self):
+        first, second = self.record(name="first.png", interpreted=True), self.record(name="second.png", interpreted=True)
+        for index in range(4):
+            row = deepcopy(first.detections[0])
+            row.attributes["__geometry_id"] = str(index)
+            first.detections.append(row)
+        self.window._records = [first, second]
+        self.window._analysis_queue = deque(IntervalJob.create(record, row) for record in (first, second) for row in record.detections)
+        self.window._analysis_active = True
+        self.window._analysis_total = 6
+        config = self.runtime_config("base")
+        with (patch.object(self.window, "_local_vlm_config", return_value=config),
+              patch(_MODULE + ".available_runtime", return_value=None),
+              patch(_MODULE + ".write_interval_crop"),
+              patch.object(self.window._vlm_client, "send", return_value="photo-batch") as send):
+            self.window._advance_cv1_description()
+        self.assertEqual(send.call_args.args[1]["operation"], "describe_photo")
+        self.assertEqual(len(send.call_args.args[1]["items"]), 5)
+        self.assertEqual(len(self.window._analysis_queue), 1)
+        self.assertEqual(self.window._analysis_queue[0].record_id, second.identifier)
+        self.assertTrue(all(job.record_id == first.identifier for job in self.window._analysis_pending[1]))
+
+    def test_redescribe_preserves_manual_rows_and_existing_geometry(self):
+        record = self.record(interpreted=True)
+        automatic = record.detections[0]
+        automatic.attributes["__interpretation_status"] = "draft"
+        edited = deepcopy(automatic)
+        edited.attributes["__manual_interval_edited"] = "1"
+        edited.attributes["Краткое описание"] = "Описание геолога"
+        record.detections.append(edited)
+        before = [(point.x(), point.y()) for point in automatic.polygon]
+        self.window._records = [record]
+        with (patch.object(self.window._vlm_client, "send", return_value="clear-cache") as send,
+              patch.object(self.window, "_start_cv1_descriptions") as start):
+            self.window._send_vlm_chat("переопиши все фото")
+        self.assertEqual(send.call_args.args[1]["operation"], "clear_description_cache")
+        start.assert_called_once()
+        self.assertEqual(automatic.attributes["__interpretation_status"], "waiting")
+        self.assertEqual(edited.attributes["__interpretation_status"], "draft")
+        self.assertEqual(edited.attributes["Краткое описание"], "Описание геолога")
+        self.assertEqual([(point.x(), point.y()) for point in automatic.polygon], before)
+
     def test_old_adapter_path_is_retained_but_requires_explicit_mode_selection(self):
         self.settings.setValue("vlm/adapter", "old-specialist")
         config = self.window._local_vlm_config()

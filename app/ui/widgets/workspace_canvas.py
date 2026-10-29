@@ -783,7 +783,8 @@ class FaciesOverlayItem(QGraphicsObject):
                 self.update()
                 event.accept()
                 return
-        index = self._detection_at(event.pos())
+        index = self._detection_at(event.pos(), include_core_columns=(
+            self.hover_detections is not None or event.button() == Qt.MouseButton.RightButton))
         if event.button() == Qt.MouseButton.RightButton:
             if index >= 0:
                 self.facies_context_requested.emit(self.detections[index])
@@ -827,6 +828,9 @@ class FaciesOverlayItem(QGraphicsObject):
                 event.accept()
                 return
         if index >= 0:
+            if index == self._editing_index:
+                event.accept()
+                return
             self.facies_clicked.emit(self.detections[index])
             event.accept()
             return
@@ -860,6 +864,12 @@ class FaciesOverlayItem(QGraphicsObject):
             self.finish_new_contour()
             event.accept()
             return
+        if self._editing_index < 0 and event.button() == Qt.MouseButton.LeftButton:
+            index = self._detection_at(event.pos(), include_core_columns=True)
+            if index >= 0:
+                self.facies_context_requested.emit(self.detections[index])
+                event.accept()
+                return
         if event.button() == Qt.MouseButton.LeftButton and 0 <= self._editing_index < len(self.detections):
             detection = self.detections[self._editing_index]
             active_path = QPainterPath()
@@ -1897,6 +1907,12 @@ class StackColumnItem(QGraphicsObject):
             self.interpretation_interval_context_requested.emit(self.well_name, interval_index)
             event.accept()
             return
+        if event.button() == Qt.MouseButton.RightButton:
+            column = self._column_at(event.pos())
+            if column is not None:
+                self.facies_context_requested.emit(column[0], column[1])
+                event.accept()
+                return
         handle = self._interval_handle_at(event.pos())
         if handle is not None and event.button() == Qt.MouseButton.LeftButton:
             self._interval_resize = handle
@@ -1964,7 +1980,7 @@ class StackColumnItem(QGraphicsObject):
             column = self._column_at(event.pos())
             if column is not None:
                 record, detection, column_kind = column
-                self.column_paint_requested.emit(record, detection, column_kind)
+                self.facies_selected.emit(record, detection)
         else:
             anchors = self._depth_anchors()
             depth_from = self._stack_y_to_depth(start_y, anchors)

@@ -152,6 +152,7 @@ class MainWindow(QMainWindow):
         self._vlm_target: tuple[PhotoRecord, object | None] | None = None
         self._vlm_pending: tuple[str, str, object | None, str] | None = None
         self._vlm_pending_meta: dict | None = None
+        self._runtime_preparation_id: str | None = None
         self._vlm_chat_queue: deque[dict] = deque()
         self._vlm_dispatch_scheduled = False
         self._vlm_closing = False
@@ -247,7 +248,7 @@ class MainWindow(QMainWindow):
 
     def _connect_workspace(self, workspace: WorkspaceCanvas, source_photos: bool = False) -> None:
         """Connect the core-description workspace to the project data model."""
-        workspace.facies_selected.connect(self._begin_polygon_edit)
+        workspace.facies_selected.connect(self._open_facies_editor)
         workspace.facies_context_requested.connect(self._open_facies_editor)
         workspace.facies_geometry_changed.connect(self._on_facies_geometry_changed)
         workspace.facies_created.connect(self._add_manual_contour)
@@ -334,6 +335,9 @@ class MainWindow(QMainWindow):
         self._new_contour_action.setToolTip("Нарисовать контур вручную на фотографии")
         self._new_contour_action.toggled.connect(self._set_new_contour_mode)
         toolbar.addAction(self._new_contour_action)
+        edit_contour = QAction("Изменить границы", self)
+        edit_contour.triggered.connect(self._edit_selected_contour)
+        toolbar.addAction(edit_contour)
         add_vertex = QAction("＋ Точка", self)
         add_vertex.setToolTip("Добавить вершину в выбранный контур: нажмите кнопку, затем щёлкните по контуру")
         add_vertex.triggered.connect(self._prepare_polygon_vertex_insert)
@@ -688,7 +692,7 @@ class MainWindow(QMainWindow):
         if old_toolbar is not None:
             contour_actions = [
                 action for action in old_toolbar.actions()
-                if action.text().strip() in {"Новый контур", "＋ Точка", "− Точка", "✓ Готово", "К фото"}
+                if action.text().strip() in {"Новый контур", "Изменить границы", "＋ Точка", "− Точка", "✓ Готово", "К фото"}
             ]
             old_toolbar.hide()
         if training_toolbar is not None:
@@ -922,6 +926,18 @@ class MainWindow(QMainWindow):
             "model_mode": str(self._settings.value("vlm/model_mode", "base") or "base"),
             "folders": [str(folder) for folder in folders if isinstance(folder, str)],
         }
+
+    def prepare_local_runtime(self) -> None:
+        """Prepare CPU imports once; model weights wait until YOLO releases CUDA."""
+        if self._runtime_preparation_id or self._vlm_closing:
+            return
+        config = self._local_vlm_config()
+        if Path(config["python"]).is_file() and (Path(config["base"]) / "config.json").is_file():
+            try:
+                self._runtime_preparation_id = self._vlm_client.send(config["python"],
+                    {"operation": "prepare_runtime", "base": config["base"]})
+            except (OSError, RuntimeError):
+                self._runtime_preparation_id = None
 
     def _knowledge_folders(self, question: str = "", *, include_archive: bool = False) -> list[str]:
         """Use the project, selected photo and chosen folders for offline search."""
@@ -1517,6 +1533,9 @@ class MainWindow(QMainWindow):
 
     def _send_vlm_chat(self, question: str) -> None:
         self.assistant_panel.append_message("user", question)
+        if re.match(r"\s*(?:переопиши|повторно опиши|обнови описания)", question.casefold()):
+            self._redescribe_automatic_core(all_records="все" in question.casefold() or "всё" in question.casefold())
+            return
         process_project = bool(re.match(
             r"\s*(?:обработай|обработать|проанализируй все|собери (?:(?:един\w*|общ\w*)\s+)?(?:колонк\w*|столбик\w*)|добавь .*в проект)",
             question.casefold(),
@@ -1570,6 +1589,31 @@ class MainWindow(QMainWindow):
             self._analyze_chat_photo(question)
             return
         self._send_vlm_request("chat", question)
+
+    def _redescribe_automatic_core(self, *, all_records: bool = False) -> None:
+        if self._analysis_active or self._vlm_pending is not None or self._segmentation_thread is not None:
+            self.assistant_panel.append_message("system", "Дождитесь окончания текущей обработки перед повторным описанием.")
+            return
+        records = self._records if all_records else self._records_for_well(self._active_well_name)
+        eligible = [row for record in records if record.analysis_mode == PIPELINE_MODE for row in record.detections
+                    if row.attributes.get("__geometry_only") == "1" and not row.training_ready
+                    and row.attributes.get("__manual_contour") != "1"
+                    and row.attributes.get("__manual_interval_edited") != "1"
+                    and not expert_memory_is_confirmed(row) and not expert_description_is_confirmed(row)]
+        if not eligible:
+            self.assistant_panel.append_message("system", "Нет автоматических описаний для обновления. Проверенные параметры специалиста сохранены.")
+            return
+        try:
+            config = self._local_vlm_config()
+            self._vlm_client.send(config["python"], {"operation": "clear_description_cache"})
+        except (OSError, RuntimeError) as exc:
+            self.assistant_panel.append_message("system", str(exc))
+            return
+        for row in eligible:
+            row.attributes["__interpretation_status"] = "waiting"
+            row.attributes["Статус интерпретации"] = "обновляется автоматическое описание"
+        self.assistant_panel.append_message("system", f"Обновляю автоматические описания: {len(eligible)}. Глубины, контуры и проверенные правки сохранены.")
+        self._start_cv1_descriptions()
 
     def _expert_project_key(self) -> str:
         return str(self._project_folder.resolve()) if self._project_folder else f"unsaved:{self._expert_session_id}"
@@ -1712,6 +1756,9 @@ class MainWindow(QMainWindow):
             self._schedule_vlm_dispatch()
 
     def _handle_vlm_reply(self, result: dict) -> None:
+        if self._runtime_preparation_id and str(result.get("id")) == self._runtime_preparation_id:
+            self._runtime_preparation_id = None
+            return
         if self._analysis_pending is not None and str(result.get("id")) == self._analysis_pending[0]:
             self._on_cv1_interval_reply(result)
             return
@@ -5102,6 +5149,10 @@ class MainWindow(QMainWindow):
         if available_runtime(config) is not None:
             self._advance_turbo_descriptions(config)
             return
+        if (len(self._analysis_queue) > 1
+                and self._analysis_queue[0].record_id == self._analysis_queue[1].record_id):
+            self._advance_turbo_descriptions(config, per_photo=True)
+            return
         while self._analysis_queue:
             job = self._analysis_queue.popleft()
             record = next((item for item in self._records if item.identifier == job.record_id), None)
@@ -5155,14 +5206,15 @@ class MainWindow(QMainWindow):
                     self.assistant_panel.append_message("system", str(exc))
         self._finish_cv1_descriptions()
 
-    def _advance_turbo_descriptions(self, config: dict) -> None:
+    def _advance_turbo_descriptions(self, config: dict, *, per_photo: bool = False) -> None:
         """Decode several full descriptions on one shared model, with stable job bindings."""
         if not self._analysis_queue:
             self._finish_cv1_descriptions()
             return
         first = self._analysis_queue.popleft()
         candidates = [first]
-        while self._analysis_queue and len(candidates) < 4:
+        while (self._analysis_queue and len(candidates) < (5 if per_photo else 4)
+               and (not per_photo or self._analysis_queue[0].record_id == first.record_id)):
             candidates.append(self._analysis_queue.popleft())
         jobs, crops, items = [], [], []
         for job in candidates:
@@ -5195,7 +5247,8 @@ class MainWindow(QMainWindow):
             return
         try:
             request_id = self._vlm_client.send(config["python"], {
-                **config, "operation": "describe_batch", "items": items, "folders": [], "use_knowledge": False,
+                **config, "operation": "describe_photo" if per_photo else "describe_batch",
+                "items": items, "folders": [], "use_knowledge": False,
             })
         except Exception as exc:
             for job, crop in zip(jobs, crops):
@@ -5205,8 +5258,9 @@ class MainWindow(QMainWindow):
             self._schedule_vlm_dispatch()
             return
         self._analysis_pending = (request_id, jobs, crops)
-        label = f"Подробные описания {self._analysis_done + 1}–{self._analysis_done + len(jobs)}/{self._analysis_total}"
-        self._update_activity(label, self._analysis_done, self._analysis_total, busy=True)
+        label = (f"Описание фото · {Path(record.path).name} · интервалов: {len(jobs)}"
+                 if per_photo else f"Подробные описания {self._analysis_done + 1}–{self._analysis_done + len(jobs)}/{self._analysis_total}")
+        self._update_activity(label, self._analysis_done, self._analysis_total, busy=not per_photo)
         self._refresh_chat_status()
 
     def _apply_turbo_batch_reply(self, pending: tuple, result: dict) -> None:
@@ -5402,6 +5456,12 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(
                 "Контур: перетаскивайте точки · «＋ Точка» или Shift+клик добавляет · «− Точка»/Delete удаляет · ✓ Готово завершает"
             )
+
+    def _edit_selected_contour(self) -> None:
+        if self._vlm_target is None or self._vlm_target[1] is None:
+            self.statusBar().showMessage("Сначала выберите слой на фото или собранном керне")
+            return
+        self._begin_polygon_edit(*self._vlm_target)
 
     def _prepare_polygon_vertex_insert(self) -> None:
         if self.workspace.prepare_polygon_vertex_insert():

@@ -14,6 +14,7 @@ from PySide6.QtCore import QPointF
 
 from app.domain.models import FaciesDetection, PhotoRecord
 from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES
+from app.infrastructure.core_description_prompt import check_interpretation_roles
 
 PIPELINE_MODE = "yolo_vlm"
 TEXT_FIELDS = {
@@ -201,7 +202,14 @@ def apply_interval_description(record: PhotoRecord, job: IntervalJob, response: 
         if len(value) > (6000 if key == "description" else 1000):
             raise ValueError(f"Слишком длинное поле VLM: {key}.")
         values[key] = value
+    raw_values = dict(values)
+    values, review_notes = check_interpretation_roles(values)
     attributes = dict(job.detection.attributes)
+    attributes.pop("__vlm_raw_fields", None)
+    attributes.pop("__vlm_review_notes", None)
+    if review_notes:
+        attributes["__vlm_raw_fields"] = json.dumps(raw_values, ensure_ascii=False)
+        attributes["__vlm_review_notes"] = json.dumps(review_notes, ensure_ascii=False)
     attributes.pop("__expert_description_confirmed", None)
     attributes.pop("__expert_description_sha256", None)
     for key, names in TEXT_FIELDS.items():

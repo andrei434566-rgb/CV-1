@@ -105,6 +105,18 @@ class Cv1AnalysisTests(unittest.TestCase):
         self.assertEqual(self.detection.depth_from, 1500.0)
         self.assertEqual(self.detection.confidence, 0.83)
 
+    def test_invalid_facies_roles_keep_observations_and_raw_output_for_review(self):
+        before = coordinates(self.detection)
+        apply_interval_description(self.record, self.job, self.response(
+            lithology="песчаник", facies_name="песчаник", facies_association="песчаник",
+            depositional_environment="вулканическая среда"))
+        attrs = self.detection.attributes
+        self.assertEqual(attrs["Название породы"], "песчаник")
+        self.assertEqual(attrs["Фациальная ассоциация"], "Не установлена по фото")
+        self.assertEqual(json.loads(attrs["__vlm_raw_fields"])["facies_association"], "песчаник")
+        self.assertTrue(json.loads(attrs["__vlm_review_notes"]))
+        self.assertEqual(coordinates(self.detection), before)
+
     def test_incomplete_error_and_empty_responses_leave_all_fields_untouched(self):
         cases = [{"ok": False, "error": "Runtime unavailable"},
                  {**self.response(), "incomplete": True},

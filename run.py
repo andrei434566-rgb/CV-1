@@ -90,6 +90,8 @@ def main() -> int:
     app.setApplicationName("Kern Analyzer")
     window = MainWindow()
     window.showMaximized()
+    from PySide6.QtCore import QTimer
+    QTimer.singleShot(0, window.prepare_local_runtime)
     return app.exec()
 
 

@@ -19,6 +19,7 @@ from app.infrastructure.cv1_analysis import TEXT_FIELDS
 parser = argparse.ArgumentParser()
 parser.add_argument("photos", type=Path, nargs="+")
 parser.add_argument("--model", type=Path)
+parser.add_argument("--prepare", action="store_true", help="Prepare CPU imports, as at normal application startup")
 parser.add_argument("--output", type=Path, default=Path("outputs/app_pipeline_benchmark"))
 args = parser.parse_args()
 if len(set(path.resolve() for path in args.photos)) != len(args.photos):
@@ -34,7 +35,23 @@ with patch("app.ui.windows.main_window.QSettings", return_value=settings):
     window = MainWindow()
 window._resolve_model_path = lambda: args.model
 window._project_folder = None
-state = {"started": None, "chat_available": False, "errors": []}
+state = {"started": None, "chat_available": False, "errors": [], "worker_replies": []}
+state["preparation_started"] = perf_counter()
+state["preparation_seconds"] = 0.0
+state["photo_finished"] = {}
+original_interval_reply = window._on_cv1_interval_reply
+
+
+def interval_reply(result):
+    state["worker_replies"].append(result)
+    original_interval_reply(result)
+    for record in window._records:
+        if (record.identifier not in state["photo_finished"] and record.detections
+                and all(row.attributes.get("__interpretation_status") in {"draft", "error"} for row in record.detections)):
+            state["photo_finished"][record.identifier] = perf_counter() - state["started"]
+
+
+window._on_cv1_interval_reply = interval_reply
 
 
 def segmentation_error(message):
@@ -46,6 +63,10 @@ window._segmentation_error = segmentation_error
 
 
 def begin():
+    if window._runtime_preparation_id:
+        QTimer.singleShot(50, begin)
+        return
+    state["preparation_seconds"] = perf_counter() - state["preparation_started"] if args.prepare else 0.0
     state["started"] = perf_counter()
     window._import_chat_analysis_photos(args.photos)
 
@@ -73,8 +94,24 @@ def check():
                   "segmentation_model": str(args.model) if args.model else None, "errors": state["errors"],
                   "route": "real MainWindow + QProcess + local runtime; offscreen Qt", "response_cache": False,
                   "all_hypotheses_are_unconfirmed": unconfirmed}
+        report["startup_cpu_import_seconds"] = state["preparation_seconds"]
+        (args.output / "worker_replies.json").write_text(
+            json.dumps(state["worker_replies"], ensure_ascii=False, indent=2), encoding="utf-8")
+        (args.output / "worker_stderr.txt").write_text(window._vlm_client._stderr_tail, encoding="utf-8")
+        report["per_photo"] = []
+        previous_finish = 0.0
+        for record in window._records:
+            finished = state["photo_finished"].get(record.identifier)
+            report["per_photo"].append({"photo": record.path, "objects": len(record.detections),
+                "seconds_until_complete": finished,
+                "seconds_after_previous_photo": finished - previous_finish if finished is not None else None,
+                "descriptions": [dict(row.attributes) for row in record.detections]})
+            if finished is not None:
+                previous_finish = finished
         (args.output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(json.dumps(report, ensure_ascii=False), flush=True)
+        compact = {key: value for key, value in report.items() if key != "per_photo"}
+        compact["per_photo_seconds"] = [row["seconds_after_previous_photo"] for row in report["per_photo"]]
+        print(json.dumps(compact, ensure_ascii=True), flush=True)
         window.close()
         application.exit(0 if success else 1)
 
@@ -84,4 +121,6 @@ timer.setInterval(50)
 timer.timeout.connect(check)
 timer.start()
 QTimer.singleShot(0, begin)
+if args.prepare:
+    window.prepare_local_runtime()
 raise SystemExit(application.exec())

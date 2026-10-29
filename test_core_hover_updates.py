@@ -86,6 +86,20 @@ class CoreHoverUpdatesTests(unittest.TestCase):
         self.assertTrue(ui._confidence_popup is not None and ui._confidence_popup.isVisible())
         self.assertIn("Описание столбика", self.popup_text())
 
+    def test_click_on_assembled_whole_column_selects_original_for_manual_form(self):
+        selected = []
+        self.canvas.facies_selected.connect(lambda record, detection: selected.append((record, detection)))
+        self.canvas.resize(900, 600)
+        self.canvas.show()
+        self.canvas.fit_content()
+        _APP.processEvents()
+        _, _, _, rect, overlay = self.canvas._stack_item._placements[0]
+        point = self.canvas.mapFromScene(overlay.mapToScene(rect.center()))
+        QTest.mouseClick(self.canvas.viewport(), Qt.MouseButton.LeftButton, pos=point)
+        self.assertEqual(len(selected), 1)
+        self.assertIs(selected[0][0], self.record)
+        self.assertIs(selected[0][1], self.detection)
+
 
 if __name__ == "__main__":
     unittest.main()

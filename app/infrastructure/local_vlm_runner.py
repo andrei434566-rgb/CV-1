@@ -22,8 +22,12 @@ for stream in (sys.stdin, sys.stdout, sys.stderr):
 os.environ["HF_HUB_OFFLINE"] = "1"
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ["HF_DATASETS_OFFLINE"] = "1"
+app_root = str(Path(__file__).resolve().parents[2])
+if app_root not in sys.path:
+    sys.path.insert(0, app_root)
 
 if __package__:
+    from .core_description_prompt import DESCRIPTION_SYSTEM, description_prompt
     from .core_color_hint import estimate_core_color
     from .geology_reference import format_grounded_question, retrieve_notes
     from .local_knowledge_search import search_folders
@@ -32,6 +36,7 @@ if __package__:
         DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, LocalLoopbackBlocked, available_runtime,
     )
 else:
+    from core_description_prompt import DESCRIPTION_SYSTEM, description_prompt
     from core_color_hint import estimate_core_color
     from geology_reference import format_grounded_question, retrieve_notes
     from local_knowledge_search import search_folders
@@ -157,22 +162,32 @@ def _photo_reference_vocabulary(fields=PHOTO_REFERENCE_FIELDS) -> str:
 
 def _photo_description_guidance() -> str:
     return (
-        "\nСправочник ГП задаёт допустимые формулировки признаков:\n"
-        + _photo_reference_vocabulary()
-        + "\nДля каждого запрошенного свойства выбирай наиболее близкий обоснованный термин справочника, "
-        "даже если уверенность неполная. Не оставляй поле пустым и не ограничивайся словами «не определяется» "
-        "только из-за сомнения: дай рабочую гипотезу, пометь её «предположительно» или «вероятно», "
-        "укажи уверенность словами «высокая», «средняя» или «низкая» и назови краткое основание. "
-        "Если прямых признаков мало, выбери наиболее общую ближайшую категорию с низкой уверенностью "
-        "и отметь, что её нужно проверить специалисту. Отделяй увиденное от интерпретации. "
-        "Общий цвет называй всегда, если виден хотя бы тон: выбери ближайшее значение из шкалы цвета. "
-        "Не пиши «цвет не определяется», если можно уверенно сказать, например, «светло-серый», «серый» "
-        "или «темно-серый». Не добавляй вслед за названным оттенком, что цвет не определяется. "
-        "Зернистость оценивай по видимой фактуре; не выводи её из одного только цвета. "
-        "Минералогию, цементацию, биотурбацию и обстановку осадконакопления тоже можно предложить "
-        "как гипотезы только при наличии косвенных признаков, обязательно с низкой уверенностью и оговоркой; "
-        "не называй конкретный минерал, ихнотаксон или среду доказанными по одному общему фото."
+        "\nСначала опиши непосредственно видимые признаки конкретной породы: общий цвет, "
+        "направление и форму слойков, изменения по высоте, контакты и трещины. "
+        "Не превращай трещины или этикетки в слоистость. Простой описательный термин предпочтителен, "
+        "если диагностическая форма сложной текстуры не видна. Редкая текстура требует различимых "
+        "признаков на этом изображении. Называй различимый тон: светло-серый, серый, тёмно-серый, "
+        "серо-бежевый и т.д. Размер зерна при недостаточном масштабе укажи только предположительно "
+        "по фактуре; цвет его не доказывает. Для фации и обстановки нужна совокупность признаков; "
+        "не повторяй одну интерпретацию для всех пород. При недостатке оснований прямо напиши "
+        "«требуется уточнение по строению интервала». Не назначай минералы, цемент, ихнотаксоны "
+        "и условия накопления как установленный факт по общему фото."
     )
+
+
+def _description_view(image, whole_column: bool):
+    """Provide readable close-ups of a long strip without stretching pixels."""
+    if whole_column and image.height > image.width * 2.5:
+        from PIL import Image
+        sheet = Image.new("RGB", (448, 448), "white")
+        for index in range(3):
+            part = image.crop((0, round(index * image.height / 3), image.width,
+                               round((index + 1) * image.height / 3)))
+            part.thumbnail((148, 448))
+            sheet.paste(part, (index * 149 + (148 - part.width) // 2, (448 - part.height) // 2))
+        return sheet
+    image.thumbnail((640, 640))
+    return image
 
 
 class LocalModel:
@@ -183,6 +198,26 @@ class LocalModel:
         self.turbo = LocalLlamaRuntime()
         self._turbo_disabled = False
         self._description_cache = OrderedDict()
+        self._prepared_base = ""
+
+    def prepare(self, base: str) -> None:
+        """CPU-only tokenizer preparation, shared by startup and model loading."""
+        from transformers import AutoProcessor
+        self.processor = AutoProcessor.from_pretrained(Path(base), local_files_only=True)
+        self.processor.tokenizer.padding_side = "left"
+        self._prepared_base = str(Path(base).resolve())
+
+    def _description_generation_options(self, prompt_length: int) -> dict:
+        options = {"repetition_penalty": 1.08, "no_repeat_ngram_size": 16}
+        if hasattr(self.processor, "tokenizer"):
+            from app.infrastructure.structured_generation import lithology_logits_processor
+            from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
+            labels = [
+                "Предположительно: " + value for value in LITHOLOGY_ATTRIBUTE_OPTIONS["Название породы"]
+            ] + ["Не установлена по фото"]
+            options["logits_processor"] = [lithology_logits_processor(
+                self.processor.tokenizer, labels, prompt_length)]
+        return options
 
     def load(self, base: str, adapter: str, theory_adapter: str, model_mode: str = ""):
         effective = normalize_model_request({
@@ -196,6 +231,13 @@ class LocalModel:
         # current model. No adapter may silently fall back to another base.
         validate_local_models(effective)
         import torch
+        # Small decoder steps become much slower with an oversized CPU pool.
+        # This worker owns inference; four threads leave the Qt app responsive.
+        torch.set_num_threads(min(4, os.cpu_count() or 1))
+        try:
+            torch.set_num_interop_threads(1)
+        except RuntimeError:
+            pass  # PyTorch permits this setting only before its first work.
         from transformers import AutoProcessor, Qwen3VLForConditionalGeneration
 
         base_path = Path(effective["base"])
@@ -204,7 +246,8 @@ class LocalModel:
         self.model = None
         self.loaded_config = None
         torch.cuda.empty_cache()
-        self.processor = AutoProcessor.from_pretrained(base_path, local_files_only=True)
+        if self.processor is None or self._prepared_base != str(base_path.resolve()):
+            self.prepare(str(base_path))
         model = Qwen3VLForConditionalGeneration.from_pretrained(
             base_path, local_files_only=True, torch_dtype=torch.float16,
             attn_implementation="sdpa", device_map="cuda",
@@ -259,6 +302,8 @@ class LocalModel:
         return result
 
     def _answer_uncached(self, request: dict, hits: list[dict]) -> dict:
+        if request.get("operation") == "describe_photo":
+            return self._answer_photo_batch(request)
         if request.get("operation") == "describe_batch":
             return self._answer_batch(request)
         started = perf_counter()
@@ -293,31 +338,7 @@ class LocalModel:
             load_seconds = perf_counter() - load_started
         whole_column = operation == "describe" and bool(request.get("whole_column"))
         if operation == "describe":
-            subject = "целый столбик керна" if whole_column else "фрагмент керна"
-            question = (
-                f"Опиши только показанный {subject} на русском языке. Верни строго JSON "
-                'со строковыми ключами "facies_name", "lithology", "texture", '
-                '"facies_association", "depositional_environment", "description". '
-                "Разделяй непосредственно видимые признаки и геологические гипотезы. "
-                "Не оставляй facies_name, lithology, texture, facies_association или "
-                "depositional_environment пустыми только потому, что нет полной уверенности: "
-                "выбери ближайшую обоснованную категорию и пометь её как предположение с уровнем уверенности. "
-                "В поле description обязательно назови различимый общий цвет и видимые текстуры, "
-                "а затем кратко обозначь спорные свойства как гипотезы и укажи, на каких признаках они основаны. "
-                "Пиши компактно: каждый классификационный параметр — короткая фраза, description — не более двух "
-                "коротких предложений и 35 слов. Не повторяй одни и те же основания и уровень уверенности. "
-                "Геометрия уже выделена отдельной моделью; не меняй границы и не выдавай координаты. "
-                "Не придумывай глубину. Если свойство нельзя наблюдать напрямую, но нужно дать оценку, "
-                "приведи наиболее вероятную гипотезу, явно отличив её от наблюдения; не выдавай её за факт. "
-                + _photo_description_guidance()
-                + "\nКонтекст фрагмента: " + str(request.get("context") or "")[:1800]
-            )
-            if whole_column:
-                question += (
-                    " Это целый физический столбик, в котором могут последовательно меняться породы: "
-                    "не называй всю длину одной фацией без достаточных признаков; перечисли видимую "
-                    "вертикальную изменчивость в кратком описании."
-                )
+            question = description_prompt(str(request.get("context") or ""), whole_column)
         else:
             question = str(request.get("question") or "")[:3000]
             if operation == "chat":
@@ -361,7 +382,9 @@ class LocalModel:
                 if operation == "describe":
                     color_hint = estimate_core_color(image)
                     question += _color_hint_text(color_hint)
-                if operation == "photo_chat" and image.height > image.width * 2.5:
+                if operation == "describe":
+                    image = _description_view(image, whole_column)
+                elif operation == "photo_chat" and image.height > image.width * 2.5:
                     # A full metre-long strip becomes only a few dozen pixels
                     # wide at 448 px. Show top/middle/bottom as three adjacent
                     # views so Qwen can see more than a thin vertical line.
@@ -375,20 +398,6 @@ class LocalModel:
                                              (448 - part.height) // 2))
                     image = montage
                     question += "\nИзображение длинного керна показано тремя соседними фрагментами: слева верх, в центре середина, справа низ. Это части одного исходного фото, а не три физических столбика."
-                elif whole_column and image.height > image.width * 1.6:
-                    strip = image
-                    montage = Image.new("RGB", (448, 448), "white")
-                    for index in range(3):
-                        part = strip.crop((
-                            0,
-                            round(index * strip.height / 3),
-                            strip.width,
-                            round((index + 1) * strip.height / 3),
-                        ))
-                        part.thumbnail((148, 448))
-                        montage.paste(part, (index * 149 + (148 - part.width) // 2, (448 - part.height) // 2))
-                    image = montage
-                    question += "\nДлинный столбик показан тремя соседними частями: слева верх, в центре середина, справа низ. Это один столбик, а не три отдельных керна."
                 else:
                     image.thumbnail((448, 448))
             content[-1]["text"] = question
@@ -421,6 +430,8 @@ class LocalModel:
                         + "\nПравильный ответ: " + str(item.get("answer") or "")[:500] + "\n"
                     )
         messages = [{"role": "system", "content": system_text}]
+        if operation == "describe":
+            messages[0]["content"] = DESCRIPTION_SYSTEM
         if operation in {"chat", "photo_chat"}:
             for turn in request.get("history", [])[-4:]:
                 if turn.get("role") in ("user", "assistant"):
@@ -466,6 +477,7 @@ class LocalModel:
             generated = self.model.generate(
                 **inputs, max_new_tokens=max_tokens,
                 do_sample=False,
+                **(self._description_generation_options(inputs["input_ids"].shape[1]) if operation == "describe" else {}),
             )
             new_tokens = generated[:, inputs["input_ids"].shape[1]:]
             end_ids = getattr(getattr(self.model, "generation_config", None), "eos_token_id", None)
@@ -551,7 +563,7 @@ class LocalModel:
                 "Трещины сами по себе не указывают обстановку осадконакопления.\n"
                 "Все поля должны содержать содержательные фразы. Не выдавай гипотезы за наблюдения. "
                 "Не определяй минералогию, флюид, цемент и точный размер зерна без данных.\n"
-                + _photo_reference_vocabulary(("Цвет", "Название породы", "Зернистость", "Слоистость", "Текстура", "Контакт"))
+                + _photo_description_guidance()
                 + _color_hint_text(color_hint)
                 + "\nКонтекст: " + str(request.get("context") or "")[:700]
             )
@@ -603,6 +615,107 @@ class LocalModel:
                     result["fields"][key] = value
                 _add_color_review(result, color_hint)
         return result
+
+    def _answer_photo_batch(self, request: dict) -> dict:
+        """Decode up to five independent intervals together, without a collage."""
+        from PIL import Image
+        items = request.get("items")
+        if not isinstance(items, list) or not 1 <= len(items) <= 5:
+            raise ValueError("Для одного фото требуется от 1 до 5 отдельных фрагментов.")
+        ids = [str(item.get("id") or "") for item in items if isinstance(item, dict)]
+        if len(ids) != len(items) or any(not value for value in ids) or len(ids) != len(set(ids)):
+            raise ValueError("Для каждого фрагмента фото нужен уникальный id.")
+        effective = normalize_model_request(request)
+        self.turbo.close()
+        started = perf_counter()
+        self.load(effective["base"], effective["adapter"], effective["theory_adapter"], effective["model_mode"])
+        load_seconds = perf_counter() - started
+        import torch
+        images, texts, hints = [], [], []
+        for item in items:
+            with Image.open(str(item["image"])) as opened:
+                image = opened.convert("RGB")
+            hint = estimate_core_color(image)
+            image = _description_view(image, bool(item.get("whole_column")))
+            prompt = description_prompt(str(item.get("context") or ""), bool(item.get("whole_column")))
+            messages = [
+                {"role": "system", "content": DESCRIPTION_SYSTEM},
+                {"role": "user", "content": [{"type": "image", "image": image},
+                                               {"type": "text", "text": prompt + _color_hint_text(hint)}]},
+            ]
+            texts.append(self.processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True))
+            images.append(image)
+            hints.append(hint)
+        selected, adapter_path = adapter_for_operation(request, "describe")
+        adapter_context = nullcontext()
+        if adapter_path:
+            self.model.set_adapter(selected)
+        elif effective["adapter"] or effective["theory_adapter"]:
+            disable = getattr(self.model, "disable_adapter", None)
+            if disable is not None:
+                adapter_context = disable()
+            elif hasattr(self.model, "disable_adapters"):
+                self.model.disable_adapters()
+            else:
+                raise RuntimeError("Runtime не умеет отключать выбранный адаптер.")
+        inputs = None
+        out_of_memory = False
+        generation_started = perf_counter()
+        try:
+            inputs = self.processor(text=texts, images=images, padding=True, return_tensors="pt").to("cuda")
+            torch.cuda.synchronize()
+            generation_started = perf_counter()
+            with torch.inference_mode(), adapter_context:
+                generated = self.model.generate(**inputs, max_new_tokens=320, do_sample=False,
+                                                **self._description_generation_options(inputs["input_ids"].shape[1]))
+            torch.cuda.synchronize()
+        except torch.cuda.OutOfMemoryError:
+            out_of_memory = True
+        if out_of_memory:
+            # A smaller GPU still gets separate full descriptions. Do not
+            # terminate the worker or drop/merge intervals to meet a timer.
+            del inputs
+            torch.cuda.empty_cache()
+            fallback = self._answer_batch(dict(request, operation="describe_batch", items=items[:4]))
+            if len(items) == 5:
+                last = self.answer({**request, **items[4], "operation": "describe"}, [])
+                fallback["items"][ids[4]] = dict(last, ok=last.get("ok", True))
+            fallback["timing"]["smaller_batch_fallback"] = True
+            return fallback
+        generation_seconds = perf_counter() - generation_started
+        tokens = generated[:, inputs["input_ids"].shape[1]:]
+        answers = self.processor.batch_decode(tokens, skip_special_tokens=True)
+        end_ids = getattr(self.model.generation_config, "eos_token_id", None)
+        end_ids = {end_ids} if isinstance(end_ids, int) else set(end_ids or [])
+        replies = {}
+        for index, (item_id, answer, hint) in enumerate(zip(ids, answers, hints)):
+            answer, sanitized = _sanitize_model_language(answer.strip())
+            sequence = tokens[index].tolist()
+            incomplete = len(sequence) >= 320 and not any(token in end_ids for token in sequence)
+            cleaned = answer.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+            try:
+                fields = json.loads(cleaned)
+            except ValueError:
+                fields = None
+            valid = (isinstance(fields, dict) and all(isinstance(fields.get(name), str)
+                     and fields[name].strip() for name in DESCRIPTION_FIELDS))
+            result = {"ok": bool(valid and not incomplete), "answer": answer, "incomplete": incomplete,
+                      "model_info": {"model_mode": "lora" if adapter_path else "base",
+                                     "base": effective["base"], "adapter": adapter_path},
+                      "timing": {"load_seconds": round(load_seconds, 3),
+                                 "shared_batch_seconds": round(generation_seconds, 3),
+                                 "batch_size": len(items), "retried": False}}
+            if valid:
+                result["fields"] = {name: fields[name].strip() for name in DESCRIPTION_FIELDS}
+                _add_color_review(result, hint)
+            if not result["ok"]:
+                result["error"] = "Описание оборвано или модель не вернула все шесть полей."
+            if sanitized:
+                result["language_sanitized"] = True
+            replies[item_id] = result
+        return {"items": replies, "answer": "", "hits": [], "incomplete": False,
+                "timing": {"load_seconds": round(load_seconds, 3),
+                           "total_seconds": round(perf_counter() - started, 3), "batch_size": len(items)}}
 
     def _answer_batch(self, request: dict) -> dict:
         items = request.get("items")
@@ -657,7 +770,20 @@ def main():
             question_text = str(request.get("question") or "").casefold()
             active_well = re.search(r"скважина:\s*([^.;]+)", str(request.get("context") or ""), flags=re.IGNORECASE)
             asks_about_active_well = bool(active_well and active_well.group(1).strip().casefold() in question_text)
-            if request.get("operation") == "search":
+            if request.get("operation") == "clear_description_cache":
+                model._description_cache.clear()
+                result = {"answer": "", "hits": [], "cache_cleared": True}
+            elif request.get("operation") == "prepare_runtime":
+                # Import on startup while the user chooses a project. This
+                # deliberately allocates no model and no CUDA tensors, so the
+                # YOLO stage can still use the GPU before text inference.
+                import torch
+                torch.set_num_threads(min(4, os.cpu_count() or 1))
+                from transformers import AutoProcessor, Qwen3VLForConditionalGeneration
+                if request.get("base"):
+                    model.prepare(str(request["base"]))
+                result = {"prepared": True, "answer": "", "hits": []}
+            elif request.get("operation") == "search":
                 result = {"hits": hits, "answer": ""}
             elif (
                 request.get("operation") == "chat"
