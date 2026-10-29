@@ -5138,7 +5138,7 @@ class MainWindow(QMainWindow):
                 subject = "столбик" if whole_column else "интервал"
                 label = f"Описываю {subject} {self._analysis_done + 1}/{self._analysis_total} · {Path(record.path).name}"
                 self._refresh_chat_status()
-                self._update_activity(label, self._analysis_done, self._analysis_total, busy=True)
+                self._update_activity(label, self._analysis_done, self._analysis_total)
                 return
             except Exception as exc:
                 crop.unlink(missing_ok=True)
@@ -5256,6 +5256,10 @@ class MainWindow(QMainWindow):
                     mark_interval_failure(job, str(exc))
             self.workspace.update_photo_detections(record)
         self._analysis_done += 1
+        self._update_activity(
+            f"Готово описаний: {self._analysis_done}/{self._analysis_total}",
+            self._analysis_done, self._analysis_total,
+        )
         if not result.get("ok"):
             error = str(result.get("error") or "Локальная модель не ответила.")
             for remaining in self._analysis_queue:

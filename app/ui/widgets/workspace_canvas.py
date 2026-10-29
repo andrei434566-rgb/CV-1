@@ -5,7 +5,7 @@ from hashlib import md5
 
 from PySide6.QtCore import QPoint, QPointF, QRect, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPainterPathStroker, QPen, QPixmap, QPolygonF, QTransform
-from PySide6.QtWidgets import QFrame, QGraphicsObject, QGraphicsScene, QGraphicsView, QHBoxLayout, QLabel, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QFrame, QGraphicsObject, QGraphicsScene, QGraphicsView, QHBoxLayout, QLabel, QVBoxLayout
 
 from app.domain.models import FaciesDetection, PhotoRecord
 from app.domain.facies_catalog import facies_metadata
@@ -167,6 +167,7 @@ class WorkspaceCanvas(QGraphicsView):
         return {identifier: QPointF(item.pos()) for identifier, item in self._items_by_identifier.items()}
 
     def clear_workspace(self) -> None:
+        hide_facies_confidence_popup()
         self._items_by_identifier.clear()
         self._auto_placed_photo_ids.clear()
         self._facies_samples.clear()
@@ -211,6 +212,11 @@ class WorkspaceCanvas(QGraphicsView):
         item = self._items_by_identifier.get(record.identifier)
         if item:
             item.set_detections(record.detections)
+        stacks = self._correlation_items or ([self._stack_item] if self._stack_item is not None else [])
+        for stack in stacks:
+            stack.refresh_record_descriptions(record)
+        if _confidence_popup is not None:
+            _confidence_popup.refresh()
 
     def show_stack(self, records: list[PhotoRecord], gis_preview: dict | None = None, rigis_preview: dict | None = None, well_name: str | None = None, interpretation_intervals: list[dict] | None = None, description_only: bool = False) -> None:
         saved_position = QPointF(self._stack_item.pos()) if self._stack_item is not None else None
@@ -630,11 +636,13 @@ class FaciesOverlayItem(QGraphicsObject):
         detections: list[FaciesDetection],
         parent=None,
         facies_samples: dict[str, QPixmap] | None = None,
+        hover_detections: list[FaciesDetection] | None = None,
     ):
         super().__init__(parent)
         self.source_width, self.source_height = max(1, source_size.width()), max(1, source_size.height())
         self.target_rect = target_rect
         self.detections = detections
+        self.hover_detections = hover_detections
         self.facies_samples = facies_samples if facies_samples is not None else {}
         self._hovered = -1
         self._editing_index = -1
@@ -749,15 +757,13 @@ class FaciesOverlayItem(QGraphicsObject):
                 painter.drawEllipse(point, 2.8, 2.8)
 
     def hoverMoveEvent(self, event) -> None:
-        previous = self._hovered
-        self._hovered = self._detection_at(event.pos())
+        self._hovered = self._detection_at(event.pos(), include_core_columns=True)
         self.setCursor(Qt.CursorShape.PointingHandCursor if self._hovered >= 0 else Qt.CursorShape.ArrowCursor)
-        if self._hovered != previous:
-            if self._hovered >= 0:
-                detection = self.detections[self._hovered]
-                show_facies_confidence_popup(event.screenPos(), detection, self.facies_samples)
-            else:
-                hide_facies_confidence_popup()
+        if self._hovered >= 0:
+            targets = self.hover_detections if self.hover_detections is not None else self.detections
+            show_facies_confidence_popup(event.screenPos(), targets[self._hovered], self.facies_samples)
+        else:
+            hide_facies_confidence_popup()
         self.update()
 
     def hoverLeaveEvent(self, event) -> None:
@@ -892,12 +898,17 @@ class FaciesOverlayItem(QGraphicsObject):
         self.facies_geometry_changed.emit(detection)
         return True
 
-    def _detection_at(self, point: QPointF) -> int:
+    def _detection_at(self, point: QPointF, *, include_core_columns: bool = False) -> int:
         for index in reversed(self._paint_order):
             if self.detections[index].attributes.get("__core_column_description") == "1":
                 continue
             if index < len(self._visible_paths) and self._visible_paths[index].contains(point):
                 return index
+        if include_core_columns:
+            for index in reversed(self._paint_order):
+                if (self.detections[index].attributes.get("__core_column_description") == "1"
+                        and self._visible_paths[index].contains(point)):
+                    return index
         return -1
 
     def _vertex_at(self, point: QPointF) -> int:
@@ -1372,7 +1383,8 @@ class StackColumnItem(QGraphicsObject):
                     draw_width,
                     draw_height,
                 )
-                overlay = FaciesOverlayItem(pixmap.size(), rect, [display_detection], self, self._facies_samples)
+                overlay = FaciesOverlayItem(pixmap.size(), rect, [display_detection], self, self._facies_samples,
+                                            hover_detections=[source_detection])
                 overlay.facies_clicked.connect(lambda _, rec=record, det=source_detection: self.facies_selected.emit(rec, det))
                 overlay.facies_context_requested.connect(lambda _, rec=record, det=source_detection: self.facies_context_requested.emit(rec, det))
                 self._placements.append((pixmap, record, source_detection, rect, overlay))
@@ -1380,7 +1392,8 @@ class StackColumnItem(QGraphicsObject):
             for pixmap, record, source_detection, display_detection in layers:
                 x = self.core_x + (self.column_width - pixmap.width()) / 2
                 rect = QRectF(x, self._height, pixmap.width(), pixmap.height())
-                overlay = FaciesOverlayItem(pixmap.size(), rect, [display_detection], self, self._facies_samples)
+                overlay = FaciesOverlayItem(pixmap.size(), rect, [display_detection], self, self._facies_samples,
+                                            hover_detections=[source_detection])
                 overlay.facies_clicked.connect(lambda _, rec=record, det=source_detection: self.facies_selected.emit(rec, det))
                 overlay.facies_context_requested.connect(lambda _, rec=record, det=source_detection: self.facies_context_requested.emit(rec, det))
                 self._placements.append((pixmap, record, source_detection, rect, overlay))
@@ -1404,8 +1417,26 @@ class StackColumnItem(QGraphicsObject):
     def boundingRect(self) -> QRectF:
         return QRectF(0, 0, self.width, self._height)
 
+    def refresh_record_descriptions(self, record: PhotoRecord) -> None:
+        """Refresh text in place without recropping images or moving the board."""
+        changed = False
+        for _, source_record, source, _, overlay in self._placements:
+            if source_record is not record or not any(item is source for item in record.detections):
+                continue
+            display = overlay.detections[0]
+            display.label, display.confidence = source.label, source.confidence
+            display.attributes = dict(source.attributes)
+            display.depth_from, display.depth_to = source.depth_from, source.depth_to
+            display.training_ready = source.training_ready
+            display.alternatives = dict(source.alternatives)
+            overlay.update()
+            changed = True
+        if changed:
+            self.update()
+
     def _track_geometry(self, kind: str) -> tuple[float, float]:
         tracks = {
+            "core": (self.core_x, self.column_width),
             "lithology": (self.lithology_x, self.LITHOLOGY_WIDTH),
             "facies": (self.facies_x, self.FACIES_WIDTH),
             "saturation": (self.saturation_x, self.SATURATION_WIDTH),
@@ -1834,9 +1865,7 @@ class StackColumnItem(QGraphicsObject):
     def hoverMoveEvent(self, event) -> None:
         previous = self._hovered_column
         self._hovered_column = self._column_at(event.pos())
-        if self._hovered_column is not None and (
-            previous is None or previous[1] is not self._hovered_column[1]
-        ):
+        if self._hovered_column is not None:
             show_facies_confidence_popup(event.screenPos(), self._hovered_column[1], self._facies_samples)
         elif self._hovered_column is None and previous is not None:
             hide_facies_confidence_popup()
@@ -1949,6 +1978,8 @@ class StackColumnItem(QGraphicsObject):
         for _, record, detection, rect, _ in self._placements:
             if not rect.top() <= point.y() <= rect.bottom():
                 continue
+            if rect.contains(point):
+                return record, detection, "core"
             if QRectF(self.lithology_x, rect.top(), self.LITHOLOGY_WIDTH, rect.height()).contains(point):
                 return record, detection, "lithology"
             if QRectF(self.facies_x, rect.top(), self.FACIES_WIDTH, rect.height()).contains(point):
@@ -2248,6 +2279,7 @@ class FaciesConfidencePopup(QFrame):
         self.setObjectName("faciesConfidencePopup")
         self.setStyleSheet(
             "QFrame#faciesConfidencePopup { background: #ffffff; border: 1px solid #e4e7ee; border-radius: 10px; } "
+            "QLabel { color: #252a3b; background: transparent; } "
             "QLabel#confidenceTitle { color: #252a3b; font-weight: 700; } "
             "QLabel#confidenceSubtle { color: #737b8e; font-size: 11px; } "
             "QLabel#confidenceScore { color: #252a3b; font-weight: 700; }"
@@ -2255,11 +2287,21 @@ class FaciesConfidencePopup(QFrame):
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(10, 9, 10, 9)
         self.layout.setSpacing(5)
+        self._content_key = None
+        self._last_target = None
 
     def show_for(self, screen_position, detection: FaciesDetection, samples: dict[str, QPixmap]) -> None:
+        key = (id(detection), detection.label, detection.depth_from, detection.depth_to,
+               detection.confidence, detection.training_ready,
+               tuple(sorted(detection.attributes.items())), tuple(sorted(detection.alternatives.items())))
+        self._last_target = (screen_position, detection, samples)
+        if self.isVisible() and key == self._content_key:
+            return
+        self._content_key = key
         while self.layout.count():
             item = self.layout.takeAt(0)
             if item.widget() is not None:
+                item.widget().hide()
                 item.widget().deleteLater()
         is_core_column = detection.attributes.get("__core_column_description") == "1"
         title = QLabel("Описание столбика керна" if is_core_column else "Описание слоя керна", self)
@@ -2280,8 +2322,27 @@ class FaciesConfidencePopup(QFrame):
             self.layout.addWidget(depth)
         description = str(attributes.get("Краткое описание") or attributes.get("Литологическое описание (16 параметров)")
                           or attributes.get("__vlm_description") or "").strip()
+        for title, public_key, internal_key in (
+            ("Порода", "Название породы", "__vlm_lithology"),
+            ("Текстура", "Текстура", "__vlm_texture"),
+            ("Ассоциация фаций", "Фациальная ассоциация", "__vlm_facies_association"),
+            ("Обстановка", "Обстановка седиментации", "__vlm_depositional_environment"),
+        ):
+            value = str(attributes.get(public_key) or attributes.get(internal_key) or "").strip()
+            if value:
+                label = QLabel(f"{title}: {value}", self)
+                label.setWordWrap(True)
+                label.setMaximumWidth(420)
+                self.layout.addWidget(label)
+        status = str(attributes.get("Статус интерпретации") or "").strip()
+        if not description:
+            state = attributes.get("__interpretation_status")
+            placeholder = ("Описание ещё готовится локальной VLM. Готовые интервалы доступны сразу."
+                           if state in {"waiting", "processing"} else "Описание для этого слоя пока не заполнено.")
+            if state == "error":
+                placeholder = status or "Не удалось получить описание."
         description_label = QLabel(description[:900] + ("…" if len(description) > 900 else "")
-                                   if description else "Описание для этого слоя пока не заполнено.", self)
+                                   if description else placeholder, self)
         description_label.setWordWrap(True)
         description_label.setMaximumWidth(420)
         description_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
@@ -2316,8 +2377,18 @@ class FaciesConfidencePopup(QFrame):
             note.setObjectName("confidenceSubtle")
             self.layout.addWidget(note)
         self.adjustSize()
-        self.move(screen_position + QPoint(14, 12))
+        position = screen_position + QPoint(14, 12)
+        screen = QApplication.screenAt(screen_position) or QApplication.primaryScreen()
+        if screen is not None:
+            bounds = screen.availableGeometry().adjusted(8, 8, -8, -8)
+            position.setX(max(bounds.left(), min(position.x(), bounds.right() - self.width())))
+            position.setY(max(bounds.top(), min(position.y(), bounds.bottom() - self.height())))
+        self.move(position)
         self.show()
+
+    def refresh(self) -> None:
+        if self.isVisible() and self._last_target is not None:
+            self.show_for(*self._last_target)
 
     def _row(self, label: str, confidence: float, sample: QPixmap | None, primary: bool) -> QFrame:
         row = QFrame(self)
@@ -2369,3 +2440,4 @@ def show_facies_confidence_popup(screen_position, detection: FaciesDetection, sa
 def hide_facies_confidence_popup() -> None:
     if _confidence_popup is not None:
         _confidence_popup.hide()
+        _confidence_popup._last_target = None

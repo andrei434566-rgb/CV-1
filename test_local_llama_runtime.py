@@ -24,6 +24,9 @@ class LocalLlamaRuntimeTests(unittest.TestCase):
             path = root / "runtime.json"
             path.write_text(json.dumps(manifest), encoding="utf-8")
             request = {"base": "cache/models--Qwen--Qwen3-VL-2B-Instruct/snapshots/rev", "model_mode": "base", "turbo_root": str(root)}
+            with patch("app.infrastructure.local_llama_runtime.os.name", "nt"):
+                self.assertIsNone(available_runtime(request))
+            request["inference_backend"] = "llama.cpp"
             self.assertIsNotNone(available_runtime(request))
             request["base"] += "-changed"
             self.assertIsNone(available_runtime(request))

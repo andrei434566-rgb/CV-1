@@ -36,7 +36,11 @@ class LocalLoopbackBlocked(RuntimeError):
 
 
 def available_runtime(request: dict) -> tuple[Path, dict] | None:
-    if str(request.get("inference_backend") or "auto") == "transformers":
+    backend = str(request.get("inference_backend") or "auto")
+    # The UI and worker must select the same backend. Windows uses direct
+    # CUDA by default; otherwise the UI queues four sequential CUDA answers
+    # as if they were one accelerated request and hides completed results.
+    if backend == "transformers" or (os.name == "nt" and backend == "auto"):
         return None
     effective = normalize_model_request(request)
     # An official GGUF must never silently replace a specialist adapter or a

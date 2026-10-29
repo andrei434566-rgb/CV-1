@@ -6,6 +6,9 @@ import json
 import os
 import re
 import sys
+import hashlib
+from collections import OrderedDict
+from copy import deepcopy
 from time import perf_counter
 from contextlib import nullcontext
 from pathlib import Path
@@ -178,12 +181,8 @@ class LocalModel:
         self.processor = None
         self.loaded_config = None
         self.turbo = LocalLlamaRuntime()
-        # Windows may deny this application access to its own 127.0.0.1
-        # llama.cpp endpoint (WinError 10013). Use the same local checkpoint
-        # directly through CUDA on Windows so chat never waits for a server
-        # health timeout. This remains fully offline and does not weaken the
-        # Windows firewall or expose a network port.
-        self._turbo_disabled = os.name == "nt"
+        self._turbo_disabled = False
+        self._description_cache = OrderedDict()
 
     def load(self, base: str, adapter: str, theory_adapter: str, model_mode: str = ""):
         effective = normalize_model_request({
@@ -226,6 +225,40 @@ class LocalModel:
         self.loaded_config = configuration
 
     def answer(self, request: dict, hits: list[dict]) -> dict:
+        # Repeated attachments with identical pixels/context need only one
+        # inference. Keep model output separate from expert-edited objects.
+        key = None
+        if request.get("operation") == "describe" and request.get("image"):
+            effective = normalize_model_request(request)
+            stamps = []
+            for folder in dict.fromkeys(effective[name] for name in ("base", "adapter", "theory_adapter") if effective[name]):
+                for name in ("config.json", "model.safetensors", "model.safetensors.index.json",
+                             "adapter_config.json", "adapter_model.safetensors"):
+                    path = Path(folder) / name
+                    if path.is_file():
+                        stat = path.stat()
+                        stamps.append((str(path.resolve()), stat.st_size, stat.st_mtime_ns))
+            image_digest = hashlib.sha256(Path(request["image"]).read_bytes()).hexdigest()
+            key = json.dumps([effective, stamps, image_digest, request.get("context", ""),
+                              bool(request.get("whole_column")), request.get("inference_backend", "auto")],
+                             sort_keys=True, ensure_ascii=False)
+            if key in self._description_cache:
+                cached = deepcopy(self._description_cache[key])
+                self._description_cache.move_to_end(key)
+                cached["timing"] = {"load_seconds": 0.0, "generation_seconds": 0.0,
+                                    "total_seconds": 0.0, "cache_hit": True}
+                return cached
+        result = self._answer_uncached(request, hits)
+        fields = result.get("fields")
+        if (key is not None and result.get("ok", True) and not result.get("incomplete")
+                and isinstance(fields, dict) and all(isinstance(fields.get(name), str) and fields[name].strip()
+                                                     for name in DESCRIPTION_FIELDS)):
+            self._description_cache[key] = deepcopy(result)
+            while len(self._description_cache) > 256:
+                self._description_cache.popitem(last=False)
+        return result
+
+    def _answer_uncached(self, request: dict, hits: list[dict]) -> dict:
         if request.get("operation") == "describe_batch":
             return self._answer_batch(request)
         started = perf_counter()
@@ -421,7 +454,10 @@ class LocalModel:
             else:
                 raise RuntimeError("Runtime не умеет отключать LoRA. Переключитесь на базовый режим в настройках.")
         detail_requested = bool(re.search(r"подробн|развернут|по шагам|детальн", str(request.get("question") or "").casefold()))
-        max_tokens = 220 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
+        # Six JSON fields often exceed 220 tokens. Give descriptions their
+        # former final allowance immediately, stopping at EOS as usual; the
+        # old retry discarded the first 220 tokens and generated them again.
+        max_tokens = 320 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
         final_limit = max_tokens
         torch.cuda.synchronize()
         generation_started = perf_counter()
@@ -438,7 +474,7 @@ class LocalModel:
                 new_tokens.shape[1] >= max_tokens
                 and int(new_tokens[0, -1]) not in end_ids
             )
-            if hit_limit:
+            if hit_limit and operation != "describe":
                 retried = True
                 # The first pass was stopped by our token budget, not by Qwen.
                 # Repeat deterministically with more room so the answer can finish.
