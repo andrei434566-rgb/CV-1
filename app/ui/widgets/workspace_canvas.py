@@ -616,7 +616,7 @@ class WorkspaceCanvas(QGraphicsView):
 
 
 class FaciesOverlayItem(QGraphicsObject):
-    """Renders mutually exclusive masks and lets the active polygon vertices move or be added."""
+    """Renders facies masks and lets the active polygon vertices move or be added."""
 
     facies_clicked = Signal(object)
     facies_context_requested = Signal(object)
@@ -644,6 +644,7 @@ class FaciesOverlayItem(QGraphicsObject):
         self._drawing_new_contour = False
         self._new_points: list[QPointF] = []
         self._visible_paths: list[QPainterPath] = []
+        self._paint_order: list[int] = []
         self.setAcceptHoverEvents(True)
         self.setFlag(QGraphicsObject.GraphicsItemFlag.ItemIsFocusable, True)
         self._rebuild_visible_paths()
@@ -712,7 +713,8 @@ class FaciesOverlayItem(QGraphicsObject):
 
     def paint(self, painter: QPainter, option, widget=None) -> None:
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
-        for index, detection in enumerate(self.detections):
+        for index in self._paint_order:
+            detection = self.detections[index]
             if detection.attributes.get("__core_column_description") == "1":
                 # The physical-column rectangle is a framing aid, not a facies
                 # mask. Keep the source pixels visible; the cyan detector
@@ -891,7 +893,9 @@ class FaciesOverlayItem(QGraphicsObject):
         return True
 
     def _detection_at(self, point: QPointF) -> int:
-        for index in reversed(range(len(self.detections))):
+        for index in reversed(self._paint_order):
+            if self.detections[index].attributes.get("__core_column_description") == "1":
+                continue
             if index < len(self._visible_paths) and self._visible_paths[index].contains(point):
                 return index
         return -1
@@ -947,20 +951,29 @@ class FaciesOverlayItem(QGraphicsObject):
     def _polygon(self, detection: FaciesDetection) -> QPolygonF:
         return QPolygonF([self._to_target(point) for point in detection.polygon])
 
+    def _display_polygon(self, detection: FaciesDetection) -> QPolygonF:
+        """Bound overlay work to the thumbnail resolution, retaining source geometry."""
+        points = detection.polygon
+        if len(points) > 256:
+            step = max(1, (len(points) + 255) // 256)
+            points = points[::step][:256]
+        return QPolygonF([self._to_target(point) for point in points])
+
     def _rebuild_visible_paths(self) -> None:
         self._visible_paths = [QPainterPath() for _ in self.detections]
-        claimed = QPainterPath()
-        # Higher-confidence masks own every intersection, so highlights cannot overlap.
-        for index in sorted(range(len(self.detections)), key=lambda item: self.detections[item].confidence, reverse=True):
+        # Paint low-confidence masks first so stronger detections remain visible.
+        # Repeated path subtraction/union is quadratic for dense YOLO outputs and
+        # can exhaust Qt's native geometry allocator on large photo batches.
+        self._paint_order = sorted(
+            range(len(self.detections)),
+            key=lambda item: float(self.detections[item].confidence),
+        )
+        for index in self._paint_order:
             path = QPainterPath()
             path.setFillRule(Qt.FillRule.WindingFill)
-            path.addPolygon(self._polygon(self.detections[index]))
-            # addPolygon does not close its subpath.  Boolean operations on an
-            # open contour leave visual intersections, so always close first.
+            path.addPolygon(self._display_polygon(self.detections[index]))
             path.closeSubpath()
-            path = path.simplified()
-            self._visible_paths[index] = path.subtracted(claimed).simplified()
-            claimed = claimed.united(path).simplified()
+            self._visible_paths[index] = path
 
 
 class PhotoItem(QGraphicsObject):

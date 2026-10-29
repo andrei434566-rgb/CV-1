@@ -216,9 +216,12 @@ class YoloModelService:
                 label = str(result.names[class_id])
                 if self._is_excluded_label(label):
                     continue
+                # The full-resolution mask can contain thousands of vertices.
+                # Keep the same bounded contour size used by the regular route;
+                # this geometry is also clipped to display resolution below.
                 points = [
-                    QPointF(float(point[0]) * x_scale, float(point[1]) * y_scale)
-                    for point in mask_polygons[index] if len(point) >= 2
+                    QPointF(point.x() * x_scale, point.y() * y_scale)
+                    for point in self._mask_polygon(mask_polygons, index)
                 ]
                 if len(points) < 3 or any(not math.isfinite(p.x()) or not math.isfinite(p.y()) for p in points):
                     self.geometry_issues.append({"kind": "invalid_mask", "message": f"Полигон YOLO №{index + 1} некорректен и пропущен."})
@@ -288,16 +291,9 @@ class YoloModelService:
     def _geometry_coverage_issues(
         self, detections: list[FaciesDetection], columns: list[dict[str, float]],
     ) -> None:
-        covered = QPainterPath()
-        for index, detection in enumerate(detections):
-            path = self._polygon_path(detection.polygon)
-            overlap_area = self._path_area(covered.intersected(path))
-            if overlap_area > 1.0:
-                self.geometry_issues.append({
-                    "kind": "overlapping_masks", "mask_index": index, "area_px2": round(overlap_area, 3),
-                    "message": "Полигоны YOLO перекрываются: проверьте границу и привязку описаний.",
-                })
-            covered = covered.united(path)
+        valid_columns: list[tuple[int, float, float, float, float]] = []
+        all_x: list[float] = []
+        all_y: list[float] = []
         for column_index, values in enumerate(columns):
             try:
                 left, top, right, bottom = (float(values[name]) for name in ("left", "top", "right", "bottom"))
@@ -305,17 +301,86 @@ class YoloModelService:
                 continue
             if not all(math.isfinite(v) for v in (left, top, right, bottom)) or right <= left or bottom <= top:
                 continue
-            rectangle = self._polygon_path([QPointF(left, top), QPointF(right, top), QPointF(right, bottom), QPointF(left, bottom)])
-            missing = rectangle.subtracted(covered)
-            missing_area = self._path_area(missing)
+            valid_columns.append((column_index, left, top, right, bottom))
+            all_x.extend((left, right))
+            all_y.extend((top, bottom))
+        valid_polygons: list[tuple[int, np.ndarray]] = []
+        for index, detection in enumerate(detections):
+            points = [(point.x(), point.y()) for point in detection.polygon
+                      if math.isfinite(point.x()) and math.isfinite(point.y())]
+            if len(points) < 3:
+                continue
+            polygon = np.asarray(points, dtype=np.float64)
+            valid_polygons.append((index, polygon))
+            all_x.extend(polygon[:, 0].tolist())
+            all_y.extend(polygon[:, 1].tolist())
+        if not all_x or not all_y:
+            return
+
+        # Raster diagnostics avoid the repeated QPainterPath intersect/union
+        # operations that grow rapidly with the number and complexity of masks.
+        x_origin, y_origin = math.floor(min(all_x)), math.floor(min(all_y))
+        max_x, max_y = math.ceil(max(all_x)), math.ceil(max(all_y))
+        max_pixels = 4_000_000
+        scale = min(1.0, math.sqrt(max_pixels / max(1.0, (max_x - x_origin + 1) * (max_y - y_origin + 1))))
+        raster_width = max(1, int(math.ceil((max_x - x_origin) * scale)) + 1)
+        raster_height = max(1, int(math.ceil((max_y - y_origin) * scale)) + 1)
+        covered = np.zeros((raster_height, raster_width), dtype=np.uint8)
+        overlap_count = 0
+        for index, polygon in valid_polygons:
+            raster_points = np.rint((polygon - np.array([x_origin, y_origin])) * scale).astype(np.int32)
+            x0 = max(0, int(raster_points[:, 0].min()))
+            y0 = max(0, int(raster_points[:, 1].min()))
+            x1 = min(raster_width - 1, int(raster_points[:, 0].max()))
+            y1 = min(raster_height - 1, int(raster_points[:, 1].max()))
+            if x1 < x0 or y1 < y0:
+                continue
+            local_points = raster_points - np.array([x0, y0], dtype=np.int32)
+            local = np.zeros((y1 - y0 + 1, x1 - x0 + 1), dtype=np.uint8)
+            cv2.fillPoly(local, [local_points], 1)
+            covered_roi = covered[y0:y1 + 1, x0:x1 + 1]
+            overlap_pixels = int(np.count_nonzero((covered_roi != 0) & (local != 0)))
+            overlap_area = overlap_pixels / max(scale * scale, 1e-12)
+            if overlap_area > 1.0:
+                overlap_count += 1
+                if overlap_count <= 100:
+                    self.geometry_issues.append({
+                        "kind": "overlapping_masks", "mask_index": index, "area_px2": round(overlap_area, 3),
+                        "message": "Полигоны YOLO перекрываются: проверьте границу и привязку описаний.",
+                    })
+            covered_roi[local != 0] = 1
+
+        for column_index, left, top, right, bottom in valid_columns:
+            x0 = max(0, int(math.floor((left - x_origin) * scale)))
+            y0 = max(0, int(math.floor((top - y_origin) * scale)))
+            x1 = min(raster_width, int(math.ceil((right - x_origin) * scale)) + 1)
+            y1 = min(raster_height, int(math.ceil((bottom - y_origin) * scale)) + 1)
+            if x1 <= x0 or y1 <= y0:
+                continue
+            column_coverage = covered[y0:y1, x0:x1]
+            missing = column_coverage == 0
+            missing_pixels = int(np.count_nonzero(missing))
+            missing_area = missing_pixels / max(scale * scale, 1e-12)
             if missing_area > 1.0:
-                bounds = missing.boundingRect()
+                missing_rows = np.flatnonzero(np.any(missing, axis=1))
+                missing_columns = np.flatnonzero(np.any(missing, axis=0))
+                bounds = {
+                    "left": x_origin + (x0 + int(missing_columns[0])) / scale,
+                    "top": y_origin + (y0 + int(missing_rows[0])) / scale,
+                    "right": x_origin + (x0 + int(missing_columns[-1]) + 1) / scale,
+                    "bottom": y_origin + (y0 + int(missing_rows[-1]) + 1) / scale,
+                }
                 self.geometry_issues.append({
                     "kind": "uncovered_core", "column_index": column_index,
                     "area_px2": round(missing_area, 3),
-                    "bounds": {"left": bounds.left(), "top": bounds.top(), "right": bounds.right(), "bottom": bounds.bottom()},
+                    "bounds": bounds,
                     "message": f"В столбике №{column_index + 1} есть керн без полигонов YOLO. Требуется ручная проверка; фация не придумана.",
                 })
+        if overlap_count > 100:
+            self.geometry_issues.append({
+                "kind": "overlapping_masks_summary", "count": overlap_count - 100,
+                "message": f"Ещё {overlap_count - 100} перекрытий полигонов пропущено в списке диагностики.",
+            })
 
     def _attach_generated_descriptions(
         self,
