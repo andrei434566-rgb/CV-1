@@ -1,0 +1,9 @@
+{
+  "validation_record_id": "unibo_facies_b4277053d5764cb1ed6d49c1",
+  "fresh_offline_cuda_inference_matches_cached_prediction": true,
+  "maximum_absolute_score_difference": 0.0,
+  "head_sha256": "63a4e09255f2bf03cfd49c9d0849c856c16fcb76ef324994ae31298e9f63ce78",
+  "first_attempt_error": "Windows1455 during large base file mapping",
+  "standalone_host_retry_succeeded": true,
+  "system_settings_changed": false
+}

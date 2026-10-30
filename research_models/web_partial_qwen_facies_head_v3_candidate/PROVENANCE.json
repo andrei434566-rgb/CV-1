@@ -1,0 +1,66 @@
+{
+  "training_recipe": {
+    "profile": "qwen_post",
+    "folds": 3,
+    "ridge_alphas": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "external_weights": [
+      1.0,
+      4.0
+    ],
+    "supervision": "Exact A..F, or (sA+sB-1)^2 + sC^2+sD^2+sE^2+sF^2 for generic floodplain",
+    "partial_AB_difference": "unsupervised; no guessed drainage class",
+    "selection": "All six exact OOF recalls nonzero, exact OOF macroF1, mean source-group admissible accuracy, larger alpha, smaller external weight",
+    "encoder": "original frozen Qwen3-VL-2B, image side300, same pre/post mean/std cache as v2",
+    "validation": "Previous50 unchanged and evaluated after frozen train-only selection",
+    "seed": 20261031,
+    "commercial_deployment": false
+  },
+  "criteria_fixed_before_validation": {
+    "minimum_correct": 28,
+    "macro_f1_minimum": 0.5161304436304436,
+    "prodelta_min_correct": 2,
+    "PDF_min_correct": 3,
+    "FS_min_correct": 10
+  },
+  "train_count": 728,
+  "original_train_count": 704,
+  "new_exact_crop_count": 18,
+  "new_partial_floodplain_crop_count": 6,
+  "new_source_groups": 2,
+  "new_photo_panels": 4,
+  "dependencies_sha256": {
+    "scripts/train_web_partial_facies_head.py": "aacf710bc2bc31b98bf97cd1061e4c33e9155eac7cebfa2ad7254c2572ea71d2",
+    "scripts/partial_facies_ridge.py": "6975b7bcb6340ff94bd852029effbc5d9e45d894934184a15f78aa78882ac060",
+    "scripts/facies_head_v2_features.py": "c6a1566f2c77d61b5afadd42f05674fb02ca84cf0ec2ae02d50b72f91da2c839",
+    "scripts/train_qwen_visual_facies_head.py": "a540c328dd842c6d7bcfc18b01f6d6e0588df073e96b2262678acaf79502eb49",
+    "scripts/prepare_web_facies_20261031.py": "40a50f6452ec8bad37798a618a3ecab03e6cfff8cf4a91c8cb9cdb27e5e7ced0",
+    "web_dataset/train.jsonl": "2654c834a4b49256cddb16b9ec36f597ff5154acac00f5ecca3ba70d787e2294",
+    "web_dataset/summary.json": "d8cc68076096ac413b8528f490d0d971826359040c8ac716cb0f1513d56cd5fc",
+    "reference_head_v2/train_features.safetensors": "0dad0f2494cbdc27846e94d71aa7dce77af17e6feb566f05ed84fc0e084c3cbe",
+    "reference_head_v2/train.jsonl": "02bccce9cf6ed46b33e30c909ec9b83317b70023e4b55dd96ec5260b0ae597b7",
+    "reference_head_v2/val.jsonl": "395654f4020934973f41122f990683a68e5fdad31a17b14eedde35ba762b0f92",
+    "reference_head_v2/MODEL_CONTRACT.json": "3558a808595b68c76ed77d84bdeb767703a21c64fefad13dc0fb92d2728b92de"
+  },
+  "head_bytes": 295408,
+  "python_package_versions": {
+    "torch": "2.6.0+cu126",
+    "transformers": "5.18.0",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "safetensors": "0.8.0",
+    "Pillow": "12.3.0"
+  },
+  "numpy_version": "2.4.6",
+  "validation_note": "Same reused50 development crops, not an independent final test",
+  "app_activation": false,
+  "source_extraction_versions": {
+    "pypdf": "6.10.0",
+    "Pillow": "12.3.0",
+    "pdfplumber": "0.11.9"
+  }
+}

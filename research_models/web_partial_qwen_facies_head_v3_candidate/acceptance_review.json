@@ -1,0 +1,35 @@
+{
+  "status": "not_promoted_failed_prospective_gates",
+  "source_crops_reconstructed_exactly": true,
+  "generic_floodplain_not_given_hard_subclass": true,
+  "group_oof_and_winner_reproduced": true,
+  "train_only_normalizer_reproduced": true,
+  "partial_normal_equation_relative_residual": 5.1293590367639776e-14,
+  "head_sha256": "63a4e09255f2bf03cfd49c9d0849c856c16fcb76ef324994ae31298e9f63ce78",
+  "audit_script_sha256": "774923ff9ccc15459a0820be91ace2c075248f5a3a22ddd650a2203b4d03d647",
+  "source_file_sha256": {
+    "sydney_p16_image0.jpg": "791263b5e4fa4ff0f624dce8359efe5e5309ef14b10f6be8151a27c20d773260",
+    "sydney_p16_image1.jpg": "ed1f86558290d7bc5d3324e84ab7f554ddd5da42dfd156bdb4755be8020a9c97",
+    "fujian_fig3.webp": "ac4ca0cbd27423160013cedfa1b78bc634692b3b5cd7e25df27f2ec65d4aeedc"
+  },
+  "val_correct": 29,
+  "val_total": 50,
+  "val_macro_f1": 0.5867044783173816,
+  "external_source_oof": {
+    "total": 24,
+    "allowed_set_correct": 7
+  },
+  "research_gates": {
+    "accuracy": true,
+    "macro_f1": true,
+    "all_six_recalled": true,
+    "prodelta": true,
+    "PDF": false,
+    "FS": true
+  },
+  "installed_in_application": false,
+  "geologist_approved": false,
+  "general_chat_weights_changed": false,
+  "prepared_test_pixels_opened": 0,
+  "validation_note": "Repeated development50, three correlated S-proxy groups; external OOF is a small correlated diagnostic, not general field accuracy."
+}
