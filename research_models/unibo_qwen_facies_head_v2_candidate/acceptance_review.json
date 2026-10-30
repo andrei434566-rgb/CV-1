@@ -1,0 +1,47 @@
+{
+  "status": "not_promoted_failed_prospective_gates",
+  "train_correct": 649,
+  "val_correct": 27,
+  "macro_f1": 0.5565295815295815,
+  "paired_vs_v1": {
+    "fixed_old_errors": 4,
+    "introduced_errors": 3,
+    "changed_predictions": 12
+  },
+  "validation_per_group": {
+    "S10": {
+      "total": 8,
+      "v1_correct": 4,
+      "v2_correct": 4
+    },
+    "S11": {
+      "total": 20,
+      "v1_correct": 7,
+      "v2_correct": 8
+    },
+    "S21": {
+      "total": 22,
+      "v1_correct": 15,
+      "v2_correct": 15
+    }
+  },
+  "selected_oof_reproduced": true,
+  "all_source_image_hashes_and_splits_verified": true,
+  "selected_candidate_matches_train_only_rule": true,
+  "final_fit_relative_normal_equation_residual": 2.145019600329544e-14,
+  "head_sha256": "b0a425a574680c605f55a3efa6cd5d58c5f5be49e07cfe693cf8ae80dfc92a89",
+  "selection_frozen_sha256": "c82ca38ec9a1bf9c4e792c3063daedb8e0b9aa1cdafa46f386d507b194d6a058",
+  "research_gates": {
+    "accuracy": false,
+    "macro_f1": true,
+    "all_six_recalled": true,
+    "prodelta_improved": true,
+    "PDF_preserved": false
+  },
+  "installed_in_application": false,
+  "geologist_approved": false,
+  "source_license": "CC BY-NC-SA 4.0",
+  "validation_note": "Repeated development set, three correlated proxy S groups; no final independent accuracy",
+  "chat_or_encoder_weights_changed": false,
+  "prepared_test_pixels_opened": 0
+}

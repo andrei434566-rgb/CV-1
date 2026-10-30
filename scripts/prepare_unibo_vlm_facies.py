@@ -153,7 +153,7 @@ def candidate_windows(mask):
                         break
 
 
-def collect_candidates(prepared, rows):
+def collect_candidates(prepared, rows, window_generator=None):
     grouped = defaultdict(list)
     for row in rows:
         if row["split"] in {"train", "val"}:
@@ -184,7 +184,7 @@ def collect_candidates(prepared, rows):
             mask = exact[ty:ty + height, tx:tx + width]
             if mask.shape != (height, width):
                 raise ValueError("Tile outside source annotation")
-            for class_id, box, quality in candidate_windows(mask):
+            for class_id, box, quality in (window_generator or candidate_windows)(mask):
                 global_box = (tx + box[0], ty + box[1], tx + box[2], ty + box[3])
                 candidates[row["split"], class_id].append({"row": row, "box": box,
                     "resized_source_box": global_box, "quality": quality})

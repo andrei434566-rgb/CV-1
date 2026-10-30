@@ -1,0 +1,59 @@
+{
+  "training_recipe": {
+    "profiles": [
+      "qwen_all",
+      "qwen_pre",
+      "qwen_post",
+      "qwen_texture"
+    ],
+    "ridge_alphas": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "weightings": [
+      "class",
+      "class_group"
+    ],
+    "folds": 3,
+    "selection": "all six OOF recalls nonzero, then pooled OOF macroF1, mean S-group accuracy, larger lambda, baseline profile order",
+    "qwen": "original frozen Qwen3-VL-2B vision, same pooled features asv1",
+    "image_side": 300,
+    "texture_version": "rgb_local_texture_v1",
+    "seed": 20261030,
+    "validation": "previous50 exactly unchanged, used once after selection freeze"
+  },
+  "criteria_fixed_before_validation": {
+    "minimum_correct": 28,
+    "macro_f1_minimum": 0.5161304436304436,
+    "all_six_nonzero_recall": true,
+    "prodelta_min_correct": 2,
+    "poorly_drained_floodplain_min_correct": 3
+  },
+  "train_images": 704,
+  "val_images": 50,
+  "prepared_test_pixels_opened": 0,
+  "new_train_crops": 352,
+  "new_train_source_photos": 5,
+  "train_source_photos": 49,
+  "train_proxy_S_groups": 21,
+  "training_script_sha256": "44a6a925a7ab5896805f876be52de0079bd34e0f93b2582c0457eba394a44243",
+  "dependencies_sha256": {
+    "scripts/train_facies_head_groupcv.py": "44a6a925a7ab5896805f876be52de0079bd34e0f93b2582c0457eba394a44243",
+    "scripts/facies_head_v2_features.py": "c6a1566f2c77d61b5afadd42f05674fb02ca84cf0ec2ae02d50b72f91da2c839",
+    "scripts/train_qwen_visual_facies_head.py": "a540c328dd842c6d7bcfc18b01f6d6e0588df073e96b2262678acaf79502eb49",
+    "scripts/train_unibo_visual_facies.py": "611887f809598cea48eed3fed4f95252beee2c29bb399bcb97b6f7f7c8aeb74a",
+    "expanded_dataset/summary.json": "993a9f4781419fb369f6eae09e7fc8e64e596210976da1ae20861d987dc9ade4",
+    "expanded_dataset/train.jsonl": "9ced4925dc5f2d377197022ce4f6257304e9482b3eeb29ab80d514ea4b23963c",
+    "expanded_dataset/val.jsonl": "2bfd48fbbcce5bd516617c56a4637314b3688fdaf18eddce650276e508a72515",
+    "reference_head_v1/features.safetensors": "82d40b15c8751484359586e4967f47cdc1952601e798d74e589374d6fdae2cc7",
+    "reference_head_v1/train.jsonl": "31430530ab4077a1533ba59dc0a9d97e84c1a2f54598484344893e8c219d47ad",
+    "reference_head_v1/val.jsonl": "395654f4020934973f41122f990683a68e5fdad31a17b14eedde35ba762b0f92",
+    "reference_head_v1/facies_head.safetensors": "177159bee931a20de345149c4756eb93aa2f61de6868d4d6df196140fb38f7d5",
+    "reference_head_v1/MODEL_CONTRACT.json": "443e63f59e3b34e4e9a52cab914dcb40340d45dd83c0444879558b4dc8a229a9"
+  },
+  "head_bytes": 295408,
+  "scope": "Separate noncommercial six-source-class research, not promoted, no app activation",
+  "numpy_version": "2.4.6"
+}
