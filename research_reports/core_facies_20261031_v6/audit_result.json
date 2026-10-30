@@ -1,0 +1,61 @@
+{
+  "status": "not_promoted_preservation_or_target_gate_failed",
+  "head_sha256": "fe0cb632d26a55ec3d2ec249faccce13a7e57149e621ccace515453876fe7fa6",
+  "new_source_oof": {
+    "WEB_Gaoyou_L24": {
+      "total": 4,
+      "correct": 4
+    },
+    "WEB_Hainan_KZK01": {
+      "total": 1,
+      "correct": 0
+    },
+    "WEB_Salpi_SAM9": {
+      "total": 8,
+      "correct": 0
+    }
+  },
+  "new_and_previous_core_crops_reproduced": true,
+  "outcrop_crops": 0,
+  "old_features_unchanged": true,
+  "normalization_old_train_only": true,
+  "cross_fitted_prior_and_selected_oof_reproduced": true,
+  "proximal_relative_residual": 7.867640506195585e-15,
+  "validation_gates": {
+    "A_recall": true,
+    "A_f1": true,
+    "D_recall": true,
+    "D_f1": true,
+    "E_recall": true,
+    "E_f1": true,
+    "F_recall": true,
+    "F_f1": true,
+    "B_improved": false,
+    "C_improved": false,
+    "accuracy": true,
+    "macro_f1": true,
+    "no_protected_correct_case_lost": true,
+    "train_eligible": false
+  },
+  "old_train_oof_gates": {
+    "A_recall": true,
+    "A_f1": true,
+    "D_recall": true,
+    "D_f1": true,
+    "E_recall": true,
+    "E_f1": true,
+    "F_recall": true,
+    "F_f1": true,
+    "B_improved": false,
+    "C_improved": true,
+    "macro_f1": true
+  },
+  "val_correct": 29,
+  "val_total": 50,
+  "distribution_approved": false,
+  "installed_in_application": false,
+  "encoder_or_chat_weights_changed": false,
+  "prepared_test_pixels_opened": 0,
+  "audit_script_sha256": "009de53542ee6b6c4a881738bb8e14e3a663f13edb78142b71346d00d17093f4",
+  "limitations": "Repeated50 development crops. Salpi and other Italian source provenance may overlap anonymized regions; no claim of independent wells or final accuracy."
+}

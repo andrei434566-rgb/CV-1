@@ -1,0 +1,1236 @@
+{
+  "stage": "before_validation_features_and_predictions",
+  "selection_status": "NO_ELIGIBLE_UPDATE_DIAGNOSTIC_ONLY",
+  "baseline_old_train_oof": {
+    "total": 722,
+    "correct": 434,
+    "accuracy": 0.6011080332409973,
+    "macro_f1": 0.5703347885020973,
+    "per_class_recall": {
+      "A": 0.65625,
+      "B": 0.5859375,
+      "C": 0.2236842105263158,
+      "D": 0.890625,
+      "E": 0.7089552238805971,
+      "F": 0.3828125
+    },
+    "per_class_precision": {
+      "A": 0.7304347826086957,
+      "B": 0.49019607843137253,
+      "C": 0.2537313432835821,
+      "D": 0.8142857142857143,
+      "E": 0.6643356643356644,
+      "F": 0.47115384615384615
+    },
+    "per_class_f1": {
+      "A": 0.691358024691358,
+      "B": 0.5338078291814946,
+      "C": 0.23776223776223776,
+      "D": 0.8507462686567164,
+      "E": 0.6859205776173285,
+      "F": 0.4224137931034483
+    },
+    "expected_distribution": {
+      "A": 128,
+      "B": 128,
+      "C": 76,
+      "D": 128,
+      "E": 134,
+      "F": 128
+    },
+    "prediction_distribution": {
+      "A": 115,
+      "B": 153,
+      "E": 143,
+      "F": 104,
+      "C": 67,
+      "D": 140
+    },
+    "invalid_outputs": 0,
+    "confusion_expected_rows_predicted_columns": {
+      "A": {
+        "A": 84,
+        "B": 24,
+        "C": 3,
+        "D": 2,
+        "E": 8,
+        "F": 7,
+        "INVALID": 0
+      },
+      "B": {
+        "A": 10,
+        "B": 75,
+        "C": 11,
+        "D": 2,
+        "E": 9,
+        "F": 21,
+        "INVALID": 0
+      },
+      "C": {
+        "A": 0,
+        "B": 18,
+        "C": 17,
+        "D": 8,
+        "E": 17,
+        "F": 16,
+        "INVALID": 0
+      },
+      "D": {
+        "A": 2,
+        "B": 2,
+        "C": 3,
+        "D": 114,
+        "E": 4,
+        "F": 3,
+        "INVALID": 0
+      },
+      "E": {
+        "A": 12,
+        "B": 5,
+        "C": 6,
+        "D": 8,
+        "E": 95,
+        "F": 8,
+        "INVALID": 0
+      },
+      "F": {
+        "A": 7,
+        "B": 29,
+        "C": 27,
+        "D": 6,
+        "E": 10,
+        "F": 49,
+        "INVALID": 0
+      }
+    }
+  },
+  "fold_source_groups": {
+    "S7": 0,
+    "S4": 1,
+    "S18": 2,
+    "S14": 1,
+    "S30": 2,
+    "S8": 0,
+    "S19": 2,
+    "S2": 1,
+    "S26": 0,
+    "S20": 2,
+    "S27": 1,
+    "S24": 0,
+    "S25": 1,
+    "S6": 0,
+    "S23": 2,
+    "S12": 0,
+    "S17": 2,
+    "S15": 1,
+    "S28": 2,
+    "S22": 0,
+    "S16": 2,
+    "WEB_Sydney_FA7_unknown_wells": 0,
+    "WEB_Fujian_LJ01": 1,
+    "WEB_Chengjiang_Yuanshan": 2,
+    "WEB_Nakdong_ND3": 2,
+    "WEB_Gaoyou_L24": 2,
+    "WEB_Hainan_KZK01": 0,
+    "WEB_Salpi_SAM9": 1
+  },
+  "candidates": [
+    {
+      "proximity": 1.0,
+      "new_weight": 0.25,
+      "old_train_oof": {
+        "total": 722,
+        "correct": 439,
+        "accuracy": 0.6080332409972299,
+        "macro_f1": 0.5825227563864354,
+        "per_class_recall": {
+          "A": 0.6484375,
+          "B": 0.5859375,
+          "C": 0.2894736842105263,
+          "D": 0.8984375,
+          "E": 0.7014925373134329,
+          "F": 0.390625
+        },
+        "per_class_precision": {
+          "A": 0.7345132743362832,
+          "B": 0.487012987012987,
+          "C": 0.3013698630136986,
+          "D": 0.8214285714285714,
+          "E": 0.6714285714285714,
+          "F": 0.49019607843137253
+        },
+        "per_class_f1": {
+          "A": 0.6887966804979253,
+          "B": 0.5319148936170213,
+          "C": 0.2953020134228188,
+          "D": 0.8582089552238806,
+          "E": 0.6861313868613139,
+          "F": 0.43478260869565216
+        },
+        "expected_distribution": {
+          "A": 128,
+          "B": 128,
+          "C": 76,
+          "D": 128,
+          "E": 134,
+          "F": 128
+        },
+        "prediction_distribution": {
+          "A": 113,
+          "E": 140,
+          "B": 154,
+          "F": 102,
+          "C": 73,
+          "D": 140
+        },
+        "invalid_outputs": 0,
+        "confusion_expected_rows_predicted_columns": {
+          "A": {
+            "A": 83,
+            "B": 24,
+            "C": 3,
+            "D": 2,
+            "E": 9,
+            "F": 7,
+            "INVALID": 0
+          },
+          "B": {
+            "A": 10,
+            "B": 75,
+            "C": 11,
+            "D": 2,
+            "E": 9,
+            "F": 21,
+            "INVALID": 0
+          },
+          "C": {
+            "A": 0,
+            "B": 19,
+            "C": 22,
+            "D": 7,
+            "E": 14,
+            "F": 14,
+            "INVALID": 0
+          },
+          "D": {
+            "A": 2,
+            "B": 2,
+            "C": 2,
+            "D": 115,
+            "E": 4,
+            "F": 3,
+            "INVALID": 0
+          },
+          "E": {
+            "A": 12,
+            "B": 5,
+            "C": 8,
+            "D": 8,
+            "E": 94,
+            "F": 7,
+            "INVALID": 0
+          },
+          "F": {
+            "A": 6,
+            "B": 29,
+            "C": 27,
+            "D": 6,
+            "E": 10,
+            "F": 50,
+            "INVALID": 0
+          }
+        }
+      },
+      "training_gates": {
+        "A_recall": false,
+        "A_f1": false,
+        "D_recall": true,
+        "D_f1": true,
+        "E_recall": false,
+        "E_f1": true,
+        "F_recall": true,
+        "F_f1": true,
+        "B_improved": false,
+        "C_improved": true,
+        "macro_f1": true
+      }
+    },
+    {
+      "proximity": 1.0,
+      "new_weight": 1.0,
+      "old_train_oof": {
+        "total": 722,
+        "correct": 438,
+        "accuracy": 0.6066481994459834,
+        "macro_f1": 0.5853546167185945,
+        "per_class_recall": {
+          "A": 0.6171875,
+          "B": 0.5703125,
+          "C": 0.34210526315789475,
+          "D": 0.8984375,
+          "E": 0.7014925373134329,
+          "F": 0.3984375
+        },
+        "per_class_precision": {
+          "A": 0.7117117117117117,
+          "B": 0.48344370860927155,
+          "C": 0.3170731707317073,
+          "D": 0.8273381294964028,
+          "E": 0.6861313868613139,
+          "F": 0.5
+        },
+        "per_class_f1": {
+          "A": 0.6610878661087866,
+          "B": 0.5232974910394266,
+          "C": 0.3291139240506329,
+          "D": 0.8614232209737828,
+          "E": 0.6937269372693727,
+          "F": 0.4434782608695652
+        },
+        "expected_distribution": {
+          "A": 128,
+          "B": 128,
+          "C": 76,
+          "D": 128,
+          "E": 134,
+          "F": 128
+        },
+        "prediction_distribution": {
+          "A": 111,
+          "B": 151,
+          "E": 137,
+          "F": 102,
+          "C": 82,
+          "D": 139
+        },
+        "invalid_outputs": 0,
+        "confusion_expected_rows_predicted_columns": {
+          "A": {
+            "A": 79,
+            "B": 24,
+            "C": 5,
+            "D": 1,
+            "E": 10,
+            "F": 9,
+            "INVALID": 0
+          },
+          "B": {
+            "A": 12,
+            "B": 73,
+            "C": 13,
+            "D": 2,
+            "E": 8,
+            "F": 20,
+            "INVALID": 0
+          },
+          "C": {
+            "A": 0,
+            "B": 18,
+            "C": 26,
+            "D": 7,
+            "E": 12,
+            "F": 13,
+            "INVALID": 0
+          },
+          "D": {
+            "A": 2,
+            "B": 2,
+            "C": 3,
+            "D": 115,
+            "E": 4,
+            "F": 2,
+            "INVALID": 0
+          },
+          "E": {
+            "A": 12,
+            "B": 5,
+            "C": 8,
+            "D": 8,
+            "E": 94,
+            "F": 7,
+            "INVALID": 0
+          },
+          "F": {
+            "A": 6,
+            "B": 29,
+            "C": 27,
+            "D": 6,
+            "E": 9,
+            "F": 51,
+            "INVALID": 0
+          }
+        }
+      },
+      "training_gates": {
+        "A_recall": false,
+        "A_f1": false,
+        "D_recall": true,
+        "D_f1": true,
+        "E_recall": false,
+        "E_f1": true,
+        "F_recall": true,
+        "F_f1": true,
+        "B_improved": false,
+        "C_improved": true,
+        "macro_f1": true
+      }
+    },
+    {
+      "proximity": 1.0,
+      "new_weight": 4.0,
+      "old_train_oof": {
+        "total": 722,
+        "correct": 431,
+        "accuracy": 0.5969529085872576,
+        "macro_f1": 0.5813070689755205,
+        "per_class_recall": {
+          "A": 0.5859375,
+          "B": 0.5390625,
+          "C": 0.40789473684210525,
+          "D": 0.890625,
+          "E": 0.6791044776119403,
+          "F": 0.3984375
+        },
+        "per_class_precision": {
+          "A": 0.7009345794392523,
+          "B": 0.45098039215686275,
+          "C": 0.33695652173913043,
+          "D": 0.8321167883211679,
+          "E": 0.6842105263157895,
+          "F": 0.51
+        },
+        "per_class_f1": {
+          "A": 0.6382978723404256,
+          "B": 0.49110320284697506,
+          "C": 0.36904761904761907,
+          "D": 0.8603773584905661,
+          "E": 0.6816479400749064,
+          "F": 0.4473684210526316
+        },
+        "expected_distribution": {
+          "A": 128,
+          "B": 128,
+          "C": 76,
+          "D": 128,
+          "E": 134,
+          "F": 128
+        },
+        "prediction_distribution": {
+          "A": 107,
+          "B": 153,
+          "E": 133,
+          "F": 100,
+          "C": 92,
+          "D": 137
+        },
+        "invalid_outputs": 0,
+        "confusion_expected_rows_predicted_columns": {
+          "A": {
+            "A": 75,
+            "B": 32,
+            "C": 4,
+            "D": 1,
+            "E": 8,
+            "F": 8,
+            "INVALID": 0
+          },
+          "B": {
+            "A": 11,
+            "B": 69,
+            "C": 16,
+            "D": 3,
+            "E": 8,
+            "F": 21,
+            "INVALID": 0
+          },
+          "C": {
+            "A": 0,
+            "B": 17,
+            "C": 31,
+            "D": 4,
+            "E": 13,
+            "F": 11,
+            "INVALID": 0
+          },
+          "D": {
+            "A": 2,
+            "B": 2,
+            "C": 4,
+            "D": 114,
+            "E": 4,
+            "F": 2,
+            "INVALID": 0
+          },
+          "E": {
+            "A": 12,
+            "B": 5,
+            "C": 11,
+            "D": 8,
+            "E": 91,
+            "F": 7,
+            "INVALID": 0
+          },
+          "F": {
+            "A": 7,
+            "B": 28,
+            "C": 26,
+            "D": 7,
+            "E": 9,
+            "F": 51,
+            "INVALID": 0
+          }
+        }
+      },
+      "training_gates": {
+        "A_recall": false,
+        "A_f1": false,
+        "D_recall": true,
+        "D_f1": true,
+        "E_recall": false,
+        "E_f1": false,
+        "F_recall": true,
+        "F_f1": true,
+        "B_improved": false,
+        "C_improved": true,
+        "macro_f1": true
+      }
+    },
+    {
+      "proximity": 10.0,
+      "new_weight": 0.25,
+      "old_train_oof": {
+        "total": 722,
+        "correct": 438,
+        "accuracy": 0.6066481994459834,
+        "macro_f1": 0.5777360813490452,
+        "per_class_recall": {
+          "A": 0.65625,
+          "B": 0.5859375,
+          "C": 0.25,
+          "D": 0.8984375,
+          "E": 0.7089552238805971,
+          "F": 0.390625
+        },
+        "per_class_precision": {
+          "A": 0.7368421052631579,
+          "B": 0.49019607843137253,
+          "C": 0.2753623188405797,
+          "D": 0.8156028368794326,
+          "E": 0.6690140845070423,
+          "F": 0.4854368932038835
+        },
+        "per_class_f1": {
+          "A": 0.6942148760330579,
+          "B": 0.5338078291814946,
+          "C": 0.2620689655172414,
+          "D": 0.8550185873605948,
+          "E": 0.6884057971014492,
+          "F": 0.4329004329004329
+        },
+        "expected_distribution": {
+          "A": 128,
+          "B": 128,
+          "C": 76,
+          "D": 128,
+          "E": 134,
+          "F": 128
+        },
+        "prediction_distribution": {
+          "A": 114,
+          "B": 153,
+          "E": 142,
+          "F": 103,
+          "C": 69,
+          "D": 141
+        },
+        "invalid_outputs": 0,
+        "confusion_expected_rows_predicted_columns": {
+          "A": {
+            "A": 84,
+            "B": 24,
+            "C": 3,
+            "D": 2,
+            "E": 8,
+            "F": 7,
+            "INVALID": 0
+          },
+          "B": {
+            "A": 10,
+            "B": 75,
+            "C": 11,
+            "D": 2,
+            "E": 9,
+            "F": 21,
+            "INVALID": 0
+          },
+          "C": {
+            "A": 0,
+            "B": 18,
+            "C": 19,
+            "D": 8,
+            "E": 16,
+            "F": 15,
+            "INVALID": 0
+          },
+          "D": {
+            "A": 2,
+            "B": 2,
+            "C": 2,
+            "D": 115,
+            "E": 4,
+            "F": 3,
+            "INVALID": 0
+          },
+          "E": {
+            "A": 12,
+            "B": 5,
+            "C": 7,
+            "D": 8,
+            "E": 95,
+            "F": 7,
+            "INVALID": 0
+          },
+          "F": {
+            "A": 6,
+            "B": 29,
+            "C": 27,
+            "D": 6,
+            "E": 10,
+            "F": 50,
+            "INVALID": 0
+          }
+        }
+      },
+      "training_gates": {
+        "A_recall": true,
+        "A_f1": true,
+        "D_recall": true,
+        "D_f1": true,
+        "E_recall": true,
+        "E_f1": true,
+        "F_recall": true,
+        "F_f1": true,
+        "B_improved": false,
+        "C_improved": true,
+        "macro_f1": true
+      }
+    },
+    {
+      "proximity": 10.0,
+      "new_weight": 1.0,
+      "old_train_oof": {
+        "total": 722,
+        "correct": 437,
+        "accuracy": 0.6052631578947368,
+        "macro_f1": 0.5829670682820466,
+        "per_class_recall": {
+          "A": 0.6171875,
+          "B": 0.5859375,
+          "C": 0.32894736842105265,
+          "D": 0.8984375,
+          "E": 0.6940298507462687,
+          "F": 0.390625
+        },
+        "per_class_precision": {
+          "A": 0.7247706422018348,
+          "B": 0.49019607843137253,
+          "C": 0.3125,
+          "D": 0.8214285714285714,
+          "E": 0.6739130434782609,
+          "F": 0.49019607843137253
+        },
+        "per_class_f1": {
+          "A": 0.6666666666666666,
+          "B": 0.5338078291814946,
+          "C": 0.32051282051282054,
+          "D": 0.8582089552238806,
+          "E": 0.6838235294117647,
+          "F": 0.43478260869565216
+        },
+        "expected_distribution": {
+          "A": 128,
+          "B": 128,
+          "C": 76,
+          "D": 128,
+          "E": 134,
+          "F": 128
+        },
+        "prediction_distribution": {
+          "A": 109,
+          "B": 153,
+          "E": 138,
+          "F": 102,
+          "C": 80,
+          "D": 140
+        },
+        "invalid_outputs": 0,
+        "confusion_expected_rows_predicted_columns": {
+          "A": {
+            "A": 79,
+            "B": 25,
+            "C": 5,
+            "D": 1,
+            "E": 10,
+            "F": 8,
+            "INVALID": 0
+          },
+          "B": {
+            "A": 10,
+            "B": 75,
+            "C": 12,
+            "D": 2,
+            "E": 8,
+            "F": 21,
+            "INVALID": 0
+          },
+          "C": {
+            "A": 0,
+            "B": 17,
+            "C": 25,
+            "D": 8,
+            "E": 13,
+            "F": 13,
+            "INVALID": 0
+          },
+          "D": {
+            "A": 2,
+            "B": 2,
+            "C": 2,
+            "D": 115,
+            "E": 4,
+            "F": 3,
+            "INVALID": 0
+          },
+          "E": {
+            "A": 12,
+            "B": 5,
+            "C": 9,
+            "D": 8,
+            "E": 93,
+            "F": 7,
+            "INVALID": 0
+          },
+          "F": {
+            "A": 6,
+            "B": 29,
+            "C": 27,
+            "D": 6,
+            "E": 10,
+            "F": 50,
+            "INVALID": 0
+          }
+        }
+      },
+      "training_gates": {
+        "A_recall": false,
+        "A_f1": false,
+        "D_recall": true,
+        "D_f1": true,
+        "E_recall": false,
+        "E_f1": false,
+        "F_recall": true,
+        "F_f1": true,
+        "B_improved": false,
+        "C_improved": true,
+        "macro_f1": true
+      }
+    },
+    {
+      "proximity": 10.0,
+      "new_weight": 4.0,
+      "old_train_oof": {
+        "total": 722,
+        "correct": 433,
+        "accuracy": 0.5997229916897507,
+        "macro_f1": 0.583013907741509,
+        "per_class_recall": {
+          "A": 0.5859375,
+          "B": 0.5625,
+          "C": 0.39473684210526316,
+          "D": 0.8984375,
+          "E": 0.6791044776119403,
+          "F": 0.390625
+        },
+        "per_class_precision": {
+          "A": 0.7075471698113207,
+          "B": 0.47368421052631576,
+          "C": 0.30927835051546393,
+          "D": 0.8455882352941176,
+          "E": 0.6893939393939394,
+          "F": 0.5050505050505051
+        },
+        "per_class_f1": {
+          "A": 0.6410256410256411,
+          "B": 0.5142857142857142,
+          "C": 0.3468208092485549,
+          "D": 0.8712121212121212,
+          "E": 0.6842105263157895,
+          "F": 0.44052863436123346
+        },
+        "expected_distribution": {
+          "A": 128,
+          "B": 128,
+          "C": 76,
+          "D": 128,
+          "E": 134,
+          "F": 128
+        },
+        "prediction_distribution": {
+          "A": 106,
+          "B": 152,
+          "E": 132,
+          "F": 99,
+          "C": 97,
+          "D": 136
+        },
+        "invalid_outputs": 0,
+        "confusion_expected_rows_predicted_columns": {
+          "A": {
+            "A": 75,
+            "B": 29,
+            "C": 6,
+            "D": 1,
+            "E": 9,
+            "F": 8,
+            "INVALID": 0
+          },
+          "B": {
+            "A": 11,
+            "B": 72,
+            "C": 16,
+            "D": 2,
+            "E": 7,
+            "F": 20,
+            "INVALID": 0
+          },
+          "C": {
+            "A": 0,
+            "B": 16,
+            "C": 30,
+            "D": 5,
+            "E": 13,
+            "F": 12,
+            "INVALID": 0
+          },
+          "D": {
+            "A": 2,
+            "B": 2,
+            "C": 3,
+            "D": 115,
+            "E": 4,
+            "F": 2,
+            "INVALID": 0
+          },
+          "E": {
+            "A": 12,
+            "B": 5,
+            "C": 12,
+            "D": 7,
+            "E": 91,
+            "F": 7,
+            "INVALID": 0
+          },
+          "F": {
+            "A": 6,
+            "B": 28,
+            "C": 30,
+            "D": 6,
+            "E": 8,
+            "F": 50,
+            "INVALID": 0
+          }
+        }
+      },
+      "training_gates": {
+        "A_recall": false,
+        "A_f1": false,
+        "D_recall": true,
+        "D_f1": true,
+        "E_recall": false,
+        "E_f1": false,
+        "F_recall": true,
+        "F_f1": true,
+        "B_improved": false,
+        "C_improved": true,
+        "macro_f1": true
+      }
+    },
+    {
+      "proximity": 100.0,
+      "new_weight": 0.25,
+      "old_train_oof": {
+        "total": 722,
+        "correct": 434,
+        "accuracy": 0.6011080332409973,
+        "macro_f1": 0.5705799359248177,
+        "per_class_recall": {
+          "A": 0.65625,
+          "B": 0.5859375,
+          "C": 0.2236842105263158,
+          "D": 0.890625,
+          "E": 0.7089552238805971,
+          "F": 0.3828125
+        },
+        "per_class_precision": {
+          "A": 0.7304347826086957,
+          "B": 0.487012987012987,
+          "C": 0.25,
+          "D": 0.8201438848920863,
+          "E": 0.6643356643356644,
+          "F": 0.47572815533980584
+        },
+        "per_class_f1": {
+          "A": 0.691358024691358,
+          "B": 0.5319148936170213,
+          "C": 0.2361111111111111,
+          "D": 0.8539325842696629,
+          "E": 0.6859205776173285,
+          "F": 0.42424242424242425
+        },
+        "expected_distribution": {
+          "A": 128,
+          "B": 128,
+          "C": 76,
+          "D": 128,
+          "E": 134,
+          "F": 128
+        },
+        "prediction_distribution": {
+          "A": 115,
+          "B": 154,
+          "E": 143,
+          "F": 103,
+          "C": 68,
+          "D": 139
+        },
+        "invalid_outputs": 0,
+        "confusion_expected_rows_predicted_columns": {
+          "A": {
+            "A": 84,
+            "B": 24,
+            "C": 3,
+            "D": 2,
+            "E": 8,
+            "F": 7,
+            "INVALID": 0
+          },
+          "B": {
+            "A": 10,
+            "B": 75,
+            "C": 11,
+            "D": 2,
+            "E": 9,
+            "F": 21,
+            "INVALID": 0
+          },
+          "C": {
+            "A": 0,
+            "B": 19,
+            "C": 17,
+            "D": 7,
+            "E": 17,
+            "F": 16,
+            "INVALID": 0
+          },
+          "D": {
+            "A": 2,
+            "B": 2,
+            "C": 3,
+            "D": 114,
+            "E": 4,
+            "F": 3,
+            "INVALID": 0
+          },
+          "E": {
+            "A": 12,
+            "B": 5,
+            "C": 7,
+            "D": 8,
+            "E": 95,
+            "F": 7,
+            "INVALID": 0
+          },
+          "F": {
+            "A": 7,
+            "B": 29,
+            "C": 27,
+            "D": 6,
+            "E": 10,
+            "F": 49,
+            "INVALID": 0
+          }
+        }
+      },
+      "training_gates": {
+        "A_recall": true,
+        "A_f1": true,
+        "D_recall": true,
+        "D_f1": true,
+        "E_recall": true,
+        "E_f1": true,
+        "F_recall": true,
+        "F_f1": true,
+        "B_improved": false,
+        "C_improved": false,
+        "macro_f1": true
+      }
+    },
+    {
+      "proximity": 100.0,
+      "new_weight": 1.0,
+      "old_train_oof": {
+        "total": 722,
+        "correct": 434,
+        "accuracy": 0.6011080332409973,
+        "macro_f1": 0.5744385013389608,
+        "per_class_recall": {
+          "A": 0.625,
+          "B": 0.59375,
+          "C": 0.2631578947368421,
+          "D": 0.890625,
+          "E": 0.7014925373134329,
+          "F": 0.390625
+        },
+        "per_class_precision": {
+          "A": 0.7272727272727273,
+          "B": 0.48717948717948717,
+          "C": 0.26666666666666666,
+          "D": 0.8201438848920863,
+          "E": 0.6666666666666666,
+          "F": 0.49504950495049505
+        },
+        "per_class_f1": {
+          "A": 0.6722689075630253,
+          "B": 0.5352112676056338,
+          "C": 0.26490066225165565,
+          "D": 0.8539325842696629,
+          "E": 0.6836363636363636,
+          "F": 0.4366812227074236
+        },
+        "expected_distribution": {
+          "A": 128,
+          "B": 128,
+          "C": 76,
+          "D": 128,
+          "E": 134,
+          "F": 128
+        },
+        "prediction_distribution": {
+          "A": 110,
+          "B": 156,
+          "E": 141,
+          "F": 101,
+          "C": 75,
+          "D": 139
+        },
+        "invalid_outputs": 0,
+        "confusion_expected_rows_predicted_columns": {
+          "A": {
+            "A": 80,
+            "B": 25,
+            "C": 4,
+            "D": 2,
+            "E": 9,
+            "F": 8,
+            "INVALID": 0
+          },
+          "B": {
+            "A": 10,
+            "B": 76,
+            "C": 13,
+            "D": 2,
+            "E": 8,
+            "F": 19,
+            "INVALID": 0
+          },
+          "C": {
+            "A": 0,
+            "B": 19,
+            "C": 20,
+            "D": 7,
+            "E": 16,
+            "F": 14,
+            "INVALID": 0
+          },
+          "D": {
+            "A": 2,
+            "B": 2,
+            "C": 3,
+            "D": 114,
+            "E": 4,
+            "F": 3,
+            "INVALID": 0
+          },
+          "E": {
+            "A": 12,
+            "B": 5,
+            "C": 8,
+            "D": 8,
+            "E": 94,
+            "F": 7,
+            "INVALID": 0
+          },
+          "F": {
+            "A": 6,
+            "B": 29,
+            "C": 27,
+            "D": 6,
+            "E": 10,
+            "F": 50,
+            "INVALID": 0
+          }
+        }
+      },
+      "training_gates": {
+        "A_recall": false,
+        "A_f1": false,
+        "D_recall": true,
+        "D_f1": true,
+        "E_recall": false,
+        "E_f1": false,
+        "F_recall": true,
+        "F_f1": true,
+        "B_improved": true,
+        "C_improved": true,
+        "macro_f1": true
+      }
+    },
+    {
+      "proximity": 100.0,
+      "new_weight": 4.0,
+      "old_train_oof": {
+        "total": 722,
+        "correct": 432,
+        "accuracy": 0.5983379501385041,
+        "macro_f1": 0.5779827678990477,
+        "per_class_recall": {
+          "A": 0.609375,
+          "B": 0.6015625,
+          "C": 0.34210526315789475,
+          "D": 0.890625,
+          "E": 0.6716417910447762,
+          "F": 0.3671875
+        },
+        "per_class_precision": {
+          "A": 0.7289719626168224,
+          "B": 0.4873417721518987,
+          "C": 0.26804123711340205,
+          "D": 0.8260869565217391,
+          "E": 0.6818181818181818,
+          "F": 0.5222222222222223
+        },
+        "per_class_f1": {
+          "A": 0.6638297872340425,
+          "B": 0.5384615384615384,
+          "C": 0.30057803468208094,
+          "D": 0.8571428571428571,
+          "E": 0.6766917293233082,
+          "F": 0.43119266055045874
+        },
+        "expected_distribution": {
+          "A": 128,
+          "B": 128,
+          "C": 76,
+          "D": 128,
+          "E": 134,
+          "F": 128
+        },
+        "prediction_distribution": {
+          "B": 158,
+          "A": 107,
+          "E": 132,
+          "F": 90,
+          "C": 97,
+          "D": 138
+        },
+        "invalid_outputs": 0,
+        "confusion_expected_rows_predicted_columns": {
+          "A": {
+            "A": 78,
+            "B": 27,
+            "C": 6,
+            "D": 1,
+            "E": 10,
+            "F": 6,
+            "INVALID": 0
+          },
+          "B": {
+            "A": 9,
+            "B": 77,
+            "C": 15,
+            "D": 2,
+            "E": 7,
+            "F": 18,
+            "INVALID": 0
+          },
+          "C": {
+            "A": 0,
+            "B": 18,
+            "C": 26,
+            "D": 7,
+            "E": 13,
+            "F": 12,
+            "INVALID": 0
+          },
+          "D": {
+            "A": 2,
+            "B": 2,
+            "C": 4,
+            "D": 114,
+            "E": 4,
+            "F": 2,
+            "INVALID": 0
+          },
+          "E": {
+            "A": 12,
+            "B": 5,
+            "C": 14,
+            "D": 8,
+            "E": 90,
+            "F": 5,
+            "INVALID": 0
+          },
+          "F": {
+            "A": 6,
+            "B": 29,
+            "C": 32,
+            "D": 6,
+            "E": 8,
+            "F": 47,
+            "INVALID": 0
+          }
+        }
+      },
+      "training_gates": {
+        "A_recall": false,
+        "A_f1": false,
+        "D_recall": true,
+        "D_f1": true,
+        "E_recall": false,
+        "E_f1": false,
+        "F_recall": false,
+        "F_f1": true,
+        "B_improved": true,
+        "C_improved": true,
+        "macro_f1": true
+      }
+    }
+  ],
+  "selected_diagnostic": {
+    "proximity": 10.0,
+    "new_weight": 0.25,
+    "training_gates": {
+      "A_recall": true,
+      "A_f1": true,
+      "D_recall": true,
+      "D_f1": true,
+      "E_recall": true,
+      "E_f1": true,
+      "F_recall": true,
+      "F_f1": true,
+      "B_improved": false,
+      "C_improved": true,
+      "macro_f1": true
+    }
+  }
+}

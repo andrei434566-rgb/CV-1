@@ -1,0 +1,53 @@
+{
+  "recipe": {
+    "proximities": [
+      1.0,
+      10.0,
+      100.0
+    ],
+    "new_weights": [
+      0.25,
+      1.0,
+      4.0
+    ],
+    "alpha": 1.0,
+    "end_face_weight": 0.25,
+    "seed": 20261031,
+    "folds": 3,
+    "profile": "qwen_post",
+    "selection": "Old728 group OOF only: require nondecreasing recall AND F1 for A,D,E,F, improved recall for BOTH B,C and macroF1 not lower; otherwise diagnostic only.",
+    "normalizer": "Fit only on old train rows of each fold; no held/new-source statistics",
+    "objective": "Original supervised/partial-label loss + new core labels + alpha*||beta||^2 + proximity*||beta-prior||^2",
+    "prior": "Re-fit v3 alpha1, external_weight1 on old train subset only; no held labels in prior",
+    "validation": "Previous50 unchanged, one evaluation after train selection frozen",
+    "distribution_approved": false,
+    "installed_in_application": false,
+    "encoder_or_chat_weights_changed": false
+  },
+  "train_count": 752,
+  "old_count": 728,
+  "previous_core_crops": 11,
+  "new_crops": 13,
+  "source_rights": "UniBo NC-SA; old web sources CC BY; Salpi explicit distribution grant unverified. LOCAL ONLY, no weight/source redistribution.",
+  "base_model_id": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "head_sha256": "fe0cb632d26a55ec3d2ec249faccce13a7e57149e621ccace515453876fe7fa6",
+  "weight_location": "Local ignored experiment output; NOT included in this report folder",
+  "source_counts": {
+    "new_B": 8,
+    "new_C": 5,
+    "new_photo_panels": 4,
+    "new_source_groups": 3,
+    "outcrop_crops": 0
+  },
+  "distribution_approved": false,
+  "installed_in_application": false,
+  "encoder_or_chat_weights_changed": false,
+  "prepared_test_pixels_opened": 0,
+  "script_sha256": {
+    "prepare_core_facies_20261031_v6.py": "48ee7c8f330729bc3c811aabe74a9b35763c0ddf15bd0af0642758d107a3874d",
+    "conservative_facies_update.py": "5bed0005939c528f21ad00a469776e68bda5fb1557b8ac299757bb2df7445b24",
+    "train_core_facies_conservative.py": "57495fae1d44ee28a0d123e2b37df44d84205be22f45d6d4b00bee822bdadfa7",
+    "audit_core_facies_conservative.py": "009de53542ee6b6c4a881738bb8e14e3a663f13edb78142b71346d00d17093f4"
+  }
+}

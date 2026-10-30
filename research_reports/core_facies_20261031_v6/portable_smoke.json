@@ -1,0 +1,16 @@
+{
+  "status": "numerical_inference_equivalence_passed",
+  "offline": true,
+  "fresh_cuda_encoder": true,
+  "record_id": "corefacies_1b35d991c45b38a7d4056f09",
+  "source_expected_code": "B",
+  "predicted_code": "A",
+  "classification_correct": false,
+  "maximum_score_delta": 0.0,
+  "head_sha256": "fe0cb632d26a55ec3d2ec249faccce13a7e57149e621ccace515453876fe7fa6",
+  "distribution_approved": false,
+  "training_crop": true,
+  "prepared_test_pixels_opened": 0,
+  "scope": "Numerical/inference check, not independent accuracy. Prediction A on new Salpi B is an actual classification error.",
+  "initial_invocation_issue": "Wrong manually supplied image filename; rerun with existing manifest image."
+}
