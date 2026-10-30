@@ -1,0 +1,242 @@
+{
+  "role": "separate_noncommercial_six_facies_head_on_frozen_qwen_vision",
+  "source_license": "CC BY-NC-SA 4.0",
+  "training_images": 352,
+  "validation_images": 50,
+  "reference_vlm_correct": 16,
+  "train": {
+    "total": 352,
+    "correct": 338,
+    "accuracy": 0.9602272727272727,
+    "macro_f1": 0.956431751347429,
+    "per_class_recall": {
+      "A": 0.90625,
+      "B": 0.984375,
+      "C": 0.96875,
+      "D": 1.0,
+      "E": 0.96875,
+      "F": 0.9375
+    },
+    "per_class_precision": {
+      "A": 0.9830508474576272,
+      "B": 0.9130434782608695,
+      "C": 0.8611111111111112,
+      "D": 0.9846153846153847,
+      "E": 0.9841269841269841,
+      "F": 1.0
+    },
+    "per_class_f1": {
+      "A": 0.943089430894309,
+      "B": 0.9473684210526315,
+      "C": 0.9117647058823529,
+      "D": 0.9922480620155039,
+      "E": 0.9763779527559056,
+      "F": 0.967741935483871
+    },
+    "expected_distribution": {
+      "C": 32,
+      "A": 64,
+      "B": 64,
+      "D": 64,
+      "E": 64,
+      "F": 64
+    },
+    "prediction_distribution": {
+      "C": 36,
+      "A": 59,
+      "B": 69,
+      "D": 65,
+      "E": 63,
+      "F": 60
+    },
+    "invalid_outputs": 0,
+    "confusion_expected_rows_predicted_columns": {
+      "A": {
+        "A": 58,
+        "B": 4,
+        "C": 2,
+        "D": 0,
+        "E": 0,
+        "F": 0,
+        "INVALID": 0
+      },
+      "B": {
+        "A": 1,
+        "B": 63,
+        "C": 0,
+        "D": 0,
+        "E": 0,
+        "F": 0,
+        "INVALID": 0
+      },
+      "C": {
+        "A": 0,
+        "B": 0,
+        "C": 31,
+        "D": 0,
+        "E": 1,
+        "F": 0,
+        "INVALID": 0
+      },
+      "D": {
+        "A": 0,
+        "B": 0,
+        "C": 0,
+        "D": 64,
+        "E": 0,
+        "F": 0,
+        "INVALID": 0
+      },
+      "E": {
+        "A": 0,
+        "B": 1,
+        "C": 1,
+        "D": 0,
+        "E": 62,
+        "F": 0,
+        "INVALID": 0
+      },
+      "F": {
+        "A": 0,
+        "B": 1,
+        "C": 2,
+        "D": 1,
+        "E": 0,
+        "F": 60,
+        "INVALID": 0
+      }
+    }
+  },
+  "val": {
+    "total": 50,
+    "correct": 26,
+    "accuracy": 0.52,
+    "macro_f1": 0.4861304436304436,
+    "per_class_recall": {
+      "A": 0.25,
+      "B": 0.375,
+      "C": 0.1,
+      "D": 1.0,
+      "E": 0.9166666666666666,
+      "F": 0.5
+    },
+    "per_class_precision": {
+      "A": 0.3333333333333333,
+      "B": 0.375,
+      "C": 0.3333333333333333,
+      "D": 0.8,
+      "E": 0.6111111111111112,
+      "F": 0.46153846153846156
+    },
+    "per_class_f1": {
+      "A": 0.2857142857142857,
+      "B": 0.375,
+      "C": 0.15384615384615385,
+      "D": 0.8888888888888888,
+      "E": 0.7333333333333333,
+      "F": 0.48
+    },
+    "expected_distribution": {
+      "A": 4,
+      "B": 8,
+      "C": 10,
+      "D": 4,
+      "E": 12,
+      "F": 12
+    },
+    "prediction_distribution": {
+      "A": 3,
+      "F": 13,
+      "B": 8,
+      "E": 18,
+      "C": 3,
+      "D": 5
+    },
+    "invalid_outputs": 0,
+    "confusion_expected_rows_predicted_columns": {
+      "A": {
+        "A": 1,
+        "B": 2,
+        "C": 0,
+        "D": 0,
+        "E": 0,
+        "F": 1,
+        "INVALID": 0
+      },
+      "B": {
+        "A": 0,
+        "B": 3,
+        "C": 1,
+        "D": 0,
+        "E": 3,
+        "F": 1,
+        "INVALID": 0
+      },
+      "C": {
+        "A": 1,
+        "B": 0,
+        "C": 1,
+        "D": 0,
+        "E": 3,
+        "F": 5,
+        "INVALID": 0
+      },
+      "D": {
+        "A": 0,
+        "B": 0,
+        "C": 0,
+        "D": 4,
+        "E": 0,
+        "F": 0,
+        "INVALID": 0
+      },
+      "E": {
+        "A": 1,
+        "B": 0,
+        "C": 0,
+        "D": 0,
+        "E": 11,
+        "F": 0,
+        "INVALID": 0
+      },
+      "F": {
+        "A": 0,
+        "B": 3,
+        "C": 1,
+        "D": 1,
+        "E": 1,
+        "F": 6,
+        "INVALID": 0
+      }
+    }
+  },
+  "paired_against_previous_vlm": {
+    "still_correct": 12,
+    "still_wrong": 20,
+    "fixed": 14,
+    "new_error": 4
+  },
+  "per_source_group": {
+    "S10": {
+      "correct": 4,
+      "total": 8
+    },
+    "S11": {
+      "correct": 7,
+      "total": 20
+    },
+    "S21": {
+      "correct": 15,
+      "total": 22
+    }
+  },
+  "research_gates": {
+    "accuracy": true,
+    "macro_f1": true,
+    "all_classes_recalled": true
+  },
+  "head_sha256": "177159bee931a20de345149c4756eb93aa2f61de6868d4d6df196140fb38f7d5",
+  "installed_in_application": false,
+  "geologist_approved": false,
+  "validation_scope": "reused source-domain development set, 3 correlated proxy S-groups, no independent final test"
+}

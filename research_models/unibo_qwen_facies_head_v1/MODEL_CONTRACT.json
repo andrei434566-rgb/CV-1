@@ -1,0 +1,43 @@
+{
+  "type": "frozen_qwen_visual_ridge_head_not_peft",
+  "base_model_id": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "base_config_sha256": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+  "feature_dimension": 6144,
+  "feature_spec": {
+    "encoder": "original frozen Qwen3-VL-2B vision, no LoRA",
+    "image_side": 300,
+    "features": "mean and population std of pre-merger and merged visual tokens",
+    "normalization": "train mean/std floor1e-3, per-image L2, appended intercept",
+    "classifier": "class-balanced multiclass ridge regression",
+    "ridge_lambda": 1.0,
+    "class_weights": "N/(6*n_class)",
+    "fit": "one fixed dual linear solve, float64",
+    "seed": 20261030,
+    "activation": "none; closed-set argmax scores, not calibrated probabilities"
+  },
+  "code_to_russian": {
+    "A": "Хорошо дренируемая пойма",
+    "B": "Плохо дренируемая пойма",
+    "C": "Продельта",
+    "D": "Прослой торфа",
+    "E": "Русловой песок",
+    "F": "Болото"
+  },
+  "training_source_license": "CC BY-NC-SA 4.0",
+  "general_chat_or_description_model": false,
+  "automatic_project_catalog_mapping": null,
+  "base_weights_sha256": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+  "base_weights_bytes": 4255140312,
+  "head_sha256": "177159bee931a20de345149c4756eb93aa2f61de6868d4d6df196140fb38f7d5",
+  "package_versions": {
+    "torch": "2.6.0+cu126",
+    "transformers": "5.18.0",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "safetensors": "0.8.0",
+    "Pillow": "12.3.0"
+  },
+  "feature_contract_version": "qwen3vl_pre_post_merger_mean_std_v1",
+  "input_scope": "cropped core interval, six UniBo source classes only, not a whole tray or complete geological description"
+}

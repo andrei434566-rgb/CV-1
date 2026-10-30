@@ -1,0 +1,17 @@
+{
+  "status": "accepted_source_development_research_only",
+  "installed_in_application": false,
+  "geologist_approved": false,
+  "source_license": "CC BY-NC-SA 4.0",
+  "research_gates": {
+    "accuracy": true,
+    "macro_f1": true,
+    "all_classes_recalled": true
+  },
+  "head_sha256": "177159bee931a20de345149c4756eb93aa2f61de6868d4d6df196140fb38f7d5",
+  "field_validation_passed": false,
+  "general_assistant_approved": false,
+  "source_classification_accuracy": 0.52,
+  "validation_note": "reused development set, 3 correlated proxy S groups; not independent final test",
+  "weakest_class": "Prodelta 1/10"
+}
