@@ -14,11 +14,14 @@ LITHOLOGY_LEGEND = [
     {"name": "Уголь", "symbol": "COAL", "color": "#111111", "pattern": "solid"},
     {"name": "Переслаивание", "symbol": "ALT", "color": "#c7a46a", "pattern": "alternating"},
     {"name": "Породы фундамента", "symbol": "BASE", "color": "#b66a7a", "pattern": "cross"},
+    {"name": "Известняк", "symbol": "LIM", "color": "#a9c9dc", "pattern": "bricks"},
+    {"name": "Доломит", "symbol": "DOL", "color": "#c5b4d4", "pattern": "dolomite_bricks"},
+    {"name": "Глинистая порода", "symbol": "SH", "color": "#b4bec9", "pattern": "thin_horizontal"},
 ]
 
 LITHOLOGY_PATTERN_TITLES = {
     "solid": "Сплошная заливка",
-    "horizontal": "Горизонтальные линии",
+    "horizontal": "Штрихи с точками (алевролит)",
     "thin_horizontal": "Тонкие горизонтальные линии",
     "dots": "Точки (песчаник)",
     "pebbles": "Галька (гравелит)",
@@ -26,6 +29,8 @@ LITHOLOGY_PATTERN_TITLES = {
     "alternating": "Переслаивание",
     "dark_lines": "Тёмные линии",
     "coal_lines": "Угольные линии",
+    "bricks": "Блоки (известняк)",
+    "dolomite_bricks": "Блоки со штрихом (доломит)",
 }
 
 

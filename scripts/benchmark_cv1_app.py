@@ -19,6 +19,7 @@ from app.infrastructure.cv1_analysis import TEXT_FIELDS
 parser = argparse.ArgumentParser()
 parser.add_argument("photos", type=Path, nargs="+")
 parser.add_argument("--model", type=Path)
+parser.add_argument("--adapter", type=Path, help="Explicit candidate LoRA for an isolated comparison; does not change user settings")
 parser.add_argument("--prepare", action="store_true", help="Prepare CPU imports, as at normal application startup")
 parser.add_argument("--output", type=Path, default=Path("outputs/app_pipeline_benchmark"))
 args = parser.parse_args()
@@ -26,11 +27,16 @@ if len(set(path.resolve() for path in args.photos)) != len(args.photos):
     parser.error("Use distinct source photographs, not repeated cached inputs")
 if any(not path.is_file() for path in args.photos) or args.model is not None and not args.model.is_file():
     parser.error("An input photo or model does not exist")
+if args.adapter is not None and not (args.adapter / "adapter_model.safetensors").is_file():
+    parser.error("The candidate adapter does not exist")
 args.output.mkdir(parents=True, exist_ok=True)
 application = QApplication([])
 application.setQuitOnLastWindowClosed(False)
 settings = QSettings(str(args.output / "isolated_settings.ini"), QSettings.Format.IniFormat)
 settings.clear()
+if args.adapter is not None:
+    settings.setValue("vlm/model_mode", "lora")
+    settings.setValue("vlm/adapter", str(args.adapter.resolve()))
 with patch("app.ui.windows.main_window.QSettings", return_value=settings):
     window = MainWindow()
 window._resolve_model_path = lambda: args.model
@@ -92,6 +98,7 @@ def check():
         report = {"photos": len(window._records), "objects": len(rows), "complete_descriptions": complete,
                   "total_seconds": elapsed, "chat_available_during_processing": state["chat_available"],
                   "segmentation_model": str(args.model) if args.model else None, "errors": state["errors"],
+                  "candidate_adapter": str(args.adapter) if args.adapter else None,
                   "route": "real MainWindow + QProcess + local runtime; offscreen Qt", "response_cache": False,
                   "all_hypotheses_are_unconfirmed": unconfirmed}
         report["startup_cpu_import_seconds"] = state["preparation_seconds"]

@@ -212,8 +212,11 @@ class LocalModel:
         if hasattr(self.processor, "tokenizer"):
             from app.infrastructure.structured_generation import lithology_logits_processor
             from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
+            from app.domain.lithology import LITHOLOGY_LEGEND
+            names = dict.fromkeys([*LITHOLOGY_ATTRIBUTE_OPTIONS["Название породы"],
+                                   *(item["name"] for item in LITHOLOGY_LEGEND)])
             labels = [
-                "Предположительно: " + value for value in LITHOLOGY_ATTRIBUTE_OPTIONS["Название породы"]
+                "Предположительно: " + value for value in names
             ] + ["Не установлена по фото"]
             options["logits_processor"] = [lithology_logits_processor(
                 self.processor.tokenizer, labels, prompt_length)]

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
+from PySide6.QtCore import QRectF, QSize, Qt
+from PySide6.QtGui import QColor, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import (
     QColorDialog,
     QComboBox,
@@ -25,6 +25,7 @@ from app.domain.lithology import (
     normalize_lithology_palette,
 )
 from app.domain.facies_palette import normalize_facies_palette
+from app.ui.widgets.workspace_canvas import StackColumnItem
 
 
 class LithologyPaletteDialog(QDialog):
@@ -103,12 +104,24 @@ class LithologyPaletteDialog(QDialog):
         self.table.setItem(row, 1, QTableWidgetItem(str(item.get("symbol") or "LITH")))
         self._set_color(row, str(item.get("color") or "#808080"))
         patterns = QComboBox(self.table)
+        patterns.setIconSize(QSize(48, 20))
         for value, title in LITHOLOGY_PATTERN_TITLES.items():
-            patterns.addItem(title, value)
+            patterns.addItem(self._pattern_icon(value, QColor(self.table.item(row, 2).text())), title, value)
         index = patterns.findData(str(item.get("pattern") or "solid"))
         patterns.setCurrentIndex(max(0, index))
         self.table.setCellWidget(row, 3, patterns)
+        self.table.setRowHeight(row, 38)
         self.table.setCurrentCell(row, 0)
+
+    @staticmethod
+    def _pattern_icon(pattern: str, color: QColor) -> QIcon:
+        pixmap = QPixmap(96, 40)
+        pixmap.setDevicePixelRatio(2.0)
+        pixmap.fill(color)
+        painter = QPainter(pixmap)
+        StackColumnItem._fill_legend_pattern(painter, QRectF(0, 0, 48, 20), color, pattern)
+        painter.end()
+        return QIcon(pixmap)
 
     def _remove_selected(self) -> None:
         rows = sorted({index.row() for index in self.table.selectionModel().selectedRows()}, reverse=True)
@@ -134,6 +147,10 @@ class LithologyPaletteDialog(QDialog):
         item.setBackground(color)
         item.setForeground(QColor("#ffffff") if color.lightness() < 125 else QColor("#202532"))
         self.table.setItem(row, 2, item)
+        patterns = self.table.cellWidget(row, 3)
+        if isinstance(patterns, QComboBox):
+            for index in range(patterns.count()):
+                patterns.setItemIcon(index, self._pattern_icon(str(patterns.itemData(index)), color))
 
     def _restore_defaults(self) -> None:
         self.table.setRowCount(0)

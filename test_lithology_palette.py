@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import os
 import unittest
+from unittest.mock import Mock
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from PySide6.QtCore import QPointF
-from PySide6.QtGui import QColor, QPixmap
+from PySide6.QtCore import QPointF, QRectF
+from PySide6.QtGui import QColor, QFont, QImage, QPainter, QPixmap
 from PySide6.QtWidgets import QApplication, QSpinBox, QToolBar
 
 from app.domain.facies_palette import normalize_facies_palette
@@ -82,6 +83,36 @@ class LithologyPaletteTests(unittest.TestCase):
 
         self.assertIsNotNone(info)
         self.assertEqual("BCL", info["symbol"])
+
+    def test_sandstone_pattern_keeps_its_scale_on_a_long_interval(self):
+        def render(height):
+            image = QImage(94, height, QImage.Format.Format_RGB32)
+            color = QColor("#d8b45b")
+            image.fill(color)
+            painter = QPainter(image)
+            StackColumnItem._fill_legend_pattern(painter, QRectF(0, 0, 94, height), color, "dots")
+            painter.end()
+            return image
+        short, long = render(96), render(960)
+        self.assertEqual(short, long.copy(0, 0, 94, 96))
+        # Sandstone dots occupy only a small fraction of each tile, with
+        # multiple grain rows even near the top of a metre-long interval.
+        rows = [y for y in range(48) if any(short.pixelColor(x, y) != QColor("#d8b45b") for x in range(94))]
+        self.assertGreater(len(rows), 6)
+        self.assertLess(len(rows), 24)
+
+    def test_uncertain_caption_has_short_title_and_explicit_unknown(self):
+        value = "Предположительно: Песчаник (уверенность низкая)"
+        self.assertEqual(StackColumnItem._badge_title(value), "Песчаник")
+        self.assertTrue(StackColumnItem._unresolved_label("Не установлена по фото"))
+        self.assertEqual(StackColumnItem._compact_symbol("Предположительно: Русловая песчаная фация"), "РПФ")
+
+    def test_short_manual_interval_without_symbol_uses_its_name(self):
+        painter = Mock()
+        painter.font.return_value = QFont()
+        StackColumnItem._draw_badge_caption(painter, QRectF(0, 0, 94, 40), "", "Ручной интервал")
+        self.assertEqual(painter.drawText.call_count, 1)
+        self.assertEqual(painter.drawText.call_args.args[2], "РИ")
 
     def test_facies_palette_keeps_model_key_when_display_name_changes(self):
         palette = normalize_facies_palette(

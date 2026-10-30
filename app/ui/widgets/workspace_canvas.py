@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from hashlib import md5
+import re
 
 from PySide6.QtCore import QPoint, QPointF, QRect, QRectF, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QImage, QPainter, QPainterPath, QPainterPathStroker, QPen, QPixmap, QPolygonF, QTransform
+from PySide6.QtGui import QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath, QPainterPathStroker, QPen, QPixmap, QPolygonF, QTransform
 from PySide6.QtWidgets import QApplication, QFrame, QGraphicsObject, QGraphicsScene, QGraphicsView, QHBoxLayout, QLabel, QVBoxLayout
 
 from app.domain.models import FaciesDetection, PhotoRecord
@@ -1549,46 +1550,34 @@ class StackColumnItem(QGraphicsObject):
         if custom_color.isValid():
             color = custom_color
         badge = QRectF(self.lithology_x + 8, rect.top() + 1, self.LITHOLOGY_WIDTH - 16, max(2, rect.height() - 2))
-        # The legend is rendered as reusable raster tiles, so the track uses
-        # pictograms rather than a flat programmatic fill.
-        tile = self._legend_tile(color, (info or {}).get("pattern", "solid"))
+        unresolved = self._unresolved_label(lithology_name)
+        if unresolved and not custom_color.isValid():
+            color = QColor("#e8edf3")
         painter.fillRect(badge, color)
-        painter.drawPixmap(badge.toRect(), tile)
+        self._fill_legend_pattern(painter, badge, color, (info or {}).get("pattern", "solid"))
         painter.setPen(QPen(color.darker(135), 1))
         painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawRect(badge)
-        symbol = (info or {}).get("symbol") or lithology_name[:5]
-        if badge.height() >= 20:
-            painter.setPen(QColor("#ffffff") if color.lightness() < 115 else QColor("#273044"))
-            text = str(symbol) if badge.height() < 46 else f"{symbol}\n{lithology_name}"
-            painter.drawText(
-                badge.adjusted(2, 1, -2, -1),
-                Qt.AlignmentFlag.AlignCenter | Qt.TextFlag.TextWordWrap,
-                text,
-            )
+        symbol = "?" if unresolved else (info or {}).get("symbol") or lithology_name[:5]
+        title = "Уточнить" if unresolved else (info or {}).get("name") or self._badge_title(lithology_name)
+        self._draw_badge_caption(painter, badge, str(symbol), str(title),
+                                 tentative=bool(re.search("предполож|вероятн|гипотез", lithology_name, re.I)))
 
     def _draw_facies_badge(self, painter: QPainter, rect: QRectF, detection: FaciesDetection) -> None:
         info = self._facies_info(detection.label)
         display_name = str((info or {}).get("name") or detection.label or "—").strip()
-        symbol = str((info or {}).get("symbol") or detection.label or "—").strip()
+        symbol = str((info or {}).get("symbol") or self._compact_symbol(detection.label)).strip()
         color = QColor(str((info or {}).get("color") or facies_color(detection.label).name()))
+        if self._unresolved_label(detection.label):
+            color, symbol, display_name = QColor("#e8edf3"), "?", "Уточнить"
         badge = QRectF(self.facies_x + 8, rect.top(), self.FACIES_WIDTH - 16, max(2, rect.height()))
         painter.fillRect(badge, color)
-        painter.drawPixmap(
-            badge.toRect(),
-            self._legend_tile(color, str((info or {}).get("pattern") or "solid")),
-        )
+        self._fill_legend_pattern(painter, badge, color, str((info or {}).get("pattern") or "solid"))
         painter.setPen(QPen(color.darker(135), 1))
         painter.setBrush(Qt.BrushStyle.NoBrush)
         painter.drawRect(badge)
-        if badge.height() >= 20:
-            painter.setPen(QColor("#ffffff") if color.lightness() < 115 else QColor("#273044"))
-            text = symbol if badge.height() < 46 else f"{symbol}\n{display_name}"
-            painter.drawText(
-                badge.adjusted(2, 1, -2, -1),
-                Qt.AlignmentFlag.AlignCenter | Qt.TextFlag.TextWordWrap,
-                text,
-            )
+        self._draw_badge_caption(painter, badge, symbol, self._badge_title(display_name),
+                                 tentative=bool(re.search("предполож|вероятн|гипотез", display_name, re.I)))
 
     def _draw_saturation_badge(self, painter: QPainter, rect: QRectF, detection: FaciesDetection) -> None:
         value = str(detection.attributes.get("Флюидонасыщение") or "").strip()
@@ -1636,10 +1625,7 @@ class StackColumnItem(QGraphicsObject):
             badge = QRectF(x + 8, min(y1, y2), width - 16, max(3.0, abs(y2 - y1)))
             painter.fillRect(badge, color)
             if kind in {"lithology", "facies"}:
-                painter.drawPixmap(
-                    badge.toRect(),
-                    self._legend_tile(color, str(interval.get("pattern") or "solid")),
-                )
+                self._fill_legend_pattern(painter, badge, color, str(interval.get("pattern") or "solid"))
             painter.setPen(QPen(color.darker(140), 1.4))
             painter.setBrush(Qt.BrushStyle.NoBrush)
             painter.drawRect(badge)
@@ -1648,14 +1634,9 @@ class StackColumnItem(QGraphicsObject):
             for y in (badge.top(), badge.bottom()):
                 painter.drawRect(QRectF(badge.center().x() - 7, y - 2.5, 14, 5))
             if badge.height() >= 20:
-                painter.setPen(QColor("#ffffff") if color.lightness() < 125 else QColor("#273044"))
                 label = str(interval.get("name") or "Интервал")
                 symbol = str(interval.get("symbol") or "").strip()
-                painter.drawText(
-                    badge.adjusted(3, 2, -3, -2),
-                    Qt.AlignmentFlag.AlignCenter | Qt.TextFlag.TextWordWrap,
-                    symbol if symbol and badge.height() < 46 else f"{symbol}\n{label}" if symbol else label,
-                )
+                self._draw_badge_caption(painter, badge, symbol, self._badge_title(label))
         if self._column_draw_start is not None and self._column_draw_current_y is not None:
             kind, start_y = self._column_draw_start
             x, width = self._track_geometry(kind)
@@ -1701,6 +1682,12 @@ class StackColumnItem(QGraphicsObject):
             "mudstone": "Аргиллит",
             "madstone": "Аргиллит",
             "shale": "Аргиллит",
+            "limestone": "Известняк",
+            "dolomite": "Доломит",
+            "dolostone": "Доломит",
+            "известняк": "Известняк",
+            "доломит": "Доломит",
+            "глинистая порода": "Глинистая порода",
             "coal": "Уголь",
             "gravel": "Гравелит",
             "битуминоз": "Битуминозный аргиллит",
@@ -1737,40 +1724,126 @@ class StackColumnItem(QGraphicsObject):
         key = (color.name(QColor.NameFormat.HexRgb), str(pattern))
         if key in cls._legend_tiles:
             return cls._legend_tiles[key]
-        tile = QPixmap(48, 48)
-        tile.fill(color)
+        tile = QPixmap(96, 96)
+        tile.setDevicePixelRatio(2.0)
+        tile.fill(Qt.GlobalColor.transparent)
         tile_painter = QPainter(tile)
+        tile_painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         cls._draw_lithology_pattern(tile_painter, QRectF(0, 0, 48, 48), str(pattern), color)
         tile_painter.end()
         cls._legend_tiles[key] = tile
         return tile
 
+    @classmethod
+    def _fill_legend_pattern(cls, painter: QPainter, rect: QRectF, color: QColor, pattern: str) -> None:
+        if pattern == "solid":
+            return
+        painter.save()
+        painter.setClipRect(rect, Qt.ClipOperation.IntersectClip)
+        # Tile at a fixed logical scale. Stretching a single 48px tile across
+        # an entire interval turned sandstone dots into metre-long ovals.
+        painter.drawTiledPixmap(rect, cls._legend_tile(color, pattern), QPointF(0, 0))
+        painter.restore()
+
+    @staticmethod
+    def _unresolved_label(value: str) -> bool:
+        return not value.strip() or bool(re.search(r"не установлен|не определ|нераспознан|требуется уточн", value, re.I))
+
+    @staticmethod
+    def _badge_title(value: str) -> str:
+        value = re.sub(r"^\s*(?:предположительно|вероятно|гипотеза)\s*:?\s*", "", value, flags=re.I)
+        value = re.sub(r"\s*\(уверенность[^)]*\)", "", value, flags=re.I)
+        return re.sub(r"\s+", " ", value).strip()
+
+    @classmethod
+    def _compact_symbol(cls, value: str) -> str:
+        title = cls._badge_title(value)
+        if len(title) <= 10:
+            return title or "—"
+        words = re.findall(r"[\w]+", title)
+        return "".join(word[0].upper() for word in words[:4]) or "—"
+
+    @staticmethod
+    def _draw_badge_caption(painter: QPainter, badge: QRectF, symbol: str, title: str, *, tentative=False) -> None:
+        if badge.height() < 22 or badge.width() < 28:
+            return
+        painter.save()
+        painter.setClipRect(badge.adjusted(1, 1, -1, -1), Qt.ClipOperation.IntersectClip)
+        show_title = badge.height() >= 58
+        height = 42 if show_title else 23
+        chip = QRectF(badge.left() + 5, badge.center().y() - height / 2, badge.width() - 10, height)
+        painter.setPen(QPen(QColor(255, 255, 255, 210), .8))
+        painter.setBrush(QColor(255, 255, 255, 224))
+        painter.drawRoundedRect(chip, 5, 5)
+        painter.setPen(QColor("#26374d"))
+        code_font = QFont(painter.font())
+        code_font.setPixelSize(12)
+        code_font.setBold(True)
+        painter.setFont(code_font)
+        caption = ("≈ " if tentative else "") + (symbol or StackColumnItem._compact_symbol(title))
+        caption = QFontMetricsF(code_font).elidedText(caption, Qt.TextElideMode.ElideRight, chip.width() - 8)
+        code_rect = chip.adjusted(3, 2, -3, -20 if show_title else -2)
+        painter.drawText(code_rect, Qt.AlignmentFlag.AlignCenter, caption)
+        if show_title:
+            name_font = QFont(code_font)
+            name_font.setPixelSize(10)
+            name_font.setBold(False)
+            painter.setFont(name_font)
+            title = QFontMetricsF(name_font).elidedText(title, Qt.TextElideMode.ElideRight, chip.width() - 8)
+            painter.drawText(QRectF(chip.left() + 4, chip.bottom() - 20, chip.width() - 8, 17),
+                             Qt.AlignmentFlag.AlignCenter, title)
+        painter.restore()
+
     @staticmethod
     def _draw_lithology_pattern(painter: QPainter, rect: QRectF, pattern: str, color: QColor) -> None:
-        ink = QColor("#ffffff") if color.lightness() < 115 else QColor("#323846")
-        ink.setAlpha(125)
-        painter.setPen(QPen(ink, 1))
-        if pattern in {"horizontal", "thin_horizontal", "dark_lines", "coal_lines", "alternating"}:
-            step = 5 if pattern == "thin_horizontal" else 8
-            y = rect.top() + step
-            while y < rect.bottom():
-                painter.drawLine(rect.left() + 3, y, rect.right() - 3, y)
-                y += step
-        if pattern in {"dots", "pebbles"}:
-            radius = 1.4 if pattern == "dots" else 2.6
-            y = rect.top() + 7
-            while y < rect.bottom():
-                x = rect.left() + 10
-                while x < rect.right() - 5:
-                    painter.drawEllipse(QPointF(x, y), radius, radius)
-                    x += 17
-                y += 13
-        if pattern in {"cross", "alternating"}:
-            offset = -rect.height()
-            while offset < rect.width() + rect.height():
-                painter.drawLine(rect.left() + offset, rect.top(), rect.left() + offset + rect.height(), rect.bottom())
-                painter.drawLine(rect.left() + offset + rect.height(), rect.top(), rect.left() + offset, rect.bottom())
-                offset += 16
+        ink = QColor("#e2e9f0") if color.lightness() < 115 else QColor("#465267")
+        ink.setAlpha(150)
+        painter.setPen(QPen(ink, .8))
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        if pattern == "dots":
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(ink)
+            for row, y in enumerate(range(4, 48, 8)):
+                for x in range(4 + 4 * (row % 2), 48, 8):
+                    painter.drawEllipse(QPointF(x, y), 1.05, 1.05)
+        elif pattern == "pebbles":
+            for row, y in enumerate(range(6, 48, 12)):
+                for x in range(5 + 8 * (row % 2), 48, 16):
+                    painter.drawEllipse(QRectF(x - 3.5, y - 2.4, 7, 4.8))
+        elif pattern == "horizontal":
+            for row, y in enumerate(range(5, 48, 8)):
+                for x in range(2 + 8 * (row % 2), 48, 16):
+                    painter.drawLine(QPointF(x, y), QPointF(x + 7, y))
+                    painter.drawPoint(QPointF(x + 11, y + 3))
+        elif pattern in {"thin_horizontal", "dark_lines", "coal_lines"}:
+            step = 6 if pattern == "thin_horizontal" else 12
+            for y in range(3, 48, step):
+                painter.drawLine(QPointF(0, y), QPointF(48, y))
+                if pattern == "dark_lines":
+                    painter.drawLine(QPointF(0, y + 2), QPointF(48, y + 2))
+                elif pattern == "coal_lines":
+                    for x in range(4, 48, 16):
+                        painter.drawLine(QPointF(x, y + 4), QPointF(x + 5, y + 7))
+        elif pattern == "alternating":
+            shade = QColor(ink)
+            shade.setAlpha(28)
+            for top in (0, 24):
+                painter.fillRect(QRectF(0, top + 12, 48, 12), shade)
+                for y in (top + 12, top + 18, top + 24):
+                    painter.drawLine(QPointF(0, y), QPointF(48, y))
+                for x in range(5, 48, 8):
+                    painter.drawPoint(QPointF(x, top + 5))
+        elif pattern == "cross":
+            for offset in range(-48, 97, 12):
+                painter.drawLine(QPointF(offset, 0), QPointF(offset + 48, 48))
+                painter.drawLine(QPointF(offset, 0), QPointF(offset - 48, 48))
+        elif pattern in {"bricks", "dolomite_bricks"}:
+            for row, y in enumerate(range(0, 49, 12)):
+                painter.drawLine(QPointF(0, y), QPointF(48, y))
+                for x in range(12 * (row % 2), 49, 24):
+                    painter.drawLine(QPointF(x, y), QPointF(x, y + 12))
+                    if pattern == "dolomite_bricks":
+                        painter.drawLine(QPointF(x + 6, y + 8), QPointF(x + 11, y + 3))
 
     def _draw_gis_tracks(self, painter: QPainter) -> None:
         self._draw_log_tracks(painter, self.gis_x, self.gis_width, self.gis_tracks, "LAS не загружен")
