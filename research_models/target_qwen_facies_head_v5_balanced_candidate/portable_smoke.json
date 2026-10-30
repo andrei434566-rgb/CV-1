@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "network": "denied inside inference process",
+  "fresh_cuda_encoder": true,
+  "research_training_image": true,
+  "record_id": "targetfacies_ac16b56f3b478b729d2f762a",
+  "predicted_code": "C",
+  "maximum_score_delta": 0.0,
+  "head_sha256": "fd8e945e5b13037888b3dda548bf88b3c08b4b797a9bcd5847fb0f5322cdd233",
+  "test_pixels_opened": 0,
+  "scope": "Portable package/inference equivalence only, not independent accuracy or application acceptance"
+}

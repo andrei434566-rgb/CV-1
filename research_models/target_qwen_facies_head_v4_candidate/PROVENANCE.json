@@ -1,0 +1,101 @@
+{
+  "recipe": {
+    "profile": "qwen_post",
+    "alphas": [
+      0.1,
+      1.0,
+      10.0,
+      100.0
+    ],
+    "target_class_boosts": [
+      1.0,
+      2.0,
+      4.0
+    ],
+    "outcrop_weight": 0.25,
+    "old_external_weight": 1.0,
+    "seed": 20261031,
+    "folds": 3,
+    "selection": "All six recalled, min(B,C) exact OOF recall, mean(B,C) recall, exact macroF1, mean group accuracy, larger alpha, smaller boost",
+    "partial_AB": "A+B sum supervised; A-B direction not supervised",
+    "frozen_encoder": true,
+    "chat_weights_changed": false,
+    "input": "Original RGB crop thumbnail300, original frozen Qwen3-VL-2B processor",
+    "validation": "Previous50 unchanged, loaded only after train-only selection frozen"
+  },
+  "criteria": {
+    "minimum_correct": 29,
+    "macro_f1_minimum": 0.5867044783173816,
+    "PDF_min_correct": 3,
+    "prodelta_min_correct": 3,
+    "FS_min_correct": 10
+  },
+  "train_count": 743,
+  "val_count": 50,
+  "new_count": 15,
+  "sources": {
+    "chengjiang": {
+      "author": "Saleh et al. (2022)",
+      "doi": "10.1038/s41467-022-29246-z",
+      "url": "https://www.nature.com/articles/s41467-022-29246-z",
+      "pdf": "https://www.nature.com/articles/s41467-022-29246-z.pdf",
+      "sha256": "d424de10bde1f729d56b23fa94053e49806a3f0093bd0a1117242e962d4b515e",
+      "license": "CC BY 4.0",
+      "license_basis": "PDF page9, applies to figures unless otherwise credited; no separate credit on Fig2",
+      "source_group": "WEB_Chengjiang_Yuanshan",
+      "domain": "core",
+      "figure": "2i,2j; page3",
+      "description_ru": "Массивный аргиллит с местной слабой ламинацией, отложения пробковых потоков и малоплотностных турбидитных течений продельты. Биотурбированные гемипелагические прослои относятся к шельфу и исключены из выбранных участков.",
+      "label_basis": "Fig2i,j caption plus Fig3/environmental interpretation; only Mm beds selected, not dark organic/bioturbated interbeds",
+      "interval": "Figure-specific depth unavailable; Cambrian Yuanshan Formation",
+      "limitations": "Ancient lithified core, not a Holocene mud; several patches from two panels of one paper"
+    },
+    "nakdong": {
+      "author": "Jeong et al. (2022; published2021-12-24)",
+      "doi": "10.3390/app12010177",
+      "url": "https://www.mdpi.com/2076-3417/12/1/177",
+      "pdf": "https://mdpi-res.com/d_attachment/applsci/applsci-12-00177/article_deploy/applsci-12-00177.pdf",
+      "sha256": "a3b3f9c7cfda18cc726539322e438988b42e286655523087fec6536d79aa1cef",
+      "license": "CC BY 4.0",
+      "license_basis": "PDF page1 copyright and CC BY4 link",
+      "source_group": "WEB_Nakdong_ND3",
+      "domain": "core",
+      "figure": "2e; page5",
+      "description_ru": "Преимущественно массивные тонкозернистые илистые отложения продельты, с морскими микрофоссилиями и обломками раковин; по разрезу слабое укрупнение вверх. Отдельная фотография показывает часть керна около 17 м.",
+      "label_basis": "Fig2e UnitD 17.00-17.78m; abstract and section5.1.4 assign UnitD 23.50-15.10m to prodelta",
+      "interval": "Core ND-3, photographed section17.00-17.78m within prodelta UnitD23.50-15.10m; no precise depth assigned to individual patches",
+      "limitations": "Native photo width about110px; no physical grain size inferred from pixels"
+    },
+    "boss_point": {
+      "author": "Rygel et al. (2015)",
+      "doi": "10.4138/atlgeol.2015.001",
+      "url": "https://journals.lib.unb.ca/index.php/ag/article/view/21439",
+      "pdf": "https://journals.lib.unb.ca/index.php/ag/article/download/21439/26308/34252",
+      "sha256": "9551811e7a1f3be3b3d0001f35dd76193faa6e72aa179cb223fcb2026549d02f",
+      "license": "CC BY 4.0 stated on current article page, checked2026-10-31",
+      "license_basis": "Current article License box: journal adopted CC BY4 on2025-01-01; old PDF retains2015 copyright footer. This date distinction is retained, not silently rewritten.",
+      "source_group": "WEB_BossPoint_type_section",
+      "domain": "outcrop_analogue",
+      "figure": "11b; page17",
+      "description_ru": "Серые глинистые породы с блоковой отдельностью в плохо дренируемой пойменной ассоциации. Авторы связывают глинистые породы с осаждением взвеси на насыщенной водой пойме и незрелым гидроморфным почвообразованием.",
+      "label_basis": "Fig11b explicitly grey blocky mudrocks at174m, poorly drained facies association; interpretation page16",
+      "interval": "174m measured stratigraphic section, NOT borehole depth",
+      "limitations": "One weathered outcrop photograph, not core; scale/surface/age domain shift. Low auxiliary training weight, no claim of new independent cores"
+    }
+  },
+  "source_license": "UniBo CC BY-NC-SA4.0; caption-grounded public papers CC BY4.0; BossPoint current article license dated2025. Combined head research only CC BY-NC-SA4.0",
+  "encoder_or_chat_weights_changed": false,
+  "installed_in_application": false,
+  "prepared_test_pixels_opened": 0,
+  "previous_v3_head_sha256": "63a4e09255f2bf03cfd49c9d0849c856c16fcb76ef324994ae31298e9f63ce78",
+  "source_preparation_script_sha256": "0edb92e7922e389a25481a8cb6398ce96edf1a592e71f6f2ce9e02ccfa799008",
+  "training_script_sha256": "27f00efa570a7671817d94d9fa505a4aba4bc6d42439b30df2734a6d73342e0b",
+  "source_photo_panels": 4,
+  "source_groups": 3,
+  "new_exact_codes": {
+    "B": 4,
+    "C": 11
+  },
+  "outcrop_note": "B: four patches of one grey-mudrock outcrop photo; no new exact B core. Not independent15 photos.",
+  "commercial_deployment": false
+}

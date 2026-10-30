@@ -1,0 +1,72 @@
+{
+  "type": "frozen_qwen_target_weighted_partial_ridge_head",
+  "base_model_id": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "base_config_sha256": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+  "feature_dimension": 4096,
+  "feature_spec": {
+    "encoder": "Original frozen Qwen3-VL-2B, no vision or language adapter",
+    "input": "One RGB core crop, thumbnail side300 before original processor",
+    "pooling": "Pre/post merger token mean and population std;6144 raw features",
+    "selected": "Post merger mean/std, columns2048:6144,4096 values",
+    "normalization": "Train-only feature mean/std floor1e-3, L2, appended intercept",
+    "texture": "Not selected; reserved dimensions retain v2 inference compatibility"
+  },
+  "code_to_russian": {
+    "A": "Хорошо дренируемая пойма",
+    "B": "Плохо дренируемая пойма",
+    "C": "Продельта",
+    "D": "Прослой торфа",
+    "E": "Русловой песок",
+    "F": "Болото"
+  },
+  "training_source_license": "UniBo CC BY-NC-SA4.0; caption-grounded public papers CC BY4.0; BossPoint current article license dated2025. Combined head research only CC BY-NC-SA4.0",
+  "general_chat_or_description_model": false,
+  "automatic_project_catalog_mapping": null,
+  "base_weights_sha256": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+  "base_weights_bytes": 4255140312,
+  "head_sha256": "fd8e945e5b13037888b3dda548bf88b3c08b4b797a9bcd5847fb0f5322cdd233",
+  "package_versions": {
+    "torch": "2.6.0+cu126",
+    "transformers": "5.18.0",
+    "peft": "0.21.2",
+    "accelerate": "1.15.0",
+    "safetensors": "0.8.0",
+    "Pillow": "12.3.0"
+  },
+  "feature_contract_version": "qwen3vl_visual_texture_groupcv_v2",
+  "input_scope": "One core-interval crop; six source classes. Training includes low-weight outcrop analogue, not general chat or92 project facies",
+  "qwen_feature_dimension": 6144,
+  "texture_dimension": 114,
+  "texture_version": "rgb_local_texture_v1",
+  "selected_profile": {
+    "profile": "qwen_post",
+    "alpha": 1.0,
+    "target_boost": 1.0,
+    "outcrop_weight": 0.25
+  },
+  "pre_merger_feature_dimension": 2048,
+  "acceptance_status": "not_promoted_failed_prospective_gates",
+  "preprocessing_files_sha256": {
+    "chat_template.json": "6f8a6a55027e3da5160105556cda5dd69f6423f1c32645f6730d32de7773d0c4",
+    "config.json": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+    "generation_config.json": "1e241830b48b397cb0900101421df5450baddc7adf01e5fc86b5615865f3bae4",
+    "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+    "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+    "tokenizer.json": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7",
+    "tokenizer_config.json": "c2da771801886ad9ae98181793ffd3dfb7f1af30f6f7c6a4e15d7dbba52e2399",
+    "video_preprocessor_config.json": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+  },
+  "training_recipe": {
+    "profile": "qwen_post",
+    "alpha": 1.0,
+    "target_boost": 1.0,
+    "outcrop_weight": 0.25,
+    "folds": 3,
+    "selection": "No hyperparameter search: fixed prior v3 alpha1, balanced boost1. v4 target recall priority rejected due swamp regression.",
+    "frozen_encoder": true,
+    "chat_weights_changed": false,
+    "validation": "Previous50 unchanged; evaluated only after fixed-recipe OOF saved"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "status": "not_promoted_failed_prospective_gates",
+  "head_sha256": "fd8e945e5b13037888b3dda548bf88b3c08b4b797a9bcd5847fb0f5322cdd233",
+  "source_crops_reconstructed_exactly": true,
+  "old_features_and_validation_unchanged": true,
+  "train_only_normalizer_reproduced": true,
+  "selected_group_oof_reproduced": true,
+  "partial_normal_equation_relative_residual": 4.228284129855616e-14,
+  "new_source_group_oof": {
+    "WEB_BossPoint_type_section": {
+      "total": 4,
+      "correct": 0
+    },
+    "WEB_Chengjiang_Yuanshan": {
+      "total": 7,
+      "correct": 7
+    },
+    "WEB_Nakdong_ND3": {
+      "total": 4,
+      "correct": 1
+    }
+  },
+  "research_gates": {
+    "accuracy": true,
+    "macro_f1": false,
+    "all_six_recalled": true,
+    "PDF": false,
+    "prodelta": false,
+    "FS": true
+  },
+  "val_correct": 29,
+  "val_total": 50,
+  "installed_in_application": false,
+  "general_chat_weights_changed": false,
+  "geologist_approved": false,
+  "prepared_test_pixels_opened": 0,
+  "audit_script_sha256": "90731e67359411c0b23c360567f71c7ced26e52803b02f01dff0c07c50b4f595",
+  "limitations": "Repeated development50; B source is one weathered outcrop, not new core. OOF used for selection, not independent final accuracy."
+}
