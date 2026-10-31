@@ -5,6 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 import zipfile
+import runpy
+import sys
 
 from transfer.build_offline_release import VolumeWriter
 from transfer.offline_installer import Volumes, install, safe_target
@@ -49,6 +51,26 @@ class OfflineInstallerTests(unittest.TestCase):
             reader.seek(290); self.assertEqual(reader.read(100), expected[290:390])
             reader.seek(-15, 2); self.assertEqual(reader.read(), expected[-15:])
             reader.seek(0); self.assertEqual(reader.read(25), expected[:25])
+
+    def test_client_installs_dll_search_setup_for_separate_python_workers(self):
+        control,_=self.media()
+        target=self.root/'installed'
+        runtime=target/'python_runtime'
+        (runtime/'Lib/site-packages/PySide6').mkdir(parents=True)
+        (runtime/'python311._pth').write_text('import site\n')
+        install(control,self.root,target)
+        startup=runtime/'sitecustomize.py'
+        self.assertTrue(startup.is_file())
+        previous=getattr(sys,'_cv1_runtime_dll_handles',None)
+        try:
+            loaded=runpy.run_path(str(startup))
+            self.assertEqual(loaded['_runtime'],runtime.resolve())
+            if hasattr(__import__('os'),'add_dll_directory'):
+                self.assertGreaterEqual(len(sys._cv1_runtime_dll_handles),2)
+        finally:
+            for handle in getattr(sys,'_cv1_runtime_dll_handles',[]):handle.close()
+            if previous is None:del sys._cv1_runtime_dll_handles
+            else:sys._cv1_runtime_dll_handles=previous
 
     def test_zip_paths_cannot_escape_chosen_directory(self):
         for name in ("../outside", "/absolute", "C:/system", "a\\b", "a:stream"):

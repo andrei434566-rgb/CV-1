@@ -110,6 +110,21 @@ def install(control, media, target=None, progress=lambda *args: None, cancelled=
                     progress(entry.filename, min(100, int(completed * 100 / control["unpacked_bytes"])))
             if digest.hexdigest() != item["sha256"]: raise ValueError("Неверная контрольная сумма " + entry.filename)
             os.replace(temporary, destination)
+    if control['kind']=='client' and (target/'python_runtime/python311._pth').is_file():
+        # Every Python subprocess needs the app-local VC/CUDA DLL directories,
+        # including training and Qwen workers started without the GUI bootstrap.
+        startup = '''import os, sys
+from pathlib import Path
+_runtime=Path(__file__).resolve().parent
+_packages=_runtime/'Lib/site-packages'
+_handles=[]
+for _folder in (_runtime,_packages/'PySide6',_packages/'shiboken6',_packages/'torch/lib',_packages/'cv2'):
+    if _folder.is_dir() and hasattr(os,'add_dll_directory'):
+        try: _handles.append(os.add_dll_directory(str(_folder)))
+        except OSError: pass
+sys._cv1_runtime_dll_handles=_handles
+'''
+        (target/'python_runtime/sitecustomize.py').write_text(startup,encoding='utf-8')
     (target / ".cv1_install.json").write_text(json.dumps({"version":control["version"],"kind":control["kind"]}), encoding="utf-8")
     if control["kind"] == "server":
         for name in ("training/incoming", "training/approved", "training/datasets", "reports/validation", "registry/history"):
