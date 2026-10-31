@@ -1,0 +1,91 @@
+{
+  "recipe": {
+    "thresholds": [
+      0.0,
+      0.005,
+      0.01,
+      0.02,
+      0.03,
+      0.05,
+      0.08,
+      0.12,
+      0.2
+    ],
+    "selection": "Old source-group OOF only: all-class gates, corrected-2*introduced, worst F1 gain, macroF1, group accuracy, higher threshold",
+    "scope": "Raw uncalibrated margin gate, no new encoder training; parent head fixed before controls"
+  },
+  "train_count": 822,
+  "validation_count": 50,
+  "external_count": 16,
+  "source_rights": "Mixed sources include previous Salpi/Rome and new GEUS/GSJ with unverified redistribution grant; local research only.",
+  "dependency_sha256": [
+    {
+      "file": "kern_analyzer_app/scripts/train_margin_facies_v17.py",
+      "sha256": "11e56451921d6220ccb84a9f8ff7e84f2d8e3798c06787364ca78a97a8a7ad81"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/margin_facies_gate.py",
+      "sha256": "17abcf8ff0915e3e1cf7a00461b6d5ebfc834e49967acc6866c2f9089086510e"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/paired_context_facies_head.py",
+      "sha256": "97fab1e849d724b4368280de77bbd235b59e0e016ced5feccea55591e98a3644"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/dino_facies_head.py",
+      "sha256": "498c1a648b449ed418188cfe461ea94e1bf60eba4c31436c2415ae5a96bb2ddf"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/gray_facies_head.py",
+      "sha256": "a0f52bf930a22a8f986e3168490512e863fbbc66fbb9cfc8ed3c2e6c7f4c4406"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/facies_transfer_evaluation.py",
+      "sha256": "14a35636065a00e85d2f4958694a9f2d6dcd62cd1181753507d6a5d8d8ac8813"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/kernel_facies_head.py",
+      "sha256": "4050d3ea2322f95a64a3a9b07d79c7772b006a92bfd62f49921c5a051ef6297b"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/facies_head_v2_features.py",
+      "sha256": "c6a1566f2c77d61b5afadd42f05674fb02ca84cf0ec2ae02d50b72f91da2c839"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/train_core_facies_conservative.py",
+      "sha256": "57495fae1d44ee28a0d123e2b37df44d84205be22f45d6d4b00bee822bdadfa7"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/partial_facies_ridge.py",
+      "sha256": "6975b7bcb6340ff94bd852029effbc5d9e45d894934184a15f78aa78882ac060"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_paired_context_facies_20261031_v16/paired_train.safetensors",
+      "sha256": "e74c002c14a589273b836b2f8881ef6a38673568ca3503a7176bf82fa1c06991"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_paired_context_facies_20261031_v16/facies_head.safetensors",
+      "sha256": "2d557e0b33c82634e2e4b9aa45679551c46dbeff843d71e2744378a2a4010589"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_paired_context_facies_20261031_v16/run_config.json",
+      "sha256": "9d40d48be620be6fef60dfce75fa07c55f76c80dd8c3d25515739ff557c0dd89"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_paired_context_facies_20261031_v16/selection_frozen.json",
+      "sha256": "7bffd6265a9b5b7f8aae8098073bcabc060e9f1751473b1413054c3201129e8f"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_new_well_facies_20261031_v10/features.safetensors",
+      "sha256": "eb72ccfbfe60a7deff91c0319ad76d7b1be055567796e4455c1e53bc5bff90d8"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_web_partial_facies_20261031_v3/facies_head.safetensors",
+      "sha256": "63a4e09255f2bf03cfd49c9d0849c856c16fcb76ef324994ae31298e9f63ce78"
+    }
+  ],
+  "head_sha256": "2d557e0b33c82634e2e4b9aa45679551c46dbeff843d71e2744378a2a4010589",
+  "selection_frozen_sha256": "78089351dd6a2314793f691adaa0d3d25babff0481d7e77b2a970d41aa42de53",
+  "distribution_approved": false,
+  "installed_in_application": false
+}

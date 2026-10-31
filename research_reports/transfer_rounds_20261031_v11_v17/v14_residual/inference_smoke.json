@@ -1,0 +1,9 @@
+{
+  "record_id": "newwell_v10_012",
+  "expected_code": "E",
+  "prediction": "E",
+  "teacher_code": "A",
+  "maximum_score_delta_to_cached_batch": 1.7881393432617188e-07,
+  "head_sha256": "bde1e66622e03dc98e94e0c2fbf72094dcc91be92e66299cdfd710464e02a4ff",
+  "research_only": true
+}

@@ -1,0 +1,13 @@
+{
+  "version": "qwen_dino_teacher_class_guard_v1",
+  "guard_classes": [
+    "D",
+    "F"
+  ],
+  "dino_selection": {
+    "view": "letterbox",
+    "alpha": 1.0,
+    "dino_weight": 0.25
+  },
+  "head_sha256": "ee5730fc67a52a382a34794da6d8741950efdb01faa922d04bfd01900b6c463d"
+}

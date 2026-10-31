@@ -1,0 +1,39 @@
+{
+  "status": "not_promoted_all_class_or_new_well_gate_failed",
+  "head_sha256": "2d557e0b33c82634e2e4b9aa45679551c46dbeff843d71e2744378a2a4010589",
+  "parent_context_feature_audit_verified": true,
+  "all9_train_only_candidates_reproduced": true,
+  "grouped_and_control_predictions_reproduced": true,
+  "validation_gates": {
+    "A_recall": true,
+    "A_f1": true,
+    "B_recall": true,
+    "B_f1": true,
+    "C_recall": true,
+    "C_f1": true,
+    "D_recall": true,
+    "D_f1": true,
+    "E_recall": true,
+    "E_f1": false,
+    "F_recall": true,
+    "F_f1": true,
+    "macro_f1_improved": true,
+    "train_eligible": true,
+    "accuracy": true,
+    "no_previously_correct_case_lost": true,
+    "new_wells_eligible": true
+  },
+  "new_well_gates": {
+    "GS-TM-1_C": true,
+    "GS-TM-1_E": true,
+    "West Lulu-2_E": true,
+    "at_least_one_gain": true
+  },
+  "selected_threshold": 0.0,
+  "threshold_zero_leaves_parent_unchanged": true,
+  "distribution_approved": false,
+  "installed_in_application": false,
+  "prepared_test_pixels_opened": 0,
+  "controls_reused_from_prior_development": true,
+  "audit_script_sha256": "7c95cc771a418a1b97674cc5d966a9a841e4571aec5b176f1eff29c2fa9f9254"
+}

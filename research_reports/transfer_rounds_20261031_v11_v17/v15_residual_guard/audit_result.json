@@ -1,0 +1,45 @@
+{
+  "status": "not_promoted_all_class_or_new_well_gate_failed",
+  "round": 15,
+  "head_sha256": "bde1e66622e03dc98e94e0c2fbf72094dcc91be92e66299cdfd710464e02a4ff",
+  "train_only_selection_candidates_reproduced": 64,
+  "all_grouped_and_control_predictions_reproduced": true,
+  "all_class_and_per_well_gates_reproduced": true,
+  "source_images_verified": 888,
+  "fresh_feature_max_delta": 0.0,
+  "fresh_feature_images": 0,
+  "feature_replay_explicitly_skipped": false,
+  "feature_parent_audited": true,
+  "neural_fold_receipts": [
+    {
+      "tag": "fold0",
+      "head_sha256": "79ea84989c8bc4eb8497a89640a816b9b9c374a1064e08244a989114e591c837",
+      "actual_gradient_verified": true,
+      "train_only_normalizer_verified": true
+    },
+    {
+      "tag": "fold1",
+      "head_sha256": "73f779b526ac8bf69dec0156fb8136b87c59e7b5c7058db034638ebc0908f43e",
+      "actual_gradient_verified": true,
+      "train_only_normalizer_verified": true
+    },
+    {
+      "tag": "fold2",
+      "head_sha256": "5a95f38bc1767d46c8f0164e98e971813809aceee9c0ad339ac7ffd3cd2414ae",
+      "actual_gradient_verified": true,
+      "train_only_normalizer_verified": true
+    },
+    {
+      "tag": "final",
+      "head_sha256": "bde1e66622e03dc98e94e0c2fbf72094dcc91be92e66299cdfd710464e02a4ff",
+      "actual_gradient_verified": true,
+      "train_only_normalizer_verified": true
+    }
+  ],
+  "distribution_approved": false,
+  "installed_in_application": false,
+  "prepared_test_pixels_opened": 0,
+  "controls_reused_from_prior_development": true,
+  "audit_script_sha256": "dcbcbc9ff0c85f7a87fd92ac80fe69c4255a43bd177f5e5388c1891cbb50dde0",
+  "limitation": "Six source classes, correlated crops and reused controls; not independent field accuracy or92-class/full-description validation"
+}

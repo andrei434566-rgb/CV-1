@@ -1,0 +1,98 @@
+{
+  "recipe": {
+    "alphas": [
+      0.1,
+      1.0,
+      10.0
+    ],
+    "gray_weights": [
+      0.1,
+      0.25,
+      0.5
+    ],
+    "folds": 3,
+    "seed": 20261031,
+    "rgb": "Original v3 ridge teacher, re-fit only on OLD728 train subset per fold; final exact v3 state",
+    "gray": "Class+source-group balanced partial ridge on all train records; external0.5,endface0.25; normalizer per train fold only",
+    "view": "Pillow grayscale luma -> RGB, original thumbnail300/processor; colour view unchanged",
+    "selection": "9 candidates by old OOF all-six recall/F1 preservation and macro gain; worst recall gain, worst F1 gain, mean group accuracy, macroF1, smaller gray weight, larger alpha. No val/external selection.",
+    "scope": "Two heads on original frozen Qwen features; not language/vision LoRA or general chat",
+    "encoder_or_language_weights_changed": false,
+    "distribution_approved": false,
+    "installed_in_application": false
+  },
+  "train_count": 822,
+  "validation_count": 50,
+  "external_count": 16,
+  "source_rights": "Mixed sources include previous Salpi/Rome and new GEUS/GSJ with unverified redistribution grant; local research only.",
+  "dependency_sha256": [
+    {
+      "file": "kern_analyzer_app/scripts/train_gray_facies_v11.py",
+      "sha256": "6760a84ac4fdb84ca0e787d44acbca67200c1c3ec7698db0ae402f256711d729"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/gray_facies_head.py",
+      "sha256": "a0f52bf930a22a8f986e3168490512e863fbbc66fbb9cfc8ed3c2e6c7f4c4406"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/vision_facies_adapter.py",
+      "sha256": "68739fc9eb6d269136b2242c4c7e166c87c53bcee97ca2d2c5ad8f8022ce3118"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/kernel_facies_head.py",
+      "sha256": "4050d3ea2322f95a64a3a9b07d79c7772b006a92bfd62f49921c5a051ef6297b"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/partial_facies_ridge.py",
+      "sha256": "6975b7bcb6340ff94bd852029effbc5d9e45d894934184a15f78aa78882ac060"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/facies_head_v2_features.py",
+      "sha256": "c6a1566f2c77d61b5afadd42f05674fb02ca84cf0ec2ae02d50b72f91da2c839"
+    },
+    {
+      "file": "kern_analyzer_app/scripts/train_core_facies_conservative.py",
+      "sha256": "57495fae1d44ee28a0d123e2b37df44d84205be22f45d6d4b00bee822bdadfa7"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_new_well_facies_20261031_v10/features.safetensors",
+      "sha256": "eb72ccfbfe60a7deff91c0319ad76d7b1be055567796e4455c1e53bc5bff90d8"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_new_well_facies_20261031_v10/external_features.safetensors",
+      "sha256": "01368e326b643748f66e336776242ddf2f894db6a3e252ba34ff7781679ac4db"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_new_well_facies_20261031_v10/selection_frozen.json",
+      "sha256": "07b78965547313eb0a71d42be2ed7048c28cad1940866ab26eac6e0f69f4cde8"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_new_well_facies_20261031_v10/audit_result.json",
+      "sha256": "f1e2a5f06cbfd3ac31b93949e132a7c229ff05c3dcdb18b635f4d084ed9180fa"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_new_well_facies_20261031_v10/train.jsonl",
+      "sha256": "7fa9c4e0239332fa4a2ea0ddb211a0a4aad1c873ab9774716f98718fb69f03f7"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_new_well_facies_20261031_v10/val.jsonl",
+      "sha256": "395654f4020934973f41122f990683a68e5fdad31a17b14eedde35ba762b0f92"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_new_well_facies_20261031_v10/external_holdout.jsonl",
+      "sha256": "2da45932063c85740af6df667241c1ad0419c6a5433172bd5bf849b069e03603"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_web_partial_facies_20261031_v3/facies_head.safetensors",
+      "sha256": "63a4e09255f2bf03cfd49c9d0849c856c16fcb76ef324994ae31298e9f63ce78"
+    },
+    {
+      "file": "vlm_core_v1/outputs/core_qwen_web_partial_facies_20261031_v3/oof_answers.json",
+      "sha256": "ef5d2f08f66c3e5bff9c50ecf02cc701eca278e60f7ecf8896ce3a7b14117eb2"
+    }
+  ],
+  "head_sha256": "1e088b3af11ce5733393091b897715312a2de66b297284455d2ab16ba5f6559a",
+  "selection_frozen_sha256": "6a92a7fa819c453fbf9acddc03050b0fb72046ab84c8c5814f6aa47a2c242870",
+  "distribution_approved": false,
+  "installed_in_application": false
+}

@@ -1,0 +1,380 @@
+{
+  "do_not_train": false,
+  "counts": {
+    "train": 822,
+    "val": 50,
+    "external": 16
+  },
+  "context_counts": {
+    "train": 722,
+    "val": 50,
+    "external": 16
+  },
+  "context_is_label_independent": true,
+  "masks_read": 0,
+  "source_photos": [
+    {
+      "source_sha256": "083653057d6b7c1f131ca3f56a952eaad3faa980e9b2941e028003b7772d9396",
+      "split": "train",
+      "original_member": "Training/Images/S30_4.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "08486401420b607a96170b35b307a99e484647cf8f2ace2864b4fd5e55900d61",
+      "split": "train",
+      "original_member": "Test/Images/S27_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "0ef42919cdf9bea11263585a281875048b6ee959ea89195d18d61432fa23a624",
+      "split": "train",
+      "original_member": "Training/Images/S2_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "137210a78c6091268812eacf5ab8c2581a978837c905c4ad4f1c16a7fea9df45",
+      "split": "val",
+      "original_member": "Training/Images/S11_3.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "142b9a5bca8d85ed7ceca274df8817729fa2726fcc91849edeb65e4119d416f6",
+      "split": "train",
+      "original_member": "Training/Images/S24_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "18a1494e381090cea2e3ff6d86e278214459e850c3e2aec8359d45b829544e63",
+      "split": "train",
+      "original_member": "Training/Images/S7_3.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "26180456ed39a066b70c3d5f685bc17b16b2151dbf53cdcd1ef595fd3c2c3f08",
+      "split": "train",
+      "original_member": "Test/Images/S30_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "2b1b951161d165ed47416ca8e91c2ce90e370b2235dc656f4643dcb5eef20f3b",
+      "split": "train",
+      "original_member": "Training/Images/S4_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "2fd7e49b0d4e452ebfe42f1d33b23d95254f152dc8727d7608a7093db030699a",
+      "split": "train",
+      "original_member": "Test/Images/S19_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "33284dc75bfa3d6a9d707690c31242d9a2e8cb7244cc96e49db26dd3093bdb8a",
+      "split": "train",
+      "original_member": "Training/Images/S26_3.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "3889d4b21439fd44d2e902fe3ee98f1c7682b8678c446e594a3874c64320e68b",
+      "split": "train",
+      "original_member": "Training/Images/S8_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "38bc044734c0d34635848300fc6bb1c521ab47027f6d0e261013de77e096e5b0",
+      "split": "train",
+      "original_member": "Test/Images/S4_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "39caff03861c71ee0704e48056c0e517b12a78609626222323c7f2850557b6f9",
+      "split": "val",
+      "original_member": "Training/Images/S21_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "4423c5376499fed2165beefc04c25dd282b7ce5e6fca134fe977828436af5e8f",
+      "split": "train",
+      "original_member": "Training/Images/S7_4.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "44fa1a40b5b30446cfe86d298afd76e1dfadcd2335a4e45f58274cb01e107ca3",
+      "split": "train",
+      "original_member": "Validation/Images/S20_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "4a58ea7494514479bc7cfdb638efe7efdfa5d0731a88df3ff34bb122cf34ad3a",
+      "split": "train",
+      "original_member": "Training/Images/S26_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "5aa35f7794ff61426f64fdb9299ead156088202562e5683d60df2f25c4acd233",
+      "split": "train",
+      "original_member": "Training/Images/S7_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "6387799cd9f309d07709293cd6d92a0bb4066e33444c14a8f9d7c5f05ca020df",
+      "split": "train",
+      "original_member": "Test/Images/S12_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "647f78c52994a79a9d8ebce5690abc5e4c6e30a330776a6ee4541675c457d600",
+      "split": "train",
+      "original_member": "Training/Images/S2_4.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "6fc9c30e435aba105f19b3b1b0ff3e14def21214ef8285f87ea3156978646277",
+      "split": "val",
+      "original_member": "Training/Images/S11_6.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "741722c59700a4d92dd3805a2e60c055235d7ab08f68b57cef88a1cecdbc7b2a",
+      "split": "train",
+      "original_member": "Training/Images/S30_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "764365fd579eb4dac85de43372ade2825f02f28a5d9b41f3dfdb7c7323796fae",
+      "split": "train",
+      "original_member": "Training/Images/S2_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "77e218e2d7280e5c3f4e5d289bce446e1f02912b6466e336e9ef0bb68a732923",
+      "split": "train",
+      "original_member": "Validation/Images/S14_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "81f9ec421991f713d949d38eef8154708165f01787f7ae9c6b7317364718442d",
+      "split": "train",
+      "original_member": "Training/Images/S25_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "8dd0b0fc6ec73ae440b3b3062d8dac77686dbc6611a1b21ffc2b1ddf84a1da7b",
+      "split": "val",
+      "original_member": "Training/Images/S11_4.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "90f36cf7d9a33cb141d926620565f58935fb90333c5f9b177042b18ea787571e",
+      "split": "train",
+      "original_member": "Training/Images/S28_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "99bc07bf5605d7d597d5389403ee26834464d0651480637d6f8bca5cb7c27c76",
+      "split": "train",
+      "original_member": "Training/Images/S14_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "99efca263769d4f2858fb7cd26c5f28ca014972a8132e0954d936ce83e22d638",
+      "split": "train",
+      "original_member": "Training/Images/S2_3.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "9fae369b3d7a4bea00642b0813167f409c05259ca32b2697783e9be5de2cdba6",
+      "split": "train",
+      "original_member": "Training/Images/S17_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "a9003ad8d2d769e81c64ddd6f704daef1c43f01a89d333c88770dfab622896a9",
+      "split": "train",
+      "original_member": "Training/Images/S22_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "b1b48465f727f985149fe54bb30a7c8ad5dbb7b0c5ac4d6c1cb48b19afb885cb",
+      "split": "train",
+      "original_member": "Training/Images/S25_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "b20d73af376cd090fcc2c2f859728a3316538d5dff790b03555c1ae0ffae0b39",
+      "split": "val",
+      "original_member": "Training/Images/S21_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "b5bec938a5b1e56d65c9c954e04a24c27f1650af3325423816e31fb6c0aacd28",
+      "split": "train",
+      "original_member": "Training/Images/S24_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "b5f8dbb70bab2f235a386f290bde2e0481043e38eaac64e3df83a3debbdb0c4b",
+      "split": "train",
+      "original_member": "Training/Images/S6_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "b8b0f2d0b973e965bd6b57cf9aafd200fdac11e24367e1912831be7e8f44825e",
+      "split": "train",
+      "original_member": "Training/Images/S27_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "bcc1e4b114edafcb6e88c9686fed1790458c2827ef053800ccfd6c60ef81f269",
+      "split": "train",
+      "original_member": "Validation/Images/S19_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "c23abbdb0c740fbdeb21fdd4bb5d6111a736066b999f2138c39cc8d4ea79e935",
+      "split": "train",
+      "original_member": "Validation/Images/S14_4.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "c3fabcb02f3026fe75c2ec4bd77c4c045ea68228cda48026ab58b03d2eec8ce6",
+      "split": "train",
+      "original_member": "Test/Images/S16_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "c62c2ace1419dc867d80c978e8460e9ff48622620a141f4539da290bf20a807d",
+      "split": "val",
+      "original_member": "Training/Images/S10_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "ccc4775af9178204a4f9512fce536593d27eedfd12d4231af92843e74d83a0c7",
+      "split": "val",
+      "original_member": "Training/Images/S11_5.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "ce203b7919c56503c4ab5d67d5c26cfcf04f66432bf882de0c12b375e0cd72d4",
+      "split": "train",
+      "original_member": "Training/Images/S23_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "cf49be339c6e1d4c9e9496c1f3cc4ec66909697f3daccd7c356894a5dc16cdad",
+      "split": "train",
+      "original_member": "Training/Images/S30_3.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "d52fbedcaa97e95da2ddd21e48467c94fe7354f58d83cc0bcc59bcb4cca34cc1",
+      "split": "train",
+      "original_member": "Training/Images/S19_3.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "d5ec20610e92579721cbbd1fb9ae49124cffb96fb91c9a1a9ad760bca48500cb",
+      "split": "train",
+      "original_member": "Training/Images/S18_3.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "d7f94eb57c175d92b380844bfc6e650269aef5e35124e31758f6989555ed57f6",
+      "split": "train",
+      "original_member": "Training/Images/S19_4.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "d94438b6d19d5ba23fc92480081ddd73519eb509fc905c6eb7042f49cd15f8cd",
+      "split": "train",
+      "original_member": "Training/Images/S14_3.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "da97050fbddc65dcf5ae2381508c807c1071cc0550dfcb0277b18a6d4154bb39",
+      "split": "train",
+      "original_member": "Training/Images/S26_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "dda589a5c8e4f114b3c19aafff675ed5e6129fb87a4a38b8b0dc51f4cfe80058",
+      "split": "train",
+      "original_member": "Validation/Images/S23_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "de220cc62f49ae4c4cee1a13c9b7a085b10f4c74543045e672edbc225e3a91c8",
+      "split": "val",
+      "original_member": "Training/Images/S11_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "df1a21cf73f75e2d64b41460f8d9971c6fe47526fe5a8a36e6c32068dea2e098",
+      "split": "train",
+      "original_member": "Training/Images/S17_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "e08d4c7700c3fff5371c4484c009afd5191dfbed49c9b57de0c7ac5bb242f85e",
+      "split": "train",
+      "original_member": "Training/Images/S8_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "e3ddf049cb151fe77cb9a247a07dbf49736eb1b05cb2f004cbd4b329b4824d98",
+      "split": "train",
+      "original_member": "Training/Images/S7_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "e3ebe1e70352b8c077193ff88722a537c89be60ec1b747bf2d589375c2b49b22",
+      "split": "train",
+      "original_member": "Training/Images/S2_5.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "e60d7169c1ff8ed7c6ac838e86d7431301f4d8e50d77a997faabcb2daad5bb5e",
+      "split": "train",
+      "original_member": "Validation/Images/S18_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "e8a321ddd13bdf7c0298e9672e71e31f3c27866e1508aef35c9051a5ba2116e8",
+      "split": "val",
+      "original_member": "Training/Images/S11_7.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "e9cdccb79735c5f1c0b87aa3d79c3068774997baff28079f856873340b668136",
+      "split": "train",
+      "original_member": "Test/Images/S15_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "eb0089d8576238bc70ec0791bbf204c38adaff64c56f371e812e05caef41f4fb",
+      "split": "val",
+      "original_member": "Training/Images/S11_1.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "ecb6fe89831209735cadccf28022c7d2f08af9bf01a0d4e79c4a943aa504ecf6",
+      "split": "train",
+      "original_member": "Validation/Images/S12_2.png",
+      "known_assigned_photo_only": true
+    },
+    {
+      "source_sha256": "f3c0a6a22258a2717ff84784781738bfcc14f96a48f73ea830c022b9c93f0446",
+      "split": "train",
+      "original_member": "Training/Images/S8_3.png",
+      "known_assigned_photo_only": true
+    }
+  ],
+  "source_manifests_sha256": {
+    "train": "7fa9c4e0239332fa4a2ea0ddb211a0a4aad1c873ab9774716f98718fb69f03f7",
+    "val": "395654f4020934973f41122f990683a68e5fdad31a17b14eedde35ba762b0f92",
+    "external": "2da45932063c85740af6df667241c1ad0419c6a5433172bd5bf849b069e03603"
+  },
+  "closed_project_test_pixels_opened": 0,
+  "new_independent_photos": 0,
+  "distribution_approved": false,
+  "limitation": "Same assigned source photos, fixed geometric neighbours may include other facies and tray gaps. Source original Test members were previously regrouped into train/val; not a new sealed test."
+}

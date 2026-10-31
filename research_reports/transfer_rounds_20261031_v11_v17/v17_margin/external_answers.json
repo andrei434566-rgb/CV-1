@@ -1,0 +1,114 @@
+[
+  {
+    "record_id": "newwell_v10_012",
+    "well": "West Lulu-2",
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "A"
+  },
+  {
+    "record_id": "newwell_v10_013",
+    "well": "West Lulu-2",
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "A"
+  },
+  {
+    "record_id": "newwell_v10_014",
+    "well": "West Lulu-2",
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "B"
+  },
+  {
+    "record_id": "newwell_v10_015",
+    "well": "West Lulu-2",
+    "expected_code": "E",
+    "prediction": "B",
+    "baseline_prediction": "B"
+  },
+  {
+    "record_id": "newwell_v10_016",
+    "well": "West Lulu-2",
+    "expected_code": "E",
+    "prediction": "A",
+    "baseline_prediction": "C"
+  },
+  {
+    "record_id": "newwell_v10_017",
+    "well": "West Lulu-2",
+    "expected_code": "E",
+    "prediction": "D",
+    "baseline_prediction": "D"
+  },
+  {
+    "record_id": "newwell_v10_024",
+    "well": "GS-TM-1",
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "D"
+  },
+  {
+    "record_id": "newwell_v10_025",
+    "well": "GS-TM-1",
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "newwell_v10_026",
+    "well": "GS-TM-1",
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "D"
+  },
+  {
+    "record_id": "newwell_v10_027",
+    "well": "GS-TM-1",
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "newwell_v10_028",
+    "well": "GS-TM-1",
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "newwell_v10_029",
+    "well": "GS-TM-1",
+    "expected_code": "C",
+    "prediction": "A",
+    "baseline_prediction": "A"
+  },
+  {
+    "record_id": "newwell_v10_030",
+    "well": "GS-TM-1",
+    "expected_code": "C",
+    "prediction": "B",
+    "baseline_prediction": "A"
+  },
+  {
+    "record_id": "newwell_v10_031",
+    "well": "GS-TM-1",
+    "expected_code": "C",
+    "prediction": "B",
+    "baseline_prediction": "B"
+  },
+  {
+    "record_id": "newwell_v10_032",
+    "well": "GS-TM-1",
+    "expected_code": "C",
+    "prediction": "B",
+    "baseline_prediction": "A"
+  },
+  {
+    "record_id": "newwell_v10_033",
+    "well": "GS-TM-1",
+    "expected_code": "C",
+    "prediction": "B",
+    "baseline_prediction": "A"
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "status": "not_promoted_all_class_or_new_well_gate_failed",
+  "round": 16,
+  "head_sha256": "2d557e0b33c82634e2e4b9aa45679551c46dbeff843d71e2744378a2a4010589",
+  "train_only_selection_candidates_reproduced": 12,
+  "all_grouped_and_control_predictions_reproduced": true,
+  "all_class_and_per_well_gates_reproduced": true,
+  "source_images_verified": 888,
+  "fresh_feature_max_delta": 0.0,
+  "fresh_feature_images": 888,
+  "feature_replay_explicitly_skipped": false,
+  "feature_parent_audited": false,
+  "neural_fold_receipts": [],
+  "distribution_approved": false,
+  "installed_in_application": false,
+  "prepared_test_pixels_opened": 0,
+  "controls_reused_from_prior_development": true,
+  "audit_script_sha256": "dcbcbc9ff0c85f7a87fd92ac80fe69c4255a43bd177f5e5388c1891cbb50dde0",
+  "limitation": "Six source classes, correlated crops and reused controls; not independent field accuracy or92-class/full-description validation"
+}

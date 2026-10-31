@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "records_reconstructed": 888,
+  "focal_fallbacks": 100,
+  "larger_contexts_reconstructed": 788,
+  "known_assigned_source_photos_reopened": 59,
+  "annotation_masks_read": 0,
+  "independent_geometry_reconstruction": true,
+  "no_class_text_drawn": true,
+  "source_photos_disjoint_between_train_and_control": true,
+  "closed_project_test_pixels_opened": 0,
+  "new_independent_photos": 0,
+  "distribution_approved": false,
+  "script_sha256": "01ff6f4b8cfbec81ace947ed3f7801060b6beaa6a76b77691ec62af90c8d4f8c",
+  "limits": "Context may contain neighbouring facies or tray gaps; target label remains the focal crop. Original publisher Test was previously regrouped, not newly treated as sealed."
+}

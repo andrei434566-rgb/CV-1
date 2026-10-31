@@ -1,0 +1,352 @@
+[
+  {
+    "record_id": "unibo_facies_b4277053d5764cb1ed6d49c1",
+    "well": null,
+    "expected_code": "A",
+    "prediction": "A",
+    "baseline_prediction": "A"
+  },
+  {
+    "record_id": "unibo_facies_763f4e8fc94429691cf9cc25",
+    "well": null,
+    "expected_code": "A",
+    "prediction": "A",
+    "baseline_prediction": "A"
+  },
+  {
+    "record_id": "unibo_facies_c82478875868ffc49f955057",
+    "well": null,
+    "expected_code": "A",
+    "prediction": "A",
+    "baseline_prediction": "B"
+  },
+  {
+    "record_id": "unibo_facies_c272c430e470ae69453c5ab6",
+    "well": null,
+    "expected_code": "A",
+    "prediction": "A",
+    "baseline_prediction": "A"
+  },
+  {
+    "record_id": "unibo_facies_7ef1aa8da45aa775fe1d0f56",
+    "well": null,
+    "expected_code": "B",
+    "prediction": "F",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_4ce7119fbea7f3ee38b26066",
+    "well": null,
+    "expected_code": "B",
+    "prediction": "B",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_e88fbb85d4cbe3ec63bfc358",
+    "well": null,
+    "expected_code": "B",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_986b001b4557c5067d1858a8",
+    "well": null,
+    "expected_code": "B",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_5f71a5cf105a1c37db08702a",
+    "well": null,
+    "expected_code": "B",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_f9a1e794b7eb235311105958",
+    "well": null,
+    "expected_code": "B",
+    "prediction": "B",
+    "baseline_prediction": "B"
+  },
+  {
+    "record_id": "unibo_facies_db3d7b8e769acdff2afbea61",
+    "well": null,
+    "expected_code": "B",
+    "prediction": "C",
+    "baseline_prediction": "C"
+  },
+  {
+    "record_id": "unibo_facies_507c76866cd2dd33263a42a7",
+    "well": null,
+    "expected_code": "B",
+    "prediction": "B",
+    "baseline_prediction": "B"
+  },
+  {
+    "record_id": "unibo_facies_dcdffe37e8bef49c4568f32e",
+    "well": null,
+    "expected_code": "C",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_1c70106eb936b6f8b1a74faf",
+    "well": null,
+    "expected_code": "C",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_f6c473bc3b7525cadf2bf325",
+    "well": null,
+    "expected_code": "C",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_5a87d55c44f523470043a1d2",
+    "well": null,
+    "expected_code": "C",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_0de2d906c7cfe6328dbfb2fd",
+    "well": null,
+    "expected_code": "C",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_90e5af3b41c66be77e3efc5a",
+    "well": null,
+    "expected_code": "C",
+    "prediction": "C",
+    "baseline_prediction": "C"
+  },
+  {
+    "record_id": "unibo_facies_85949a92f7d898ae311b5e53",
+    "well": null,
+    "expected_code": "C",
+    "prediction": "E",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_b9844add468cf8c8f88c9f8f",
+    "well": null,
+    "expected_code": "C",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_0c5dbcaf35b4766ff1342eb9",
+    "well": null,
+    "expected_code": "C",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_3003b6f00c706cb88d603344",
+    "well": null,
+    "expected_code": "C",
+    "prediction": "F",
+    "baseline_prediction": "C"
+  },
+  {
+    "record_id": "unibo_facies_73e5a052a6aab38151683a7d",
+    "well": null,
+    "expected_code": "D",
+    "prediction": "D",
+    "baseline_prediction": "D"
+  },
+  {
+    "record_id": "unibo_facies_f12ccbf0d75af6816fcbe085",
+    "well": null,
+    "expected_code": "D",
+    "prediction": "D",
+    "baseline_prediction": "D"
+  },
+  {
+    "record_id": "unibo_facies_8613c691f3e126c34452f27c",
+    "well": null,
+    "expected_code": "D",
+    "prediction": "D",
+    "baseline_prediction": "D"
+  },
+  {
+    "record_id": "unibo_facies_a91007830c0c0707be08ea13",
+    "well": null,
+    "expected_code": "D",
+    "prediction": "D",
+    "baseline_prediction": "D"
+  },
+  {
+    "record_id": "unibo_facies_0f5379ad562c5ed481a43d28",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_cf65d3555afd53a609f1ef43",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_daec86889480562192a6be35",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_86f36fb9112e37311ec954de",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_92583c070a1917de8affe8a9",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_86c990cab6caaab5a221f91b",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_3149d9733c64d0f7380ee3c0",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_de69bcb5ae27dc9c1d19e2cc",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "D",
+    "baseline_prediction": "D"
+  },
+  {
+    "record_id": "unibo_facies_bddb43ea52d98e9378b1f50f",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_3369fe4c208289e5b84167f2",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_73cb68ebcad47f2c88ee1490",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_ede2dec3f6df056a74df9b94",
+    "well": null,
+    "expected_code": "E",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_8c796d826de0bd8a36b1b04f",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "B",
+    "baseline_prediction": "B"
+  },
+  {
+    "record_id": "unibo_facies_50770fc47a072dc1d5880303",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "B",
+    "baseline_prediction": "B"
+  },
+  {
+    "record_id": "unibo_facies_319338a905ccee52dbbe6bb2",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_8d5bb55fa2eacd324ba41121",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "D",
+    "baseline_prediction": "D"
+  },
+  {
+    "record_id": "unibo_facies_e3f4e41f015738cf61abc6f0",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_a551a25febb7a936b70d0961",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "B",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_f98e8866ffb6e687507aae7a",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "E",
+    "baseline_prediction": "E"
+  },
+  {
+    "record_id": "unibo_facies_f42f347011e725afd536051b",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_bbd66763b386a81bb12c9f66",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_8714f922a7af165fab0a383b",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_896561c747335ebb82a90847",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "F",
+    "baseline_prediction": "F"
+  },
+  {
+    "record_id": "unibo_facies_c6cdb09d7aaae8ee502a9e27",
+    "well": null,
+    "expected_code": "F",
+    "prediction": "B",
+    "baseline_prediction": "B"
+  }
+]

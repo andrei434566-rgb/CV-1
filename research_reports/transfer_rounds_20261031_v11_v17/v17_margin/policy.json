@@ -1,0 +1,5 @@
+{
+  "version": "qwen_dino_context_margin_facies_v1",
+  "threshold": 0.0,
+  "head_sha256": "2d557e0b33c82634e2e4b9aa45679551c46dbeff843d71e2744378a2a4010589"
+}

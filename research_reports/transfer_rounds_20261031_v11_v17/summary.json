@@ -1,0 +1,149 @@
+{
+  "11": {
+    "role": "gray",
+    "status": "not_promoted_all_class_or_new_well_gate_failed",
+    "old_oof_correct": 440,
+    "old_oof_total": 722,
+    "old_oof_macro_f1": 0.5769531518405294,
+    "val_correct": 27,
+    "val_total": 50,
+    "val_macro_f1": 0.48696581196581196,
+    "external_correct": 3,
+    "external_total": 16,
+    "failed_training_gates": [],
+    "failed_control_gates": [
+      "A_recall",
+      "A_f1",
+      "B_f1",
+      "C_recall",
+      "C_f1",
+      "F_f1",
+      "macro_f1_improved",
+      "accuracy",
+      "no_previously_correct_case_lost",
+      "new_wells_eligible"
+    ],
+    "controls_reused": true
+  },
+  "12": {
+    "role": "dino",
+    "status": "not_promoted_all_class_or_new_well_gate_failed",
+    "old_oof_correct": 462,
+    "old_oof_total": 722,
+    "old_oof_macro_f1": 0.6066558087073087,
+    "val_correct": 30,
+    "val_total": 50,
+    "val_macro_f1": 0.6086459836459837,
+    "external_correct": 5,
+    "external_total": 16,
+    "failed_training_gates": [
+      "D_recall"
+    ],
+    "failed_control_gates": [
+      "C_recall",
+      "C_f1",
+      "train_eligible",
+      "no_previously_correct_case_lost"
+    ],
+    "controls_reused": true
+  },
+  "13": {
+    "role": "guarded",
+    "status": "not_promoted_all_class_or_new_well_gate_failed",
+    "old_oof_correct": 459,
+    "old_oof_total": 722,
+    "old_oof_macro_f1": 0.6036159866868337,
+    "val_correct": 29,
+    "val_total": 50,
+    "val_macro_f1": 0.5870097286226319,
+    "external_correct": 4,
+    "external_total": 16,
+    "failed_training_gates": [],
+    "failed_control_gates": [
+      "C_recall",
+      "C_f1",
+      "no_previously_correct_case_lost",
+      "new_wells_eligible"
+    ],
+    "controls_reused": true
+  },
+  "14": {
+    "role": "residual",
+    "status": "not_promoted_all_class_or_new_well_gate_failed",
+    "old_oof_correct": 456,
+    "old_oof_total": 722,
+    "old_oof_macro_f1": 0.6063628321900674,
+    "val_correct": 30,
+    "val_total": 50,
+    "val_macro_f1": 0.6182915173237754,
+    "external_correct": 9,
+    "external_total": 16,
+    "failed_training_gates": [
+      "D_recall"
+    ],
+    "failed_control_gates": [
+      "C_recall",
+      "C_f1",
+      "F_recall",
+      "F_f1",
+      "train_eligible",
+      "no_previously_correct_case_lost"
+    ],
+    "controls_reused": true
+  },
+  "15": {
+    "role": "residual_guard",
+    "status": "not_promoted_all_class_or_new_well_gate_failed",
+    "old_oof_correct": 458,
+    "old_oof_total": 722,
+    "old_oof_macro_f1": 0.6062029939793004,
+    "val_correct": 29,
+    "val_total": 50,
+    "val_macro_f1": 0.5966666666666667,
+    "external_correct": 7,
+    "external_total": 16,
+    "failed_training_gates": [],
+    "failed_control_gates": [
+      "C_recall",
+      "C_f1",
+      "F_recall",
+      "F_f1",
+      "no_previously_correct_case_lost"
+    ],
+    "controls_reused": true
+  },
+  "16": {
+    "role": "paired_context",
+    "status": "not_promoted_all_class_or_new_well_gate_failed",
+    "old_oof_correct": 473,
+    "old_oof_total": 722,
+    "old_oof_macro_f1": 0.6217138425631156,
+    "val_correct": 32,
+    "val_total": 50,
+    "val_macro_f1": 0.6504105915870622,
+    "external_correct": 8,
+    "external_total": 16,
+    "failed_training_gates": [],
+    "failed_control_gates": [
+      "E_f1"
+    ],
+    "controls_reused": true
+  },
+  "17": {
+    "role": "margin",
+    "status": "not_promoted_all_class_or_new_well_gate_failed",
+    "old_oof_correct": 473,
+    "old_oof_total": 722,
+    "old_oof_macro_f1": 0.6217138425631156,
+    "val_correct": 32,
+    "val_total": 50,
+    "val_macro_f1": 0.6504105915870622,
+    "external_correct": 8,
+    "external_total": 16,
+    "failed_training_gates": [],
+    "failed_control_gates": [
+      "E_f1"
+    ],
+    "controls_reused": true
+  }
+}
