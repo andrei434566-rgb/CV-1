@@ -49,6 +49,9 @@ def _enable_command_console() -> None:
 
 
 def main() -> int:
+    if len(sys.argv) == 3 and sys.argv[1] == "--hub-sync-job":
+        from app.infrastructure.model_hub_worker import main as run_hub_job
+        return run_hub_job(sys.argv[2])
     if len(sys.argv) > 1 and sys.argv[1] == "--portable-smoke-test":
         _enable_command_console()
         import os

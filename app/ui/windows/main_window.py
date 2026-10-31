@@ -4,6 +4,8 @@ import json
 import math
 import re
 import shutil
+import hashlib
+import socket
 from collections import deque
 from bisect import bisect_left
 from datetime import datetime
@@ -12,7 +14,7 @@ from uuid import uuid4
 
 from PySide6.QtCore import QDir, QPointF, QSettings, QThread, QTimer, Qt
 from PySide6.QtGui import QAction, QColor, QCursor, QImage, QPolygonF
-from PySide6.QtWidgets import QApplication, QCheckBox, QColorDialog, QComboBox, QDialog, QDialogButtonBox, QFileDialog, QDockWidget, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow, QMenu, QMessageBox, QPlainTextEdit, QProgressBar, QProgressDialog, QPushButton, QSizePolicy, QSpinBox, QStatusBar, QTabWidget, QToolBar, QToolButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication, QCheckBox, QColorDialog, QComboBox, QDialog, QDialogButtonBox, QFileDialog, QDockWidget, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow, QMenu, QMessageBox, QPlainTextEdit, QProgressBar, QProgressDialog, QPushButton, QSizePolicy, QSpinBox, QStatusBar, QTabWidget, QTextBrowser, QToolBar, QToolButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 
 from app.domain.facies_catalog import facies_metadata, resolve_facies_class
 from app.domain.facies_palette import normalize_facies_palette
@@ -66,11 +68,12 @@ from app.infrastructure.primary_facies_catalog import (
     resolve_catalog_class, save_catalog_snapshot,
 )
 from app.infrastructure.primary_description_source import is_reference_question
+from app.infrastructure.model_hub_client import ModelHubClient
 from app.infrastructure.project_storage import MANIFEST_NAME, load_project, save_project
 from app.infrastructure.training_dataset import MIN_TRAINING_SAMPLES, automatic_samples_count, export_training_dataset, unlabeled_manual_samples_count, verified_samples_count
 from app.infrastructure.training_quality import review_queue, training_quality
 from app.infrastructure.training_recommendation import TrainingRecommendation, recommend_training
-from app.runtime_paths import application_root, bundled_root, user_data_root
+from app.runtime_paths import application_root, bundled_root, user_data_root, bundled_runtime_defaults
 from app.ui.dialogs.depth_range_dialog import DepthRangeDialog
 from app.ui.dialogs.excel_report_inputs_dialog import ExcelReportInputsDialog
 from app.ui.dialogs.core_columns_dialog import CoreColumnsDialog
@@ -81,6 +84,7 @@ from app.ui.dialogs.lithology_palette_dialog import FaciesPaletteDialog, Litholo
 from app.ui.dialogs.local_vlm_settings_dialog import LocalVlmSettingsDialog
 from app.ui.dialogs.training_center_dialog import TrainingCenterDialog
 from app.ui.dialogs.primary_description_source_dialog import PrimaryDescriptionSourceDialog
+from app.ui.dialogs.model_hub_dialog import ModelHubDialog
 from app.ui.dialogs.open_datasets_dialog import OpenDatasetsDialog
 from app.ui.dialogs.photo_interval_dialog import PhotoIntervalDialog
 from app.ui.dialogs.photo_interval_mapping_dialog import PhotoIntervalMappingDialog
@@ -126,6 +130,8 @@ class MainWindow(QMainWindow):
         self._settings = QSettings("Kern Analyzer", "KernAnalyzer")
         self._primary_facies_catalog = self._load_global_primary_catalog()
         saved_facies_model = str(self._settings.value("facies/model_path", "") or "")
+        if not saved_facies_model:
+            saved_facies_model = bundled_runtime_defaults().get("geometry", "")
         self._selected_model_path: Path | None = Path(saved_facies_model) if saved_facies_model else None
         self._missing_model_notice: str | None = None
         self._gis_data: dict | None = None
@@ -205,6 +211,15 @@ class MainWindow(QMainWindow):
         self._build_project_sidebar()
         self._build_visual_shell()
         self._show_remembered_model_status()
+        self._hub_closing = False
+        self._hub_client = ModelHubClient(self)
+        self._hub_client.finished.connect(self._network_finished)
+        self._hub_client.status_changed.connect(self.statusBar().showMessage)
+        self._hub_dialog = None
+        self._network_active_pending = None
+        self._network_submit_pending = False
+        self._network_submission_signature = ""
+        QTimer.singleShot(1200, self._network_startup)
 
     def closeEvent(self, event) -> None:
         if self._training_center is not None and self._training_center.busy:
@@ -249,6 +264,9 @@ class MainWindow(QMainWindow):
                 self._vlm_pending_meta = None
             self._vlm_client.stop()
         self._cleanup_vlm_image()
+        self._hub_closing = True
+        if hasattr(self, "_hub_client"):
+            self._hub_client.stop()
         super().closeEvent(event)
 
     def _connect_workspace(self, workspace: WorkspaceCanvas, source_photos: bool = False) -> None:
@@ -752,6 +770,7 @@ class MainWindow(QMainWindow):
         tools_menu.addAction("Выбрать модель сегментации…", self.select_detection_model)
         tools_menu.addAction("Обучение…", self.show_training_center)
         tools_menu.addAction("Основной источник…", self.configure_primary_source)
+        tools_menu.addAction("Общие модели и данные…", self.show_model_hub)
         tools_menu.addAction("Проверить границы керна…", self.configure_core_columns)
         tools_menu.addAction("Сохранить проект как…", self.save_project_as)
         if contour_actions:
@@ -764,6 +783,9 @@ class MainWindow(QMainWindow):
         self._assistant_visibility_action.toggled.connect(self._set_assistant_visible)
         tools_menu.addAction("Настроить помощника и папки…", self.configure_local_vlm)
         tools_menu.addAction("Учебные материалы из открытых источников…", self.show_open_datasets)
+        help_action = tools_menu.addAction("Инструкция пользователя…", self.show_user_manual)
+        help_action.setShortcut("F1")
+        self.addAction(help_action)
         header.addWidget(settings)
 
         nav_layout = self._sidebar_layout
@@ -915,11 +937,12 @@ class MainWindow(QMainWindow):
         root = application_root().parent / "vlm_core_v1"
         snapshot_root = root / "model_cache" / "hub" / "models--Qwen--Qwen3-VL-2B-Instruct" / "snapshots"
         snapshots = sorted(path for path in snapshot_root.glob("*") if (path / "config.json").is_file())
+        packaged = bundled_runtime_defaults()
         defaults = {
-            "python": root / ".venv" / "Scripts" / "python.exe",
-            "base": str(snapshots[-1]) if snapshots else "",
+            "python": packaged.get("python") or root / ".venv" / "Scripts" / "python.exe",
+            "base": packaged.get("base") or (str(snapshots[-1]) if snapshots else ""),
             "adapter": "",
-            "folders": [str(root / "data" / "knowledge")] if (root / "data" / "knowledge").is_dir() else [],
+            "folders": [packaged["knowledge"]] if packaged.get("knowledge") else [str(root / "data" / "knowledge")] if (root / "data" / "knowledge").is_dir() else [],
         }
         raw_folders = self._settings.value("vlm/knowledge_folders_json", "")
         try:
@@ -1057,6 +1080,119 @@ class MainWindow(QMainWindow):
             message += "\n" + "\n".join(dialog.import_result["warnings"])
         self.assistant_panel.append_message("system", message)
         self.statusBar().showMessage("Основной источник обновлён")
+
+    def show_model_hub(self) -> None:
+        if self._hub_dialog is None:
+            self._hub_dialog = ModelHubDialog(self)
+        self._hub_dialog.exec()
+
+    def show_user_manual(self) -> None:
+        path = bundled_root() / "docs/USER_GUIDE_RU.md"
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Инструкция пользователя CV-1")
+        dialog.resize(950, 760)
+        layout = QVBoxLayout(dialog)
+        text = QTextBrowser(dialog)
+        text.setOpenExternalLinks(False)
+        text.setMarkdown(path.read_text(encoding="utf-8") if path.exists() else "Инструкция находится в файле CV1_User_Manual_RU.docx в релизе приложения.")
+        layout.addWidget(text)
+        close = QPushButton("Закрыть", dialog); close.clicked.connect(dialog.accept); layout.addWidget(close)
+        dialog.exec()
+
+    def _network_startup(self) -> None:
+        if self._hub_closing:
+            return
+        if str(self._settings.value("network/auto_models", "true")).lower() == "true" and self._settings.value("network/hub", ""):
+            self._network_action("sync")
+
+    def _network_snapshot(self) -> dict:
+        from app.infrastructure.training_dataset import _geometry_problem
+        from app.infrastructure.vlm_training_data import _pair_provenance
+        photos = []
+        for record in self._records:
+            rows = []
+            for detection in record.detections:
+                if not detection.training_ready or str(detection.label).casefold().startswith(("не определ", "не установ", "новый контур")):
+                    continue
+                if not detection.label or _geometry_problem(record, detection):
+                    continue
+                provenance, _ = _pair_provenance(detection)
+                rows.append({"label": detection.label, "well": record.well_name,
+                    "depth_from": detection.depth_from, "depth_to": detection.depth_to,
+                    "polygon": [[point.x(), point.y()] for point in detection.polygon],
+                    "attributes": dict(detection.attributes), "geometry_approved": True,
+                    "text_approved": bool(provenance), "text_provenance": provenance})
+            if rows:
+                photos.append({"source": record.path, "canvas_size": [record.pixmap.width(), record.pixmap.height()], "annotations": rows})
+        project_key = hashlib.sha256(str(self._project_folder or self._expert_session_id).casefold().encode()).hexdigest()
+        return {"project": self._project_title, "project_key": project_key, "computer": socket.gethostname(), "photos": photos}
+
+    def _network_action(self, operation: str) -> None:
+        if self._hub_closing:
+            return
+        hub = str(self._settings.value("network/hub", "") or "")
+        if not hub and operation != "rollback":
+            self.statusBar().showMessage("Выберите общую папку через ⚙ → Общие модели и данные…")
+            return
+        if self._hub_client.busy:
+            if operation == "submit":
+                self._network_submit_pending = True
+            self.statusBar().showMessage("Операция с общим хранилищем уже выполняется")
+            return
+        snapshot = None
+        if operation == "submit":
+            snapshot = self._network_snapshot()
+            if not snapshot["photos"]:
+                self.statusBar().showMessage("Нет интервалов с подтверждённой фацией и геометрией для передачи")
+                return
+            signature = hashlib.sha256(json.dumps(snapshot, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+            if signature == self._settings.value("network/last_submitted_signature", ""):
+                self.statusBar().showMessage("Эти подтверждённые интервалы уже переданы")
+                return
+            self._network_submission_signature = signature
+        self._hub_client.start(operation, hub, snapshot)
+
+    def _network_finished(self, operation: str, result: dict) -> None:
+        if self._hub_closing:
+            return
+        if not result.get("ok"):
+            self.statusBar().showMessage("Общее хранилище недоступно или операция не выполнена; локальные модели сохранены")
+        elif operation in {"sync", "rollback"}:
+            self._network_active_pending = result["active"]
+            self._apply_network_models()
+        elif operation == "submit":
+            self._settings.setValue("network/last_submitted_signature", self._network_submission_signature)
+            self._settings.sync()
+            self.statusBar().showMessage(f"Передано проверенных интервалов: {result.get('annotations', 0)} · ожидают центральной проверки")
+        if self._network_submit_pending:
+            self._network_submit_pending = False
+            QTimer.singleShot(500, lambda: self._network_action("submit"))
+
+    def _apply_network_models(self) -> None:
+        if not self._network_active_pending or self._hub_closing:
+            return
+        if (self._analysis_active or self._vlm_pending is not None or self._analysis_pending is not None
+                or self._segmentation_thread is not None or self._training_thread is not None
+                or self._column_training_thread is not None or self._qwen_training_active()):
+            QTimer.singleShot(2000, self._apply_network_models)
+            return
+        models = {model["role"]: model for model in self._network_active_pending["models"]}
+        self._vlm_client.stop()
+        if "geometry" in models:
+            self._selected_model_path = Path(models["geometry"]["local_entrypoint"])
+            self._settings.setValue("facies/model_path", str(self._selected_model_path))
+        if "columns" in models:
+            self._selected_column_model_path = Path(models["columns"]["local_entrypoint"])
+            self._settings.setValue("core_columns/model_path", str(self._selected_column_model_path))
+        if "vlm_base" in models:
+            self._settings.setValue("vlm/base", models["vlm_base"]["local_folder"])
+            adapter = models.get("vlm_adapter", {}).get("local_folder", "")
+            self._settings.setValue("vlm/adapter", adapter)
+            self._settings.setValue("vlm/theory_adapter", "")
+            self._settings.setValue("vlm/model_mode", "lora" if adapter else "base")
+        self._settings.sync()
+        self.statusBar().showMessage("Подключены локальные модели общего набора: " + self._network_active_pending["release_id"])
+        self._network_active_pending = None
 
     def _qwen_training_active(self) -> bool:
         from PySide6.QtCore import QProcess
@@ -2337,6 +2473,9 @@ class MainWindow(QMainWindow):
             self._save_indicator.setText("●  Только что сохранено")
         self._refresh_project_tree()
         self.statusBar().showMessage(f"Проект сохранён: {folder.name}{feedback_warning}")
+        if (hasattr(self, "_hub_client") and not self._hub_closing and self._settings.value("network/hub", "")
+                and str(self._settings.value("network/auto_data", "false")).lower() == "true"):
+            QTimer.singleShot(0, lambda: self._network_action("submit"))
         return True
 
     def _schedule_edit_autosave(self) -> None:

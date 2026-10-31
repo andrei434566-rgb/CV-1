@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+import json
 
 
 def source_root() -> Path:
@@ -36,3 +37,20 @@ def user_data_root() -> Path:
     root = application_root() / "Kern Analyzer Data" if getattr(sys, "frozen", False) else source_root()
     root.mkdir(parents=True, exist_ok=True)
     return root
+
+
+def bundled_runtime_defaults() -> dict[str, str]:
+    root = application_root()
+    manifest = root / "bundle_runtime.json"
+    if not manifest.is_file():
+        return {}
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+    if data.get("schema") != "cv1-offline-runtime-v1":
+        return {}
+    result = {}
+    for key in ("python", "base", "geometry", "knowledge"):
+        relative = Path(str(data.get(key) or ""))
+        path = root / relative
+        if str(relative) != "." and not relative.is_absolute() and path.resolve().is_relative_to(root.resolve()) and path.exists():
+            result[key] = str(path.resolve())
+    return result

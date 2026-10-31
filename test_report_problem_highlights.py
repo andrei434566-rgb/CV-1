@@ -27,9 +27,13 @@ class ReportProblemHighlightTests(unittest.TestCase):
                 self.assertIn("G4", rules)
                 for rule in rules["S4"]:
                     self.assertEqual(rule.type, "expression")
-                    self.assertEqual(rule.dxf.fill.fgColor.rgb, "00FCE4E4")
+                    self.assertEqual(rule.dxf.fill.fgColor.rgb, "00FF0000")
+                    self.assertEqual(rule.dxf.font.color.rgb, "00000000")
                     self.assertIn("SEARCH", rule.formula[0])
                 self.assertEqual(rules["G4"][0].formula, ['NOT(ISNUMBER(G4))'])
+                for address in ("A1", "M4", "V4", "B4"):
+                    self.assertEqual(sheet[address].border.left.style, "thin")
+                    self.assertEqual(sheet[address].border.bottom.style, "thin")
             finally:
                 book.close()
 

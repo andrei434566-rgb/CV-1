@@ -407,6 +407,15 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
         for row in source_sheet.iter_rows(min_row=4, max_col=22):
             for cell in row:
                 cell.value = None
+    from openpyxl.styles import Border, Side
+    grid = Side(style="thin", color="000000")
+    for sheet in workbook.worksheets:
+        for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=1, max_col=22):
+            for cell in row:
+                cell.border = Border(left=grid, right=grid, top=grid, bottom=grid)
+                text_font = copy(cell.font)
+                text_font.color = "000000"
+                cell.font = text_font
     workbook.save(file_path)
 
 
@@ -415,7 +424,7 @@ def _highlight_report_problems(sheet, first: int, last: int) -> None:
     from openpyxl.formatting.rule import FormulaRule
     from openpyxl.styles import Font, PatternFill
 
-    fill, font = PatternFill("solid", fgColor="FCE4E4"), Font(color="9C0006")
+    fill, font = PatternFill("solid", fgColor="FF0000"), Font(color="000000")
     def mark(columns: str, formula: str) -> None:
         for column in columns.split():
             sheet.conditional_formatting.add(f"{column}{first}:{column}{last}",
