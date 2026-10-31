@@ -71,6 +71,11 @@ Excel: ярко-красный фон проблемных ячеек, чёрн�
     r=s.get(api+f"/releases/{release['id']}/assets?per_page=100",timeout=45);r.raise_for_status()
     remote={v['name']:v for v in r.json()}
     if any(name not in remote or remote[name]['size']!=(OUT/name).stat().st_size for name in names):raise RuntimeError('Final remote asset check failed')
+    checksums={line.split('  ',1)[1]:line.split('  ',1)[0] for line in (OUT/'SHA256SUMS.txt').read_text().splitlines()}
+    checksums['SHA256SUMS.txt']=hashlib.sha256((OUT/'SHA256SUMS.txt').read_bytes()).hexdigest()
+    for name in names:
+        if remote[name]['state']!='uploaded':raise ValueError('Asset is not complete: '+name)
+        if remote[name].get('digest') not in (None,'sha256:'+checksums[name]):raise ValueError('Final remote checksum mismatch: '+name)
     if args.publish:
         r=s.patch(api+f"/releases/{release['id']}",json={'draft':False,'make_latest':'true'},timeout=45);r.raise_for_status()
         print('PUBLISHED',r.json()['html_url'],flush=True)
