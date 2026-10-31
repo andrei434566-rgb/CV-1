@@ -74,6 +74,7 @@ class WordPhotoTrainingWidget(QWidget):
         row.addWidget(self.choose_word_folder)
         layout.addLayout(row)
         self.check_button = QPushButton("Проверить пары")
+        self.check_button.setObjectName("trainingPrimary")
         self.check_button.clicked.connect(self.check_pairs)
         layout.addWidget(self.check_button)
         self.status = QLabel("Выберите фотографии и Word, затем проверьте пары.")
@@ -108,6 +109,7 @@ class WordPhotoTrainingWidget(QWidget):
         self.approval.toggled.connect(self._refresh_buttons)
         layout.addWidget(self.approval)
         self.export_button = QPushButton("Подготовить проверенные пары")
+        self.export_button.setObjectName("trainingPrimary")
         self.export_button.clicked.connect(self.export_pairs)
         layout.addWidget(self.export_button)
         self.manifest_label = QLabel()
@@ -116,6 +118,7 @@ class WordPhotoTrainingWidget(QWidget):
         self.continue_adapter = QCheckBox("Продолжить с подключённой дообученной модели")
         layout.addWidget(self.continue_adapter)
         self.train_button = QPushButton("Начать локальное обучение на этих парах")
+        self.train_button.setObjectName("trainingPrimary")
         self.train_button.clicked.connect(self.train_requested)
         layout.addWidget(self.train_button)
         note = QLabel(

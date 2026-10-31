@@ -7,7 +7,8 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
-from PySide6.QtCore import QProcess, QProcessEnvironment, QSettings, Qt
+from PySide6.QtCore import QProcess, QProcessEnvironment, QSettings
+from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import (
     QCheckBox, QDialog, QFileDialog, QFrame, QGroupBox, QHBoxLayout, QLabel,
     QMessageBox, QPushButton, QScrollArea, QTabWidget, QTextEdit, QVBoxLayout, QWidget,
@@ -20,11 +21,10 @@ from app.ui.widgets.word_photo_training import WordPhotoTrainingWidget
 
 
 class TrainingCenterDialog(QDialog):
-    def __init__(self, main_window, *, embedded: bool = False):
+    def __init__(self, main_window):
         super().__init__(main_window)
-        self._embedded = embedded
-        if embedded:
-            self.setWindowFlags(Qt.WindowType.Widget)
+        self.setObjectName("trainingCenterDialog")
+        self._apply_light_theme()
         self.main = main_window
         self.settings: QSettings = main_window._settings
         self.process = QProcess(self)
@@ -33,9 +33,14 @@ class TrainingCenterDialog(QDialog):
         self.process.finished.connect(self._finished)
         self._track = ""
         self._output_dir: Path | None = None
-        self.resize(780, 690)
-        self.setWindowTitle("Обучение")
+        self.resize(940, 840)
+        self.setWindowTitle("Обучение · Kern Analyzer")
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(18, 16, 18, 16)
+        layout.setSpacing(10)
+        title = QLabel("Обучение модели", self)
+        title.setObjectName("trainingTitle")
+        layout.addWidget(title)
         tabs = QTabWidget(self)
         layout.addWidget(tabs, 1)
         word_scroll = QScrollArea(self)
@@ -160,10 +165,62 @@ class TrainingCenterDialog(QDialog):
         self.log.setMaximumHeight(80)
         layout.addWidget(self.log)
         self.close_button = QPushButton("Закрыть")
-        self.close_button.clicked.connect(self.accept)
-        layout.addWidget(self.close_button)
-        self.close_button.setVisible(not embedded)
+        self.close_button.clicked.connect(self.reject)
+        footer = QHBoxLayout()
+        footer.addStretch()
+        footer.addWidget(self.close_button)
+        layout.addLayout(footer)
         self.refresh()
+
+    def _apply_light_theme(self) -> None:
+        # Explicit colours keep the popup consistent with the application when
+        # Windows uses a dark theme. The document/processing area stays intact.
+        palette = QPalette(self.palette())
+        for role, color in (
+            (QPalette.ColorRole.Window, "#f6faff"), (QPalette.ColorRole.Base, "#ffffff"),
+            (QPalette.ColorRole.AlternateBase, "#f0f6ff"), (QPalette.ColorRole.Button, "#edf5ff"),
+            (QPalette.ColorRole.WindowText, "#153e77"), (QPalette.ColorRole.Text, "#153e77"),
+            (QPalette.ColorRole.ButtonText, "#153e77"), (QPalette.ColorRole.Highlight, "#087ce8"),
+            (QPalette.ColorRole.HighlightedText, "#ffffff"), (QPalette.ColorRole.PlaceholderText, "#7890ac"),
+        ):
+            palette.setColor(role, QColor(color))
+        self.setPalette(palette)
+        self.setAutoFillBackground(True)
+        self.setStyleSheet("""
+            QWidget { background: #f6faff; color: #153e77; font-family: "Segoe UI"; font-size: 13px; }
+            QLabel { background: transparent; }
+            QLabel#trainingTitle { font-size: 22px; font-weight: 700; padding: 0 0 5px 0; }
+            QTabWidget::pane { border: 1px solid #d4e5f6; border-radius: 8px; background: #ffffff; }
+            QTabBar::tab { background: #edf5ff; color: #486784; border: 1px solid #d4e5f6;
+                          border-bottom: none; padding: 9px 18px; margin-right: 3px; }
+            QTabBar::tab:selected { background: #ffffff; color: #087ce8; font-weight: 600; }
+            QScrollArea { border: none; background: #f6faff; }
+            QLineEdit, QPlainTextEdit, QTextEdit, QTableWidget {
+                background: #ffffff; color: #153e77; border: 1px solid #cfdfef; border-radius: 6px;
+                padding: 5px; selection-background-color: #dceeff; selection-color: #153e77;
+            }
+            QLineEdit:focus, QPlainTextEdit:focus { border-color: #1689ec; }
+            QHeaderView::section { background: #eaf3ff; color: #153e77; padding: 5px;
+                                   border: none; border-bottom: 1px solid #cfdfef; }
+            QTableWidget { gridline-color: #e4edf7; alternate-background-color: #f0f6ff; }
+            QTableCornerButton::section { background: #eaf3ff; border: none; }
+            QPushButton { background: #edf5ff; color: #0869c4; border: 1px solid #c8e0f8;
+                          border-radius: 7px; padding: 7px 12px; }
+            QPushButton:hover { background: #dceeff; border-color: #8bc7fa; }
+            QPushButton:pressed { background: #cfe6fc; }
+            QPushButton#trainingPrimary { background: #087ce8; color: #ffffff; border-color: #087ce8; }
+            QPushButton#trainingPrimary:hover { background: #066bd0; }
+            QPushButton:disabled, QPushButton#trainingPrimary:disabled {
+                background: #edf1f6; color: #8a9aaf; border-color: #dce4ee;
+            }
+            QCheckBox { spacing: 7px; background: transparent; }
+            QGroupBox { border: 1px solid #d4e5f6; border-radius: 8px; margin-top: 15px; padding: 12px; }
+            QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px; }
+            QScrollBar:vertical { background: #edf3fa; width: 10px; margin: 0; border-radius: 5px; }
+            QScrollBar::handle:vertical { background: #b8cfe6; min-height: 28px; border-radius: 5px; }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
+            QSplitter::handle { background: #e6eff9; }
+        """)
 
     @property
     def busy(self) -> bool:
@@ -371,8 +428,5 @@ class TrainingCenterDialog(QDialog):
     def reject(self) -> None:
         if self.busy:
             QMessageBox.information(self, "Обучение идёт", "Дождитесь окончания подготовки пар или обучения Qwen, прежде чем закрывать окно.")
-            return
-        if self._embedded:
-            # Escape must not hide the persistent widget inside a tab.
             return
         super().reject()

@@ -192,10 +192,7 @@ class MainWindow(QMainWindow):
         self.sheets.setTabPosition(QTabWidget.TabPosition.South)
         self.sheets.addTab(self.workspace, "\u041a\u0435\u0440\u043d \u0438 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435")
         self._training_center: TrainingCenterDialog | None = None
-        self._training_page = QWidget(self.sheets)
-        QVBoxLayout(self._training_page).setContentsMargins(0, 0, 0, 0)
-        self.sheets.addTab(self._training_page, "Обучение")
-        self.sheets.currentChanged.connect(self._workspace_sheet_changed)
+        self.sheets.tabBar().hide()
         self._workspace_frame = QFrame(self)
         self._workspace_frame.setObjectName("workspaceFrame")
         workspace_layout = QVBoxLayout(self._workspace_frame)
@@ -209,7 +206,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event) -> None:
         if self._training_center is not None and self._training_center.busy:
-            self.statusBar().showMessage("Дождитесь окончания подготовки пар или обучения во вкладке «Обучение».")
+            self.statusBar().showMessage("Дождитесь окончания подготовки пар или обучения в окне «Обучение».")
             event.ignore()
             return
         if self._theory_import_queue or (self._theory_import_thread is not None and self._theory_import_thread.isRunning()):
@@ -751,6 +748,7 @@ class MainWindow(QMainWindow):
         tools_menu.addAction("Открыть проект…", self.open_project_dialog)
         tools_menu.addAction("Загрузить фото/PDF…", self.open_images)
         tools_menu.addAction("Выбрать модель сегментации…", self.select_detection_model)
+        tools_menu.addAction("Обучение…", self.show_training_center)
         tools_menu.addAction("Проверить границы керна…", self.configure_core_columns)
         tools_menu.addAction("Сохранить проект как…", self.save_project_as)
         if contour_actions:
@@ -775,7 +773,6 @@ class MainWindow(QMainWindow):
             ("▢   Разметка", self._select_markup_view),
             ("⌁   Столбик", self._select_column_view),
             ("▤   Отчёт", self.export_core_description_report),
-            ("◉   Обучение", self.show_training_center),
         ):
             button = QPushButton(title)
             button.setObjectName("shellNav")
@@ -1022,20 +1019,21 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(0, self._start_cv1_descriptions)
 
     def show_training_center(self) -> None:
-        self.sheets.setCurrentWidget(self._training_page)
-        self._workspace_sheet_changed(self.sheets.currentIndex())
-
-    def _workspace_sheet_changed(self, _index: int) -> None:
-        if self.sheets.currentWidget() is self._training_page:
-            for title, button in getattr(self, "_nav_buttons", {}).items():
-                button.setChecked(title == "◉   Обучение")
-            if self._training_center is None:
-                self._training_center = TrainingCenterDialog(self, embedded=True)
-                self._training_page.layout().addWidget(self._training_center)
-            self._training_center.refresh()
-        elif getattr(self, "_nav_buttons", {}).get("◉   Обучение") is not None and self._nav_buttons["◉   Обучение"].isChecked():
-            self._nav_buttons["◉   Обучение"].setChecked(False)
-            self._nav_buttons["▧   Фото керна"].setChecked(True)
+        if self._training_center is None:
+            self._training_center = TrainingCenterDialog(self)
+        dialog = self._training_center
+        dialog.refresh()
+        if not dialog.isVisible():
+            screen = self.screen() or QApplication.primaryScreen()
+            if screen is not None:
+                area = screen.availableGeometry()
+                dialog.resize(min(dialog.width(), area.width() - 32), min(dialog.height(), area.height() - 48))
+                x = max(area.left(), min(self.frameGeometry().right() - dialog.width() - 16, area.right() - dialog.width() + 1))
+                y = max(area.top(), min(self.frameGeometry().top() + 64, area.bottom() - dialog.height() + 1))
+                dialog.move(x, y)
+            dialog.show()
+        dialog.raise_()
+        dialog.activateWindow()
 
     def _qwen_training_active(self) -> bool:
         from PySide6.QtCore import QProcess

@@ -1,4 +1,4 @@
-"""User workflows: optional report fields and Word-photo training from a tab."""
+"""User workflows: optional report fields and a separate Word-photo training window."""
 
 import json
 import os
@@ -14,8 +14,8 @@ from docx import Document
 from PIL import Image
 from openpyxl import load_workbook
 from PySide6.QtCore import QPointF, QProcess, QSettings
-from PySide6.QtGui import QCloseEvent, QPixmap
-from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QCloseEvent, QPalette, QPixmap
+from PySide6.QtWidgets import QApplication, QMenu
 
 from app.domain.models import FaciesDetection, PhotoRecord
 from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES
@@ -110,11 +110,19 @@ class TrainingTabAndReportTests(unittest.TestCase):
     def test_word_pairs_prepare_in_background_and_train_through_local_runner(self):
         self.window.show_training_center()
         center = self.window._training_center
-        self.assertIs(self.window.sheets.currentWidget(), self.window._training_page)
-        self.assertFalse(center.isWindow())
+        self.assertIs(self.window.sheets.currentWidget(), self.window.workspace)
+        self.assertTrue(self.window.sheets.tabBar().isHidden())
+        self.assertTrue(center.isWindow())
+        self.assertNotIn("◉   Обучение", self.window._nav_buttons)
+        menu = self.window.findChild(QMenu, "shellSettingsMenu")
+        self.assertIn("Обучение…", [action.text() for action in menu.actions()])
+        self.assertEqual(center.palette().color(QPalette.ColorRole.Window).name(), "#f6faff")
+        self.assertEqual(center.word_pairs.preview_text.palette().color(QPalette.ColorRole.Base).name(), "#ffffff")
         self.window.show_training_center()
         self.assertIs(center, self.window._training_center)
         center.reject()
+        self.assertTrue(center.isHidden())
+        self.window.show_training_center()
         self.assertFalse(center.isHidden())
         page = center.word_pairs
         photos = self.root / "Фото"
