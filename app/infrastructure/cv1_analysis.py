@@ -203,8 +203,20 @@ def apply_interval_description(record: PhotoRecord, job: IntervalJob, response: 
             raise ValueError(f"Слишком длинное поле VLM: {key}.")
         values[key] = value
     raw_values = dict(values)
+    hydrodynamic = fields.get("hydrodynamic_regime")
+    if hydrodynamic is not None and (not isinstance(hydrodynamic, str) or len(hydrodynamic) > 1000):
+        raise ValueError("Некорректный гидродинамический режим VLM.")
     values, review_notes = check_interpretation_roles(values)
     attributes = dict(job.detection.attributes)
+    previous_hydrodynamic = attributes.pop("__vlm_hydrodynamic_regime", None)
+    if previous_hydrodynamic and attributes.get("Гидродинамический режим") == previous_hydrodynamic:
+        attributes.pop("Гидродинамический режим", None)
+    attributes.pop("__primary_reference", None)
+    if hydrodynamic is not None:
+        attributes["__vlm_hydrodynamic_regime"] = hydrodynamic.strip()
+        attributes["Гидродинамический режим"] = hydrodynamic.strip()
+    if isinstance(response.get("primary_reference"), dict):
+        attributes["__primary_reference"] = json.dumps(response["primary_reference"], ensure_ascii=False)
     attributes.pop("__vlm_raw_fields", None)
     attributes.pop("__vlm_review_notes", None)
     if review_notes:

@@ -141,6 +141,9 @@ class FaciesDialog(QDialog):
         self.depth_to.setPlaceholderText("например, 2451.2")
         form.addRow("Начало слоя, м:", self.depth_from)
         form.addRow("Конец слоя, м:", self.depth_to)
+        self.hydrodynamic_regime = QLineEdit(str(attributes.get("__vlm_hydrodynamic_regime") or attributes.get("Гидродинамический режим") or ""))
+        self.hydrodynamic_regime.setPlaceholderText("Гипотеза по структурам и основному источнику")
+        form.addRow("Гидродинамический режим:", self.hydrodynamic_regime)
         for field_name, options in LITHOLOGY_ATTRIBUTE_OPTIONS.items():
             combo = QComboBox()
             combo.addItem("— не выбрано —", "")
@@ -264,6 +267,8 @@ class FaciesDialog(QDialog):
         values["__vlm_facies_association"] = self.vlm_association.text().strip()
         values["__vlm_depositional_environment"] = self.vlm_environment.text().strip()
         values["__vlm_description"] = self.vlm_description.toPlainText().strip()
+        values["__vlm_hydrodynamic_regime"] = self.hydrodynamic_regime.text().strip()
+        values["Гидродинамический режим"] = values["__vlm_hydrodynamic_regime"]
         if values.get("__geometry_only") == "1":
             # The editable text is authoritative over the original draft.
             values["Краткое описание"] = values["__vlm_description"]

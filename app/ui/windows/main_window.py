@@ -65,6 +65,7 @@ from app.infrastructure.primary_facies_catalog import (
     SNAPSHOT_NAME, load_catalog_snapshot, read_primary_facies_workbook,
     resolve_catalog_class, save_catalog_snapshot,
 )
+from app.infrastructure.primary_description_source import is_reference_question
 from app.infrastructure.project_storage import MANIFEST_NAME, load_project, save_project
 from app.infrastructure.training_dataset import MIN_TRAINING_SAMPLES, automatic_samples_count, export_training_dataset, unlabeled_manual_samples_count, verified_samples_count
 from app.infrastructure.training_quality import review_queue, training_quality
@@ -79,6 +80,7 @@ from app.ui.dialogs.log_editor_dialog import LogEditorDialog
 from app.ui.dialogs.lithology_palette_dialog import FaciesPaletteDialog, LithologyPaletteDialog
 from app.ui.dialogs.local_vlm_settings_dialog import LocalVlmSettingsDialog
 from app.ui.dialogs.training_center_dialog import TrainingCenterDialog
+from app.ui.dialogs.primary_description_source_dialog import PrimaryDescriptionSourceDialog
 from app.ui.dialogs.open_datasets_dialog import OpenDatasetsDialog
 from app.ui.dialogs.photo_interval_dialog import PhotoIntervalDialog
 from app.ui.dialogs.photo_interval_mapping_dialog import PhotoIntervalMappingDialog
@@ -749,6 +751,7 @@ class MainWindow(QMainWindow):
         tools_menu.addAction("Загрузить фото/PDF…", self.open_images)
         tools_menu.addAction("Выбрать модель сегментации…", self.select_detection_model)
         tools_menu.addAction("Обучение…", self.show_training_center)
+        tools_menu.addAction("Основной источник…", self.configure_primary_source)
         tools_menu.addAction("Проверить границы керна…", self.configure_core_columns)
         tools_menu.addAction("Сохранить проект как…", self.save_project_as)
         if contour_actions:
@@ -929,6 +932,7 @@ class MainWindow(QMainWindow):
             "adapter": str(self._settings.value("vlm/adapter", "") or defaults["adapter"]),
             "theory_adapter": str(self._settings.value("vlm/theory_adapter", "") or ""),
             "model_mode": str(self._settings.value("vlm/model_mode", "base") or "base"),
+            "primary_reference": str(self._settings.value("vlm/primary_reference", "") or ""),
             "folders": [str(folder) for folder in folders if isinstance(folder, str)],
         }
 
@@ -1034,6 +1038,25 @@ class MainWindow(QMainWindow):
             dialog.show()
         dialog.raise_()
         dialog.activateWindow()
+
+    def configure_primary_source(self) -> None:
+        if (self._analysis_active or self._vlm_pending is not None or self._analysis_pending is not None
+                or self._segmentation_thread is not None or self._vlm_chat_queue or self._pending_photo_imports
+                or self._qwen_training_active()):
+            QMessageBox.information(self, "Основной источник", "Дождитесь завершения текущего ответа, анализа или обучения.")
+            return
+        current = str(self._settings.value("vlm/primary_reference", "") or "")
+        dialog = PrimaryDescriptionSourceDialog(current, self)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+        self._settings.setValue("vlm/primary_reference", dialog.folder)
+        self._settings.sync()
+        message = ("Основной источник подключён для фаций и гидродинамического режима. Новые описания будут учитывать его в приоритете. "
+                   "Существующие описания и правки специалиста сохранены." if dialog.folder else "Основной источник отключён.")
+        if dialog.import_result and dialog.import_result.get("warnings"):
+            message += "\n" + "\n".join(dialog.import_result["warnings"])
+        self.assistant_panel.append_message("system", message)
+        self.statusBar().showMessage("Основной источник обновлён")
 
     def _qwen_training_active(self) -> bool:
         from PySide6.QtCore import QProcess
@@ -1479,6 +1502,7 @@ class MainWindow(QMainWindow):
                 "base": config["base"], "adapter": config["adapter"],
                 "theory_adapter": config["theory_adapter"],
                 "model_mode": config["model_mode"],
+                "primary_reference": config.get("primary_reference", ""),
             }
             target = self._vlm_target[1] if self._vlm_target is not None else None
             selected_job = (
@@ -1590,7 +1614,8 @@ class MainWindow(QMainWindow):
             if not photo_request else None
         )
         immediate = expert_answer or quick_reply(question, has_history=bool(self._vlm_history))
-        if immediate is None and not photo_request:
+        primary_question = bool(self._settings.value("vlm/primary_reference", "")) and is_reference_question(question)
+        if immediate is None and not photo_request and not primary_question:
             cards = bundled_root() / "app" / "resources" / "theory" / "theory_cards_v5.json"
             immediate = lookup_theory_answer(question, cards, include_sources=wants_sources(question))
             if immediate is None and wants_sources(question) and len(question.split()) <= 5:
@@ -4916,6 +4941,9 @@ class MainWindow(QMainWindow):
             image = QImage()
             layers = []
             for record in self._records_for_well(well_name):
+                if not record.detections:
+                    layers.append({"label": "", "depth_from": record.photo_depth_from,
+                                   "depth_to": record.photo_depth_to, "attributes": {}, "vlm": {}})
                 for detection in StackColumnItem._sort_by_reading_order(record.detections):
                     attributes = dict(detection.attributes or {})
                     label = detection.label
@@ -5202,6 +5230,7 @@ class MainWindow(QMainWindow):
                     "whole_column": whole_column,
                     "base": config["base"], "adapter": config["adapter"],
                     "theory_adapter": config["theory_adapter"], "model_mode": config["model_mode"],
+                    "primary_reference": config.get("primary_reference", ""),
                     "folders": [], "use_knowledge": False,
                 })
                 self._analysis_pending = (request_id, job, crop)

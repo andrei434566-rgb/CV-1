@@ -33,6 +33,7 @@ vlm_temp/
 chat_materials/
 vlm_training/
 vlm_models/
+primary_reference/
 third_party/
 **/node_modules/
 **/.env

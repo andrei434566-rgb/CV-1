@@ -82,6 +82,23 @@ class Cv1AnalysisTests(unittest.TestCase):
         np.testing.assert_array_equal(crop[-1, -1], np.array([255, 255, 255]))
         self.assertEqual(coordinates(self.detection), [(5, 5), (25, 5), (5, 25)])
 
+    def test_primary_source_regime_and_provenance_are_saved_without_changing_geometry(self):
+        response = self.response(hydrodynamic_regime="Предположительно: переменный поток")
+        response["primary_reference"] = {"documents": [{"name": "Методика.docx", "sha256": "test"}],
+                                         "scope": ["facies_name", "hydrodynamic_regime"]}
+        original = coordinates(self.detection)
+        apply_interval_description(self.record, self.job, response)
+        self.assertEqual(self.detection.attributes["Гидродинамический режим"], "Предположительно: переменный поток")
+        self.assertIn("Методика.docx", self.detection.attributes["__primary_reference"])
+        self.assertEqual(coordinates(self.detection), original)
+        self.assertEqual((self.detection.depth_from, self.detection.depth_to), (1500, 1500.4))
+
+    def test_invalid_regime_cannot_partially_overwrite_interval(self):
+        before = deepcopy(self.detection.attributes)
+        with self.assertRaisesRegex(ValueError, "гидродинамический"):
+            apply_interval_description(self.record, self.job, self.response(hydrodynamic_regime=["not a string"]))
+        self.assertEqual(self.detection.attributes, before)
+
     def test_fusion_changes_only_draft_semantics_and_keeps_geometry_depth_and_confidence(self):
         before = (coordinates(self.detection), self.detection.depth_from,
                   self.detection.depth_to, self.detection.confidence, self.detection.stack_order)

@@ -27,6 +27,7 @@ if app_root not in sys.path:
     sys.path.insert(0, app_root)
 
 if __package__:
+    from .primary_description_source import description_fields, is_reference_question, source_context, source_prompt
     from .core_description_prompt import DESCRIPTION_SYSTEM, description_prompt
     from .core_color_hint import estimate_core_color
     from .geology_reference import format_grounded_question, retrieve_notes
@@ -36,6 +37,7 @@ if __package__:
         DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, LocalLoopbackBlocked, available_runtime,
     )
 else:
+    from primary_description_source import description_fields, is_reference_question, source_context, source_prompt
     from core_description_prompt import DESCRIPTION_SYSTEM, description_prompt
     from core_color_hint import estimate_core_color
     from geology_reference import format_grounded_question, retrieve_notes
@@ -285,8 +287,13 @@ class LocalModel:
                         stat = path.stat()
                         stamps.append((str(path.resolve()), stat.st_size, stat.st_mtime_ns))
             image_digest = hashlib.sha256(Path(request["image"]).read_bytes()).hexdigest()
+            reference_stamp = None
+            if request.get("primary_reference"):
+                reference_path = Path(request["primary_reference"]) / "index.json"
+                reference_stat = reference_path.stat()
+                reference_stamp = [str(reference_path.resolve()), reference_stat.st_mtime_ns, reference_stat.st_size]
             key = json.dumps([effective, stamps, image_digest, request.get("context", ""),
-                              bool(request.get("whole_column")), request.get("inference_backend", "auto")],
+                              bool(request.get("whole_column")), request.get("inference_backend", "auto"), reference_stamp],
                              sort_keys=True, ensure_ascii=False)
             if key in self._description_cache:
                 cached = deepcopy(self._description_cache[key])
@@ -295,10 +302,14 @@ class LocalModel:
                                     "total_seconds": 0.0, "cache_hit": True}
                 return cached
         result = self._answer_uncached(request, hits)
+        if request.get("primary_reference") and request.get("operation") in {"describe", "chat", "photo_chat"}:
+            _, reference_metadata = source_context(request, str(request.get("question") or request.get("context") or ""))
+            if reference_metadata:
+                result["primary_reference"] = reference_metadata
         fields = result.get("fields")
         if (key is not None and result.get("ok", True) and not result.get("incomplete")
                 and isinstance(fields, dict) and all(isinstance(fields.get(name), str) and fields[name].strip()
-                                                     for name in DESCRIPTION_FIELDS)):
+                                                     for name in description_fields(request, DESCRIPTION_FIELDS))):
             self._description_cache[key] = deepcopy(result)
             while len(self._description_cache) > 256:
                 self._description_cache.popitem(last=False)
@@ -345,7 +356,10 @@ class LocalModel:
         else:
             question = str(request.get("question") or "")[:3000]
             if operation == "chat":
-                question, hits, reference_note_ids = prepare_geology_reference_chat(request, hits)
+                if request.get("primary_reference") and is_reference_question(question):
+                    hits = []
+                else:
+                    question, hits, reference_note_ids = prepare_geology_reference_chat(request, hits)
             if operation == "photo_chat":
                 question += (
                     "\nОтвечай как черновое визуальное описание: сначала перечисли признаки, "
@@ -372,6 +386,7 @@ class LocalModel:
                     question += "Если используешь выдержку, укажи её номер. Не утверждай, что она описывает данное фото без привязки."
                 else:
                     question += "Используй выдержки для проверки ответа, но не перечисляй их номера, ссылки или пути к файлам. Не утверждай, что они описывают данное фото без привязки."
+        question += source_prompt(request, str(request.get("question") or request.get("context") or ""))
         content = [{"type": "text", "text": question}]
         image_path = str(request.get("image") or "")
         image = None
@@ -472,6 +487,8 @@ class LocalModel:
         # former final allowance immediately, stopping at EOS as usual; the
         # old retry discarded the first 220 tokens and generated them again.
         max_tokens = 320 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
+        if operation == "describe" and request.get("primary_reference"):
+            max_tokens = 400
         final_limit = max_tokens
         torch.cuda.synchronize()
         generation_started = perf_counter()
@@ -537,7 +554,7 @@ class LocalModel:
                 parsed = json.loads(cleaned)
             except (ValueError, TypeError):
                 parsed = None
-            field_names = ("facies_name", "lithology", "texture", "facies_association", "depositional_environment", "description")
+            field_names = description_fields(request, DESCRIPTION_FIELDS)
             if isinstance(parsed, dict) and all(isinstance(parsed.get(key), str) for key in field_names):
                 result["fields"] = {
                     key: parsed[key].strip() for key in field_names
@@ -572,11 +589,17 @@ class LocalModel:
             )
             if request.get("whole_column"):
                 prompt += " Показан целый столбик тремя частями: слева верх, в центре середина, справа низ. Опиши вертикальные изменения, это не три отдельные фации."
+            prompt += source_prompt(request, str(request.get("context") or ""))
             messages = [{"role": "system", "content": "Ты помощник геолога-седиментолога. Пиши только по-русски, не вставляй китайские иероглифы или другие языки. Пиши предметно по фотографии, различай наблюдение и предположение."},
                         {"role": "user", "content": [{"type": "text", "text": prompt}, *images]}]
+        schema = DESCRIPTION_SCHEMA
+        if operation == "describe" and request.get("primary_reference"):
+            schema = deepcopy(DESCRIPTION_SCHEMA)
+            schema["properties"]["hydrodynamic_regime"] = {"type": "string", "minLength": 1, "maxLength": 240}
+            schema["required"].append("hydrodynamic_regime")
         response = self.turbo.complete(
             messages, max_tokens=650,
-            schema=DESCRIPTION_SCHEMA if operation == "describe" else None,
+            schema=schema if operation == "describe" else None,
         )
         choice = response["choices"][0]
         answer = str(choice["message"].get("content") or "").strip()
@@ -600,10 +623,11 @@ class LocalModel:
             except ValueError:
                 result["incomplete"] = True
                 return result
-            if not isinstance(parsed, dict) or not all(isinstance(parsed.get(key), str) for key in DESCRIPTION_FIELDS):
+            field_names = description_fields(request, DESCRIPTION_FIELDS)
+            if not isinstance(parsed, dict) or not all(isinstance(parsed.get(key), str) for key in field_names):
                 result["structured_error"] = "Локальная VLM не вернула все поля описания."
                 return result
-            result["fields"] = {key: parsed[key].strip() for key in DESCRIPTION_FIELDS}
+            result["fields"] = {key: parsed[key].strip() for key in field_names}
             if any(not re.search(r"[A-Za-zА-Яа-яЁё]", value) or re.fullmatch(r"(?:предположительно|вероятно|(?:низкая|средняя|высокая)(?: уверенность)?)[.!:; ]*", value, re.I)
                    for value in result["fields"].values()):
                 result.pop("fields")
@@ -641,6 +665,7 @@ class LocalModel:
             hint = estimate_core_color(image)
             image = _description_view(image, bool(item.get("whole_column")))
             prompt = description_prompt(str(item.get("context") or ""), bool(item.get("whole_column")))
+            prompt += source_prompt({**request, "operation": "describe"}, str(item.get("context") or ""))
             messages = [
                 {"role": "system", "content": DESCRIPTION_SYSTEM},
                 {"role": "user", "content": [{"type": "image", "image": image},
@@ -669,7 +694,7 @@ class LocalModel:
             torch.cuda.synchronize()
             generation_started = perf_counter()
             with torch.inference_mode(), adapter_context:
-                generated = self.model.generate(**inputs, max_new_tokens=320, do_sample=False,
+                generated = self.model.generate(**inputs, max_new_tokens=400 if request.get("primary_reference") else 320, do_sample=False,
                                                 **self._description_generation_options(inputs["input_ids"].shape[1]))
             torch.cuda.synchronize()
         except torch.cuda.OutOfMemoryError:
@@ -694,14 +719,15 @@ class LocalModel:
         for index, (item_id, answer, hint) in enumerate(zip(ids, answers, hints)):
             answer, sanitized = _sanitize_model_language(answer.strip())
             sequence = tokens[index].tolist()
-            incomplete = len(sequence) >= 320 and not any(token in end_ids for token in sequence)
+            incomplete = len(sequence) >= (400 if request.get("primary_reference") else 320) and not any(token in end_ids for token in sequence)
             cleaned = answer.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
             try:
                 fields = json.loads(cleaned)
             except ValueError:
                 fields = None
+            field_names = description_fields(request, DESCRIPTION_FIELDS)
             valid = (isinstance(fields, dict) and all(isinstance(fields.get(name), str)
-                     and fields[name].strip() for name in DESCRIPTION_FIELDS))
+                     and fields[name].strip() for name in field_names))
             result = {"ok": bool(valid and not incomplete), "answer": answer, "incomplete": incomplete,
                       "model_info": {"model_mode": "lora" if adapter_path else "base",
                                      "base": effective["base"], "adapter": adapter_path},
@@ -709,7 +735,9 @@ class LocalModel:
                                  "shared_batch_seconds": round(generation_seconds, 3),
                                  "batch_size": len(items), "retried": False}}
             if valid:
-                result["fields"] = {name: fields[name].strip() for name in DESCRIPTION_FIELDS}
+                result["fields"] = {name: fields[name].strip() for name in field_names}
+                if request.get("primary_reference"):
+                    result["primary_reference"] = source_context(request, str(items[index].get("context") or ""))[1]
                 _add_color_review(result, hint)
             if not result["ok"]:
                 result["error"] = "Описание оборвано или модель не вернула все шесть полей."

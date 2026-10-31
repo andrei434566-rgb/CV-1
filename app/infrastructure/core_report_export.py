@@ -8,6 +8,7 @@ import hashlib
 import math
 from pathlib import Path
 import re
+import textwrap
 from tempfile import TemporaryDirectory
 
 from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
@@ -323,7 +324,12 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
         used_titles.add(title.casefold())
         sheet.title = title
         report_inputs = dict(well.get("excel_report_inputs") or {})
-        runs = _report_drilling_runs(report_inputs)
+        try:
+            runs = _report_drilling_runs(report_inputs)
+        except ValueError:
+            # A malformed/incomplete passport must remain exportable. Missing
+            # drilling numbers and invalid numeric inputs are flagged below.
+            runs = []
         if runs:
             report_inputs["core_top"] = min(run["top"] for run in runs)
             report_inputs["core_base"] = max(run["base"] for run in runs)
@@ -361,8 +367,9 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
             attributes = dict(layer.get("attributes") or {})
             top = _depth_or_none(layer.get("depth_from"))
             base = _depth_or_none(layer.get("depth_to"))
-            if top is not None and base is not None and base > top:
+            if top is not None and math.isfinite(top):
                 sheet[f"M{row_number}"] = top
+            if base is not None and math.isfinite(base):
                 sheet[f"N{row_number}"] = base
             sheet[f"Q{row_number}"] = layer_index
             sheet[f"C{row_number}"] = layer.get("__report_drilling_number")
@@ -374,8 +381,26 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
             sheet[f"T{row_number}"] = _text(vlm.get("facies_association") or attributes.get("__vlm_facies_association"))
             sheet[f"U{row_number}"] = _text(vlm.get("depositional_environment") or attributes.get("__vlm_depositional_environment"))
             sheet[f"V{row_number}"] = _text(vlm.get("description") or attributes.get("__vlm_description"))
-            if any(sheet[f"{letter}{row_number}"].value for letter in ("T", "U", "V")):
-                sheet.row_dimensions[row_number].height = min(160, max(30, 15 * (1 + len(str(sheet[f"V{row_number}"].value or "")) // 55)))
+            hydrodynamic = _text(attributes.get("__vlm_hydrodynamic_regime"))
+            if hydrodynamic:
+                note = "Гидродинамический режим: " + hydrodynamic
+                description = str(sheet[f"V{row_number}"].value or "")
+                if note not in description:
+                    sheet[f"V{row_number}"] = (description + "\n" + note).strip()
+            if any(sheet[f"{letter}{row_number}"].value for letter in ("S", "T", "U", "V")):
+                lines = 1
+                for letter in ("S", "T", "U", "V"):
+                    cell = sheet[f"{letter}{row_number}"]
+                    alignment = copy(cell.alignment)
+                    alignment.wrap_text, alignment.vertical = True, "top"
+                    cell.alignment = alignment
+                    dimension = sheet.column_dimensions.get(letter)
+                    width = max(10, int(dimension.width if dimension is not None else 13))
+                    count = sum(max(1, len(textwrap.wrap(paragraph, width))) for paragraph in str(cell.value or "").split("\n"))
+                    lines = max(lines, count)
+                sheet.row_dimensions[row_number].height = min(409, max(30, 16 * lines + 6))
+        if layers or any(value is not None and value != "" for value in report_inputs.values()):
+            _highlight_report_problems(sheet, 4, max(4, len(layers) + 3))
 
     if not wells:
         source_sheet.title = "Послойное описание"
@@ -383,6 +408,39 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
             for cell in row:
                 cell.value = None
     workbook.save(file_path)
+
+
+def _highlight_report_problems(sheet, first: int, last: int) -> None:
+    """Excel evaluates these rules again after a specialist fixes a cell."""
+    from openpyxl.formatting.rule import FormulaRule
+    from openpyxl.styles import Font, PatternFill
+
+    fill, font = PatternFill("solid", fgColor="FCE4E4"), Font(color="9C0006")
+    def mark(columns: str, formula: str) -> None:
+        for column in columns.split():
+            sheet.conditional_formatting.add(f"{column}{first}:{column}{last}",
+                FormulaRule(formula=[formula.replace("{r}", str(first)).replace("{c}", column)], fill=fill, font=font))
+
+    mark("A B C F", 'LEN(TRIM({c}{r}&""))=0')
+    mark("D E", 'OR(COUNT($D{r}:$E{r})<>2,$E{r}<=$D{r})')
+    mark("G", 'NOT(ISNUMBER(G{r}))')
+    mark("H I", 'OR(COUNT($D{r}:$E{r})<>2,NOT(ISNUMBER($G{r})),$E{r}<=$D{r})')
+    mark("J", 'OR(NOT(ISNUMBER(J{r})),J{r}<=0)')
+    mark("K", 'OR(NOT(ISNUMBER(K{r})),K{r}<0,AND(ISNUMBER(J{r}),K{r}>J{r}))')
+    mark("L", 'OR(COUNT($J{r}:$K{r})<>2,$J{r}<=0,$K{r}<0,$K{r}>$J{r})')
+    depth_rule = ('OR(COUNT($M{r}:$N{r})<>2,$N{r}<=$M{r},'
+                  'AND(ISNUMBER($D{r}),$M{r}<$D{r}),AND(ISNUMBER($E{r}),$N{r}>$E{r}))')
+    mark("M N R", depth_rule)
+    mark("O P", depth_rule[:-1] + ',NOT(ISNUMBER($G{r})))')
+    uncertain = ["не установ", "не определ", "уверенность низ", "низкая уверенность", "ошибка", "оборван"]
+    checks = ','.join(f'ISNUMBER(SEARCH("{term}",{{c}}{{r}}))' for term in uncertain)
+    mark("S T U V", 'OR(LEN(TRIM({c}{r}&""))=0,' + checks + ')')
+    # Both sides of an overlap are visible, and the warning clears if either
+    # contact is corrected directly in the exported workbook.
+    for row in range(first, last):
+        for address in (f"N{row}", f"M{row + 1}"):
+            sheet.conditional_formatting.add(address, FormulaRule(
+                formula=[f'AND(COUNT($N${row},$M${row + 1})=2,$N${row}>$M${row + 1})'], fill=fill, font=font))
 
 
 def _set_cell_shading(cell, color: str) -> None:

@@ -15,7 +15,7 @@ from PIL import Image
 from openpyxl import load_workbook
 from PySide6.QtCore import QPointF, QProcess, QSettings
 from PySide6.QtGui import QCloseEvent, QPalette, QPixmap
-from PySide6.QtWidgets import QApplication, QMenu
+from PySide6.QtWidgets import QApplication, QDialog, QMenu
 
 from app.domain.models import FaciesDetection, PhotoRecord
 from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES
@@ -100,6 +100,24 @@ class TrainingTabAndReportTests(unittest.TestCase):
         self.assertEqual(wells[0]["layers"][0]["attributes"]["Название фации"], "Русловая")
         self.assertEqual(wells[0]["layers"][0]["attributes"]["Индекс фации"], "F1")
 
+    def test_primary_source_selected_in_menu_is_persistent_and_regime_is_editable(self):
+        dialog = Mock()
+        dialog.exec.return_value = QDialog.DialogCode.Accepted
+        dialog.folder = str(self.root / "primary_reference")
+        dialog.import_result = {"warnings": []}
+        with patch(_MODULE + ".PrimaryDescriptionSourceDialog", return_value=dialog):
+            self.window.configure_primary_source()
+        self.assertEqual(self.window._local_vlm_config()["primary_reference"], dialog.folder)
+        self.assertEqual(self.settings.value("vlm/primary_reference"), dialog.folder)
+        from app.ui.dialogs.facies_dialog import FaciesDialog
+        with patch("app.ui.dialogs.facies_dialog.QSettings", return_value=self.settings):
+            editor = FaciesDialog("", .5, {"__vlm_hydrodynamic_regime": "Переменный"})
+        editor.hydrodynamic_regime.setText("Спокойный, правка специалиста")
+        values = editor.selected_attributes()
+        self.assertEqual(values["Гидродинамический режим"], "Спокойный, правка специалиста")
+        self.assertEqual(values["__vlm_hydrodynamic_regime"], values["Гидродинамический режим"])
+        editor.close()
+
     def wait_for_job(self, page):
         deadline = time.monotonic() + 10
         while page.busy and time.monotonic() < deadline:
@@ -116,6 +134,7 @@ class TrainingTabAndReportTests(unittest.TestCase):
         self.assertNotIn("◉   Обучение", self.window._nav_buttons)
         menu = self.window.findChild(QMenu, "shellSettingsMenu")
         self.assertIn("Обучение…", [action.text() for action in menu.actions()])
+        self.assertIn("Основной источник…", [action.text() for action in menu.actions()])
         self.assertEqual(center.palette().color(QPalette.ColorRole.Window).name(), "#f6faff")
         self.assertEqual(center.word_pairs.preview_text.palette().color(QPalette.ColorRole.Base).name(), "#ffffff")
         self.window.show_training_center()
