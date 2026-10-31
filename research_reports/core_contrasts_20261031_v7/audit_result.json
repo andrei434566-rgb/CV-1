@@ -1,0 +1,57 @@
+{
+  "status": "not_promoted_preservation_or_target_gate_failed",
+  "head_sha256": "54f7d84513e6dbab3cc5dfdfc37d44920085538c258f6e60ae36e0199801f5c3",
+  "source_crops_reproduced": 52,
+  "original_pdf_and_photo_hashes_verified": true,
+  "previous_features_unchanged": true,
+  "old_only_normalizer_reproduced": true,
+  "group_oof_and_validation_reproduced": true,
+  "proximal_relative_residual": 6.9420823810096794e-15,
+  "training_gates": {
+    "A_recall": false,
+    "A_f1": false,
+    "D_recall": true,
+    "D_f1": true,
+    "E_recall": true,
+    "E_f1": true,
+    "F_recall": false,
+    "F_f1": true,
+    "B_improved": true,
+    "C_improved": true,
+    "macro_f1": true
+  },
+  "validation_gates": {
+    "A_recall": true,
+    "A_f1": true,
+    "D_recall": true,
+    "D_f1": true,
+    "E_recall": true,
+    "E_f1": false,
+    "F_recall": true,
+    "F_f1": true,
+    "B_improved": false,
+    "C_improved": false,
+    "accuracy": true,
+    "macro_f1": true,
+    "train_eligible": false,
+    "no_protected_correct_case_lost": true
+  },
+  "val_correct": 29,
+  "val_total": 50,
+  "new_source_group_oof": {
+    "WEB_Po2021_B1_B2": {
+      "total": 36,
+      "correct": 19
+    },
+    "WEB_Rome2018_Palatine": {
+      "total": 16,
+      "correct": 11
+    }
+  },
+  "prepared_test_pixels_opened": 0,
+  "distribution_approved": false,
+  "installed_in_application": false,
+  "general_chat_weights_changed": false,
+  "audit_script_sha256": "f1593c9ca177060739d1adbd8e84788dbab0e91c25c6ef7e807f98b63b7118fb",
+  "limitation": "Repeated development50; source/proxy geographic overlap not ruled out; no independent field accuracy claimed"
+}

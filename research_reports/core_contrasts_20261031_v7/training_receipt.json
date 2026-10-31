@@ -1,0 +1,52 @@
+{
+  "recipe": {
+    "profile": "qwen_post",
+    "alpha": 1.0,
+    "proximity": 10.0,
+    "new_weight": 0.25,
+    "end_face_weight": 0.25,
+    "folds": 3,
+    "selection": "One fixed previous-v6 recipe; no search after new source acquisition",
+    "normalizer": "Old728 train subset only per fold; prior re-fit on that subset",
+    "training_scope": "local_research_only",
+    "distribution_approved": false,
+    "installed_in_application": false,
+    "validation": "Previous50 unchanged and loaded only after train OOF and recipe frozen",
+    "encoder_or_chat_weights_changed": false
+  },
+  "train_count": 804,
+  "new_count": 52,
+  "source_rights": "Po CC BY; Rome CC BY-NC-ND and previous Salpi unresolved. Local only; mixed weights not distributed.",
+  "base_model_id": "Qwen/Qwen3-VL-2B-Instruct",
+  "base_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+  "base_weights_sha256": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+  "head_sha256": "54f7d84513e6dbab3cc5dfdfc37d44920085538c258f6e60ae36e0199801f5c3",
+  "source_panels": 8,
+  "named_boreholes": [
+    "B1",
+    "B2",
+    "22 P",
+    "9 MS",
+    "18 P"
+  ],
+  "new_class_counts": {
+    "B": 24,
+    "A": 10,
+    "D": 6,
+    "E": 6,
+    "F": 6
+  },
+  "public_terms_source_crops": 36,
+  "local_review_source_crops": 16,
+  "distribution_approved": false,
+  "installed_in_application": false,
+  "language_or_vision_encoder_changed": false,
+  "prepared_test_pixels_opened": 0,
+  "script_sha256": {
+    "prepare_core_contrasts_20261031_v7.py": "52b0c82f2f6c6a9b96286c962b12460796aa728bb7450e4bbcd787c176867922",
+    "train_core_contrasts_v7.py": "82c8b89089e59f9a0e474dc6a95aa63e848f19556e8af58f612c2afbbc97058b",
+    "audit_core_contrasts_v7.py": "f1593c9ca177060739d1adbd8e84788dbab0e91c25c6ef7e807f98b63b7118fb"
+  },
+  "feature_contract_validation": "passed; fresh CUDA CLI not repeated because encoder/inference contract unchanged",
+  "weights_location": "Local ignored experiment outputs, NOT included in this public report"
+}

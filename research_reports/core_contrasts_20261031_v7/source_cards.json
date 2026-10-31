@@ -1,0 +1,290 @@
+[
+  {
+    "source": {
+      "author": "Amorosi et al. (2021)",
+      "doi": "10.1111/sed.12784",
+      "url": "https://doi.org/10.3929/ethz-b-000444047",
+      "download_url": "https://www.research-collection.ethz.ch/server/api/core/bitstreams/60343ac9-e6d6-4327-b517-a8ccbac1675a/content",
+      "license": "CC BY4.0, ETH generated cover and published article page402",
+      "distribution_approved": true,
+      "source_group": "WEB_Po2021_B1_B2",
+      "group_note": "Both cores kept together because one paper/figure; possible reuse/overlap with anonymized UniBo regions not ruled out",
+      "figure": "Fig3, article page408, PDF page8 including generated ETH cover",
+      "domains": [
+        "core_longitudinal"
+      ],
+      "geologist_approved": false,
+      "download_note": "Downloaded PDF has an automatically generated ETH cover and therefore differs in byte count/MD5 from repository bitstream metadata. This exact returned PDF and extracted image were reviewed and pinned separately."
+    },
+    "code": "E",
+    "well": "B1",
+    "interval": [
+      29.0,
+      29.4
+    ],
+    "panel": "3A",
+    "description_ru": "По авторам: средне- и крупнозернистый русловой песок, умеренно сортированный. Выбран внутренний участок фотографии, без края и фона.",
+    "id": "Po3A",
+    "source_id": "po",
+    "crop_count": 6,
+    "crop_exact_depth_m": null,
+    "geologist_approved": false,
+    "project_92_facies_mapping": null
+  },
+  {
+    "source": {
+      "author": "Amorosi et al. (2021)",
+      "doi": "10.1111/sed.12784",
+      "url": "https://doi.org/10.3929/ethz-b-000444047",
+      "download_url": "https://www.research-collection.ethz.ch/server/api/core/bitstreams/60343ac9-e6d6-4327-b517-a8ccbac1675a/content",
+      "license": "CC BY4.0, ETH generated cover and published article page402",
+      "distribution_approved": true,
+      "source_group": "WEB_Po2021_B1_B2",
+      "group_note": "Both cores kept together because one paper/figure; possible reuse/overlap with anonymized UniBo regions not ruled out",
+      "figure": "Fig3, article page408, PDF page8 including generated ETH cover",
+      "domains": [
+        "core_longitudinal"
+      ],
+      "geologist_approved": false,
+      "download_note": "Downloaded PDF has an automatically generated ETH cover and therefore differs in byte count/MD5 from repository bitstream metadata. This exact returned PDF and extracted image were reviewed and pinned separately."
+    },
+    "code": "A",
+    "well": "B1",
+    "interval": [
+      14.4,
+      14.9
+    ],
+    "panel": "3D",
+    "description_ru": "По авторам: пёстроокрашенные алевритовые и глинистые отложения хорошо дренируемой поймы. Светлая основная окраска с желтовато-оранжевыми пятнами сохранена без коррекции цвета.",
+    "id": "Po3D",
+    "source_id": "po",
+    "crop_count": 6,
+    "crop_exact_depth_m": null,
+    "geologist_approved": false,
+    "project_92_facies_mapping": null
+  },
+  {
+    "source": {
+      "author": "Amorosi et al. (2021)",
+      "doi": "10.1111/sed.12784",
+      "url": "https://doi.org/10.3929/ethz-b-000444047",
+      "download_url": "https://www.research-collection.ethz.ch/server/api/core/bitstreams/60343ac9-e6d6-4327-b517-a8ccbac1675a/content",
+      "license": "CC BY4.0, ETH generated cover and published article page402",
+      "distribution_approved": true,
+      "source_group": "WEB_Po2021_B1_B2",
+      "group_note": "Both cores kept together because one paper/figure; possible reuse/overlap with anonymized UniBo regions not ruled out",
+      "figure": "Fig3, article page408, PDF page8 including generated ETH cover",
+      "domains": [
+        "core_longitudinal"
+      ],
+      "geologist_approved": false,
+      "download_note": "Downloaded PDF has an automatically generated ETH cover and therefore differs in byte count/MD5 from repository bitstream metadata. This exact returned PDF and extracted image were reviewed and pinned separately."
+    },
+    "code": "B",
+    "well": "B2",
+    "interval": [
+      7.2,
+      7.7
+    ],
+    "panel": "3E",
+    "description_ru": "По авторам: алевритовые и глинистые отложения плохо дренируемой поймы с органическим веществом. Сохранены светло-серые тонкозернистые участки и мелкие тёмные включения; точная гранулометрия по пикселям не назначается.",
+    "id": "Po3E",
+    "source_id": "po",
+    "crop_count": 12,
+    "crop_exact_depth_m": null,
+    "geologist_approved": false,
+    "project_92_facies_mapping": null
+  },
+  {
+    "source": {
+      "author": "Amorosi et al. (2021)",
+      "doi": "10.1111/sed.12784",
+      "url": "https://doi.org/10.3929/ethz-b-000444047",
+      "download_url": "https://www.research-collection.ethz.ch/server/api/core/bitstreams/60343ac9-e6d6-4327-b517-a8ccbac1675a/content",
+      "license": "CC BY4.0, ETH generated cover and published article page402",
+      "distribution_approved": true,
+      "source_group": "WEB_Po2021_B1_B2",
+      "group_note": "Both cores kept together because one paper/figure; possible reuse/overlap with anonymized UniBo regions not ruled out",
+      "figure": "Fig3, article page408, PDF page8 including generated ETH cover",
+      "domains": [
+        "core_longitudinal"
+      ],
+      "geologist_approved": false,
+      "download_note": "Downloaded PDF has an automatically generated ETH cover and therefore differs in byte count/MD5 from repository bitstream metadata. This exact returned PDF and extracted image were reviewed and pinned separately."
+    },
+    "code": "F",
+    "well": "B2",
+    "interval": [
+      10.3,
+      10.8
+    ],
+    "panel": "3F",
+    "description_ru": "По авторам: обогащённая органическим веществом болотная глина. Это отдельный контраст к плохо дренируемой пойме; наличие растительных остатков не превращает выбранную глину в отдельный прослой торфа.",
+    "id": "Po3F",
+    "source_id": "po",
+    "crop_count": 6,
+    "crop_exact_depth_m": null,
+    "geologist_approved": false,
+    "project_92_facies_mapping": null
+  },
+  {
+    "source": {
+      "author": "Amorosi et al. (2021)",
+      "doi": "10.1111/sed.12784",
+      "url": "https://doi.org/10.3929/ethz-b-000444047",
+      "download_url": "https://www.research-collection.ethz.ch/server/api/core/bitstreams/60343ac9-e6d6-4327-b517-a8ccbac1675a/content",
+      "license": "CC BY4.0, ETH generated cover and published article page402",
+      "distribution_approved": true,
+      "source_group": "WEB_Po2021_B1_B2",
+      "group_note": "Both cores kept together because one paper/figure; possible reuse/overlap with anonymized UniBo regions not ruled out",
+      "figure": "Fig3, article page408, PDF page8 including generated ETH cover",
+      "domains": [
+        "core_longitudinal"
+      ],
+      "geologist_approved": false,
+      "download_note": "Downloaded PDF has an automatically generated ETH cover and therefore differs in byte count/MD5 from repository bitstream metadata. This exact returned PDF and extracted image were reviewed and pinned separately."
+    },
+    "code": "D",
+    "well": "B2",
+    "interval": [
+      17.3,
+      17.8
+    ],
+    "panel": "3G",
+    "description_ru": "По авторам: болотный торф. Участки с заметным органическим материалом сохраняются как класс торфа, отдельно от болотной глины и плохо дренируемой поймы.",
+    "id": "Po3G",
+    "source_id": "po",
+    "crop_count": 6,
+    "crop_exact_depth_m": null,
+    "geologist_approved": false,
+    "project_92_facies_mapping": null
+  },
+  {
+    "source": {
+      "author": "Mancini et al. (2018)",
+      "doi": "10.26382/AMQ.2018.11",
+      "url": "https://amq.aiqua.it/index.php/amq/article/view/137",
+      "download_url": "https://amq.aiqua.it/index.php/amq/article/download/137/110",
+      "license": "CC BY-NC-ND4.0, explicit article page",
+      "distribution_approved": false,
+      "source_group": "WEB_Rome2018_Palatine",
+      "group_note": "All selected boreholes grouped together to avoid paper/photo leakage",
+      "figure": "PlateII e/f (PDF15, printed185), PlateIII f (PDF17, printed187)",
+      "domains": [
+        "core_longitudinal"
+      ],
+      "geologist_approved": false,
+      "restriction": "Retain as separate local research/review materials; cropped images and mixed weights not redistributed under a false CC BY/NC-SA grant."
+    },
+    "code": "B",
+    "well": "22 P",
+    "interval": [
+      20.0,
+      25.0
+    ],
+    "panel": "PlateIIe",
+    "description_ru": "По авторам: светло-серая, преимущественно массивная алевритовая глина с редкими карбонатными конкрециями, плохо дренируемая пойма FTR D. Выбран чистый керн; красная стрелка и лоток исключены.",
+    "id": "RomeIIe",
+    "source_id": "rome",
+    "crop_count": 6,
+    "crop_exact_depth_m": null,
+    "geologist_approved": false,
+    "project_92_facies_mapping": null
+  },
+  {
+    "source": {
+      "author": "Mancini et al. (2018)",
+      "doi": "10.26382/AMQ.2018.11",
+      "url": "https://amq.aiqua.it/index.php/amq/article/view/137",
+      "download_url": "https://amq.aiqua.it/index.php/amq/article/download/137/110",
+      "license": "CC BY-NC-ND4.0, explicit article page",
+      "distribution_approved": false,
+      "source_group": "WEB_Rome2018_Palatine",
+      "group_note": "All selected boreholes grouped together to avoid paper/photo leakage",
+      "figure": "PlateII e/f (PDF15, printed185), PlateIII f (PDF17, printed187)",
+      "domains": [
+        "core_longitudinal"
+      ],
+      "geologist_approved": false,
+      "restriction": "Retain as separate local research/review materials; cropped images and mixed weights not redistributed under a false CC BY/NC-SA grant."
+    },
+    "code": "B",
+    "well": "9 MS",
+    "interval": [
+      25.0,
+      30.0
+    ],
+    "panel": "PlateIIf-FTRD",
+    "description_ru": "По авторам: голубовато-серая массивная, богатая органическим веществом глина плохо дренируемой поймы FTR D. Угольный прослой и вышележащий хорошо дренируемый интервал исключены из выбранных участков.",
+    "id": "RomeIIf",
+    "source_id": "rome",
+    "crop_count": 4,
+    "crop_exact_depth_m": null,
+    "geologist_approved": false,
+    "project_92_facies_mapping": null
+  },
+  {
+    "source": {
+      "author": "Mancini et al. (2018)",
+      "doi": "10.26382/AMQ.2018.11",
+      "url": "https://amq.aiqua.it/index.php/amq/article/view/137",
+      "download_url": "https://amq.aiqua.it/index.php/amq/article/download/137/110",
+      "license": "CC BY-NC-ND4.0, explicit article page",
+      "distribution_approved": false,
+      "source_group": "WEB_Rome2018_Palatine",
+      "group_note": "All selected boreholes grouped together to avoid paper/photo leakage",
+      "figure": "PlateII e/f (PDF15, printed185), PlateIII f (PDF17, printed187)",
+      "domains": [
+        "core_longitudinal"
+      ],
+      "geologist_approved": false,
+      "restriction": "Retain as separate local research/review materials; cropped images and mixed weights not redistributed under a false CC BY/NC-SA grant."
+    },
+    "code": "B",
+    "well": "18 P",
+    "interval": [
+      15.0,
+      20.0
+    ],
+    "panel": "PlateIIIf-SFTbaD",
+    "description_ru": "По авторам: серый, богатый органическим веществом пойменный ил плохо дренируемой поймы SFTba D. Взяты участки серого столбика без надписи и этикетки.",
+    "id": "RomeIIIfB",
+    "source_id": "rome",
+    "crop_count": 2,
+    "crop_exact_depth_m": null,
+    "geologist_approved": false,
+    "project_92_facies_mapping": null
+  },
+  {
+    "source": {
+      "author": "Mancini et al. (2018)",
+      "doi": "10.26382/AMQ.2018.11",
+      "url": "https://amq.aiqua.it/index.php/amq/article/view/137",
+      "download_url": "https://amq.aiqua.it/index.php/amq/article/download/137/110",
+      "license": "CC BY-NC-ND4.0, explicit article page",
+      "distribution_approved": false,
+      "source_group": "WEB_Rome2018_Palatine",
+      "group_note": "All selected boreholes grouped together to avoid paper/photo leakage",
+      "figure": "PlateII e/f (PDF15, printed185), PlateIII f (PDF17, printed187)",
+      "domains": [
+        "core_longitudinal"
+      ],
+      "geologist_approved": false,
+      "restriction": "Retain as separate local research/review materials; cropped images and mixed weights not redistributed under a false CC BY/NC-SA grant."
+    },
+    "code": "A",
+    "well": "18 P",
+    "interval": [
+      15.0,
+      20.0
+    ],
+    "panel": "PlateIIIf-SFTbaF",
+    "description_ru": "По авторам: вышележащий светло-бурый педогенный песчанистый алеврит хорошо дренируемой поймы SFTba F. Выбраны участки выше красной границы, отдельно от серого плохо дренируемого материала.",
+    "id": "RomeIIIfA",
+    "source_id": "rome",
+    "crop_count": 4,
+    "crop_exact_depth_m": null,
+    "geologist_approved": false,
+    "project_92_facies_mapping": null
+  }
+]
