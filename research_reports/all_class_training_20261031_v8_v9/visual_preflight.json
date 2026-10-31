@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "original_feature_max_deltas": [
+    0.0,
+    0.0
+  ],
+  "preprocessing_equal": true,
+  "real_gradient_norms": {
+    "blocks.20.attn.qkv.lora_b": 0.42388609051704407,
+    "blocks.20.attn.proj.lora_b": 0.30474409461021423,
+    "blocks.21.attn.qkv.lora_b": 0.6448487639427185,
+    "blocks.21.attn.proj.lora_b": 0.3893694579601288,
+    "blocks.22.attn.qkv.lora_b": 0.5678843259811401,
+    "blocks.22.attn.proj.lora_b": 0.3002869784832001,
+    "blocks.23.attn.qkv.lora_b": 0.8244222402572632,
+    "blocks.23.attn.proj.lora_b": 0.2911269962787628
+  },
+  "changed_parameter_tensors": 16,
+  "trainable_parameters": 196608,
+  "modules": [
+    "blocks.20.attn.qkv",
+    "blocks.20.attn.proj",
+    "blocks.21.attn.qkv",
+    "blocks.21.attn.proj",
+    "blocks.22.attn.qkv",
+    "blocks.22.attn.proj",
+    "blocks.23.attn.qkv",
+    "blocks.23.attn.proj"
+  ],
+  "one_batch_seconds": 0.5470296000130475,
+  "peak_cuda_bytes": 975954944,
+  "language_model_loaded": false,
+  "language_weights_changed": false
+}

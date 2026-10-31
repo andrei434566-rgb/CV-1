@@ -1,0 +1,40 @@
+{
+  "kernel_v8": {
+    "status": "not_promoted_all_class_gate_failed",
+    "old_oof_correct": 441,
+    "old_oof_total": 722,
+    "old_oof_macro_f1": 0.5826173457079227,
+    "val_correct": 29,
+    "val_total": 50,
+    "val_macro_f1": 0.5811321653257138,
+    "failed_validation_gates": [
+      "C_recall",
+      "C_f1",
+      "D_f1",
+      "E_recall",
+      "E_f1",
+      "macro_f1_improved",
+      "train_eligible"
+    ]
+  },
+  "visual_lora_v9": {
+    "status": "not_promoted_all_class_gate_failed",
+    "old_oof_correct": 449,
+    "old_oof_total": 722,
+    "old_oof_macro_f1": 0.5952526300942634,
+    "val_correct": 27,
+    "val_total": 50,
+    "val_macro_f1": 0.544205495818399,
+    "failed_validation_gates": [
+      "A_f1",
+      "B_f1",
+      "C_recall",
+      "C_f1",
+      "F_recall",
+      "F_f1",
+      "macro_f1_improved",
+      "train_eligible",
+      "accuracy"
+    ]
+  }
+}

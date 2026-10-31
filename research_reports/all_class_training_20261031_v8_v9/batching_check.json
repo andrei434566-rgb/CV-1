@@ -1,0 +1,10 @@
+{
+  "adapter_sha256": "536eebb02acb83e25b5d96727caf9ad65d62721c1f6432e115aa4b41d4b9d3bd",
+  "validation_count": 50,
+  "same_batch_max_score_delta_to_saved": 0.0,
+  "maximum_single_vs_batch_score_delta": 0.0043160319328308105,
+  "changed_predictions": [],
+  "single_correct": 27,
+  "batch_correct": 27,
+  "limitation": "FP16 batch shapes can change raw uncalibrated scores. This is the reused val50, not a new test set."
+}

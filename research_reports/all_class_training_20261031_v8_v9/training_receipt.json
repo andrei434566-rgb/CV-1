@@ -1,0 +1,343 @@
+{
+  "kernel_v8": {
+    "recipe": {
+      "profile": "qwen_post",
+      "factors": [
+        0.5,
+        2.0,
+        8.0
+      ],
+      "alphas": [
+        0.01,
+        0.1,
+        1.0
+      ],
+      "weightings": [
+        "class",
+        "class_group"
+      ],
+      "external_weight": 0.5,
+      "folds": 3,
+      "selection": "On same old728 OOF: all six recall AND F1 nondecreasing, macroF1 higher; if none pass, maximum worst-class recall gain then minimum recall, macroF1, mean group accuracy. No val selection.",
+      "normalization": "All train rows in each fold only, population std floor1e-3, L2; RBF bandwidth=median positive squared training distance",
+      "partial_AB": "Only sum A+B is supervised for generic floodplain; no guessed drainage",
+      "validation": "Previous50 loaded once after train-group selection frozen",
+      "seed": 20261031,
+      "distribution_approved": false,
+      "installed_in_application": false,
+      "encoder_or_chat_weights_changed": false
+    },
+    "train_count": 804,
+    "validation_count": 50,
+    "source_rights": "Po CC BY; Rome CC BY-NC-ND and previous Salpi unresolved. Local only; mixed weights not distributed.",
+    "original_base_sha256": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+    "adapter_or_head_sha256": "e0b4564fb0da58f55d852a176ebb0fa28ac0445151fa4e0c49e4820fa469e121",
+    "selection_frozen_sha256": "b0e94efee83b7ce7b2fd02314ef37b106da66a4d2526eefbbbe5ba0b5c4adc96",
+    "dependencies_sha256": {
+      "train_kernel_facies_v8.py": "ae6eeec922be1e952d8342f41c943c4d9e8329ef0e8273c25e986bbacf3d584e",
+      "kernel_facies_head.py": "4050d3ea2322f95a64a3a9b07d79c7772b006a92bfd62f49921c5a051ef6297b",
+      "facies_head_v2_features.py": "c6a1566f2c77d61b5afadd42f05674fb02ca84cf0ec2ae02d50b72f91da2c839",
+      "partial_facies_ridge.py": "6975b7bcb6340ff94bd852029effbc5d9e45d894934184a15f78aa78882ac060",
+      "train.jsonl": "40d2434fec1efc085c397253535f973689c5e6984746d445f68e4d569a6adafd",
+      "val.jsonl": "395654f4020934973f41122f990683a68e5fdad31a17b14eedde35ba762b0f92",
+      "features.safetensors": "bb96ca42e7f7879d795316acc18823798d3ec8fe04493b7b85c4a4b9d5567689",
+      "selection_frozen.json": "0d318483c9f02f79b86a165175b15a35409639e5e58bec48481f4b6f038513a4",
+      "audit_result.json": "0711ac341d3f0a776e1bf6a0d97c9e5ebb1c0c9395c0f7af8c5fbb3a29c72094",
+      "oof_answers.json": "ef5d2f08f66c3e5bff9c50ecf02cc701eca278e60f7ecf8896ce3a7b14117eb2",
+      "facies_head.safetensors": "63a4e09255f2bf03cfd49c9d0849c856c16fcb76ef324994ae31298e9f63ce78"
+    },
+    "distribution_approved": false,
+    "installed_in_application": false,
+    "prepared_test_pixels_opened": 0
+  },
+  "visual_lora_v9": {
+    "recipe": {
+      "epochs": 3,
+      "batch_size": 4,
+      "rank": 8,
+      "lora_alpha": 16,
+      "last_vision_blocks": 4,
+      "lora_lr": 0.0001,
+      "head_lr": 0.0005,
+      "weight_decay": 0.01,
+      "logit_scale": 5.0,
+      "old_correct_exact_KL_weight": 0.3,
+      "head_delta_penalty": 0.1,
+      "seed": 20261031,
+      "gradient_clip": 1.0,
+      "supervision": "Weighted exact CE, -log(PA+PB) for generic floodplain. Teacher KL only on correctly classified OLD EXACT targets, not on partial targets.",
+      "weights": "Class+source-group balanced on each train fold; external0.5, core end-face0.25",
+      "normalization": "Old train subset only, Qwen post mean/std -> L2, fixed within run",
+      "selection": "One fixed recipe; final epoch only. Three group OOF folds then frozen recipe before repeated val50.",
+      "image": "Original RGB thumbnail300, unchanged original processor; no synthetic images or geometric/colour augmentation",
+      "language_weights_changed": false,
+      "vision_encoder_changed": true,
+      "distribution_approved": false,
+      "installed_in_application": false
+    },
+    "train_count": 804,
+    "validation_count": 50,
+    "source_rights": "Po CC BY; Rome CC BY-NC-ND and previous Salpi unresolved. Local only; mixed weights not distributed.",
+    "original_base_sha256": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+    "adapter_or_head_sha256": "536eebb02acb83e25b5d96727caf9ad65d62721c1f6432e115aa4b41d4b9d3bd",
+    "selection_frozen_sha256": "8df63f9f812c1a76f34c75b109ee88f74d8d37fd70220917328233fcdcf75f1b",
+    "dependencies_sha256": {
+      "train_vision_facies_v9.py": "7969b46bd99d6c56595e529cc9981187aa5587527e2499bac30e5cc683c47d11",
+      "vision_facies_adapter.py": "68739fc9eb6d269136b2242c4c7e166c87c53bcee97ca2d2c5ad8f8022ce3118",
+      "train_core_facies_conservative.py": "57495fae1d44ee28a0d123e2b37df44d84205be22f45d6d4b00bee822bdadfa7",
+      "kernel_facies_head.py": "4050d3ea2322f95a64a3a9b07d79c7772b006a92bfd62f49921c5a051ef6297b",
+      "partial_facies_ridge.py": "6975b7bcb6340ff94bd852029effbc5d9e45d894934184a15f78aa78882ac060",
+      "vision_facies_adapter_v9_preflight.json": "bf065b78d11d77721fcbf4594ebbff84ab05c0401d919251efd64e809495e656",
+      "features.safetensors": "bb96ca42e7f7879d795316acc18823798d3ec8fe04493b7b85c4a4b9d5567689",
+      "train.jsonl": "40d2434fec1efc085c397253535f973689c5e6984746d445f68e4d569a6adafd",
+      "val.jsonl": "395654f4020934973f41122f990683a68e5fdad31a17b14eedde35ba762b0f92",
+      "selection_frozen.json": "0d318483c9f02f79b86a165175b15a35409639e5e58bec48481f4b6f038513a4",
+      "audit_result.json": "0711ac341d3f0a776e1bf6a0d97c9e5ebb1c0c9395c0f7af8c5fbb3a29c72094",
+      "oof_answers.json": "ef5d2f08f66c3e5bff9c50ecf02cc701eca278e60f7ecf8896ce3a7b14117eb2",
+      "facies_head.safetensors": "63a4e09255f2bf03cfd49c9d0849c856c16fcb76ef324994ae31298e9f63ce78"
+    },
+    "distribution_approved": false,
+    "installed_in_application": false,
+    "prepared_test_pixels_opened": 0,
+    "folds": [
+      {
+        "tag": "fold0",
+        "seed": 20261031,
+        "teacher_protected_exact_rows": 443,
+        "epochs": [
+          {
+            "epoch": 1,
+            "mean_loss": 0.48742279209937267,
+            "examples": 513
+          },
+          {
+            "epoch": 2,
+            "mean_loss": 0.44942516506763924,
+            "examples": 513
+          },
+          {
+            "epoch": 3,
+            "mean_loss": 0.4157657806578203,
+            "examples": 513
+          }
+        ],
+        "modules": [
+          "blocks.20.attn.qkv",
+          "blocks.20.attn.proj",
+          "blocks.21.attn.qkv",
+          "blocks.21.attn.proj",
+          "blocks.22.attn.qkv",
+          "blocks.22.attn.proj",
+          "blocks.23.attn.qkv",
+          "blocks.23.attn.proj"
+        ],
+        "trainable_vision_parameters": 196608,
+        "trainable_head_parameters": 24582,
+        "first_gradient_norms": {
+          "blocks.20.attn.qkv.lora_b": 0.4950435161590576,
+          "blocks.20.attn.proj.lora_b": 0.23770646750926971,
+          "blocks.21.attn.qkv.lora_b": 0.5622005462646484,
+          "blocks.21.attn.proj.lora_b": 0.3240766227245331,
+          "blocks.22.attn.qkv.lora_b": 0.552528977394104,
+          "blocks.22.attn.proj.lora_b": 0.18426820635795593,
+          "blocks.23.attn.qkv.lora_b": 0.7132290601730347,
+          "blocks.23.attn.proj.lora_b": 0.1634560227394104
+        },
+        "adapter_sha256": "f1c97839b106c1e700e9d5376be7d0ccd497a5c845f14ef53d7fb2d04606a10b",
+        "seconds": 40.06624419998843,
+        "train_count": 513,
+        "held_count": 291,
+        "normalizer_old_train_count": 474
+      },
+      {
+        "tag": "fold1",
+        "seed": 20261032,
+        "teacher_protected_exact_rows": 470,
+        "epochs": [
+          {
+            "epoch": 1,
+            "mean_loss": 0.41869576754411497,
+            "examples": 549
+          },
+          {
+            "epoch": 2,
+            "mean_loss": 0.3823148086531349,
+            "examples": 549
+          },
+          {
+            "epoch": 3,
+            "mean_loss": 0.3613802505104051,
+            "examples": 549
+          }
+        ],
+        "modules": [
+          "blocks.20.attn.qkv",
+          "blocks.20.attn.proj",
+          "blocks.21.attn.qkv",
+          "blocks.21.attn.proj",
+          "blocks.22.attn.qkv",
+          "blocks.22.attn.proj",
+          "blocks.23.attn.qkv",
+          "blocks.23.attn.proj"
+        ],
+        "trainable_vision_parameters": 196608,
+        "trainable_head_parameters": 24582,
+        "first_gradient_norms": {
+          "blocks.20.attn.qkv.lora_b": 0.6098407506942749,
+          "blocks.20.attn.proj.lora_b": 0.40010491013526917,
+          "blocks.21.attn.qkv.lora_b": 0.6544016003608704,
+          "blocks.21.attn.proj.lora_b": 0.28598928451538086,
+          "blocks.22.attn.qkv.lora_b": 0.7015019059181213,
+          "blocks.22.attn.proj.lora_b": 0.3953315019607544,
+          "blocks.23.attn.qkv.lora_b": 2.257766008377075,
+          "blocks.23.attn.proj.lora_b": 0.43120765686035156
+        },
+        "adapter_sha256": "5c9974be6edacffc409d79c1f92e577a291119e697b11045468a472d6c669ec8",
+        "seconds": 42.58787619997747,
+        "train_count": 549,
+        "held_count": 255,
+        "normalizer_old_train_count": 497
+      },
+      {
+        "tag": "fold2",
+        "seed": 20261033,
+        "teacher_protected_exact_rows": 447,
+        "epochs": [
+          {
+            "epoch": 1,
+            "mean_loss": 0.5032703171828727,
+            "examples": 546
+          },
+          {
+            "epoch": 2,
+            "mean_loss": 0.45609027103626687,
+            "examples": 546
+          },
+          {
+            "epoch": 3,
+            "mean_loss": 0.43058828938575017,
+            "examples": 546
+          }
+        ],
+        "modules": [
+          "blocks.20.attn.qkv",
+          "blocks.20.attn.proj",
+          "blocks.21.attn.qkv",
+          "blocks.21.attn.proj",
+          "blocks.22.attn.qkv",
+          "blocks.22.attn.proj",
+          "blocks.23.attn.qkv",
+          "blocks.23.attn.proj"
+        ],
+        "trainable_vision_parameters": 196608,
+        "trainable_head_parameters": 24582,
+        "first_gradient_norms": {
+          "blocks.20.attn.qkv.lora_b": 0.37186911702156067,
+          "blocks.20.attn.proj.lora_b": 0.2764819860458374,
+          "blocks.21.attn.qkv.lora_b": 0.6123844385147095,
+          "blocks.21.attn.proj.lora_b": 0.3251676857471466,
+          "blocks.22.attn.qkv.lora_b": 0.6185954213142395,
+          "blocks.22.attn.proj.lora_b": 0.30123186111450195,
+          "blocks.23.attn.qkv.lora_b": 0.8299785852432251,
+          "blocks.23.attn.proj.lora_b": 0.3363577425479889
+        },
+        "adapter_sha256": "c3a4b425951ac7d4b8b3a70df2e35812a906490663992b6605e94a47ff2ff408",
+        "seconds": 41.9299800999579,
+        "train_count": 546,
+        "held_count": 258,
+        "normalizer_old_train_count": 485
+      },
+      {
+        "tag": "final",
+        "seed": 20261034,
+        "teacher_protected_exact_rows": 665,
+        "epochs": [
+          {
+            "epoch": 1,
+            "mean_loss": 0.48812189019882857,
+            "examples": 804
+          },
+          {
+            "epoch": 2,
+            "mean_loss": 0.45235938085845456,
+            "examples": 804
+          },
+          {
+            "epoch": 3,
+            "mean_loss": 0.41798859564077795,
+            "examples": 804
+          }
+        ],
+        "modules": [
+          "blocks.20.attn.qkv",
+          "blocks.20.attn.proj",
+          "blocks.21.attn.qkv",
+          "blocks.21.attn.proj",
+          "blocks.22.attn.qkv",
+          "blocks.22.attn.proj",
+          "blocks.23.attn.qkv",
+          "blocks.23.attn.proj"
+        ],
+        "trainable_vision_parameters": 196608,
+        "trainable_head_parameters": 24582,
+        "first_gradient_norms": {
+          "blocks.20.attn.qkv.lora_b": 0.3195241093635559,
+          "blocks.20.attn.proj.lora_b": 0.1978074312210083,
+          "blocks.21.attn.qkv.lora_b": 0.37221601605415344,
+          "blocks.21.attn.proj.lora_b": 0.23071618378162384,
+          "blocks.22.attn.qkv.lora_b": 0.3438793420791626,
+          "blocks.22.attn.proj.lora_b": 0.2363271266222,
+          "blocks.23.attn.qkv.lora_b": 0.5949960947036743,
+          "blocks.23.attn.proj.lora_b": 0.13268502056598663
+        },
+        "adapter_sha256": "536eebb02acb83e25b5d96727caf9ad65d62721c1f6432e115aa4b41d4b9d3bd",
+        "seconds": 59.89631079998799,
+        "train_count": 804,
+        "held_count": 0,
+        "normalizer_old_train_count": 728
+      }
+    ],
+    "staged_process_exits": [
+      {
+        "event": "stage_started",
+        "stage": "fold0"
+      },
+      {
+        "event": "stage_exited",
+        "stage": "fold0",
+        "exit_code": 0,
+        "seconds": 68.28100000001723
+      },
+      {
+        "event": "stage_started",
+        "stage": "fold1"
+      },
+      {
+        "event": "stage_exited",
+        "stage": "fold1",
+        "exit_code": 0,
+        "seconds": 69.59399999998277
+      },
+      {
+        "event": "stage_started",
+        "stage": "fold2"
+      },
+      {
+        "event": "stage_exited",
+        "stage": "fold2",
+        "exit_code": 0,
+        "seconds": 69.26500000001397
+      },
+      {
+        "event": "stage_started",
+        "stage": "finalize"
+      },
+      {
+        "event": "stage_exited",
+        "stage": "finalize",
+        "exit_code": 0,
+        "seconds": 97.31199999997625
+      }
+    ]
+  }
+}

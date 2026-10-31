@@ -1,0 +1,112 @@
+{
+  "kernel_v8": {
+    "status": "not_promoted_all_class_gate_failed",
+    "head_sha256": "e0b4564fb0da58f55d852a176ebb0fa28ac0445151fa4e0c49e4820fa469e121",
+    "training_rows_unchanged": true,
+    "train_only_normalizer_and_bandwidth_reproduced": true,
+    "selected_group_oof_reproduced": true,
+    "rkhs_normal_equation_relative_residual": 2.0418444302648685e-14,
+    "validation_reproduced": true,
+    "validation_gates": {
+      "A_recall": true,
+      "A_f1": true,
+      "B_recall": true,
+      "B_f1": true,
+      "C_recall": false,
+      "C_f1": false,
+      "D_recall": true,
+      "D_f1": false,
+      "E_recall": false,
+      "E_f1": false,
+      "F_recall": true,
+      "F_f1": true,
+      "macro_f1_improved": false,
+      "train_eligible": false,
+      "accuracy": true
+    },
+    "distribution_approved": false,
+    "installed_in_application": false,
+    "prepared_test_pixels_opened": 0,
+    "audit_script_sha256": "89a7307e829a3ca14f528fa6c8deb5cb1298dd98358758f4ed977022e343cf76"
+  },
+  "visual_lora_v9": {
+    "status": "not_promoted_all_class_gate_failed",
+    "adapter_sha256": "536eebb02acb83e25b5d96727caf9ad65d62721c1f6432e115aa4b41d4b9d3bd",
+    "original_base_sha256_unchanged": true,
+    "language_model_loaded": false,
+    "language_weights_changed": false,
+    "real_visual_parameter_updates_verified": true,
+    "group_fold_receipts": [
+      {
+        "tag": "fold0",
+        "adapter_sha256": "f1c97839b106c1e700e9d5376be7d0ccd497a5c845f14ef53d7fb2d04606a10b",
+        "training_receipt_sha256": "bd794c4a50d1ec344fe30f9bde9eb19ee7a1eb2f0fffda285a67f8e82ab14ed6",
+        "answers_sha256": "271b313fe2dbe01867f47b64a6638826a8ffd41dbdac8a04ce4fbab7e87854c4",
+        "audit_script_sha256": "2f2a4eceecb7f5f8a8b70a5ebfd3daf0f2e236815fcd83f1167224dacaeb1e68",
+        "old_only_prior_verified": true,
+        "train_held_source_groups_disjoint": true,
+        "nonzero_visual_update": true,
+        "fresh_inference_reproduced": true
+      },
+      {
+        "tag": "fold1",
+        "adapter_sha256": "5c9974be6edacffc409d79c1f92e577a291119e697b11045468a472d6c669ec8",
+        "training_receipt_sha256": "1976c5fa2193cdc1fe8e19a5397ca56ab0d0ceadadb7664a0164fc6867a8e3b3",
+        "answers_sha256": "79c8a388a4c22b411337fd385ce66e97c3953e650230fedd34fb907dbe75136e",
+        "audit_script_sha256": "2f2a4eceecb7f5f8a8b70a5ebfd3daf0f2e236815fcd83f1167224dacaeb1e68",
+        "old_only_prior_verified": true,
+        "train_held_source_groups_disjoint": true,
+        "nonzero_visual_update": true,
+        "fresh_inference_reproduced": true
+      },
+      {
+        "tag": "fold2",
+        "adapter_sha256": "c3a4b425951ac7d4b8b3a70df2e35812a906490663992b6605e94a47ff2ff408",
+        "training_receipt_sha256": "50f4b9a0e191bb87107329b6d4086f87aff4be80369130f721888489fe1fd097",
+        "answers_sha256": "0a5ae0e0f5e5510adf4f62ed994f95cca530b61ac7575c4d51d7cafbc4289124",
+        "audit_script_sha256": "2f2a4eceecb7f5f8a8b70a5ebfd3daf0f2e236815fcd83f1167224dacaeb1e68",
+        "old_only_prior_verified": true,
+        "train_held_source_groups_disjoint": true,
+        "nonzero_visual_update": true,
+        "fresh_inference_reproduced": true
+      },
+      {
+        "tag": "final",
+        "adapter_sha256": "536eebb02acb83e25b5d96727caf9ad65d62721c1f6432e115aa4b41d4b9d3bd",
+        "training_receipt_sha256": "dfb85973ba2ea76c8f0f3087e32c18b40040b0a6100e2f69dcc8d0b8a42ad76e",
+        "answers_sha256": "af51ae06c51cb19d7caede79ef759d2388830d6faef5ae4f8236cf75725cb313",
+        "audit_script_sha256": "2f2a4eceecb7f5f8a8b70a5ebfd3daf0f2e236815fcd83f1167224dacaeb1e68",
+        "old_only_prior_verified": true,
+        "train_held_source_groups_disjoint": true,
+        "nonzero_visual_update": true,
+        "fresh_inference_reproduced": true,
+        "maximum_val_score_delta": 0.0
+      }
+    ],
+    "all_oof_predictions_replayed": true,
+    "validation_predictions_and_scores_replayed": true,
+    "maximum_val_score_delta": 0.0,
+    "validation_gates": {
+      "A_recall": true,
+      "A_f1": false,
+      "B_recall": true,
+      "B_f1": false,
+      "C_recall": false,
+      "C_f1": false,
+      "D_recall": true,
+      "D_f1": true,
+      "E_recall": true,
+      "E_f1": true,
+      "F_recall": false,
+      "F_f1": false,
+      "macro_f1_improved": false,
+      "train_eligible": false,
+      "accuracy": false
+    },
+    "distribution_approved": false,
+    "installed_in_application": false,
+    "prepared_test_pixels_opened": 0,
+    "audit_script_sha256": "2f2a4eceecb7f5f8a8b70a5ebfd3daf0f2e236815fcd83f1167224dacaeb1e68",
+    "limitation": "Three correlated source-proxy folds and repeatedly used val50, not independent field accuracy or92-facies/full-description validation"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "kernel_v8": {
+    "real_image": true,
+    "maximum_score_delta_to_cached_features": 0.0,
+    "prediction": "A",
+    "language_model_loaded": false
+  },
+  "visual_lora_v9": {
+    "real_image": true,
+    "validation_record_id": "unibo_facies_b4277053d5764cb1ed6d49c1",
+    "maximum_single_image_score_delta_to_saved_batch": 0.001352548599243164,
+    "single_and_batch_scores_identical": false,
+    "expected_code": "A",
+    "prediction": "A",
+    "same_class_as_saved_batch": true,
+    "language_model_loaded": false,
+    "visual_adapter_loaded": true
+  },
+  "limitations": "Single-image integration smoke tests, not additional field accuracy measurement. FP16 batch shapes change raw scores; see batching_check.json for all50 comparisons."
+}

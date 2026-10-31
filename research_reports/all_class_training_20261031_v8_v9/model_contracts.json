@@ -1,0 +1,148 @@
+{
+  "kernel_v8": {
+    "type": "frozen_qwen_rbf_partial_ridge_head",
+    "base_model_id": "Qwen/Qwen3-VL-2B-Instruct",
+    "base_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+    "base_config_sha256": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+    "base_weights_sha256": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+    "base_weights_bytes": 4255140312,
+    "head_sha256": "e0b4564fb0da58f55d852a176ebb0fa28ac0445151fa4e0c49e4820fa469e121",
+    "feature_contract_version": "qwen3vl_rbf_partial_head_v1",
+    "feature_dimension": 4096,
+    "feature_spec": {
+      "encoder": "Original frozen Qwen3-VL-2B",
+      "input": "RGB core crop thumbnail300",
+      "normalization": "Train-only Qwen post features, L2; RBF kernel to804 train anchors",
+      "output": "Six uncalibrated class scores; partial A/B sum supervision"
+    },
+    "code_to_russian": {
+      "A": "Хорошо дренируемая пойма",
+      "B": "Плохо дренируемая пойма",
+      "C": "Продельта",
+      "D": "Прослой торфа",
+      "E": "Русловой песок",
+      "F": "Болото"
+    },
+    "package_versions": {
+      "torch": "2.6.0+cu126",
+      "transformers": "5.18.0",
+      "peft": "0.21.2",
+      "accelerate": "1.15.0",
+      "safetensors": "0.8.0",
+      "Pillow": "12.3.0"
+    },
+    "preprocessing_files_sha256": {
+      "chat_template.json": "6f8a6a55027e3da5160105556cda5dd69f6423f1c32645f6730d32de7773d0c4",
+      "config.json": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+      "generation_config.json": "1e241830b48b397cb0900101421df5450baddc7adf01e5fc86b5615865f3bae4",
+      "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+      "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "tokenizer.json": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7",
+      "tokenizer_config.json": "c2da771801886ad9ae98181793ffd3dfb7f1af30f6f7c6a4e15d7dbba52e2399",
+      "video_preprocessor_config.json": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    },
+    "training_recipe": {
+      "profile": "qwen_post",
+      "factors": [
+        0.5,
+        2.0,
+        8.0
+      ],
+      "alphas": [
+        0.01,
+        0.1,
+        1.0
+      ],
+      "weightings": [
+        "class",
+        "class_group"
+      ],
+      "external_weight": 0.5,
+      "folds": 3,
+      "selection": "On same old728 OOF: all six recall AND F1 nondecreasing, macroF1 higher; if none pass, maximum worst-class recall gain then minimum recall, macroF1, mean group accuracy. No val selection.",
+      "normalization": "All train rows in each fold only, population std floor1e-3, L2; RBF bandwidth=median positive squared training distance",
+      "partial_AB": "Only sum A+B is supervised for generic floodplain; no guessed drainage",
+      "validation": "Previous50 loaded once after train-group selection frozen",
+      "seed": 20261031,
+      "distribution_approved": false,
+      "installed_in_application": false,
+      "encoder_or_chat_weights_changed": false
+    },
+    "training_source_license": "Po CC BY; Rome CC BY-NC-ND and previous Salpi unresolved. Local only; mixed weights not distributed.",
+    "acceptance_status": "not_promoted_all_class_gate_failed",
+    "general_chat_or_description_model": false,
+    "automatic_project_catalog_mapping": null,
+    "distribution_approved": false,
+    "input_scope": "cropped core interval, six UniBo source classes only, not a whole tray or complete geological description"
+  },
+  "visual_lora_v9": {
+    "type": "qwen3vl_vision_lora_residual_facies_classifier",
+    "base_model_id": "Qwen/Qwen3-VL-2B-Instruct",
+    "base_revision": "89644892e4d85e24eaac8bacfd4f463576704203",
+    "base_config_sha256": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+    "base_weights_sha256": "7de1838c87a5349b016c26a1c3f7d2bc400a3d485f95ef39a7059ffd734977a0",
+    "base_weights_bytes": 4255140312,
+    "head_sha256": "536eebb02acb83e25b5d96727caf9ad65d62721c1f6432e115aa4b41d4b9d3bd",
+    "feature_contract_version": "qwen3vl_vision_lora_facies_v1",
+    "feature_dimension": 4096,
+    "feature_spec": "Original vision + LoRA last4 qkv/proj, post token mean/std4096 -> fixed old-only normalizer -> base ridge + trained head delta",
+    "code_to_russian": {
+      "A": "Хорошо дренируемая пойма",
+      "B": "Плохо дренируемая пойма",
+      "C": "Продельта",
+      "D": "Прослой торфа",
+      "E": "Русловой песок",
+      "F": "Болото"
+    },
+    "package_versions": {
+      "torch": "2.6.0+cu126",
+      "transformers": "5.18.0",
+      "peft": "0.21.2",
+      "accelerate": "1.15.0",
+      "safetensors": "0.8.0",
+      "Pillow": "12.3.0"
+    },
+    "preprocessing_files_sha256": {
+      "chat_template.json": "6f8a6a55027e3da5160105556cda5dd69f6423f1c32645f6730d32de7773d0c4",
+      "config.json": "bec4b3d446efa05807365c9e1cec03ac590836879d02f3a6da879971154bdd3b",
+      "generation_config.json": "1e241830b48b397cb0900101421df5450baddc7adf01e5fc86b5615865f3bae4",
+      "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+      "preprocessor_config.json": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516",
+      "tokenizer.json": "a5d85b6dcc535e6b93115a9ef287e6132fdbf30270da6218194ba742261173c7",
+      "tokenizer_config.json": "c2da771801886ad9ae98181793ffd3dfb7f1af30f6f7c6a4e15d7dbba52e2399",
+      "video_preprocessor_config.json": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13",
+      "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    },
+    "training_recipe": {
+      "epochs": 3,
+      "batch_size": 4,
+      "rank": 8,
+      "lora_alpha": 16,
+      "last_vision_blocks": 4,
+      "lora_lr": 0.0001,
+      "head_lr": 0.0005,
+      "weight_decay": 0.01,
+      "logit_scale": 5.0,
+      "old_correct_exact_KL_weight": 0.3,
+      "head_delta_penalty": 0.1,
+      "seed": 20261031,
+      "gradient_clip": 1.0,
+      "supervision": "Weighted exact CE, -log(PA+PB) for generic floodplain. Teacher KL only on correctly classified OLD EXACT targets, not on partial targets.",
+      "weights": "Class+source-group balanced on each train fold; external0.5, core end-face0.25",
+      "normalization": "Old train subset only, Qwen post mean/std -> L2, fixed within run",
+      "selection": "One fixed recipe; final epoch only. Three group OOF folds then frozen recipe before repeated val50.",
+      "image": "Original RGB thumbnail300, unchanged original processor; no synthetic images or geometric/colour augmentation",
+      "language_weights_changed": false,
+      "vision_encoder_changed": true,
+      "distribution_approved": false,
+      "installed_in_application": false
+    },
+    "training_source_license": "Po CC BY; Rome CC BY-NC-ND and previous Salpi unresolved. Local only; mixed weights not distributed.",
+    "acceptance_status": "not_promoted_all_class_gate_failed",
+    "general_chat_or_description_model": false,
+    "automatic_project_catalog_mapping": null,
+    "distribution_approved": false,
+    "input_scope": "cropped core interval, six UniBo source classes only, not a whole tray or complete geological description"
+  }
+}
