@@ -1,0 +1,60 @@
+{
+  "train_count": 18,
+  "holdout_count": 16,
+  "sources": {
+    "geus": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "bohai": {
+      "author": "Lei et al. (2025)",
+      "doi": "10.3390/jmse13050881",
+      "url": "https://www.mdpi.com/2077-1312/13/5/881",
+      "download_url": "https://mdpi-res.com/d_attachment/jmse/jmse-13-00881/article_deploy/jmse-13-00881.pdf",
+      "rights": "CC BY4.0, PDF page1",
+      "note": "Only Fig3f: caption, depth0.64-1.04m and DU1 text agree on prodelta. Fig3a/c/d excluded for caption/text or depth/unit conflicts. BHZK/BXZK spelling variation retained as source alias."
+    },
+    "gsj": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    }
+  },
+  "pdf_sha256": {
+    "andsbjerg2003.pdf": "95e049fb937a441891426cce2f6cf9de97bdc213ddb67881a1879d10f75a896e",
+    "bohai2025.pdf": "44a85bfb63941f9adfa7d93cf145e26484a1f0e1bb6ddc874300be3ad8f7dd24",
+    "gsj2016.pdf": "29d4cb5e4f44b1604f27479f248134be20c81760f39081c381ec8a93c9f1d6fe"
+  },
+  "source_photo_sha256": {
+    "geus_p12_1.png": "3ceb653970cba1f1859e59126c873b61d4a06a9eb7e8dd1b3b5b751160d0a95c",
+    "geus_p12_2.png": "d507c6b59c368b565b279d8461f319687b3982c3b50185e5106cd6e4608b7518",
+    "geus_p12_3.png": "d35c0276247d2820f6dba14e4f3008801e719aef31d2048cc787c6a4e64a6155",
+    "geus_p12_4.png": "fd255bb1e8f6acdd3a2b676262296158e1b3115674b156657654ef9f48cf1314",
+    "geus_p13_2.png": "195481ab4131e1e9c2d6965a54036b01460fe54784509a333d59965b09b8feca",
+    "geus_p13_3.png": "f95c2fe175d7a2ab7d54bd1ee131b8e5d1c946357eba891b51d74800e8113cdc",
+    "geus_p13_4.png": "bee96dd86aed3460d0400cb6017331b72d8f3c2b12c11370978c3ddedc1236d8",
+    "bohai_fig3.png": "2dd69688cf51fc71436be98bceb5bc7e3dbe5058daaa6d2c7ee947428ca40741",
+    "japan_fig4.png": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6"
+  },
+  "train_classes": {
+    "E": 12,
+    "C": 6
+  },
+  "holdout_classes": {
+    "E": 11,
+    "C": 5
+  },
+  "split_frozen_before_model_predictions": true,
+  "geologist_approved": false,
+  "distribution_approved": false,
+  "do_not_train": false,
+  "exclusions": [
+    "Bohai Fig3a/c/d: caption/body/depth conflicts; no drainage subtype guessed",
+    "GEUS Fig5A/G/H/L and estuarine figures: mixed/ambiguous or outside chosen class",
+    "Japan Fig4-2/3/4/6/7/8: not forcibly relabelled as peat/floodplain/channel/prodelta"
+  ]
+}

@@ -1,0 +1,1358 @@
+[
+  {
+    "source_file": "geus_p12_1.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5B",
+    "published_panel_interval_m": [
+      3751.0,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      45,
+      30,
+      105,
+      140
+    ],
+    "record_id": "newwell_v10_000",
+    "image_sha256": "00e5994e409ea1fae1fc20f1486d1bfd4afad75f6ff2d9399b9133001b6d3d16",
+    "pixel_sha256": "4295ad8012dda51462e240581913f5b259c2514e24041a6f205f32c54185760e",
+    "source_file_sha256": "3ceb653970cba1f1859e59126c873b61d4a06a9eb7e8dd1b3b5b751160d0a95c",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_1.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5B",
+    "published_panel_interval_m": [
+      3751.0,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      45,
+      175,
+      105,
+      285
+    ],
+    "record_id": "newwell_v10_001",
+    "image_sha256": "226065f4bf33bbff5fd23d5d1fb6a8a673127c12314f94947107fc7b3afbf3e2",
+    "pixel_sha256": "0276063ca9d4f3d2d61c28d4869dcbfd9808e02a0dd063c7359bf53cadb1ea74",
+    "source_file_sha256": "3ceb653970cba1f1859e59126c873b61d4a06a9eb7e8dd1b3b5b751160d0a95c",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_1.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5B",
+    "published_panel_interval_m": [
+      3751.0,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      45,
+      365,
+      105,
+      465
+    ],
+    "record_id": "newwell_v10_002",
+    "image_sha256": "30b7422fc0e0217969d03d8b4ee9538da2558c7b08f493c9d91df9114fc88ea6",
+    "pixel_sha256": "6acb2bfba6f65cce310577fa998ecd1799c067f8dc6f8754f37754e1a9d3a33e",
+    "source_file_sha256": "3ceb653970cba1f1859e59126c873b61d4a06a9eb7e8dd1b3b5b751160d0a95c",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_1.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5B",
+    "published_panel_interval_m": [
+      3751.0,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      45,
+      525,
+      105,
+      660
+    ],
+    "record_id": "newwell_v10_003",
+    "image_sha256": "7ff2790a99ef332cf72cae51616d22e0ff8d70d1301485a927828c5fd655d5e1",
+    "pixel_sha256": "ab032ff4b20c1a1b56375655affb773ef59640e9c210e9a40ffabbb8adc7b5fd",
+    "source_file_sha256": "3ceb653970cba1f1859e59126c873b61d4a06a9eb7e8dd1b3b5b751160d0a95c",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_2.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5C",
+    "published_panel_interval_m": [
+      3751.8,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      45,
+      30,
+      95,
+      140
+    ],
+    "record_id": "newwell_v10_004",
+    "image_sha256": "4f8511cca8c4db5a06e27ebf7e959b22f26502e98b25d4291febc1980686c7b0",
+    "pixel_sha256": "b2bfdc134ac26389b2ab3a9f7a095c7bb6d03f7ef2cdddd41c03ac1e46560461",
+    "source_file_sha256": "d507c6b59c368b565b279d8461f319687b3982c3b50185e5106cd6e4608b7518",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_2.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5C",
+    "published_panel_interval_m": [
+      3751.8,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      45,
+      500,
+      95,
+      640
+    ],
+    "record_id": "newwell_v10_005",
+    "image_sha256": "cc120fea5529b14806e512d322a2e1c2e9e36b69f3a42d9558776d6ca591c329",
+    "pixel_sha256": "44730f1ae3844c602913facdecd4e57a9a7b5bae2a9d0945f6582b60d716a209",
+    "source_file_sha256": "d507c6b59c368b565b279d8461f319687b3982c3b50185e5106cd6e4608b7518",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_3.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5D",
+    "published_panel_interval_m": [
+      3753.3,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      35,
+      40,
+      85,
+      180
+    ],
+    "record_id": "newwell_v10_006",
+    "image_sha256": "434c3abd578ea3c3cf3413246a04f3dd4aae9434407c5cdbcf175f78bb3770d0",
+    "pixel_sha256": "a6e3422bb7324abbbbce4e8b781667c0f10d33c2ae078db734fcee7b2adb1440",
+    "source_file_sha256": "d35c0276247d2820f6dba14e4f3008801e719aef31d2048cc787c6a4e64a6155",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_3.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5D",
+    "published_panel_interval_m": [
+      3753.3,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      35,
+      300,
+      85,
+      420
+    ],
+    "record_id": "newwell_v10_007",
+    "image_sha256": "bafa829322bbee62523c7a939117f0937dafbacf2bee889f42526faf9f834d01",
+    "pixel_sha256": "0bd952d2dd512fb65cf81e4b714efb6cfb26760bd55c6a02557091714fb81f43",
+    "source_file_sha256": "d35c0276247d2820f6dba14e4f3008801e719aef31d2048cc787c6a4e64a6155",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_3.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5D",
+    "published_panel_interval_m": [
+      3753.3,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      35,
+      500,
+      85,
+      600
+    ],
+    "record_id": "newwell_v10_008",
+    "image_sha256": "c7cef2b8d37a7b2455e90b28940be76d11098d27ec0f6f88dc63433b5f011ae0",
+    "pixel_sha256": "ec740aa568acdf831cee08cbb827c01df48557260bd700c185b818b99fb773f5",
+    "source_file_sha256": "d35c0276247d2820f6dba14e4f3008801e719aef31d2048cc787c6a4e64a6155",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_4.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5E",
+    "published_panel_interval_m": [
+      3754.1,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      25,
+      40,
+      75,
+      180
+    ],
+    "record_id": "newwell_v10_009",
+    "image_sha256": "65ce7d4268f905547b065b73fd319af57ee860f9ba2266669146d0bf0f580c3f",
+    "pixel_sha256": "33d98daab602659ef2787315281f90159a4fb2651107221ad20a987f25a8c109",
+    "source_file_sha256": "fd255bb1e8f6acdd3a2b676262296158e1b3115674b156657654ef9f48cf1314",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_4.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5E",
+    "published_panel_interval_m": [
+      3754.1,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      25,
+      320,
+      75,
+      420
+    ],
+    "record_id": "newwell_v10_010",
+    "image_sha256": "26eca33f225f9278b020e23adf0b48b435b1850dfa6b5daa0c5e50d8c59c7a94",
+    "pixel_sha256": "828ed626eff3edb29c665298248b9b90353d4f702eb7b519c163cdcd488ed462",
+    "source_file_sha256": "fd255bb1e8f6acdd3a2b676262296158e1b3115674b156657654ef9f48cf1314",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p12_4.png",
+    "source_id": "geus",
+    "well": "West Lulu-3",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "train",
+    "figure": "Fig5E",
+    "published_panel_interval_m": [
+      3754.1,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      25,
+      460,
+      75,
+      600
+    ],
+    "record_id": "newwell_v10_011",
+    "image_sha256": "32a56b38077d2d3f74d44f7866abc55405430fcb7633f0d2e88e271a8d93639f",
+    "pixel_sha256": "0f439b4c7116efe6162b51b18f8ef8ca1ab134ce24fa27e4007e5c7b3763cd54",
+    "source_file_sha256": "fd255bb1e8f6acdd3a2b676262296158e1b3115674b156657654ef9f48cf1314",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_GEUS2003_WestLulu3",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p13_2.png",
+    "source_id": "geus",
+    "well": "West Lulu-2",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig5I",
+    "published_panel_interval_m": [
+      3860.0,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      50,
+      600,
+      115,
+      740
+    ],
+    "record_id": "newwell_v10_012",
+    "image_sha256": "fe9595cfe149cd479b7a75fd090b5be2dbee42d0ad49b6f494f8f951e33e5c8b",
+    "pixel_sha256": "e843f3d81b13f8d423b5d52ebdd6b076c4e04eae57742184234c5fa65403fa64",
+    "source_file_sha256": "195481ab4131e1e9c2d6965a54036b01460fe54784509a333d59965b09b8feca",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_geus_West Lulu-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p13_2.png",
+    "source_id": "geus",
+    "well": "West Lulu-2",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig5I",
+    "published_panel_interval_m": [
+      3860.0,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      50,
+      760,
+      115,
+      900
+    ],
+    "record_id": "newwell_v10_013",
+    "image_sha256": "78724f4f4377228fcf84c9dd877f04fbc773857e9a49e8c71da4562494cd65cd",
+    "pixel_sha256": "688f4c158eceb0aaf2ae29538b4b79ff30fd22c6b67cdd6e636b57f6f6a4b9cf",
+    "source_file_sha256": "195481ab4131e1e9c2d6965a54036b01460fe54784509a333d59965b09b8feca",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_geus_West Lulu-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p13_3.png",
+    "source_id": "geus",
+    "well": "West Lulu-2",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig5J",
+    "published_panel_interval_m": [
+      3861.6,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      40,
+      230,
+      110,
+      365
+    ],
+    "record_id": "newwell_v10_014",
+    "image_sha256": "9fadb54875612425ce129f1da84c2cf24cda7eab9ff1528fa6cda82db2ce1665",
+    "pixel_sha256": "7a52ed5cb9faea7932387316ee8a99ccd914909f4ae3ccd4844482672ce72bdd",
+    "source_file_sha256": "f95c2fe175d7a2ab7d54bd1ee131b8e5d1c946357eba891b51d74800e8113cdc",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_geus_West Lulu-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p13_3.png",
+    "source_id": "geus",
+    "well": "West Lulu-2",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig5J",
+    "published_panel_interval_m": [
+      3861.6,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      40,
+      600,
+      110,
+      690
+    ],
+    "record_id": "newwell_v10_015",
+    "image_sha256": "15d6a120c8a4047f2cd761b99b480e0f7f780adde8dd9acb6d425d92a020d0d9",
+    "pixel_sha256": "1b1a73427c7cc0092fdd3a52420c090e251974b39a8ecc7af549952fc529a551",
+    "source_file_sha256": "f95c2fe175d7a2ab7d54bd1ee131b8e5d1c946357eba891b51d74800e8113cdc",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_geus_West Lulu-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p13_4.png",
+    "source_id": "geus",
+    "well": "West Lulu-2",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig5K",
+    "published_panel_interval_m": [
+      3862.2,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      40,
+      355,
+      100,
+      475
+    ],
+    "record_id": "newwell_v10_016",
+    "image_sha256": "cecd48f13722ca76e7ce1d354d17ae25bb11535fea6a55e08f90c303942d3ef4",
+    "pixel_sha256": "2f03d8b510c2b4c716ddd2accddfdea5aa2cab2d2569e4fdfdca7cde8b32a57d",
+    "source_file_sha256": "bee96dd86aed3460d0400cb6017331b72d8f3c2b12c11370978c3ddedc1236d8",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_geus_West Lulu-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "geus_p13_4.png",
+    "source_id": "geus",
+    "well": "West Lulu-2",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig5K",
+    "published_panel_interval_m": [
+      3862.2,
+      null
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: активное заполнение речного русла, песчаники с косой/рябной слоистостью либо массивные, с углистыми и глинистыми обломками.",
+    "box": [
+      40,
+      570,
+      100,
+      700
+    ],
+    "record_id": "newwell_v10_017",
+    "image_sha256": "fde66bbba22892cdaa1a4f02a6eda20dbae7ec09e0b35d8d17258c69c77a5ebf",
+    "pixel_sha256": "cd4a81936f5c372e68d098dd353ebf106fc30906349b34413d36c7ca21a86fd9",
+    "source_file_sha256": "bee96dd86aed3460d0400cb6017331b72d8f3c2b12c11370978c3ddedc1236d8",
+    "source": {
+      "author": "Andsbjerg (2003)",
+      "doi": "10.34194/geusb.v1.4676",
+      "url": "https://www.geus.dk/media/13879/nr1_p301-347.pdf",
+      "rights": "Public GEUS PDF; explicit licence on publisher page not verified in this acquisition. Local research only; no photo/weight distribution.",
+      "note": "West Lulu-3 training, West Lulu-2 held entirely out; shared publication/photographic style, not independent articles."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_geus_West Lulu-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "Embedded PDF CMYK ICC -> sRGB",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "bohai_fig3.png",
+    "source_id": "bohai",
+    "well": "BHZK2017-2",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "train",
+    "figure": "Fig3f",
+    "published_panel_interval_m": [
+      0.64,
+      1.04
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовые алевритисто-глинистые отложения DU1; биотурбация, тонкое переслаивание и морские/солоноватоводные раковинные остатки.",
+    "box": [
+      2410,
+      150,
+      2580,
+      290
+    ],
+    "record_id": "newwell_v10_018",
+    "image_sha256": "3739e0112304765af47868fd38fa47e99445a697b20d6302c71f644b71472706",
+    "pixel_sha256": "307fcb44dbf7c0316fb079fbb5101fcd8647afaa7c868ed674e3b59e0427b9c4",
+    "source_file_sha256": "2dd69688cf51fc71436be98bceb5bc7e3dbe5058daaa6d2c7ee947428ca40741",
+    "source": {
+      "author": "Lei et al. (2025)",
+      "doi": "10.3390/jmse13050881",
+      "url": "https://www.mdpi.com/2077-1312/13/5/881",
+      "download_url": "https://mdpi-res.com/d_attachment/jmse/jmse-13-00881/article_deploy/jmse-13-00881.pdf",
+      "rights": "CC BY4.0, PDF page1",
+      "note": "Only Fig3f: caption, depth0.64-1.04m and DU1 text agree on prodelta. Fig3a/c/d excluded for caption/text or depth/unit conflicts. BHZK/BXZK spelling variation retained as source alias."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_bohai_BHZK2017-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "bohai_fig3.png",
+    "source_id": "bohai",
+    "well": "BHZK2017-2",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "train",
+    "figure": "Fig3f",
+    "published_panel_interval_m": [
+      0.64,
+      1.04
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовые алевритисто-глинистые отложения DU1; биотурбация, тонкое переслаивание и морские/солоноватоводные раковинные остатки.",
+    "box": [
+      2410,
+      330,
+      2580,
+      470
+    ],
+    "record_id": "newwell_v10_019",
+    "image_sha256": "24cbdab8de98c3858ad09c1b361dc7ea1079df1d8d3a5c9553045c95494c3535",
+    "pixel_sha256": "48420b256cb1d1c18e5e8cd0593a84e3fe365dab0334fbafbab85f1fc6bbc98e",
+    "source_file_sha256": "2dd69688cf51fc71436be98bceb5bc7e3dbe5058daaa6d2c7ee947428ca40741",
+    "source": {
+      "author": "Lei et al. (2025)",
+      "doi": "10.3390/jmse13050881",
+      "url": "https://www.mdpi.com/2077-1312/13/5/881",
+      "download_url": "https://mdpi-res.com/d_attachment/jmse/jmse-13-00881/article_deploy/jmse-13-00881.pdf",
+      "rights": "CC BY4.0, PDF page1",
+      "note": "Only Fig3f: caption, depth0.64-1.04m and DU1 text agree on prodelta. Fig3a/c/d excluded for caption/text or depth/unit conflicts. BHZK/BXZK spelling variation retained as source alias."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_bohai_BHZK2017-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 8.403361344537815e-05
+  },
+  {
+    "source_file": "bohai_fig3.png",
+    "source_id": "bohai",
+    "well": "BHZK2017-2",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "train",
+    "figure": "Fig3f",
+    "published_panel_interval_m": [
+      0.64,
+      1.04
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовые алевритисто-глинистые отложения DU1; биотурбация, тонкое переслаивание и морские/солоноватоводные раковинные остатки.",
+    "box": [
+      2410,
+      510,
+      2580,
+      650
+    ],
+    "record_id": "newwell_v10_020",
+    "image_sha256": "b4d004b43812269738750b0bab705c7cd732cd513ee4d6995d24e331014c091f",
+    "pixel_sha256": "dfef3e9e74448a684d46d6a17564e3efa3e1ba6b0fa5585e98d5354c243b5024",
+    "source_file_sha256": "2dd69688cf51fc71436be98bceb5bc7e3dbe5058daaa6d2c7ee947428ca40741",
+    "source": {
+      "author": "Lei et al. (2025)",
+      "doi": "10.3390/jmse13050881",
+      "url": "https://www.mdpi.com/2077-1312/13/5/881",
+      "download_url": "https://mdpi-res.com/d_attachment/jmse/jmse-13-00881/article_deploy/jmse-13-00881.pdf",
+      "rights": "CC BY4.0, PDF page1",
+      "note": "Only Fig3f: caption, depth0.64-1.04m and DU1 text agree on prodelta. Fig3a/c/d excluded for caption/text or depth/unit conflicts. BHZK/BXZK spelling variation retained as source alias."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_bohai_BHZK2017-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 4.201680672268908e-05
+  },
+  {
+    "source_file": "bohai_fig3.png",
+    "source_id": "bohai",
+    "well": "BHZK2017-2",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "train",
+    "figure": "Fig3f",
+    "published_panel_interval_m": [
+      0.64,
+      1.04
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовые алевритисто-глинистые отложения DU1; биотурбация, тонкое переслаивание и морские/солоноватоводные раковинные остатки.",
+    "box": [
+      2410,
+      690,
+      2580,
+      830
+    ],
+    "record_id": "newwell_v10_021",
+    "image_sha256": "c085286417bfa3d3ec75f5f3cdeb21d8d9ef9379cb5a334c36797de9847cdbaa",
+    "pixel_sha256": "6102704f8459bc5104c71d02d144422682d36214d2109f3d3959ab229c0f166c",
+    "source_file_sha256": "2dd69688cf51fc71436be98bceb5bc7e3dbe5058daaa6d2c7ee947428ca40741",
+    "source": {
+      "author": "Lei et al. (2025)",
+      "doi": "10.3390/jmse13050881",
+      "url": "https://www.mdpi.com/2077-1312/13/5/881",
+      "download_url": "https://mdpi-res.com/d_attachment/jmse/jmse-13-00881/article_deploy/jmse-13-00881.pdf",
+      "rights": "CC BY4.0, PDF page1",
+      "note": "Only Fig3f: caption, depth0.64-1.04m and DU1 text agree on prodelta. Fig3a/c/d excluded for caption/text or depth/unit conflicts. BHZK/BXZK spelling variation retained as source alias."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_bohai_BHZK2017-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "bohai_fig3.png",
+    "source_id": "bohai",
+    "well": "BHZK2017-2",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "train",
+    "figure": "Fig3f",
+    "published_panel_interval_m": [
+      0.64,
+      1.04
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовые алевритисто-глинистые отложения DU1; биотурбация, тонкое переслаивание и морские/солоноватоводные раковинные остатки.",
+    "box": [
+      2410,
+      870,
+      2580,
+      1010
+    ],
+    "record_id": "newwell_v10_022",
+    "image_sha256": "c2496d3a10c63ebeb43f093aadc41ece1713e913ab72886d7e1622ff331c0a7c",
+    "pixel_sha256": "52044dde062455275401195cfd6e8221c89a4e52bd0cbb74f78c32ec90ad4e49",
+    "source_file_sha256": "2dd69688cf51fc71436be98bceb5bc7e3dbe5058daaa6d2c7ee947428ca40741",
+    "source": {
+      "author": "Lei et al. (2025)",
+      "doi": "10.3390/jmse13050881",
+      "url": "https://www.mdpi.com/2077-1312/13/5/881",
+      "download_url": "https://mdpi-res.com/d_attachment/jmse/jmse-13-00881/article_deploy/jmse-13-00881.pdf",
+      "rights": "CC BY4.0, PDF page1",
+      "note": "Only Fig3f: caption, depth0.64-1.04m and DU1 text agree on prodelta. Fig3a/c/d excluded for caption/text or depth/unit conflicts. BHZK/BXZK spelling variation retained as source alias."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_bohai_BHZK2017-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "bohai_fig3.png",
+    "source_id": "bohai",
+    "well": "BHZK2017-2",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "train",
+    "figure": "Fig3f",
+    "published_panel_interval_m": [
+      0.64,
+      1.04
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовые алевритисто-глинистые отложения DU1; биотурбация, тонкое переслаивание и морские/солоноватоводные раковинные остатки.",
+    "box": [
+      2410,
+      1050,
+      2580,
+      1190
+    ],
+    "record_id": "newwell_v10_023",
+    "image_sha256": "e29b0546e2744a0c5a93eb9930f9341d107734ff9d4943ec14658ac40280658f",
+    "pixel_sha256": "323ed4e426600e8a35bc103de99341d86494fc7cefe1d985142f7107f73c7301",
+    "source_file_sha256": "2dd69688cf51fc71436be98bceb5bc7e3dbe5058daaa6d2c7ee947428ca40741",
+    "source": {
+      "author": "Lei et al. (2025)",
+      "doi": "10.3390/jmse13050881",
+      "url": "https://www.mdpi.com/2077-1312/13/5/881",
+      "download_url": "https://mdpi-res.com/d_attachment/jmse/jmse-13-00881/article_deploy/jmse-13-00881.pdf",
+      "rights": "CC BY4.0, PDF page1",
+      "note": "Only Fig3f: caption, depth0.64-1.04m and DU1 text agree on prodelta. Fig3a/c/d excluded for caption/text or depth/unit conflicts. BHZK/BXZK spelling variation retained as source alias."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_bohai_BHZK2017-2",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "japan_fig4.png",
+    "source_id": "gsj",
+    "well": "GS-TM-1",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig4-1",
+    "published_panel_interval_m": [
+      62.9,
+      63.4
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: речная фация UnitI, песок с гравием и косой слоистостью.",
+    "box": [
+      10,
+      35,
+      120,
+      165
+    ],
+    "record_id": "newwell_v10_024",
+    "image_sha256": "ba89dfb9898f8b52c6a0acb4719e5f46375826f601154b84833d4cffed1d7f0e",
+    "pixel_sha256": "18d6f176258d70b8c45720a9840cc51e3949e479401773ce842328ecd93898cc",
+    "source_file_sha256": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6",
+    "source": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_gsj_GS-TM-1",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "japan_fig4.png",
+    "source_id": "gsj",
+    "well": "GS-TM-1",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig4-1",
+    "published_panel_interval_m": [
+      62.9,
+      63.4
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: речная фация UnitI, песок с гравием и косой слоистостью.",
+    "box": [
+      10,
+      185,
+      120,
+      315
+    ],
+    "record_id": "newwell_v10_025",
+    "image_sha256": "09675ad8ca9aeb4576d65302e3e54387164ab83cdc39435309a6d90ee5c71502",
+    "pixel_sha256": "d67f82596ed3deaf5e19f6961faf3aedfabd094a45ef809eca8b57da0c0e0f89",
+    "source_file_sha256": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6",
+    "source": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_gsj_GS-TM-1",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "japan_fig4.png",
+    "source_id": "gsj",
+    "well": "GS-TM-1",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig4-1",
+    "published_panel_interval_m": [
+      62.9,
+      63.4
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: речная фация UnitI, песок с гравием и косой слоистостью.",
+    "box": [
+      10,
+      335,
+      120,
+      465
+    ],
+    "record_id": "newwell_v10_026",
+    "image_sha256": "8297810f4213cafe5a1b4a019860044f4eeef4c0808e20d6ea71aeac203dd3d2",
+    "pixel_sha256": "32e35b9963500fb516bc4553c374b66f36237b0df94b60983ff554473fb40869",
+    "source_file_sha256": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6",
+    "source": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_gsj_GS-TM-1",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "japan_fig4.png",
+    "source_id": "gsj",
+    "well": "GS-TM-1",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig4-1",
+    "published_panel_interval_m": [
+      62.9,
+      63.4
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: речная фация UnitI, песок с гравием и косой слоистостью.",
+    "box": [
+      10,
+      485,
+      120,
+      615
+    ],
+    "record_id": "newwell_v10_027",
+    "image_sha256": "b9b4d5d97dfa357f3886321735d6c1b99fd43489f7e50356f359407443a586d8",
+    "pixel_sha256": "a537dcc4e4bb0501e2196433bb4d7dc67244b147efe4734acfdc64fd2d307628",
+    "source_file_sha256": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6",
+    "source": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_gsj_GS-TM-1",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "japan_fig4.png",
+    "source_id": "gsj",
+    "well": "GS-TM-1",
+    "allowed_codes": [
+      "E"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig4-1",
+    "published_panel_interval_m": [
+      62.9,
+      63.4
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: речная фация UnitI, песок с гравием и косой слоистостью.",
+    "box": [
+      10,
+      635,
+      120,
+      765
+    ],
+    "record_id": "newwell_v10_028",
+    "image_sha256": "6a4f5fe71bead058f771359a2f5d7754cfbcd65402c1c6c5a0b722d3525be7a3",
+    "pixel_sha256": "e30d82e29424b6ab62d56044dc1b365633d8d410ce2d190b6fdabeaeef7a8509",
+    "source_file_sha256": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6",
+    "source": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_gsj_GS-TM-1",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "japan_fig4.png",
+    "source_id": "gsj",
+    "well": "GS-TM-1",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig4-5",
+    "published_panel_interval_m": [
+      28.1,
+      28.6
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовая фация UnitIV, биотурбированный песчанистый ил.",
+    "box": [
+      635,
+      35,
+      740,
+      165
+    ],
+    "record_id": "newwell_v10_029",
+    "image_sha256": "52d2bc8effa8e4a39ec3e2320535ffe5643503ef5fb2a88fa4ae7e776b3a2dae",
+    "pixel_sha256": "10b3c186f5823f8ce24f6fab61d7f81095becf44b31ce3a392870c8b576bc67c",
+    "source_file_sha256": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6",
+    "source": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_gsj_GS-TM-1",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "japan_fig4.png",
+    "source_id": "gsj",
+    "well": "GS-TM-1",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig4-5",
+    "published_panel_interval_m": [
+      28.1,
+      28.6
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовая фация UnitIV, биотурбированный песчанистый ил.",
+    "box": [
+      635,
+      185,
+      740,
+      315
+    ],
+    "record_id": "newwell_v10_030",
+    "image_sha256": "3ab6a6125b89e03a3f89afaece0e9322916f64640c28a8bf38b48df58b7467a4",
+    "pixel_sha256": "12c1a9509e3594e0b5acf8fc16a0969d0c9c87043845e80a895e2efac4a53197",
+    "source_file_sha256": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6",
+    "source": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_gsj_GS-TM-1",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "japan_fig4.png",
+    "source_id": "gsj",
+    "well": "GS-TM-1",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig4-5",
+    "published_panel_interval_m": [
+      28.1,
+      28.6
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовая фация UnitIV, биотурбированный песчанистый ил.",
+    "box": [
+      635,
+      335,
+      740,
+      465
+    ],
+    "record_id": "newwell_v10_031",
+    "image_sha256": "a85a561f971daaf4e533f3ca1044a738b1ac7dc93a3fd11abd7cc947d45daab3",
+    "pixel_sha256": "0f2c7b9343f9ab7b5ab5f12156196eadcfbe7204ab26bcc769bd613df6589b19",
+    "source_file_sha256": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6",
+    "source": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_gsj_GS-TM-1",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "japan_fig4.png",
+    "source_id": "gsj",
+    "well": "GS-TM-1",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig4-5",
+    "published_panel_interval_m": [
+      28.1,
+      28.6
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовая фация UnitIV, биотурбированный песчанистый ил.",
+    "box": [
+      635,
+      485,
+      740,
+      615
+    ],
+    "record_id": "newwell_v10_032",
+    "image_sha256": "58d31a0e06c792538cb20b2c294d60b2bd1ca1befb7b368b54ec523c28de78ff",
+    "pixel_sha256": "d3cfb4010a893e1e63aaf87a4aa22cc9b4f7c5a6659a17dce4d5ddeb6da609eb",
+    "source_file_sha256": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6",
+    "source": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_gsj_GS-TM-1",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  },
+  {
+    "source_file": "japan_fig4.png",
+    "source_id": "gsj",
+    "well": "GS-TM-1",
+    "allowed_codes": [
+      "C"
+    ],
+    "split": "external_holdout",
+    "figure": "Fig4-5",
+    "published_panel_interval_m": [
+      28.1,
+      28.6
+    ],
+    "crop_exact_interval_m": null,
+    "description_ru": "По авторам: продельтовая фация UnitIV, биотурбированный песчанистый ил.",
+    "box": [
+      635,
+      635,
+      740,
+      765
+    ],
+    "record_id": "newwell_v10_033",
+    "image_sha256": "a90685a958027af72b73ab7f0e91a36433dbf3662224a9993cec5922204ceb51",
+    "pixel_sha256": "64ae4876a533972766dd8584818bd54e1d17dff0053246871ddfc73a58e18740",
+    "source_file_sha256": "1a102dd9f0499bbd6d5d3b3a66b8153938ae3d0b23933582eddfd2df9827bff6",
+    "source": {
+      "author": "GSJ/AIST (2016), Kioroshi Formation chapter",
+      "url": "https://www.gsj.jp/data/prompt-rep/GSJ_INTERIMREP_071_2016.pdf",
+      "rights": "Public GSJ report; explicit redistribution grant not verified. Local held-out evaluation only.",
+      "note": "All GS-TM-1 records held out. Only numbered1 fluvial sand and5 explicitly prodelta. Other environments not forced into six classes."
+    },
+    "external": true,
+    "domain": "core_longitudinal",
+    "source_group": "WEB_gsj_GS-TM-1",
+    "geologist_approved": false,
+    "training_approval_scope": "author-caption-grounded six-class research only; not92 project facies",
+    "color_processing": "PDF image RGB interpretation; no manual colour correction",
+    "white_fraction": 0.0
+  }
+]

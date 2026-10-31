@@ -1,0 +1,43 @@
+{
+  "status": "not_promoted_all_class_or_new_well_gate_failed",
+  "head_sha256": "eed2d5bc7ad987bbf6cbb50f5c6f9dcc42f7901e02567bbb35aa09f9e785c0f9",
+  "source_pdfs_verified": true,
+  "reviewed_crops_reconstructed": 34,
+  "previous804_features_unchanged": true,
+  "fresh_qwen_feature_max_delta": 0.0,
+  "embedded_geus_cmyk_profile_verified": "990ff8ae33980a5d51846e17afef684946f659e2f834eb1b8eefa63ecb6ce316",
+  "grouped_fits_and_all_metrics_reproduced": true,
+  "train_held_wells_disjoint": true,
+  "train_val_held_exact_file_and_pixel_duplicates": 0,
+  "validation_gates": {
+    "A_recall": true,
+    "A_f1": true,
+    "B_recall": true,
+    "B_f1": true,
+    "C_recall": true,
+    "C_f1": true,
+    "D_recall": true,
+    "D_f1": true,
+    "E_recall": true,
+    "E_f1": true,
+    "F_recall": true,
+    "F_f1": true,
+    "macro_f1_improved": false,
+    "accuracy": true,
+    "no_previously_correct_case_lost": true,
+    "train_eligible": false,
+    "new_wells_eligible": true
+  },
+  "new_well_gates": {
+    "GS-TM-1": true,
+    "West Lulu-2": true,
+    "C_recall": true,
+    "E_recall": true,
+    "at_least_one_gain": true
+  },
+  "distribution_approved": false,
+  "installed_in_application": false,
+  "prepared_test_pixels_opened": 0,
+  "audit_script_sha256": "85329a9d14092dd81b87bba00abb41e3697bceeb902531c0a3330007f3037182",
+  "limits": "Held16 are correlated crops from two wells, C/E only. West Lulu-2 shares a paper with training West Lulu-3. Not95% or92-facies evidence."
+}
