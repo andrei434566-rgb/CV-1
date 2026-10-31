@@ -50,7 +50,7 @@ Excel: ярко-красный фон проблемных ячеек, чёрн�
     elif not release['draft']:
         print('Already published',release['html_url']);return
     else:
-        r=s.patch(api+f"/releases/{release['id']}",json={'body':body,'target_commitish':commit},timeout=45);r.raise_for_status()
+        r=s.patch(api+f"/releases/{release['id']}",json={'body':body,'tag_name':TAG,'target_commitish':commit},timeout=45);r.raise_for_status()
     (APP/'outputs/build_cv1_210/github_release.json').write_text(json.dumps({'id':release['id'],'tag':TAG,'url':release['html_url']}),encoding='utf8')
     r=s.get(api+f"/releases/{release['id']}/assets?per_page=100",timeout=45);r.raise_for_status()
     existing={a['name']:a for a in r.json()}
@@ -77,7 +77,7 @@ Excel: ярко-красный фон проблемных ячеек, чёрн�
         if remote[name]['state']!='uploaded':raise ValueError('Asset is not complete: '+name)
         if remote[name].get('digest') not in (None,'sha256:'+checksums[name]):raise ValueError('Final remote checksum mismatch: '+name)
     if args.publish:
-        r=s.patch(api+f"/releases/{release['id']}",json={'draft':False,'make_latest':'true'},timeout=45);r.raise_for_status()
+        r=s.patch(api+f"/releases/{release['id']}",json={'tag_name':TAG,'target_commitish':commit,'draft':False,'make_latest':'true'},timeout=45);r.raise_for_status()
         print('PUBLISHED',r.json()['html_url'],flush=True)
     else:print('DRAFT COMPLETE. Run with --publish after media verification.',flush=True)
 
