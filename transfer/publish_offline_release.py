@@ -50,7 +50,7 @@ Excel: ярко-красный фон проблемных ячеек, чёрн�
     elif not release['draft']:
         print('Already published',release['html_url']);return
     else:
-        r=s.patch(api+f"/releases/{release['id']}",json={'body':body},timeout=45);r.raise_for_status()
+        r=s.patch(api+f"/releases/{release['id']}",json={'body':body,'target_commitish':commit},timeout=45);r.raise_for_status()
     (APP/'outputs/build_cv1_210/github_release.json').write_text(json.dumps({'id':release['id'],'tag':TAG,'url':release['html_url']}),encoding='utf8')
     r=s.get(api+f"/releases/{release['id']}/assets?per_page=100",timeout=45);r.raise_for_status()
     existing={a['name']:a for a in r.json()}
