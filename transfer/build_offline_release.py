@@ -196,7 +196,8 @@ def main():
     if args.kind in {'server','all'}:pack(server_map(client),'CV1_Server_Data','server')
     hashes=[]
     for path in sorted(OUT.iterdir()):
-        if path.is_file() and path.name!='SHA256SUMS.txt':hashes.append(digest(path)+'  '+path.name)
+        if path.is_file() and path.name not in {'SHA256SUMS.txt','Kern_Analyzer.exe'} and not path.name.endswith('.verify.json'):
+            hashes.append(digest(path)+'  '+path.name)
     (OUT/'SHA256SUMS.txt').write_text('\n'.join(hashes)+'\n',encoding='ascii')
     print('RELEASE READY',OUT,flush=True)
 
