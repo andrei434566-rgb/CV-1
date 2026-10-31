@@ -11,6 +11,7 @@ datas = [
     ('README_OPEN_DATASETS_RU.md', '.'),
     ('requirements.txt', '.'),
     ('README_EXCEL_JPG_IMPORT.md', '.'),
+    ('README_WORD_PHOTO_TRAINING_RU.md', '.'),
     ('PORTABLE_README.txt', '.'),
     ('model_blueprint', 'model_blueprint'),
     # Offline OCR used by the photo-interval agent.  Ship it beside the

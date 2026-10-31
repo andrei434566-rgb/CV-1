@@ -11,7 +11,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from PySide6.QtCore import QDir, QPointF, QSettings, QThread, QTimer, Qt
-from PySide6.QtGui import QAction, QColor, QCursor, QPolygonF
+from PySide6.QtGui import QAction, QColor, QCursor, QImage, QPolygonF
 from PySide6.QtWidgets import QApplication, QCheckBox, QColorDialog, QComboBox, QDialog, QDialogButtonBox, QFileDialog, QDockWidget, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow, QMenu, QMessageBox, QPlainTextEdit, QProgressBar, QProgressDialog, QPushButton, QSizePolicy, QSpinBox, QStatusBar, QTabWidget, QToolBar, QToolButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 
 from app.domain.facies_catalog import facies_metadata, resolve_facies_class
@@ -191,9 +191,11 @@ class MainWindow(QMainWindow):
         self.sheets.setDocumentMode(True)
         self.sheets.setTabPosition(QTabWidget.TabPosition.South)
         self.sheets.addTab(self.workspace, "\u041a\u0435\u0440\u043d \u0438 \u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435")
-        # Пока это единственная рабочая область, нижняя вкладка только
-        # дублирует очевидное содержимое и занимает полезное место.
-        self.sheets.tabBar().hide()
+        self._training_center: TrainingCenterDialog | None = None
+        self._training_page = QWidget(self.sheets)
+        QVBoxLayout(self._training_page).setContentsMargins(0, 0, 0, 0)
+        self.sheets.addTab(self._training_page, "Обучение")
+        self.sheets.currentChanged.connect(self._workspace_sheet_changed)
         self._workspace_frame = QFrame(self)
         self._workspace_frame.setObjectName("workspaceFrame")
         workspace_layout = QVBoxLayout(self._workspace_frame)
@@ -206,6 +208,10 @@ class MainWindow(QMainWindow):
         self._show_remembered_model_status()
 
     def closeEvent(self, event) -> None:
+        if self._training_center is not None and self._training_center.busy:
+            self.statusBar().showMessage("Дождитесь окончания подготовки пар или обучения во вкладке «Обучение».")
+            event.ignore()
+            return
         if self._theory_import_queue or (self._theory_import_thread is not None and self._theory_import_thread.isRunning()):
             self.assistant_panel.append_message("system", "Дождитесь окончания чтения документов перед закрытием приложения.")
             event.ignore()
@@ -769,6 +775,7 @@ class MainWindow(QMainWindow):
             ("▢   Разметка", self._select_markup_view),
             ("⌁   Столбик", self._select_column_view),
             ("▤   Отчёт", self.export_core_description_report),
+            ("◉   Обучение", self.show_training_center),
         ):
             button = QPushButton(title)
             button.setObjectName("shellNav")
@@ -869,6 +876,7 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Выберите контур на фото. Новый контур: ⚙ → Правка разметки")
 
     def _select_column_view(self) -> None:
+        self.sheets.setCurrentWidget(self.workspace)
         self._show_stack()
         self.workspace.fit_content()
 
@@ -929,7 +937,7 @@ class MainWindow(QMainWindow):
 
     def prepare_local_runtime(self) -> None:
         """Prepare CPU imports once; model weights wait until YOLO releases CUDA."""
-        if self._runtime_preparation_id or self._vlm_closing:
+        if self._runtime_preparation_id or self._vlm_closing or self._qwen_training_active():
             return
         config = self._local_vlm_config()
         if Path(config["python"]).is_file() and (Path(config["base"]) / "config.json").is_file():
@@ -1014,8 +1022,25 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(0, self._start_cv1_descriptions)
 
     def show_training_center(self) -> None:
-        dialog = TrainingCenterDialog(self)
-        dialog.exec()
+        self.sheets.setCurrentWidget(self._training_page)
+        self._workspace_sheet_changed(self.sheets.currentIndex())
+
+    def _workspace_sheet_changed(self, _index: int) -> None:
+        if self.sheets.currentWidget() is self._training_page:
+            for title, button in getattr(self, "_nav_buttons", {}).items():
+                button.setChecked(title == "◉   Обучение")
+            if self._training_center is None:
+                self._training_center = TrainingCenterDialog(self, embedded=True)
+                self._training_page.layout().addWidget(self._training_center)
+            self._training_center.refresh()
+        elif getattr(self, "_nav_buttons", {}).get("◉   Обучение") is not None and self._nav_buttons["◉   Обучение"].isChecked():
+            self._nav_buttons["◉   Обучение"].setChecked(False)
+            self._nav_buttons["▧   Фото керна"].setChecked(True)
+
+    def _qwen_training_active(self) -> bool:
+        from PySide6.QtCore import QProcess
+
+        return self._training_center is not None and self._training_center.process.state() != QProcess.ProcessState.NotRunning
 
     def show_open_datasets(self, *, source_id: str | None = None, files: list[Path] | None = None) -> None:
         dialog = OpenDatasetsDialog(self, source_id=source_id, files=files)
@@ -1504,6 +1529,8 @@ class MainWindow(QMainWindow):
         self._vlm_dispatch_scheduled = False
         if self._vlm_closing or self._vlm_pending is not None or self._analysis_pending is not None:
             return
+        if self._qwen_training_active():
+            return
         if self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
             return
         if self._vlm_chat_queue:
@@ -1533,6 +1560,9 @@ class MainWindow(QMainWindow):
 
     def _send_vlm_chat(self, question: str) -> None:
         self.assistant_panel.append_message("user", question)
+        if self._qwen_training_active():
+            self.assistant_panel.append_message("system", "Идёт локальное обучение. После его завершения можно снова задавать вопросы помощнику.")
+            return
         if re.match(r"\s*(?:переопиши|повторно опиши|обнови описания)", question.casefold()):
             self._redescribe_automatic_core(all_records="все" in question.casefold() or "всё" in question.casefold())
             return
@@ -2936,6 +2966,9 @@ class MainWindow(QMainWindow):
     def run_segmentation(self, records: list[PhotoRecord] | None = None) -> None:
         if self._vlm_closing:
             return
+        if self._qwen_training_active():
+            QMessageBox.information(self, "Обучение", "Дождитесь окончания локального обучения перед обработкой фото.")
+            return
         records = list({id(record): record for record in (records or self._records)}.values())
         if not records:
             QMessageBox.information(self, "Kern Analyzer", "Сначала загрузите фотографии через File → Загрузить фотографии.")
@@ -3171,6 +3204,9 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(f"Модель столбиков выбрана: {self._selected_column_model_path.name}")
 
     def start_core_column_training(self) -> None:
+        if self._qwen_training_active():
+            QMessageBox.information(self, "Обучение", "Дождитесь окончания локального обучения Qwen.")
+            return
         if self._analysis_active or self._vlm_pending is not None:
             self.assistant_panel.append_message("system", "Дождитесь завершения анализа перед обучением.")
             return
@@ -3633,6 +3669,9 @@ class MainWindow(QMainWindow):
         return max(0.01, min(0.99, value))
 
     def start_fine_tune(self) -> None:
+        if self._qwen_training_active():
+            QMessageBox.information(self, "Обучение", "Дождитесь окончания локального обучения Qwen.")
+            return
         """Export reviewed contours and fine-tune a separate copy of the model."""
         if self._analysis_active or self._vlm_pending is not None:
             self.assistant_panel.append_message("system", "Дождитесь завершения анализа перед обучением.")
@@ -4872,25 +4911,24 @@ class MainWindow(QMainWindow):
     def _core_description_report_wells(self) -> list[dict]:
         """Capture the exact visual and editable data of the core-description sheet."""
         self._show_stack()
-        columns = {item.well_name: item for item in self.workspace._correlation_items if item.well_name}
         wells: list[dict] = []
         for well_name in self._well_names():
-            column = columns.get(well_name)
-            if column is None:
-                continue
-            region = column.sceneBoundingRect()
-            for record in self._records_for_well(well_name):
-                photo_item = self.workspace._items_by_identifier.get(record.identifier)
-                if photo_item is not None:
-                    region = region.united(photo_item.sceneBoundingRect())
-            image = self.workspace.render_scene_region(region.adjusted(-12, -12, 12, 12), long_side=7200)
+            # The fixed report is a table. Do not render a huge scene image or
+            # require an assembled column just to save existing/blank fields.
+            image = QImage()
             layers = []
             for record in self._records_for_well(well_name):
                 for detection in StackColumnItem._sort_by_reading_order(record.detections):
                     attributes = dict(detection.attributes or {})
+                    label = detection.label
+                    if label in {"", "Новый контур", UNRECOGNIZED_FACIES}:
+                        label = ""
+                        for key in ("Название фации", "Код фации", "Индекс фации"):
+                            if str(attributes.get(key) or "").strip() in {"", "Новый контур", UNRECOGNIZED_FACIES}:
+                                attributes.pop(key, None)
                     layers.append(
                         {
-                            "label": detection.label,
+                            "label": label,
                             "depth_from": detection.depth_from,
                             "depth_to": detection.depth_to,
                             "attributes": attributes,
@@ -4916,23 +4954,6 @@ class MainWindow(QMainWindow):
         return wells
 
     def export_core_description_report(self) -> None:
-        if not self._well_names():
-            QMessageBox.information(self, "Отчёт", "Сначала добавьте хотя бы одну скважину или фотографии керна.")
-            return
-        missing_columns = [Path(record.path).name for record in self._records if not record.core_columns]
-        unresolved = sum(
-            detection.label in {"", "Новый контур", UNRECOGNIZED_FACIES}
-            for record in self._records if record.core_columns
-            for detection in postprocess_detections(record, record.detections)
-        )
-        if missing_columns or unresolved:
-            details = []
-            if missing_columns:
-                details.append(f"На {len(missing_columns)} фото не найдены столбики керна; проверьте их границы.")
-            if unresolved:
-                details.append(f"Интервалов без установленной фации: {unresolved}; назначьте им фации.")
-            QMessageBox.warning(self, "Разрез ещё не заполнен", "\n".join(details))
-            return
         default = (self._project_folder or self._projects_root()) / f"{self._project_title or 'kern_analyzer'}_послойное_описание.xlsx"
         path, selected_filter = QFileDialog.getSaveFileName(
             self,
@@ -4952,7 +4973,7 @@ class MainWindow(QMainWindow):
         if not suffix:
             path += f".{report_format}"
         try:
-            wells = self._core_description_report_wells()
+            wells = self._core_description_report_wells() or [{"name": "Послойное описание", "layers": []}]
             export_core_description_report(path, self._project_title, wells, report_format)
         except Exception as exc:
             QMessageBox.critical(self, "Экспорт отчёта", str(exc))

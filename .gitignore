@@ -31,6 +31,8 @@ excel_photo_model_studio/tools/
 excel_photo_model_studio/.build_artifacts/
 vlm_temp/
 chat_materials/
+vlm_training/
+vlm_models/
 third_party/
 **/node_modules/
 **/.env

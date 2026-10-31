@@ -7,20 +7,24 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
-from PySide6.QtCore import QProcess, QProcessEnvironment, QSettings
+from PySide6.QtCore import QProcess, QProcessEnvironment, QSettings, Qt
 from PySide6.QtWidgets import (
     QCheckBox, QDialog, QFileDialog, QFrame, QGroupBox, QHBoxLayout, QLabel,
-    QMessageBox, QPushButton, QScrollArea, QTextEdit, QVBoxLayout, QWidget,
+    QMessageBox, QPushButton, QScrollArea, QTabWidget, QTextEdit, QVBoxLayout, QWidget,
 )
 
 from app.infrastructure.expert_corrections import correction_counts, export_correction_manifest
 from app.infrastructure.vlm_training_data import export_reviewed_pairs, export_theory_qa, reviewed_pair_counts
 from app.runtime_paths import bundled_root, user_data_root
+from app.ui.widgets.word_photo_training import WordPhotoTrainingWidget
 
 
 class TrainingCenterDialog(QDialog):
-    def __init__(self, main_window):
+    def __init__(self, main_window, *, embedded: bool = False):
         super().__init__(main_window)
+        self._embedded = embedded
+        if embedded:
+            self.setWindowFlags(Qt.WindowType.Widget)
         self.main = main_window
         self.settings: QSettings = main_window._settings
         self.process = QProcess(self)
@@ -30,15 +34,25 @@ class TrainingCenterDialog(QDialog):
         self._track = ""
         self._output_dir: Path | None = None
         self.resize(780, 690)
-        self.setWindowTitle("Обучение · фото + Excel, теория, сегментация")
+        self.setWindowTitle("Обучение")
         layout = QVBoxLayout(self)
+        tabs = QTabWidget(self)
+        layout.addWidget(tabs, 1)
+        word_scroll = QScrollArea(self)
+        word_scroll.setWidgetResizable(True)
+        word_scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.word_pairs = WordPhotoTrainingWidget(self.settings, word_scroll)
+        self.word_pairs.train_requested.connect(lambda: self._train("word_pairs"))
+        self.word_pairs.dataset_ready.connect(lambda path: self.log.append(f"Фото + Word: {path}"))
+        word_scroll.setWidget(self.word_pairs)
+        tabs.addTab(word_scroll, "Фото + Word")
         scroll = QScrollArea(self)
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         content = QWidget(scroll)
         content_layout = QVBoxLayout(content)
         scroll.setWidget(content)
-        layout.addWidget(scroll, 1)
+        tabs.addTab(scroll, "Другие способы обучения")
 
         intro = QLabel(
             "Три независимых потока. Фото + Excel обучают Qwen описывать видимые признаки; "
@@ -143,12 +157,17 @@ class TrainingCenterDialog(QDialog):
         self.log = QTextEdit()
         self.log.setReadOnly(True)
         self.log.setPlaceholderText("Ход подготовки и обучения будет показан здесь.")
-        self.log.setMaximumHeight(120)
+        self.log.setMaximumHeight(80)
         layout.addWidget(self.log)
         self.close_button = QPushButton("Закрыть")
         self.close_button.clicked.connect(self.accept)
         layout.addWidget(self.close_button)
+        self.close_button.setVisible(not embedded)
         self.refresh()
+
+    @property
+    def busy(self) -> bool:
+        return self.word_pairs.busy or self.process.state() != QProcess.ProcessState.NotRunning
 
     def refresh(self) -> None:
         catalog = self.main._primary_facies_catalog
@@ -264,6 +283,16 @@ class TrainingCenterDialog(QDialog):
         if self.main._analysis_active or self.main._segmentation_thread is not None:
             QMessageBox.information(self, "Обучение", "Дождитесь завершения анализа керна перед обучением Qwen.")
             return
+        if (
+            getattr(self.main, "_training_thread", None) is not None
+            or getattr(self.main, "_column_training_thread", None) is not None
+            or getattr(self.main, "_analysis_pending", None) is not None
+            or getattr(self.main, "_vlm_chat_queue", None)
+            or getattr(self.main, "_chat_photo_thread", None) is not None
+            or self.word_pairs.busy
+        ):
+            QMessageBox.information(self, "Обучение", "Дождитесь окончания обработки, ответов в очереди или подготовки пар.")
+            return
         manifest = Path(str(self.settings.value(f"training/{track}_manifest", "") or ""))
         config = self.main._local_vlm_config()
         python = Path(config["python"])
@@ -277,7 +306,8 @@ class TrainingCenterDialog(QDialog):
         additional = Path(str(self.settings.value(f"training/{track}_additional_manifest", "") or ""))
         if additional.is_file() and additional != manifest:
             args += ["--additional-manifest", str(additional)]
-        if track == "pairs" and self.continue_adapter.isChecked():
+        continue_adapter = self.word_pairs.continue_adapter if track == "word_pairs" else self.continue_adapter
+        if track in {"pairs", "word_pairs"} and continue_adapter.isChecked():
             adapter = Path(config["adapter"])
             if not (adapter / "adapter_config.json").is_file():
                 QMessageBox.warning(self, "Начальный LoRA", "Текущий адаптер не найден. Укажите его в настройках ИИ или снимите галочку продолжения.")
@@ -297,6 +327,7 @@ class TrainingCenterDialog(QDialog):
         environment = QProcessEnvironment.systemEnvironment()
         environment.insert("HF_HUB_OFFLINE", "1")
         environment.insert("TRANSFORMERS_OFFLINE", "1")
+        environment.insert("PYTHONIOENCODING", "utf-8")
         self.process.setProcessEnvironment(environment)
         self.process.start(str(python), args)
         if not self.process.waitForStarted(5000):
@@ -304,6 +335,7 @@ class TrainingCenterDialog(QDialog):
             return
         self.train_pairs.setEnabled(False)
         self.train_theory.setEnabled(False)
+        self.word_pairs.set_training_busy(True)
         self.close_button.setEnabled(False)
         self.log.append(f"Запущено локальное обучение {track}: {manifest}")
 
@@ -316,6 +348,7 @@ class TrainingCenterDialog(QDialog):
         self._read_output()
         self.train_pairs.setEnabled(True)
         self.train_theory.setEnabled(True)
+        self.word_pairs.set_training_busy(False)
         self.close_button.setEnabled(True)
         output = self._output_dir
         if code == 0 and output and (output / "adapter_config.json").is_file():
@@ -325,16 +358,21 @@ class TrainingCenterDialog(QDialog):
             QMessageBox.information(self, "Кандидат LoRA готов", f"{output}\n\nПроверьте ответы на отдельных скважинах. Затем выберите адаптер в настройках ИИ.")
         else:
             self.log.append(f"Обучение завершилось с кодом {code}. Проверьте журнал и локальную CUDA-память.")
+        if hasattr(self.main, "_schedule_vlm_dispatch"):
+            self.main._schedule_vlm_dispatch()
 
     def closeEvent(self, event) -> None:
-        if self.process.state() != QProcess.ProcessState.NotRunning:
-            QMessageBox.information(self, "Обучение идёт", "Дождитесь окончания обучения Qwen, прежде чем закрывать окно.")
+        if self.busy:
+            QMessageBox.information(self, "Обучение идёт", "Дождитесь окончания подготовки пар или обучения Qwen, прежде чем закрывать окно.")
             event.ignore()
             return
         super().closeEvent(event)
 
     def reject(self) -> None:
-        if self.process.state() != QProcess.ProcessState.NotRunning:
-            QMessageBox.information(self, "Обучение идёт", "Дождитесь окончания обучения Qwen, прежде чем закрывать окно.")
+        if self.busy:
+            QMessageBox.information(self, "Обучение идёт", "Дождитесь окончания подготовки пар или обучения Qwen, прежде чем закрывать окно.")
+            return
+        if self._embedded:
+            # Escape must not hide the persistent widget inside a tab.
             return
         super().reject()
