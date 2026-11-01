@@ -188,7 +188,7 @@ def _description_view(image, whole_column: bool):
             part.thumbnail((148, 448))
             sheet.paste(part, (index * 149 + (148 - part.width) // 2, (448 - part.height) // 2))
         return sheet
-    image.thumbnail((640, 640))
+    image.thumbnail((448, 448))
     return image
 
 
@@ -477,9 +477,9 @@ class LocalModel:
         # Six JSON fields often exceed 220 tokens. Give descriptions their
         # former final allowance immediately, stopping at EOS as usual; the
         # old retry discarded the first 220 tokens and generated them again.
-        max_tokens = 640 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
+        max_tokens = 420 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
         if operation == "describe" and request.get("primary_reference"):
-            max_tokens = 400
+            max_tokens = 480
         final_limit = max_tokens
         torch.cuda.synchronize()
         generation_started = perf_counter()
@@ -685,7 +685,7 @@ class LocalModel:
             torch.cuda.synchronize()
             generation_started = perf_counter()
             with torch.inference_mode(), adapter_context:
-                generated = self.model.generate(**inputs, max_new_tokens=720 if request.get("primary_reference") else 640, do_sample=False,
+                generated = self.model.generate(**inputs, max_new_tokens=480 if request.get("primary_reference") else 420, do_sample=False,
                                                 **self._description_generation_options(inputs["input_ids"].shape[1]))
             torch.cuda.synchronize()
         except torch.cuda.OutOfMemoryError:
@@ -710,7 +710,7 @@ class LocalModel:
         for index, (item_id, answer, hint) in enumerate(zip(ids, answers, hints)):
             answer, sanitized = _sanitize_model_language(answer.strip())
             sequence = tokens[index].tolist()
-            incomplete = len(sequence) >= (720 if request.get("primary_reference") else 640) and not any(token in end_ids for token in sequence)
+            incomplete = len(sequence) >= (480 if request.get("primary_reference") else 420) and not any(token in end_ids for token in sequence)
             cleaned = answer.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
             try:
                 fields = json.loads(cleaned)
