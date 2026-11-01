@@ -344,6 +344,11 @@ class LocalModel:
         whole_column = operation == "describe" and bool(request.get("whole_column"))
         if operation == "describe":
             question = description_prompt(str(request.get("context") or ""), whole_column)
+            # Keep all six JSON fields short enough to finish on a 12 GB GPU.
+            question += ("\nОтветь компактным валидным JSON без Markdown: ровно шесть полей. "
+                         "description — 1–2 коротких предложения; остальные значения — "
+                         "по одной краткой фразе. Закрой JSON фигурной скобкой. "
+                         "Не добавляй текст за пределами JSON.")
         else:
             question = str(request.get("question") or "")[:3000]
             if operation == "chat":
@@ -477,9 +482,9 @@ class LocalModel:
         # Six JSON fields often exceed 220 tokens. Give descriptions their
         # former final allowance immediately, stopping at EOS as usual; the
         # old retry discarded the first 220 tokens and generated them again.
-        max_tokens = 420 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
+        max_tokens = 340 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
         if operation == "describe" and request.get("primary_reference"):
-            max_tokens = 480
+            max_tokens = 420
         final_limit = max_tokens
         torch.cuda.synchronize()
         generation_started = perf_counter()
