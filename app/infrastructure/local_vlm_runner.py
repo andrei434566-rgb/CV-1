@@ -477,7 +477,7 @@ class LocalModel:
         # Six JSON fields often exceed 220 tokens. Give descriptions their
         # former final allowance immediately, stopping at EOS as usual; the
         # old retry discarded the first 220 tokens and generated them again.
-        max_tokens = 320 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
+        max_tokens = 640 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
         if operation == "describe" and request.get("primary_reference"):
             max_tokens = 400
         final_limit = max_tokens
@@ -685,7 +685,7 @@ class LocalModel:
             torch.cuda.synchronize()
             generation_started = perf_counter()
             with torch.inference_mode(), adapter_context:
-                generated = self.model.generate(**inputs, max_new_tokens=400 if request.get("primary_reference") else 320, do_sample=False,
+                generated = self.model.generate(**inputs, max_new_tokens=720 if request.get("primary_reference") else 640, do_sample=False,
                                                 **self._description_generation_options(inputs["input_ids"].shape[1]))
             torch.cuda.synchronize()
         except torch.cuda.OutOfMemoryError:
@@ -710,7 +710,7 @@ class LocalModel:
         for index, (item_id, answer, hint) in enumerate(zip(ids, answers, hints)):
             answer, sanitized = _sanitize_model_language(answer.strip())
             sequence = tokens[index].tolist()
-            incomplete = len(sequence) >= (400 if request.get("primary_reference") else 320) and not any(token in end_ids for token in sequence)
+            incomplete = len(sequence) >= (720 if request.get("primary_reference") else 640) and not any(token in end_ids for token in sequence)
             cleaned = answer.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
             try:
                 fields = json.loads(cleaned)
@@ -719,7 +719,7 @@ class LocalModel:
             field_names = description_fields(request, DESCRIPTION_FIELDS)
             valid = (isinstance(fields, dict) and all(isinstance(fields.get(name), str)
                      and fields[name].strip() for name in field_names))
-            result = {"ok": bool(valid and not incomplete), "answer": answer, "incomplete": incomplete,
+            result = {"ok": bool(valid), "answer": answer, "incomplete": incomplete,
                       "model_info": {"model_mode": "lora" if adapter_path else "base",
                                      "base": effective["base"], "adapter": adapter_path},
                       "timing": {"load_seconds": round(load_seconds, 3),
@@ -731,7 +731,7 @@ class LocalModel:
                     result["primary_reference"] = source_context(request, str(items[index].get("context") or ""))[1]
                 _add_color_review(result, hint)
             if not result["ok"]:
-                result["error"] = "Описание оборвано или модель не вернула все шесть полей."
+                result["error"] = ("Описание оборвано: достигнут лимит генерации." if incomplete else "Модель не вернула корректный JSON со всеми полями.")
             if sanitized:
                 result["language_sanitized"] = True
             replies[item_id] = result
