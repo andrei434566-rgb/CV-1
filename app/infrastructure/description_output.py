@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 def description_budget(request, *, batch=False, retry=False):
-    default = 768 if retry else 448 if request.get('primary_reference') else 384 if batch else 512
+    default = 768 if retry else 480 if request.get('primary_reference') else 420 if batch else 512
     value = request.get('max_new_tokens', request.get('max_tokens', default))
     try:
         value = int(value) if not isinstance(value, bool) else default
@@ -32,11 +32,13 @@ def validate_description(result, required):
     missing = [key for key in required if not isinstance(fields, dict) or key not in fields]
     invalid = [key for key in required if isinstance(fields, dict) and key in fields
                and (not isinstance(fields[key], str) or not fields[key].strip())]
-    code = ('token_limit' if result.get('incomplete') else 'invalid_json' if not isinstance(fields, dict)
+    complete = 'answer' in result and isinstance(fields, dict) and not missing and not invalid
+    hit_limit = bool(result.get('incomplete'))
+    code = ('token_limit' if hit_limit and not complete else 'invalid_json' if not isinstance(fields, dict)
             else 'missing_fields' if missing else 'invalid_fields' if invalid else '')
     diagnostics = dict(result.get('diagnostics') or {})
     diagnostics.update(validation_error=code, missing_fields=missing, invalid_fields=invalid,
-                       required_fields=list(required))
+                       required_fields=list(required), hit_token_limit=hit_limit)
     result['diagnostics'] = diagnostics
     result['ok'] = not code
     if code:
@@ -49,6 +51,7 @@ def validate_description(result, required):
     else:
         result.pop('recoverable', None)
         result.pop('error', None)
+        result['incomplete'] = False
         result['fields'] = {key: fields[key].strip() for key in required}
     return result
 

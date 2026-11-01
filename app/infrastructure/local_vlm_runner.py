@@ -190,7 +190,7 @@ def _description_view(image, whole_column: bool):
             part.thumbnail((148, 448))
             sheet.paste(part, (index * 149 + (148 - part.width) // 2, (448 - part.height) // 2))
         return sheet
-    image.thumbnail((640, 640))
+    image.thumbnail((448, 448))
     return image
 
 
@@ -214,17 +214,7 @@ class LocalModel:
 
     def _description_generation_options(self, prompt_length: int) -> dict:
         options = {"repetition_penalty": 1.08, "no_repeat_ngram_size": 16}
-        if hasattr(self.processor, "tokenizer"):
-            from app.infrastructure.structured_generation import lithology_logits_processor
-            from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
-            from app.domain.lithology import LITHOLOGY_LEGEND
-            names = dict.fromkeys([*LITHOLOGY_ATTRIBUTE_OPTIONS["Название породы"],
-                                   *(item["name"] for item in LITHOLOGY_LEGEND)])
-            labels = [
-                "Предположительно: " + value for value in names
-            ] + ["Не установлена по фото"]
-            options["logits_processor"] = [lithology_logits_processor(
-                self.processor.tokenizer, labels, prompt_length)]
+        # Preserve the remote diagnostic choice: do not force rock-name tokens.
         return options
 
     def load(self, base: str, adapter: str, theory_adapter: str, model_mode: str = ""):
@@ -395,6 +385,9 @@ class LocalModel:
         whole_column = operation == "describe" and bool(request.get("whole_column"))
         if operation == "describe":
             question = description_prompt(str(request.get("context") or ""), whole_column)
+            question += ("\nОтветь компактным валидным JSON без Markdown: заполни все поля схемы. "
+                         "description — 1–2 коротких предложения; остальные значения — краткие фразы. "
+                         "Закрой JSON фигурной скобкой и не добавляй текст снаружи.")
             if request.get('_description_retry'):
                 question += ('\nПовторная попытка: ответ должен быть одним законченным JSON-объектом. '
                              'Сначала заполни все обязательные ключи короткими строками. '

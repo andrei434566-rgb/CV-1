@@ -47,7 +47,7 @@ class DescriptionEfficiencyTests(unittest.TestCase):
                         model.answer({"operation": "describe", "image": str(image)}, [])
                     self.assertEqual(infer.call_count, 4)  # two bounded attempts per request, never cached
 
-    def test_description_at_token_limit_gets_one_bounded_retry(self):
+    def test_complete_json_at_token_limit_is_preserved_without_repeating_inference(self):
         import torch
         class Inputs(dict):
             def to(self, _device):
@@ -68,10 +68,11 @@ class DescriptionEfficiencyTests(unittest.TestCase):
         with (patch.object(model, "load"), patch("app.infrastructure.local_vlm_runner.available_runtime", return_value=None),
               patch("torch.cuda.synchronize")):
             response = model.answer({"operation": "describe"}, [])
-        self.assertEqual(fake.generate.call_count, 2)
-        self.assertEqual([call.kwargs['max_new_tokens'] for call in fake.generate.call_args_list], [512, 768])
+        self.assertEqual(fake.generate.call_count, 1)
+        self.assertEqual(fake.generate.call_args.kwargs['max_new_tokens'],512)
         self.assertFalse(response["incomplete"])
-        self.assertTrue(response["timing"]["retried"])
+        self.assertFalse(response["timing"]["retried"])
+        self.assertTrue(response['diagnostics']['hit_token_limit'])
 
 
 if __name__ == "__main__":

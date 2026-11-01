@@ -4,7 +4,7 @@ from build_offline_release import APP,OUT,BUILD,VERSION,freeze,VolumeWriter,dige
 
 OUT.mkdir(parents=True,exist_ok=True)
 files=['infrastructure/description_output.py','infrastructure/local_vlm_runner.py',
-       'infrastructure/local_vlm_client.py','ui/windows/main_window.py']
+       'infrastructure/local_vlm_client.py','infrastructure/core_description_prompt.py','ui/windows/main_window.py']
 control={'schema':'cv1-offline-installer-v1','kind':'update','version':VERSION,
          'compatible_versions':['2.1.0',VERSION],'files':[],'unpacked_bytes':0}
 writer=VolumeWriter(OUT,'CV1_Update_Data')
