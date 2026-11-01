@@ -5,6 +5,7 @@ import hashlib
 import io
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -14,10 +15,10 @@ import zipfile
 APP = Path(__file__).resolve().parents[1]
 VLM = APP.parent / "vlm_core_v1"
 BUILD = APP / "outputs/build_cv1_210"
-OUT = APP / "transfer/out/cv1-v2.1.0"
+VERSION = re.search(r'\d+\.\d+\.\d+', (APP/'VERSION.txt').read_text(encoding='utf8')).group()
+OUT = APP / ('transfer/out/cv1-v'+VERSION)
 REVISION = "89644892e4d85e24eaac8bacfd4f463576704203"
 BASE = VLM / "model_cache/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots" / REVISION
-VERSION = "2.1.0"
 SKIP = {"__pycache__", ".git", "node_modules", "tests", "test", ".pytest_cache"}
 
 

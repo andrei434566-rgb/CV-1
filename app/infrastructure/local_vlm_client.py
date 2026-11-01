@@ -8,7 +8,8 @@ from uuid import uuid4
 
 from PySide6.QtCore import QObject, QProcess, QProcessEnvironment, QTimer, Signal
 
-from app.runtime_paths import bundled_root
+from app.runtime_paths import bundled_root, user_data_root
+from app.infrastructure.description_output import record_description_diagnostics
 
 
 class LocalVlmClient(QObject):
@@ -70,6 +71,7 @@ class LocalVlmClient(QObject):
             except (UnicodeDecodeError, ValueError):
                 continue
             self._pending.discard(str(result.get("id")))
+            record_description_diagnostics(result, user_data_root() / 'logs')
             if not self._pending:
                 self._slow_notice.stop()
                 self._request_timeout.stop()

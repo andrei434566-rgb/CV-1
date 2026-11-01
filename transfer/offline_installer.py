@@ -74,6 +74,17 @@ def install(control, media, target=None, progress=lambda *args: None, cancelled=
         paths.append(path)
     if target is None: return
     target = Path(target).resolve()
+    update = control['kind'] == 'update'
+    if update:
+        if any(not item['path'].startswith('_internal/app/') for item in control['files']):
+            raise ValueError('Обновление кода не должно заменять модели или пользовательские данные')
+        marker=target/'.cv1_install.json'
+        if (not marker.is_file() or not (target/'Kern_Analyzer.exe').is_file()
+                or not (target/'_internal/run.py').is_file()
+                or json.loads(marker.read_text(encoding='utf8')).get('kind')!='client'):
+            raise ValueError('Выберите папку установленного полного CV-1 2.1.0, где находится Kern_Analyzer.exe')
+        if json.loads(marker.read_text(encoding='utf8')).get('version') not in control['compatible_versions']:
+            raise ValueError('Эта версия CV-1 не поддерживается данным обновлением')
     target.mkdir(parents=True, exist_ok=True)
     if control["kind"] == "server" and (target / "hub.json").exists():
         if json.loads((target / "hub.json").read_text(encoding="utf-8")).get("schema") != "cv1-network-hub-v1":
@@ -100,6 +111,10 @@ def install(control, media, target=None, progress=lambda *args: None, cancelled=
                 completed += item["size"]; continue
             if control["kind"] == "server" and entry.filename.startswith("models/") and destination.exists():
                 raise ValueError("Существующая версия модели отличается. Опубликованные модели не перезаписываются")
+            if update and destination.exists():
+                backup=safe_target(target,'Kern Analyzer Data/updates/'+control['version']+'/'+entry.filename)
+                if not backup.exists():
+                    backup.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(destination,backup)
             destination.parent.mkdir(parents=True, exist_ok=True)
             temporary = destination.with_name(destination.name + ".cv1-installing")
             digest = hashlib.sha256()
@@ -125,7 +140,7 @@ for _folder in (_runtime,_packages/'PySide6',_packages/'shiboken6',_packages/'to
 sys._cv1_runtime_dll_handles=_handles
 '''
         (target/'python_runtime/sitecustomize.py').write_text(startup,encoding='utf-8')
-    (target / ".cv1_install.json").write_text(json.dumps({"version":control["version"],"kind":control["kind"]}), encoding="utf-8")
+    (target / ".cv1_install.json").write_text(json.dumps({"version":control["version"],"kind":'client' if update else control["kind"]}), encoding="utf-8")
     if control["kind"] == "server":
         for name in ("training/incoming", "training/approved", "training/datasets", "reports/validation", "registry/history"):
             safe_target(target, name).mkdir(parents=True, exist_ok=True)
@@ -153,8 +168,10 @@ def main():
     window = tk.Tk(); window.title("CV-1 " + control["version"]); window.geometry("700x340")
     window.configure(bg="#f6faff")
     server = control["kind"] == "server"
-    tk.Label(window, text="Модели для общей папки" if server else "Установка CV-1 с локальной Qwen", font=("Segoe UI",18,"bold"), bg="#f6faff", fg="#153e77").pack(anchor="w",padx=20,pady=(18,10))
-    tk.Label(window, text="Все части данных должны находиться рядом с этим EXE. Интернет не требуется.\nПроекты и подтверждённые данные не заменяются при установке.",justify="left", bg="#f6faff",fg="#153e77").pack(anchor="w",padx=20)
+    update = control['kind']=='update'
+    tk.Label(window, text='Обновление CV-1 '+control['version'] if update else "Модели для общей папки" if server else "Установка CV-1 с локальной Qwen", font=("Segoe UI",18,"bold"), bg="#f6faff", fg="#153e77").pack(anchor="w",padx=20,pady=(18,10))
+    intro=('Сохраните проект и закройте CV-1. Выберите папку установленного приложения.\nМодели и проекты сохраняются. Файл данных должен лежать рядом с EXE.' if update else "Все части данных должны находиться рядом с этим EXE. Интернет не требуется.\nПроекты и подтверждённые данные не заменяются при установке.")
+    tk.Label(window,text=intro,justify='left',bg='#f6faff',fg='#153e77').pack(anchor='w',padx=20)
     folder = tk.StringVar(value=str(Path(os.environ.get("LOCALAPPDATA", str(Path.home()))) / ("CV1-Server" if server else "Programs/CV-1")))
     row = tk.Frame(window,bg="#f6faff"); row.pack(fill="x",padx=20,pady=14)
     ttk.Entry(row,textvariable=folder).pack(side="left",fill="x",expand=True)
@@ -162,8 +179,8 @@ def main():
     status = tk.StringVar(value="Готово к установке")
     tk.Label(window,textvariable=status,wraplength=650,bg="#f6faff",fg="#153e77",justify="left").pack(anchor="w",padx=20)
     bar = ttk.Progressbar(window,maximum=100); bar.pack(fill="x",padx=20,pady=10)
-    shortcut = tk.BooleanVar(value=not server)
-    if not server: ttk.Checkbutton(window,text="Создать ярлык на рабочем столе",variable=shortcut).pack(anchor="w",padx=20)
+    shortcut = tk.BooleanVar(value=not server and not update)
+    if not server and not update: ttk.Checkbutton(window,text="Создать ярлык на рабочем столе",variable=shortcut).pack(anchor="w",padx=20)
     events, cancel, running = queue.Queue(), threading.Event(), [False]
     def start():
         if running[0]: return

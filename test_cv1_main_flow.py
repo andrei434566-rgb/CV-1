@@ -552,6 +552,18 @@ class Cv1MainFlowTests(unittest.TestCase):
             self.window._on_segmentation_finished()
         start.assert_called_once()
 
+    def test_bad_description_does_not_mark_other_photos_as_failed(self):
+        first,second=self.record(name='first.png',interpreted=True),self.record(name='next.png',interpreted=True)
+        self.window._records=[first,second]
+        jobs=[IntervalJob.create(record,record.detections[0]) for record in (first,second)]
+        self.window._analysis_queue=deque([jobs[1]])
+        self.window._analysis_pending=('bad-json',jobs[0],self.root/'crop.png')
+        self.window._analysis_active=True
+        with patch.object(self.window,'_schedule_vlm_dispatch'),patch.object(self.window.workspace,'update_photo_detections'):
+            self.window._on_cv1_interval_reply({'ok':False,'error':'Invalid JSON','recoverable':True})
+        self.assertEqual(list(self.window._analysis_queue),[jobs[1]])
+        self.assertNotEqual(second.detections[0].attributes.get('__interpretation_status'),'error')
+
     def test_failed_segmentation_does_not_start_description_stage(self):
         self.window._segmentation_failed = True
         with (

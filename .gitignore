@@ -35,6 +35,7 @@ vlm_training/
 vlm_models/
 primary_reference/
 network_cache/
+logs/
 third_party/
 **/node_modules/
 **/.env

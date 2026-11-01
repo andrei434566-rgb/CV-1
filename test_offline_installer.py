@@ -17,8 +17,8 @@ class OfflineInstallerTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
 
-    def media(self, kind="client"):
-        files = {"Kern_Analyzer.exe": b"example app", "bundled_models/weights.bin": bytes(range(256)) * 20}
+    def media(self, kind="client", files=None):
+        files = files or {"Kern_Analyzer.exe": b"example app", "bundled_models/weights.bin": bytes(range(256)) * 20}
         writer = VolumeWriter(self.root, "data", limit=300)
         with zipfile.ZipFile(writer, "w", compression=zipfile.ZIP_DEFLATED) as archive:
             for name, content in files.items(): archive.writestr(name, content)
@@ -75,6 +75,33 @@ class OfflineInstallerTests(unittest.TestCase):
     def test_zip_paths_cannot_escape_chosen_directory(self):
         for name in ("../outside", "/absolute", "C:/system", "a\\b", "a:stream"):
             with self.subTest(name=name), self.assertRaises(ValueError): safe_target(self.root, name)
+
+    def test_update_preserves_models_projects_and_original_code_backup(self):
+        import json
+        control,_=self.media('update',{'_internal/app/module.py':b'new code'})
+        control.update(version='2.1.1',compatible_versions=['2.1.0','2.1.1'])
+        target=self.root/'client';(target/'_internal/app').mkdir(parents=True)
+        (target/'Kern_Analyzer.exe').write_bytes(b'launcher')
+        (target/'_internal/run.py').write_bytes(b'run')
+        (target/'_internal/app/module.py').write_bytes(b'old code')
+        (target/'.cv1_install.json').write_text(json.dumps({'version':'2.1.0','kind':'client'}))
+        (target/'my_project.json').write_bytes(b'important project')
+        (target/'best.pt').write_bytes(b'important model')
+        install(control,self.root,target);install(control,self.root,target)
+        self.assertEqual((target/'_internal/app/module.py').read_bytes(),b'new code')
+        self.assertEqual((target/'Kern Analyzer Data/updates/2.1.1/_internal/app/module.py').read_bytes(),b'old code')
+        self.assertEqual((target/'best.pt').read_bytes(),b'important model')
+        self.assertEqual((target/'my_project.json').read_bytes(),b'important project')
+        self.assertEqual(json.loads((target/'.cv1_install.json').read_text())['kind'],'client')
+
+    def test_update_requires_the_installed_client_and_rejects_model_payloads(self):
+        control,_=self.media('update',{'_internal/app/module.py':b'new code'})
+        control.update(compatible_versions=['2.1.0'])
+        target=self.root/'not_client'
+        with self.assertRaises(ValueError):install(control,self.root,target)
+        self.assertFalse(target.exists())
+        control['files'][0]['path']='bundled_models/weights.bin'
+        with self.assertRaises(ValueError):install(control,self.root,target)
 
 
 if __name__ == "__main__": unittest.main()

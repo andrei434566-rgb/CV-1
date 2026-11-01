@@ -5468,7 +5468,7 @@ class MainWindow(QMainWindow):
                         mark_interval_failure(job, str(exc))
                 self.workspace.update_photo_detections(record)
             self._analysis_done += 1
-        if not result.get("ok"):
+        if not result.get("ok") and not result.get("recoverable"):
             error = str(result.get("error") or "Локальная модель не ответила.")
             for remaining in self._analysis_queue:
                 mark_interval_failure(remaining, error)
@@ -5501,7 +5501,7 @@ class MainWindow(QMainWindow):
             f"Готово описаний: {self._analysis_done}/{self._analysis_total}",
             self._analysis_done, self._analysis_total,
         )
-        if not result.get("ok"):
+        if not result.get("ok") and not result.get("recoverable"):
             error = str(result.get("error") or "Локальная модель не ответила.")
             for remaining in self._analysis_queue:
                 mark_interval_failure(remaining, error)

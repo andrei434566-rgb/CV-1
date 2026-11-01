@@ -45,9 +45,9 @@ class DescriptionEfficiencyTests(unittest.TestCase):
                 with patch.object(model, "_answer_uncached", return_value=response) as infer:
                     for _ in range(2):
                         model.answer({"operation": "describe", "image": str(image)}, [])
-                    self.assertEqual(infer.call_count, 2)
+                    self.assertEqual(infer.call_count, 4)  # two bounded attempts per request, never cached
 
-    def test_description_uses_full_final_allowance_once_even_when_limit_is_hit(self):
+    def test_description_at_token_limit_gets_one_bounded_retry(self):
         import torch
         class Inputs(dict):
             def to(self, _device):
@@ -63,15 +63,15 @@ class DescriptionEfficiencyTests(unittest.TestCase):
         model.processor = Processor()
         fake = SimpleNamespace(generation_config=SimpleNamespace(eos_token_id=2))
         from unittest.mock import Mock
-        fake.generate = Mock(return_value=torch.tensor([[1, 2] + [3] * 320]))
+        fake.generate = Mock(return_value=torch.tensor([[1, 2] + [3] * 512]))
         model.model = fake
         with (patch.object(model, "load"), patch("app.infrastructure.local_vlm_runner.available_runtime", return_value=None),
               patch("torch.cuda.synchronize")):
             response = model.answer({"operation": "describe"}, [])
-        self.assertEqual(fake.generate.call_count, 1)
-        self.assertEqual(fake.generate.call_args.kwargs["max_new_tokens"], 320)
-        self.assertTrue(response["incomplete"])
-        self.assertFalse(response["timing"]["retried"])
+        self.assertEqual(fake.generate.call_count, 2)
+        self.assertEqual([call.kwargs['max_new_tokens'] for call in fake.generate.call_args_list], [512, 768])
+        self.assertFalse(response["incomplete"])
+        self.assertTrue(response["timing"]["retried"])
 
 
 if __name__ == "__main__":

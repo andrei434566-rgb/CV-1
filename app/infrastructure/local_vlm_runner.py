@@ -27,6 +27,7 @@ if app_root not in sys.path:
     sys.path.insert(0, app_root)
 
 if __package__:
+    from .description_output import description_budget, validate_description
     from .primary_description_source import description_fields, is_reference_question, source_context, source_prompt
     from .core_description_prompt import DESCRIPTION_SYSTEM, description_prompt
     from .core_color_hint import estimate_core_color
@@ -37,13 +38,14 @@ if __package__:
         DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, LocalLoopbackBlocked, available_runtime,
     )
 else:
-    from primary_description_source import description_fields, is_reference_question, source_context, source_prompt
-    from core_description_prompt import DESCRIPTION_SYSTEM, description_prompt
-    from core_color_hint import estimate_core_color
-    from geology_reference import format_grounded_question, retrieve_notes
-    from local_knowledge_search import search_folders
-    from local_vlm_modes import adapter_for_operation, normalize_model_request, validate_local_models
-    from local_llama_runtime import (
+    from app.infrastructure.description_output import description_budget, validate_description
+    from app.infrastructure.primary_description_source import description_fields, is_reference_question, source_context, source_prompt
+    from app.infrastructure.core_description_prompt import DESCRIPTION_SYSTEM, description_prompt
+    from app.infrastructure.core_color_hint import estimate_core_color
+    from app.infrastructure.geology_reference import format_grounded_question, retrieve_notes
+    from app.infrastructure.local_knowledge_search import search_folders
+    from app.infrastructure.local_vlm_modes import adapter_for_operation, normalize_model_request, validate_local_models
+    from app.infrastructure.local_llama_runtime import (
         DESCRIPTION_FIELDS, DESCRIPTION_SCHEMA, LocalLlamaRuntime, LocalLoopbackBlocked, available_runtime,
     )
 
@@ -201,6 +203,7 @@ class LocalModel:
         self._turbo_disabled = False
         self._description_cache = OrderedDict()
         self._prepared_base = ""
+        self._photo_batch_unreliable = False
 
     def prepare(self, base: str) -> None:
         """CPU-only tokenizer preparation, shared by startup and model loading."""
@@ -253,8 +256,9 @@ class LocalModel:
         torch.cuda.empty_cache()
         if self.processor is None or self._prepared_base != str(base_path.resolve()):
             self.prepare(str(base_path))
+        dtype = torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16
         model = Qwen3VLForConditionalGeneration.from_pretrained(
-            base_path, local_files_only=True, torch_dtype=torch.float16,
+            base_path, local_files_only=True, torch_dtype=dtype,
             attn_implementation="sdpa", device_map="cuda",
         )
         for name, folder in (("description", effective["adapter"]), ("theory", effective["theory_adapter"])):
@@ -271,6 +275,7 @@ class LocalModel:
         model.eval()
         self.model = model
         self.loaded_config = configuration
+        self._photo_batch_unreliable = False
 
     def answer(self, request: dict, hits: list[dict]) -> dict:
         # Repeated attachments with identical pixels/context need only one
@@ -302,6 +307,13 @@ class LocalModel:
                                     "total_seconds": 0.0, "cache_hit": True}
                 return cached
         result = self._answer_uncached(request, hits)
+        if request.get('operation') == 'describe':
+            color_review = (result.get('fields') or {}).get('description') if result.get('color_review_required') else None
+            validate_description(result, description_fields(request, DESCRIPTION_FIELDS))
+            if result['ok'] and color_review and color_review.startswith(result['fields']['description']):
+                result['fields']['description'] = color_review
+            if not result['ok'] and not request.get('_description_retry'):
+                result = self._retry_description(request, {}, result)
         if request.get("primary_reference") and request.get("operation") in {"describe", "chat", "photo_chat"}:
             _, reference_metadata = source_context(request, str(request.get("question") or request.get("context") or ""))
             if reference_metadata:
@@ -314,6 +326,36 @@ class LocalModel:
             while len(self._description_cache) > 256:
                 self._description_cache.popitem(last=False)
         return result
+
+    def _retry_description(self, request, item, failed):
+        initial = {'initial': deepcopy(failed.get('diagnostics', {})),
+                   'initial_answer': str(failed.get('answer') or '')[:1200],
+                   'initial_error': failed.get('error'), 'mode': 'single_interval'}
+        payload = dict(request)
+        payload.pop('items', None)
+        payload.update(item)
+        payload.update(operation='describe', _description_retry=True,
+                       max_new_tokens=description_budget(request, retry=True), inference_backend='transformers')
+        try:
+            result = self.answer(payload, [])
+        except Exception as exc:
+            result = {'ok': False, 'error': f'{type(exc).__name__}: {exc}', 'answer': ''}
+        result.setdefault('diagnostics', {})['recovery'] = initial
+        result.setdefault('timing', {})['retried'] = True
+        return result
+
+    def _serial_photo_descriptions(self, request, items):
+        first = self._answer_batch(dict(request, operation='describe_batch', items=items[:4]))
+        if len(items) == 5:
+            payload = dict(request); payload.pop('items', None)
+            payload.update(items[4], operation='describe')
+            try:
+                last = self.answer(payload, [])
+            except Exception as exc:
+                last = {'ok': False, 'error': f'{type(exc).__name__}: {exc}'}
+            first['items'][str(items[4]['id'])] = last
+        first.setdefault('timing', {})['serial_photo_fallback'] = True
+        return first
 
     def _answer_uncached(self, request: dict, hits: list[dict]) -> dict:
         if request.get("operation") == "describe_photo":
@@ -353,6 +395,10 @@ class LocalModel:
         whole_column = operation == "describe" and bool(request.get("whole_column"))
         if operation == "describe":
             question = description_prompt(str(request.get("context") or ""), whole_column)
+            if request.get('_description_retry'):
+                question += ('\nПовторная попытка: ответ должен быть одним законченным JSON-объектом. '
+                             'Сначала заполни все обязательные ключи короткими строками. '
+                             'Смотри на этот образец; не копируй ответ соседнего интервала.')
         else:
             question = str(request.get("question") or "")[:3000]
             if operation == "chat":
@@ -489,6 +535,8 @@ class LocalModel:
         max_tokens = 320 if operation == "describe" else 260 if operation == "photo_chat" else 460 if detail_requested else 320
         if operation == "describe" and request.get("primary_reference"):
             max_tokens = 400
+        if operation == 'describe':
+            max_tokens = description_budget(request, retry=bool(request.get('_description_retry')))
         final_limit = max_tokens
         torch.cuda.synchronize()
         generation_started = perf_counter()
@@ -532,9 +580,12 @@ class LocalModel:
                 answer = answer[:completed[-1].end()].strip() if completed else ""
         result = {
             "answer": answer, "hits": hits, "incomplete": incomplete,
+            'diagnostics': {'finish_reason': 'length' if incomplete else 'eos',
+                            'output_tokens': int(final_tokens.shape[1]), 'token_limit': final_limit},
             "model_info": {
                 "model_mode": "lora" if adapter_path else "base",
                 "base": effective["base"], "adapter": adapter_path,
+                'dtype': str(getattr(self.model, 'dtype', 'unknown')),
                 **reference_info,
             },
             "timing": {
@@ -652,6 +703,8 @@ class LocalModel:
         ids = [str(item.get("id") or "") for item in items if isinstance(item, dict)]
         if len(ids) != len(items) or any(not value for value in ids) or len(ids) != len(set(ids)):
             raise ValueError("Для каждого фрагмента фото нужен уникальный id.")
+        if self._photo_batch_unreliable:
+            return self._serial_photo_descriptions(request, items)
         effective = normalize_model_request(request)
         self.turbo.close()
         started = perf_counter()
@@ -686,15 +739,16 @@ class LocalModel:
                 self.model.disable_adapters()
             else:
                 raise RuntimeError("Runtime не умеет отключать выбранный адаптер.")
-        inputs = None
+        inputs = generated = None
         out_of_memory = False
         generation_started = perf_counter()
+        max_tokens = description_budget(request, batch=True)
         try:
             inputs = self.processor(text=texts, images=images, padding=True, return_tensors="pt").to("cuda")
             torch.cuda.synchronize()
             generation_started = perf_counter()
             with torch.inference_mode(), adapter_context:
-                generated = self.model.generate(**inputs, max_new_tokens=400 if request.get("primary_reference") else 320, do_sample=False,
+                generated = self.model.generate(**inputs, max_new_tokens=max_tokens, do_sample=False,
                                                 **self._description_generation_options(inputs["input_ids"].shape[1]))
             torch.cuda.synchronize()
         except torch.cuda.OutOfMemoryError:
@@ -702,48 +756,50 @@ class LocalModel:
         if out_of_memory:
             # A smaller GPU still gets separate full descriptions. Do not
             # terminate the worker or drop/merge intervals to meet a timer.
-            del inputs
+            del inputs, generated
+            self._photo_batch_unreliable = True
             torch.cuda.empty_cache()
-            fallback = self._answer_batch(dict(request, operation="describe_batch", items=items[:4]))
-            if len(items) == 5:
-                last = self.answer({**request, **items[4], "operation": "describe"}, [])
-                fallback["items"][ids[4]] = dict(last, ok=last.get("ok", True))
+            fallback = self._serial_photo_descriptions(request, items)
             fallback["timing"]["smaller_batch_fallback"] = True
             return fallback
         generation_seconds = perf_counter() - generation_started
         tokens = generated[:, inputs["input_ids"].shape[1]:]
-        answers = self.processor.batch_decode(tokens, skip_special_tokens=True)
+        answers = list(self.processor.batch_decode(tokens, skip_special_tokens=True))
+        answers += [''] * max(0, len(items) - len(answers))
         end_ids = getattr(self.model.generation_config, "eos_token_id", None)
         end_ids = {end_ids} if isinstance(end_ids, int) else set(end_ids or [])
         replies = {}
         for index, (item_id, answer, hint) in enumerate(zip(ids, answers, hints)):
             answer, sanitized = _sanitize_model_language(answer.strip())
             sequence = tokens[index].tolist()
-            incomplete = len(sequence) >= (400 if request.get("primary_reference") else 320) and not any(token in end_ids for token in sequence)
-            cleaned = answer.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-            try:
-                fields = json.loads(cleaned)
-            except ValueError:
-                fields = None
+            ended = any(token in end_ids for token in sequence)
+            incomplete = len(sequence) >= max_tokens and not ended
             field_names = description_fields(request, DESCRIPTION_FIELDS)
-            valid = (isinstance(fields, dict) and all(isinstance(fields.get(name), str)
-                     and fields[name].strip() for name in field_names))
-            result = {"ok": bool(valid and not incomplete), "answer": answer, "incomplete": incomplete,
+            result = {"answer": answer, "incomplete": incomplete,
                       "model_info": {"model_mode": "lora" if adapter_path else "base",
                                      "base": effective["base"], "adapter": adapter_path},
                       "timing": {"load_seconds": round(load_seconds, 3),
                                  "shared_batch_seconds": round(generation_seconds, 3),
                                  "batch_size": len(items), "retried": False}}
-            if valid:
-                result["fields"] = {name: fields[name].strip() for name in field_names}
-                if request.get("primary_reference"):
-                    result["primary_reference"] = source_context(request, str(items[index].get("context") or ""))[1]
-                _add_color_review(result, hint)
-            if not result["ok"]:
-                result["error"] = "Описание оборвано или модель не вернула все шесть полей."
             if sanitized:
                 result["language_sanitized"] = True
+            result['diagnostics'] = {'finish_reason': 'length' if incomplete else 'eos' if ended else 'stopped',
+                                     'output_tokens': next((i+1 for i,t in enumerate(sequence) if t in end_ids),len(sequence)),
+                                     'token_limit': max_tokens, 'batch_size': len(items)}
+            validate_description(result, field_names)
+            if result['ok']:
+                if request.get('primary_reference'):
+                    result['primary_reference'] = source_context(request, str(items[index].get('context') or ''))[1]
+                _add_color_review(result, hint)
             replies[item_id] = result
+        # Release the shared visual/KV tensors before decoding failed rows alone.
+        del inputs, generated, tokens
+        failed = [item for item in items if not replies[str(item['id'])]['ok']]
+        if len(failed) == len(items):
+            self._photo_batch_unreliable = True
+        for item in failed:
+            key = str(item['id'])
+            replies[key] = self._retry_description(request, item, replies[key])
         return {"items": replies, "answer": "", "hits": [], "incomplete": False,
                 "timing": {"load_seconds": round(load_seconds, 3),
                            "total_seconds": round(perf_counter() - started, 3), "batch_size": len(items)}}
@@ -832,7 +888,8 @@ def main():
                 result = {"hits": hits, "answer": answer}
             else:
                 result = model.answer(request, hits)
-            result.update({"id": request.get("id"), "ok": True})
+            result['id'] = request.get('id')
+            result.setdefault('ok', True)
         except Exception as exc:
             result = {"id": request.get("id") if isinstance(request, dict) else None,
                       "ok": False, "error": f"{type(exc).__name__}: {exc}"}
