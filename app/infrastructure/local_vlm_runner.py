@@ -546,11 +546,22 @@ class LocalModel:
             except (ValueError, TypeError):
                 parsed = None
             field_names = description_fields(request, DESCRIPTION_FIELDS)
-            if isinstance(parsed, dict) and all(isinstance(parsed.get(key), str) for key in field_names):
-                result["fields"] = {
-                    key: parsed[key].strip() for key in field_names
-                }
-                _add_color_review(result, color_hint)
+            if isinstance(parsed, dict):
+                valid_fields = {key: parsed[key].strip() for key in field_names
+                                if isinstance(parsed.get(key), str) and parsed[key].strip()}
+                if valid_fields:
+                    result["fields"] = {key: valid_fields.get(key, "Не установлено по фото")
+                                        for key in field_names}
+                    if len(valid_fields) != len(field_names):
+                        result["partial_description"] = True
+                        result["missing_description_fields"] = [
+                            key for key in field_names if key not in valid_fields
+                        ]
+                    _add_color_review(result, color_hint)
+            elif answer:
+                # Preserve raw model output for troubleshooting instead of silently
+                # dropping all observations when the JSON was truncated.
+                result["structured_error"] = "Модель вернула некорректный JSON; исходный ответ сохранён."
         return result
 
     def _turbo_reply(self, request, messages, hits, effective, started, load_seconds, color_hint=None):
