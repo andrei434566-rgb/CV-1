@@ -10,6 +10,8 @@ from pathlib import Path
 from app.runtime_paths import application_root, bundled_root, user_data_root
 from app.infrastructure.vision_models import ARCHITECTURES, LABELS, LABELS_RU, MEAN, STD
 from app.domain.rock_types import ROCK_CLASSES, COAL_CLASSES
+from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
+from app.infrastructure.description_template import PHOTO_UNRESOLVED, compose_description
 
 def default_model_folder() -> Path:
     for root in dict.fromkeys([user_data_root(),application_root(),bundled_root()]):
@@ -88,8 +90,8 @@ def image_tiles(image,columns=None,max_tiles=40):
     tiles,boxes,_=_tile_data(image,columns,max_tiles)
     return tiles,boxes
 
-def visual_band_hint(tiles,masks=None):
-    """Photographic contrast only, never an inferred sedimentary structure."""
+def _band_contrast(tiles,masks=None):
+    """Contrast seen in horizontal bands of the usable image windows."""
     import numpy as np
     scores=[]
     from PIL import Image
@@ -105,9 +107,69 @@ def visual_band_hint(tiles,masks=None):
         row=np.ma.median(np.ma.array(a[rows],mask=~valid[rows]),axis=1).filled(0)
         spread=float(np.percentile(row,90)-np.percentile(row,10))
         scores.append(spread)
-    if scores and sum(s>25 for s in scores)>=max(1,len(scores)*.4):
-        return 'На фото заметны контрастные полосы; характер слоистости требует проверки.'
-    return 'Текстура и слоистость требуют определения геологом.'
+    if not scores:
+        return None
+    return sorted(scores, reverse=True)[math.ceil(len(scores)*.4)-1]
+
+def _band_hint(contrast):
+    if contrast is None:
+        return ""
+    if contrast > 25:
+        return "На фото заметны контрастные полосы."
+    if contrast > 12:
+        return "На фото заметна слабоконтрастная полосчатость."
+    return "Выраженная полосчатость на фото не видна."
+
+def visual_band_hint(tiles, masks=None):
+    return _band_hint(_band_contrast(tiles, masks))
+
+
+def photo_description_draft(summary, color, contrast, personal_predictions=(), facies_candidate=None):
+    """Fill the form with observable values, model candidates or a photographic status."""
+    attributes = dict.fromkeys(LITHOLOGY_ATTRIBUTE_OPTIONS, PHOTO_UNRESOLVED)
+    assumptions = set()
+    lithology = summary['candidate']
+    if lithology:
+        attributes['Название породы'] = lithology
+        assumptions.add('Название породы')
+        fraction = {'sandstone': 'Песчаная фракция', 'siltstone': 'Алевритовая фракция',
+                    'carbonaceous_siltstone': 'Алевритовая фракция', 'shale': 'Глинистая фракция',
+                    'mudrock': 'Тонкодисперсная фракция'}.get(summary['native_class'])
+        if fraction:
+            attributes['Зернистость'] = fraction
+            assumptions.add('Зернистость')
+    if color:
+        attributes['Цвет'] = color
+        assumptions.add('Цвет')
+    if contrast is not None:
+        attributes['Текстура'] = 'Полосчатая' if contrast > 12 else 'Визуально однородная'
+        assumptions.add('Текстура')
+        if contrast > 12:
+            attributes['Слоистость'] = 'Субгоризонтальная'
+            assumptions.add('Слоистость')
+    for prediction in personal_predictions:
+        field = prediction['field']
+        if field in {'Слоистость', 'Биотурбация', 'Текстура', 'Зернистость'}:
+            attributes[field] = prediction['label']
+            assumptions.add(field)
+    reference = facies_candidate or {}
+    facies_name = reference.get('facies_name')
+    if not facies_name:
+        family = {'sandstone': 'Песчаная', 'siltstone': 'Алевритовая', 'shale': 'Глинистая',
+                  'mudrock': 'Глинистая', 'limestone': 'Карбонатная', 'carbonate_other': 'Карбонатная',
+                  'coal': 'Угольная'}.get(summary['native_class'])
+        facies_name = (
+            (family + ' литофация' if family else 'Литофация «' + lithology.lower() + '»')
+            if lithology else PHOTO_UNRESOLVED)
+    for field, key in (('Фациальная ассоциация', 'facies_association'),
+                       ('Обстановка седиментации', 'depositional_environment'),
+                       ('Гидродинамический режим', 'hydrodynamic_regime')):
+        attributes[field] = reference.get(key) or PHOTO_UNRESOLVED
+        if attributes[field] != PHOTO_UNRESOLVED:
+            assumptions.add(field)
+    if facies_name != PHOTO_UNRESOLVED:
+        assumptions.add('Название фации')
+    return attributes, assumptions, facies_name
 
 class VisionEngine:
     def __init__(self,device=None):
@@ -132,7 +194,6 @@ class VisionEngine:
         from PIL import Image,ImageOps
         from torchvision import transforms
         from app.infrastructure.core_color_hint import estimate_core_color
-        from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES
         start=time.perf_counter();folder=request.get('base') or str(default_model_folder())
         loaded=self._load(folder)
         with Image.open(request['image']) as im:
@@ -161,7 +222,7 @@ class VisionEngine:
         if geometry_mask is not None:colour_mask &= geometry_mask
         color_hint=estimate_core_color(image,colour_mask,exclude_boxes=quality['label_boxes'])
         color_measurement=color_hint.to_dict() if color_hint else None
-        color=color_hint.label if color_hint else 'требует проверки по исходному фото'
+        color=color_hint.label if color_hint else None
         colour_seconds=time.perf_counter()-colour_started
         transform=transforms.Compose([transforms.Resize((224,224)),transforms.ToTensor(),transforms.Normalize(MEAN,STD)])
         probabilities=[]
@@ -187,24 +248,28 @@ class VisionEngine:
             suggestions,personal_predictions=head_suggestions(embedding,self.card['model_sha256'],user_data_root()/'models/features')
         from app.infrastructure.rock_predictions import summarize_predictions
         summary=summarize_predictions(probabilities,self.card)
-        lithology=summary['lithology'];confidence=summary['confidence'];low=summary['low']
-        texture=visual_band_hint(tiles,usable_masks)
-        description=(f'{lithology}. Цвет по фото: {color}. {texture} '
-                     'Зернистость, характер контактов и биотурбация: требуется проверка геологом.')
-        if summary['detail']:description+=' '+summary['detail']
-        if low:description+=' Распознавание литологии требует проверки.'
-        fields={'facies_name':UNRECOGNIZED_FACIES,'lithology':lithology,'texture':'Требует проверки геологом',
-                'facies_association':'Не установлена','depositional_environment':'Не установлена',
-                'description':description,'hydrodynamic_regime':'Не установлен по фото'}
-        predictions=summary['predictions']
-        answer=(description+'\n\nФация и гидродинамический режим: определяет геолог. '
-                'Оценки относятся только к обученным группам; полный список пород и ограничения доступны в карточке «Признаки пород».')
+        confidence=summary['confidence'];low=summary['low']
+        contrast = _band_contrast(tiles, usable_masks)
+        facies_candidate = request.get('facies_candidate') or {}
+        attributes, assumptions, facies_name = photo_description_draft(
+            summary, color, contrast, personal_predictions, facies_candidate)
+        draft = compose_description(attributes, facies_name=facies_name, assumptions=assumptions)
+        fields={'facies_name':facies_name,'lithology':attributes['Название породы'],'texture':attributes['Текстура'],
+                'facies_association':attributes['Фациальная ассоциация'],
+                'depositional_environment':attributes['Обстановка седиментации'],
+                'description':draft.text,'hydrodynamic_regime':attributes['Гидродинамический режим']}
+        confidence_note = "Уверенность интерпретации: низкая."
+        if summary['candidate']:
+            confidence_note += f" Оценка породы: {confidence:.0%}."
+        answer = draft.text + "\n\n" + confidence_note
         if self.card.get('noncommercial_only'):answer+=' Модель для некоммерческих исследований.'
         return {'ok':True,'answer':answer,'fields':fields,'hits':[],'incomplete':False,'engine':'vision',
                 'review_required':True,'lithology_review_required':low,'field_confidence':{'lithology':confidence,'facies_name':None},
-                'observations':{'color':color_hint.label if color_hint else None,'color_measurement':color_measurement,
-                                'color_is_approximate':True,'visual_hint':texture},
-                'predictions':predictions,'column_count':len(boxes),'tiles':len(tiles),
+                'draft_observations':attributes,'draft_assumptions':sorted(assumptions),'confidence_note':confidence_note,
+                'facies_label':facies_candidate.get('facies_label'), 'facies_index':facies_candidate.get('facies_index'),
+                'observations':{'color':color,'color_measurement':color_measurement,
+                                'color_is_approximate':True,'visual_hint':_band_hint(contrast)},
+                'predictions':summary['predictions'],'column_count':len(boxes),'tiles':len(tiles),
                 'window_predictions':[{'box':list(window),'predictions':dict(zip(self.card['classes'],row))}
                                       for window,row in zip(windows,probabilities)],
                 'image_quality':quality,

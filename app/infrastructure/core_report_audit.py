@@ -9,7 +9,7 @@ import hashlib
 import json
 import math
 
-from app.infrastructure.description_template import REVIEW_FIELDS,UNKNOWN_FACIES,observation,read_assumptions
+from app.infrastructure.description_template import PHOTO_UNRESOLVED,REVIEW_FIELDS,UNKNOWN_FACIES,observation,read_assumptions
 
 
 def finite_number(value):
@@ -21,7 +21,8 @@ def finite_number(value):
 
 def named_facies(value):
     text=observation(value)[0].strip().casefold()
-    return bool(text and text not in UNKNOWN_FACIES and not text.startswith(('не определ','не установ','не распозн','интервал yolo','новый контур')))
+    return bool(text and text != PHOTO_UNRESOLVED.casefold() and text not in UNKNOWN_FACIES
+                and not text.startswith(('не определ','не установ','не распозн','интервал yolo','новый контур')))
 
 
 @dataclass(frozen=True)
@@ -84,7 +85,7 @@ def audit_report_wells(wells,*,tolerance=.005):
             missing=[]
             for field in REVIEW_FIELDS:
                 value,inline=observation(attrs.get(field))
-                if value:
+                if value and value != PHOTO_UNRESOLVED:
                     summary['fields'][field]['filled']+=1;summary['filled_fields']+=1
                     if inline or field in assumed:
                         summary['fields'][field]['assumed']+=1;summary['assumed_fields']+=1

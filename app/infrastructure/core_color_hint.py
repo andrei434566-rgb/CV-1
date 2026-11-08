@@ -148,8 +148,10 @@ def color_is_confirmed(attributes):
 
 def apply_photo_color(attributes,measurement,*,force=False):
     """Update only a blank/previous automatic colour, preserving expert edits."""
+    from app.infrastructure.description_template import PHOTO_UNRESOLVED
+
     current=attributes.get('Цвет');previous=attributes.get('__vision_color')
-    if not force and (color_is_confirmed(attributes) or current and current!=previous):return False
+    if not force and (color_is_confirmed(attributes) or current and current not in (previous, PHOTO_UNRESOLVED)):return False
     if not isinstance(measurement,dict) or not isinstance(measurement.get('label'),str) or not measurement['label']:return False
     attributes['Цвет']=measurement['label'][:120];attributes['__vision_color']=attributes['Цвет']
     attributes['__color_measurement']=json.dumps(measurement,ensure_ascii=False,allow_nan=False)

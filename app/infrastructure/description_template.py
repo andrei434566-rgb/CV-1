@@ -13,6 +13,7 @@ from typing import Iterable, Mapping
 
 SCHEMA = "cv1-core-description-template-v1"
 ASSUMPTIONS_KEY = "__description_assumptions"
+PHOTO_UNRESOLVED = "Не различимо по фото"
 UNKNOWN_FACIES = {"", "не определена", "не распознана", "интервал yolo", "новый контур"}
 REVIEW_FIELDS = ("Название породы", "Цвет", "Зернистость", "Слоистость", "Контакт")
 _EMPTY = {"", "—", "-", "не выбрано", "не выбрана", "не определено", "не определена",
@@ -58,6 +59,7 @@ def compose_description(
     assumed = set(assumptions) | read_assumptions(attributes)
     found: dict[str, str] = {}
     lines: list[str] = []
+    unresolved = False
     try:
         if (depth_from is not None and depth_to is not None
                 and math.isfinite(float(depth_from)) and math.isfinite(float(depth_to))
@@ -88,6 +90,9 @@ def compose_description(
         value, inline_assumption = observation(attributes.get(field))
         if not value:
             continue
+        if value == PHOTO_UNRESOLVED:
+            unresolved = True
+            continue
         if inline_assumption:
             assumed.add(field)
         found[field] = value
@@ -99,11 +104,15 @@ def compose_description(
         prefix = "предположительно " if field in assumed else ""
         lines.append(f"{title}: {prefix}{value}.")
     facies, inline_assumption = observation(facies_name)
-    if facies.casefold() not in UNKNOWN_FACIES:
+    if facies == PHOTO_UNRESOLVED:
+        unresolved = True
+    elif facies.casefold() not in UNKNOWN_FACIES:
         found["Название фации"] = facies
         if inline_assumption:
             assumed.add("Название фации")
         lines.append("Фация: " + ("предположительно " if "Название фации" in assumed else "") + facies + ".")
+    if unresolved and not found:
+        lines.append("На фото признаки керна не различимы.")
     missing = tuple(field for field in (*REVIEW_FIELDS, "Название фации") if field not in found)
     return DescriptionDraft(" ".join(lines) or "Признаки участка не заполнены.", missing,
                             tuple(sorted(assumed.intersection(found))))

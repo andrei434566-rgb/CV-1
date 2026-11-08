@@ -2446,7 +2446,8 @@ class FaciesConfidencePopup(QFrame):
             source_label.setWordWrap(True)
             source_label.setMaximumWidth(420)
             self.layout.addWidget(source_label)
-        if not detection.training_ready:
+        is_vision = attributes.get("__description_engine") == "vision"
+        if not detection.training_ready and not is_vision:
             review_text = (
                 "Рамка охватывает целый найденный столбик; описание классификатора проверьте по исходному фото."
                 if is_core_column else "Границы и фацию нужно проверить перед обучением."
@@ -2455,8 +2456,11 @@ class FaciesConfidencePopup(QFrame):
             review.setObjectName("confidenceSubtle")
             review.setWordWrap(True)
             self.layout.addWidget(review)
-        is_vision = attributes.get("__description_engine") == "vision"
         if is_vision:
+            if not detection.training_ready:
+                confidence_note = QLabel("Уверенность интерпретации: низкая", self)
+                confidence_note.setObjectName("confidenceSubtle")
+                self.layout.addWidget(confidence_note)
             confidence_title = QLabel("Классификатор пород · среди известных классов", self)
             confidence_title.setObjectName("confidenceTitle")
             confidence_title.setWordWrap(True)

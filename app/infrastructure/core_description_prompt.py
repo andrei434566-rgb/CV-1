@@ -1,5 +1,6 @@
 """Compact observation-first prompts shared by individual and batched photos."""
 import re
+from app.infrastructure.description_template import PHOTO_UNRESOLVED
 
 DESCRIPTION_SYSTEM = (
     "Ты геолог-седиментолог. Описывай керн на русском языке. Разделяй наблюдения и гипотезы. "
@@ -32,6 +33,8 @@ def check_interpretation_roles(fields: dict[str, str]) -> tuple[dict[str, str], 
     rock = normalized(values.get("lithology", "")).removeprefix("предположительно ").strip()
     rock_only = {"песчаник", "алевролит", "аргиллит", "суглинок", "глина", "песок", "известняк", "доломит"}
     for key in ("facies_name", "facies_association"):
+        if values.get(key) == PHOTO_UNRESOLVED:
+            continue
         value = normalized(values.get(key, "")).removeprefix("предположительно ").strip()
         if value.startswith("не установлен"):
             values[key] = "Не установлена по фото"

@@ -83,7 +83,7 @@ def _descriptor(image):
 def write_example(payload, image_png, *, root=None):
     """Replace this interval's latest review; unchecked edits revoke approval."""
     from PIL import Image
-    from app.infrastructure.description_template import observation, read_assumptions, UNKNOWN_FACIES
+    from app.infrastructure.description_template import PHOTO_UNRESOLVED, observation, read_assumptions, UNKNOWN_FACIES
     root = Path(root or default_root())
     identifier = str(payload["id"])
     if len(identifier) != 32 or any(c not in "0123456789abcdef" for c in identifier):
@@ -100,7 +100,7 @@ def write_example(payload, image_png, *, root=None):
         examples = []
         for field, entry in read_evidence(attrs).items():
             value, inline_assumption = observation(attrs.get(field))
-            if (field not in EVIDENCE_FIELDS or not value or inline_assumption or field in assumed
+            if (field not in EVIDENCE_FIELDS or not value or value == PHOTO_UNRESOLVED or inline_assumption or field in assumed
                     or not valid_evidence(entry, value, image_digest) or entry.get("reviewed") is not True):
                 continue
             l,t,r,b = entry["roi"]
@@ -119,7 +119,7 @@ def write_example(payload, image_png, *, root=None):
     reviewed = payload.get("description_reviewed") is True
     observations = {key: observation(value)[0] for key,value in attrs.items()
                     if not key.startswith("__") and key not in assumed and observation(value)[0]
-                    and not observation(value)[1]}
+                    and not observation(value)[1] and observation(value)[0] != PHOTO_UNRESOLVED}
     if attrs.get("__description_mode") != "template":
         # Reviewing free text does not approve unrelated, unmentioned form fields.
         text=str(attrs.get("Краткое описание", "")).casefold()
@@ -140,7 +140,8 @@ def write_example(payload, image_png, *, root=None):
            "facies":payload.get("facies", ""), "facies_name":attrs.get("Название фации", ""),
            "facies_index":attrs.get("Индекс фации", ""),
            "facies_reviewed":bool(payload.get("training_ready") is True and "Название фации" not in assumed
-                                  and str(payload.get("facies", "")).casefold() not in UNKNOWN_FACIES),
+                                  and str(payload.get("facies", "")).casefold() not in UNKNOWN_FACIES
+                                  and payload.get("facies") != PHOTO_UNRESOLVED),
            "visual_descriptor":descriptor if reviewed else None,
            "image_kind":"displayed_mask_crop", "automatic_training":False}
     _atomic(root/"items"/(identifier+".json"), json.dumps(row,ensure_ascii=False,allow_nan=False).encode("utf-8"))

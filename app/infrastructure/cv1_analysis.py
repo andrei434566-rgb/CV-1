@@ -16,6 +16,8 @@ import numpy as np
 from PySide6.QtCore import QPointF
 
 from app.domain.models import FaciesDetection, PhotoRecord
+from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
+from app.infrastructure.description_template import ASSUMPTIONS_KEY, SCHEMA, compose_description
 from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES
 from app.infrastructure.core_description_prompt import check_interpretation_roles
 
@@ -248,8 +250,9 @@ def apply_interval_description(record: PhotoRecord, job: IntervalJob, response: 
             if is_core_column else "YOLO masks.xy"
         ),
         "Источник описания": "локальный классификатор CV-1 Vision; описание по шаблону" if response.get("engine") == "vision" else "локальная VLM; черновик",
-        "Статус интерпретации": "черновик классификатора, требуется проверка геолога" if response.get("engine") == "vision" else "черновик VLM, требуется проверка геолога",
+        "Статус интерпретации": "Автоматический черновик" if response.get("engine") == "vision" else "черновик VLM, требуется проверка геолога",
     })
+    label = values["facies_name"] or UNRECOGNIZED_FACIES
     model_info = response.get("model_info")
     if isinstance(model_info, dict):
         attributes["__vlm_model_info"] = json.dumps(model_info, ensure_ascii=False, sort_keys=True)
@@ -275,9 +278,33 @@ def apply_interval_description(record: PhotoRecord, job: IntervalJob, response: 
             apply_photo_color(attributes,measurement if isinstance(measurement,dict) else {'label':color})
         elif 'color' in observations and not color and auto_color_matches and not color_is_confirmed(attributes):
             attributes.pop('Цвет',None);attributes.pop('__vision_color',None);attributes.pop('__color_measurement',None)
+        draft_observations = response.get("draft_observations")
+        if isinstance(draft_observations, dict):
+            for field in LITHOLOGY_ATTRIBUTE_OPTIONS:
+                value = draft_observations.get(field)
+                if isinstance(value, str) and value.strip() and (field != "Цвет" or not attributes.get(field)):
+                    attributes[field] = value.strip()[:1000]
+            assumptions = {field for field in response.get("draft_assumptions", ()) if isinstance(field, str)}
+            if color_is_confirmed(attributes):
+                assumptions.discard("Цвет")
+            reference_label = response.get("facies_label")
+            if isinstance(reference_label, str) and reference_label and values["facies_name"] == raw_values["facies_name"]:
+                label = reference_label
+                attributes["Код фации"] = label
+                if response.get("facies_index"):
+                    attributes["Индекс фации"] = str(response["facies_index"])
+            attributes[ASSUMPTIONS_KEY] = json.dumps(sorted(assumptions), ensure_ascii=False)
+            draft = compose_description(attributes, job.detection.depth_from, job.detection.depth_to,
+                                        facies_name=values["facies_name"], assumptions=assumptions)
+            attributes[ASSUMPTIONS_KEY] = json.dumps(draft.assumed, ensure_ascii=False)
+            attributes["__description_mode"] = "template"
+            attributes["__description_composer"] = SCHEMA
+            attributes["__description_template_text"] = draft.text
+            for name in TEXT_FIELDS["description"]:
+                attributes[name] = draft.text
     if isinstance(response.get("timing"), dict):
         attributes["__vlm_timing"] = json.dumps(response["timing"], ensure_ascii=False, sort_keys=True)
-    job.detection.label = values["facies_name"] or UNRECOGNIZED_FACIES
+    job.detection.label = label
     job.detection.attributes = attributes
     job.detection.training_ready = False
 

@@ -23,6 +23,9 @@ def summarize_predictions(probabilities, card):
     low=(not rock or support<.5 or mean[bg]>=.5 or confidence<card.get('review_threshold',.8)
          or margin<card.get('margin_threshold',.15))
     target=TARGET_NAMES.get(classes[index]) if classes!=LABELS else names[classes[index]]
+    candidate = (target or names[classes[index]].split(' · ', 1)[0]) if probabilities else ''
+    if candidate and classes[index] == 'mudrock' and low:
+        candidate = 'Глинистая порода'
     coal_unvalidated=classes[index]=='coal' and not card.get('coal_core_validated',False)
     if coal_unvalidated:low=True
     if not rock or support<.5 or mean[bg]>=.5:
@@ -42,4 +45,5 @@ def summarize_predictions(probabilities, card):
                      'breccia_other':'Брекчия не равна гравелиту.',
                      'coal':'Класс обучен на угольных текстурах; перенос на фотографии керна требует проверки.'}.get(classes[index],'')
     return dict(predictions=predictions,lithology=lithology,detail=detail.strip(),confidence=confidence,
-                margin=margin,low=low or not target,rock_support=support,native_class=classes[index])
+                margin=margin,low=low or not target,rock_support=support,native_class=classes[index],
+                candidate=candidate)

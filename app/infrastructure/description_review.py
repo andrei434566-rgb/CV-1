@@ -1,7 +1,7 @@
 """Conservative review hints, never automatic geological corrections."""
 from __future__ import annotations
 from dataclasses import asdict, dataclass
-from app.infrastructure.description_template import UNKNOWN_FACIES, observation
+from app.infrastructure.description_template import PHOTO_UNRESOLVED, UNKNOWN_FACIES, observation
 
 
 @dataclass(frozen=True)
@@ -52,7 +52,7 @@ def facies_candidates(attributes, examples, *, assumptions=(), limit=3):
         matched, conflicts, missing = [], [], []
         for field in DIAGNOSTIC_FIELDS:
             q, ref = query.get(field), observation(target.get(field))[0].casefold()
-            if not q or not ref:
+            if not q or not ref or PHOTO_UNRESOLVED.casefold() in (q, ref):
                 missing.append(field)
             elif q == ref:
                 matched.append(field)

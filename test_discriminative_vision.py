@@ -35,6 +35,60 @@ class VisionContractTests(unittest.TestCase):
     def test_white_mask_does_not_become_a_rock(self):
         tiles,_=image_tiles(Image.new('RGB',(80,500),'white'),[[0,0,80,500]])
         self.assertEqual(tiles,[])
+    def test_low_rock_score_still_produces_a_complete_typed_draft(self):
+        from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
+        from app.infrastructure.description_template import PHOTO_UNRESOLVED, compose_description
+        from app.infrastructure.local_vision import photo_description_draft
+        from app.infrastructure.rock_predictions import summarize_predictions
+
+        card = {'classes': ['sandstone', 'limestone', 'shale', 'garbage']}
+        summary = summarize_predictions([[.03, .01, .01, .95]], card)
+        self.assertTrue(summary['low'])
+        attributes, assumptions, facies = photo_description_draft(summary, 'Светло-серый', 32)
+        self.assertTrue(all(attributes[field] for field in LITHOLOGY_ATTRIBUTE_OPTIONS))
+        self.assertEqual(attributes['Название породы'], 'Песчаник')
+        self.assertEqual(attributes['Слоистость'], 'Субгоризонтальная')
+        self.assertEqual(attributes['Цемент'], PHOTO_UNRESOLVED)
+        self.assertIn('Название фации', assumptions)
+        draft = compose_description(attributes, facies_name=facies, assumptions=assumptions)
+        self.assertIn('предположительно Песчаник', draft.text)
+        self.assertNotIn('проверка геологом', draft.text)
+
+        blank = summarize_predictions([], card)
+        attributes, assumptions, facies = photo_description_draft(blank, None, None)
+        self.assertEqual(facies, PHOTO_UNRESOLVED)
+        self.assertEqual(set(attributes.values()), {PHOTO_UNRESOLVED})
+        self.assertFalse(assumptions)
+
+    def test_catalog_draft_keeps_its_index_and_remains_unconfirmed(self):
+        from app.domain.facies_catalog import resolve_facies_class
+        from app.infrastructure.description_template import PHOTO_UNRESOLVED, read_assumptions
+        from app.infrastructure.local_vision import photo_description_draft
+        from app.ui.windows.main_window import MainWindow
+
+        pix = QPixmap(100, 200)
+        det = FaciesDetection('Интервал YOLO', .30, [QPointF(5, 5), QPointF(70, 5), QPointF(70, 100)],
+                             {'__geometry_only': '1', '__source_model_class': 'AFm@2'}, 1000, 1001)
+        photo = PhotoRecord('p', 'unused.png', pix, [det])
+        window = SimpleNamespace(_resolve_training_class=resolve_facies_class)
+        candidate = MainWindow._vision_facies_candidate(window, det)
+        attributes, assumptions, facies = photo_description_draft(
+            {'candidate': 'Песчаник', 'native_class': 'sandstone'}, 'Серый', 19,
+            facies_candidate=candidate)
+        result = self.response()
+        result['fields'].update(facies_name=facies, texture=attributes['Текстура'],
+            facies_association=attributes['Фациальная ассоциация'],
+            depositional_environment=attributes['Обстановка седиментации'],
+            hydrodynamic_regime=attributes['Гидродинамический режим'])
+        result.update(draft_observations=attributes, draft_assumptions=list(assumptions),
+                      facies_label=candidate['facies_label'], facies_index=candidate['facies_index'])
+        apply_interval_description(photo, IntervalJob.create(photo, det), result)
+        self.assertEqual(det.label, 'AFm')
+        self.assertEqual(det.attributes['Индекс фации'], '2')
+        self.assertEqual(det.attributes['Контакт'], PHOTO_UNRESOLVED)
+        self.assertIn('Интервал 1000–1001 м.', det.attributes['Краткое описание'])
+        self.assertIn('Название фации', read_assumptions(det.attributes))
+        self.assertFalse(det.training_ready)
     def test_batch_replies_are_bound_to_ids_and_one_failure_is_local(self):
         engine=VisionEngine()
         def describe(r):

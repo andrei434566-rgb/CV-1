@@ -1268,6 +1268,23 @@ class MainWindow(QMainWindow):
             return resolve_catalog_class(label, index, self._primary_facies_catalog["classes"])
         return resolve_facies_class(label, index)
 
+    def _vision_facies_candidate(self, detection) -> dict:
+        source = detection.attributes.get("__source_model_class")
+        if not source:
+            return {}
+        resolved = self._resolve_training_class(source)
+        if not resolved:
+            return {}
+        reference = resolved["metadata"]
+        return {
+            "facies_label": resolved["code"] or resolved["model_label"],
+            "facies_index": resolved["index"],
+            "facies_name": resolved["name"],
+            "facies_association": reference.get("Фациальная ассоциация"),
+            "depositional_environment": reference.get("Обстановка седиментации"),
+            "hydrodynamic_regime": reference.get("Гидродинамический режим"),
+        }
+
     def import_primary_facies_catalog(self, *, filename_override: Path | None = None) -> bool:
         if self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
             QMessageBox.information(self, "Справочник фаций", "Дождитесь завершения обработки или обучения.")
@@ -1660,6 +1677,8 @@ class MainWindow(QMainWindow):
             elif use_image and operation != "describe" and self._vlm_target is not None:
                 payload["columns"] = self._vlm_target[0].core_columns
             target = self._vlm_target[1] if self._vlm_target is not None else None
+            if operation == "describe" and target is not None:
+                payload["facies_candidate"] = self._vision_facies_candidate(target)
             selected_job = (
                 IntervalJob.create(self._vlm_target[0], target)
                 if operation == "describe" and target is not None and target.attributes.get("__geometry_only") == "1"
@@ -2032,7 +2051,17 @@ class MainWindow(QMainWindow):
                     self.assistant_panel.append_message("system", str(exc))
                     return
                 self._refresh_facies_views(record)
-                self.assistant_panel.append_message("assistant", "Черновик описания привязан к выбранному полигону. Проверьте его перед экспортом:\n" + str(layer.attributes.get("__vlm_description") or ""))
+                description = str(layer.attributes.get("__vlm_description") or "")
+                if result.get("engine") == "vision":
+                    confidence_note = str(result.get("confidence_note") or "Уверенность интерпретации: низкая.")
+                    self.assistant_panel.append_message("assistant", description + "\n\n" + confidence_note)
+                else:
+                    self.assistant_panel.append_message("assistant", "Черновик описания привязан к выбранному полигону:\n" + description)
+                return
+            if result.get("engine") == "vision" and (layer.training_ready
+                    or layer.attributes.get("__manual_interval_edited") == "1"
+                    or current_description_is_confirmed(layer)):
+                self.assistant_panel.append_message("assistant", answer)
                 return
             layer.attributes.update({
                 "__vlm_facies_association": str(fields.get("facies_association") or ""),
@@ -2041,12 +2070,15 @@ class MainWindow(QMainWindow):
             })
             if self._project_folder is not None:
                 self._save_current_project(self._project_folder)
-            self.assistant_panel.append_message("assistant", "Поля распознавания заполнены для выбранной фации. Проверьте перед экспортом:\n" + answer)
+            self.assistant_panel.append_message("assistant", answer)
             return
         source_note = "\n\nНайденные источники: " + "; ".join(
             f"[{i}] {hit['path']}" for i, hit in enumerate(hits, 1)
         ) if hits and wants_sources(pending[3]) else ""
-        review_note = "\n\nЧерновик по фото: границы столбиков и геологические признаки проверьте на оригинале в полном разрешении." if operation == "photo_chat" else ""
+        review_note = (
+            "\n\nЧерновик по фото: границы столбиков и геологические признаки проверьте на оригинале в полном разрешении."
+            if operation == "photo_chat" and result.get("engine") != "vision" else ""
+        )
         photo_label = (
             f"Описание фото «{Path(photo_path).name}»:\n"
             if operation == "photo_chat" and photo_path else ""
@@ -5490,6 +5522,7 @@ class MainWindow(QMainWindow):
                 request_id = self._vlm_client.send(config["python"], {
                     "operation": "describe", "image": str(crop), "context": context,
                     "whole_column": whole_column,
+                    "facies_candidate": self._vision_facies_candidate(job.detection),
                     "base": config["base"], "model_mode": config["model_mode"],
                     "primary_reference": config.get("primary_reference", ""),
                     "folders": [], "use_knowledge": False,
@@ -5541,7 +5574,8 @@ class MainWindow(QMainWindow):
                     context += f"Заданный интервал: {job.detection.depth_from:g}–{job.detection.depth_to:g} м."
                 jobs.append(job)
                 crops.append(crop)
-                items.append({"id": str(len(jobs)), "image": str(crop), "context": context, "whole_column": whole_column})
+                items.append({"id": str(len(jobs)), "image": str(crop), "context": context, "whole_column": whole_column,
+                              "facies_candidate": self._vision_facies_candidate(job.detection)})
             except Exception as exc:
                 crop.unlink(missing_ok=True)
                 mark_interval_failure(job, str(exc))
@@ -5646,8 +5680,8 @@ class MainWindow(QMainWindow):
         )
         message = (
             f"Анализ завершён. Описано объектов: {self._analysis_success} из {self._analysis_total}. "
-            "Геометрия взята из масок YOLO или рамок столбиков; литология — черновик классификатора. Фации определяет геолог. "
-            "Проверьте их в карточках."
+            "Геометрия взята из масок YOLO или рамок столбиков; литология — черновик классификатора. "
+            "Оценки уверенности доступны в карточках."
         )
         if whole_columns:
             message += f" Целиком описано столбиков без фациальных масок: {whole_columns}."
@@ -5863,7 +5897,7 @@ class MainWindow(QMainWindow):
                 detection.attributes["__expert_description_sha256"] = expert_description_digest(detection)
             else:
                 detection.attributes["__interpretation_status"] = "draft"
-                detection.attributes["Статус интерпретации"] = "черновик, требуется проверка геолога"
+                detection.attributes["Статус интерпретации"] = "Черновик"
         if dialog.description_confirmed.isChecked() and detection.attributes.get("__vlm_description", "").strip():
             detection.attributes["__expert_memory_confirmed"] = "1"
             detection.attributes["__expert_memory_sha256"] = expert_memory_digest(detection)

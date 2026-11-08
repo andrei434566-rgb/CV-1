@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QCheckBox, QComboBox, QDialog, QDialogButtonBox, Q
 from app.domain.facies_catalog import FACIES_MODEL_CLASSES, FACIES_REFERENCE_FIELDS, facies_metadata, facies_title, resolve_facies_class
 from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
 from app.infrastructure.primary_facies_catalog import resolve_catalog_class
-from app.infrastructure.description_template import ASSUMPTIONS_KEY, SCHEMA, UNKNOWN_FACIES, compose_description, observation, read_assumptions
+from app.infrastructure.description_template import ASSUMPTIONS_KEY, PHOTO_UNRESOLVED, SCHEMA, UNKNOWN_FACIES, compose_description, observation, read_assumptions
 from app.infrastructure.description_review import review_description
 from app.infrastructure.attribute_examples import EVIDENCE_FIELDS, EVIDENCE_KEY, pixel_digest, png_bytes, read_evidence, valid_evidence
 from app.ui.dialogs.feature_evidence_dialog import EvidenceView, FeatureEvidenceDialog
@@ -71,7 +71,7 @@ class FaciesDialog(QDialog):
         attributes = dict(attributes or {})
         from app.infrastructure.core_color_hint import color_is_confirmed
         self._color_auto_allowed = not description_confirmed and not color_is_confirmed(attributes) and (
-            not attributes.get('Цвет') or attributes.get('Цвет') == attributes.get('__vision_color'))
+            attributes.get('Цвет') in (None, '', PHOTO_UNRESOLVED, attributes.get('__vision_color')))
         self._color_started = False
         self._color_revision = 0
         self._applying_color = False
@@ -181,7 +181,7 @@ class FaciesDialog(QDialog):
             -1,
         )
         if current_facies and current_index < 0:
-            self.facies.insertItem(0, f"{current_facies} · уточните по справочнику", current_facies)
+            self.facies.insertItem(0, current_facies, current_facies)
             current_index = 0
         if current_index >= 0:
             self.facies.setCurrentIndex(current_index)
@@ -309,7 +309,7 @@ class FaciesDialog(QDialog):
             zoom_photo.clicked.connect(self._open_photo_zoom)
             preview_layout.addWidget(zoom_photo)
 
-        vlm_note = QLabel("Описание для итогового Excel · проверьте и при необходимости исправьте")
+        vlm_note = QLabel("Типовое описание для Excel")
         vlm_note.setWordWrap(True)
         vlm_note.setStyleSheet("color: #2364a3; font-weight: 600;")
         preview_layout.addWidget(vlm_note)
@@ -324,6 +324,17 @@ class FaciesDialog(QDialog):
         self.vlm_environment = QLineEdit(str(attributes.get("__vlm_depositional_environment") or attributes.get("Обстановка седиментации") or ""))
         self.vlm_environment.setPlaceholderText("Обстановка осадконакопления")
         preview_layout.addWidget(self.vlm_environment)
+        self._automatic_context = {
+            field: (edit, edit.text()) for field, edit in (
+                ("Фациальная ассоциация", self.vlm_association),
+                ("Обстановка седиментации", self.vlm_environment),
+                ("Гидродинамический режим", self.hydrodynamic_regime),
+            ) if field in initial_assumptions
+        }
+        if attributes.get("__description_engine") == "vision" and not description_confirmed:
+            confidence_note = QLabel("Уверенность интерпретации: низкая")
+            confidence_note.setStyleSheet("color: #687087;")
+            preview_layout.addWidget(confidence_note)
         self.template_mode = QCheckBox("Описание по выбранным признакам")
         self.template_mode.setObjectName("descriptionTemplateMode")
         existing_text = str(attributes.get("__vlm_description") or attributes.get("Краткое описание") or "")
@@ -555,6 +566,7 @@ class FaciesDialog(QDialog):
                   if check.isChecked() and self.attribute_combos[field].currentData() not in {None, "", CUSTOM_VALUE}]
         if self.facies_assumed.isChecked() and self.selected_facies():
             fields.append("Название фации")
+        fields.extend(field for field, (edit, initial) in self._automatic_context.items() if edit.text().strip() == initial.strip())
         return fields
 
     def _compose(self):
@@ -581,7 +593,8 @@ class FaciesDialog(QDialog):
             "Текст обновляется при выборе признаков. Для свободной правки снимите отметку выше."
             if automatic else "Ручной текст сохранится. Изменение признаков его не перезапишет."
         )
-        missing = "Не заполнены: " + ", ".join(draft.missing) + "." if draft.missing else "Основные признаки заполнены."
+        unresolved = any(value == PHOTO_UNRESOLVED for value in self._observations().values())
+        missing = ("Нет определения по фото: " if unresolved else "Не заполнены: ") + ", ".join(draft.missing) + "." if draft.missing else "Основные признаки заполнены."
         try:
             self.selected_depth_range()
         except ValueError as exc:
@@ -645,7 +658,7 @@ class FaciesDialog(QDialog):
         values["Название фации"] = str((selected_reference or {}).get("Название фации") or self.selected_facies() or "Не определена")
         values["__vlm_facies_name"] = values["Название фации"]
         values[ASSUMPTIONS_KEY] = json.dumps(self._assumed_fields(), ensure_ascii=False)
-        if values.get('Цвет'):
+        if values.get('Цвет') and values['Цвет'] != PHOTO_UNRESOLVED:
             values['__color_expert_confirmed']='0' if 'Цвет' in self._assumed_fields() else '1'
         elif self._color_user_touched:
             values['__color_expert_confirmed']='1'

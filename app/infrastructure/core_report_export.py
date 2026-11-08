@@ -14,6 +14,7 @@ from tempfile import TemporaryDirectory
 
 from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
 from app.domain.facies_catalog import facies_identity
+from app.infrastructure.description_template import PHOTO_UNRESOLVED
 from app.runtime_paths import bundled_root
 
 
@@ -398,10 +399,10 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
             sheet[f"U{row_number}"] = _text(vlm.get("depositional_environment") or attributes.get("__vlm_depositional_environment"))
             sheet[f"V{row_number}"] = _text(vlm.get("description") or attributes.get("__vlm_description"))
             hydrodynamic = _text(attributes.get("__vlm_hydrodynamic_regime"))
-            if hydrodynamic:
+            if hydrodynamic and not (attributes.get("__description_mode") == "template" and hydrodynamic == PHOTO_UNRESOLVED):
                 note = "Гидродинамический режим: " + hydrodynamic
                 description = str(sheet[f"V{row_number}"].value or "")
-                if note not in description:
+                if "Гидродинамический режим:" not in description:
                     sheet[f"V{row_number}"] = (description + "\n" + note).strip()
             review_attributes=dict(attributes)
             review_attributes['__report_audit']=json.dumps(row_messages.get(row_number-4,[]),ensure_ascii=False)
@@ -490,7 +491,7 @@ def _highlight_report_problems(sheet, first: int, last: int) -> None:
                   'AND(ISNUMBER($D{r}),$M{r}<$D{r}),AND(ISNUMBER($E{r}),$N{r}>$E{r}))')
     mark("M N R", depth_rule)
     mark("O P", depth_rule[:-1] + ',NOT(ISNUMBER($G{r})))')
-    uncertain = ["не установ", "не определ", "уверенность низ", "низкая уверенность", "ошибка", "оборван", "предполож"]
+    uncertain = ["не установ", "не определ", "не различим", "уверенность низ", "низкая уверенность", "ошибка", "оборван", "предполож"]
     checks = ','.join(f'ISNUMBER(SEARCH("{term}",{{c}}{{r}}))' for term in uncertain)
     mark("S T U V", 'OR(LEN(TRIM({c}{r}&""))=0,' + checks + ')')
     # Both sides of an overlap are visible, and the warning clears if either
