@@ -52,6 +52,15 @@ class KnowledgeTrainingArtifactTests(unittest.TestCase):
                 path = self.put(name, {"response": "Модель может ошибаться"})
                 self.assertEqual(_document_text(path), "")
 
+    def test_legacy_research_schemas_are_filtered_by_artifact_type(self):
+        for schema in ("qwen_facies_reasoning_v1", "qwen_geology_sft_v2_native_result",
+                       "qwen_theory_round4_result_v1", "grounded_geology_evaluation_v1"):
+            with self.subTest(schema=schema):
+                path = self.put("arbitrary_name.json", {"schema": schema, "text": "Черновой ответ"})
+                self.assertEqual(_document_text(path), "")
+        source = self.put("source.json", {"schema": "company_geology_v1", "text": "Светлый песчаник"})
+        self.assertIn("Светлый песчаник", _document_text(source))
+
     def test_source_notes_and_legitimate_geological_json_remain_searchable(self):
         path = self.put("geology.json", {"well": "Р-31", "description": "Песчаник с горизонтальной слоистостью"})
         self.assertIn("Песчаник", _document_text(path))

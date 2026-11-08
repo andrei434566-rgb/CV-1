@@ -27,6 +27,12 @@ MODEL_EVALUATION_FILES = {
     "baseline_metrics.json", "candidate_metrics.json", "validation_questions.json", "evaluation_challenge.json",
     "holdout_theory.jsonl", "holdout_conversation.jsonl", "val_visual.jsonl",
 }
+RESEARCH_SCHEMA_RE = re.compile(
+    r'"schema"\s*:\s*"(?:grounded_geology_|geology_preference_|'
+    r'[a-z0-9]+_(?:acceptance_review|facies_(?:cpu_token_audit|reasoning)|geology_sft|'
+    r'language_adapter_update_audit|lora|official_base_file_verification|sft_v\d+|'
+    r'theory_(?:qualitative_rubric|round\d+|chat_index))_)'
+)
 
 SEARCH_STOPWORDS = {
     "найди", "найдите", "найти", "поищи", "поищите", "ищи", "ищите", "поиск",
@@ -150,7 +156,7 @@ def _document_text(path: Path) -> str:
             "rejected_false_statement_not_ground_truth" in content
             or re.search(r'"preference_rejected"\s*:', content)
             or re.search(r'"record_role"\s*:\s*"(?:evaluation_only_never_train|evaluation_source_audit)"', content)
-            or re.search(r'"schema"\s*:\s*"(?:qwen_|grounded_geology_|geology_preference_)', content)
+            or RESEARCH_SCHEMA_RE.search(content)
         ):
             # Deliberately false preference examples and raw model evaluations
             # are training/research artifacts, never geological references.

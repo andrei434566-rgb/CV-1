@@ -77,20 +77,31 @@ jobs:
         shell: pwsh
         run: |
           @'
+          import marshal
           from pathlib import Path
           from PyInstaller.archive.readers import CArchiveReader
 
           package = Path("dist/Kern_Analyzer")
           archive = CArchiveReader(str(package / "Kern_Analyzer.exe"))
           entries = set(archive.toc)
+          matches = []
           for name in tuple(entries):
               if name.endswith(".pyz"):
-                  entries.update(archive.open_embedded_archive(name).toc)
-          entries.update(path.relative_to(package).as_posix() for path in package.rglob("*") if path.is_file())
+                  modules = archive.open_embedded_archive(name)
+                  entries.update(modules.toc)
+                  for module in modules.toc:
+                      if module.startswith("app.") and b"qwen" in marshal.dumps(modules.extract(module)).lower():
+                          matches.append(module)
+          text_extensions = {".py", ".md", ".txt", ".json", ".jsonl", ".yaml", ".yml", ".rst", ".html", ".csv"}
+          for path in package.rglob("*"):
+              if path.is_file():
+                  entry = path.relative_to(package).as_posix()
+                  entries.add(entry)
+                  if path.suffix.lower() in text_extensions and b"qwen" in path.read_bytes().lower():
+                      matches.append(entry)
 
           blocked = {"transformers", "peft", "accelerate", "llama_cpp", "llama_cpp_python",
                      "bitsandbytes", "local_vlm_runner", "local_llama_runtime"}
-          matches = []
           for name in sorted(entries):
               normalized = name.casefold().replace("\\", "/")
               parts = normalized.replace(".", "/").split("/")
@@ -98,7 +109,7 @@ jobs:
                       part.startswith("qwen") or part.split("-", 1)[0] in blocked for part in parts):
                   matches.append(name)
           if matches:
-              raise SystemExit("Generative components in portable package: " + ", ".join(matches))
+              raise SystemExit("Generative components or references in portable package: " + ", ".join(sorted(set(matches))))
           print(f"Checked {len(entries)} package entries")
           '@ | python -
           if ($LASTEXITCODE -ne 0) { throw "Portable package audit failed" }
