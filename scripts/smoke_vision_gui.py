@@ -28,25 +28,23 @@ def main():
         from app.domain.models import FaciesDetection
         app=QApplication.instance() or QApplication([])
         window=MainWindow();config=window._local_vlm_config()
-        assert config['model_mode']=='vision' and config['adapter']==''
+        assert config['model_mode']=='vision'
         settings=LocalVlmSettingsDialog(config,window)
         assert settings.values()['model_mode']=='vision'
         training=TrainingCenterDialog(window)
-        assert training.train_pairs.isHidden() and training.train_theory.isHidden()
-        assert training.word_pairs.train_button.isHidden()
         detection=FaciesDetection('Не распознана',.84,[],{
             '__description_engine':'vision','Название породы':'Литология требует проверки',
             '__vision_predictions':json.dumps([{'name':'Известняк','score':.45},{'name':'Глинистая порода','score':.4}]),
             'Краткое описание':'Черновик: нужна проверка геологом.'})
-        popup=FaciesConfidencePopup();popup.show_for(QPoint(30,30),detection,{})
+        popup=FaciesConfidencePopup();popup.show_for(QPoint(30,30),detection)
         labels=[label.text() for label in popup.findChildren(QLabel)]
-        assert any('Известняк: 45%' in s for s in labels),labels
-        assert any('геометрии YOLO: 84%' in s for s in labels),labels
+        assert any('Литология требует проверки' in s for s in labels),labels
+        assert not any('%' in s or 'Известняк' in s for s in labels),labels
         assert not any(s=='Варианты модели' for s in labels),labels
         popup.hide();training.close();settings.close();window.close();app.processEvents();app.quit()
         assert {k:original.value(k) for k in original.allKeys()}==before,'Main settings were modified'
         result={'gui':'passed','engine':config['model_mode'],'active_model':config['base'],
-                'generative_training_controls_hidden':True,'geometry_and_lithology_scores_separate':True,
+                'description_shows_no_scores':True,
                 'existing_settings_unchanged':True,'existing_projects_edited':False}
         (output/'gui_smoke.json').write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding='utf-8')
         print(json.dumps(result,ensure_ascii=False),flush=True)

@@ -2052,11 +2052,7 @@ class MainWindow(QMainWindow):
                     return
                 self._refresh_facies_views(record)
                 description = str(layer.attributes.get("__vlm_description") or "")
-                if result.get("engine") == "vision":
-                    confidence_note = str(result.get("confidence_note") or "Уверенность интерпретации: низкая.")
-                    self.assistant_panel.append_message("assistant", description + "\n\n" + confidence_note)
-                else:
-                    self.assistant_panel.append_message("assistant", "Черновик описания привязан к выбранному полигону:\n" + description)
+                self.assistant_panel.append_message("assistant", description)
                 return
             if result.get("engine") == "vision" and (layer.training_ready
                     or layer.attributes.get("__manual_interval_edited") == "1"
@@ -5680,8 +5676,7 @@ class MainWindow(QMainWindow):
         )
         message = (
             f"Анализ завершён. Описано объектов: {self._analysis_success} из {self._analysis_total}. "
-            "Геометрия взята из масок YOLO или рамок столбиков; литология — черновик классификатора. "
-            "Оценки уверенности доступны в карточках."
+            "Геометрия взята из масок YOLO или рамок столбиков; литология — черновик классификатора."
         )
         if whole_columns:
             message += f" Целиком описано столбиков без фациальных масок: {whole_columns}."

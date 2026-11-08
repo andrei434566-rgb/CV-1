@@ -258,14 +258,11 @@ class VisionEngine:
                 'facies_association':attributes['Фациальная ассоциация'],
                 'depositional_environment':attributes['Обстановка седиментации'],
                 'description':draft.text,'hydrodynamic_regime':attributes['Гидродинамический режим']}
-        confidence_note = "Уверенность интерпретации: низкая."
-        if summary['candidate']:
-            confidence_note += f" Оценка породы: {confidence:.0%}."
-        answer = draft.text + "\n\n" + confidence_note
+        answer = draft.text
         if self.card.get('noncommercial_only'):answer+=' Модель для некоммерческих исследований.'
         return {'ok':True,'answer':answer,'fields':fields,'hits':[],'incomplete':False,'engine':'vision',
                 'review_required':True,'lithology_review_required':low,'field_confidence':{'lithology':confidence,'facies_name':None},
-                'draft_observations':attributes,'draft_assumptions':sorted(assumptions),'confidence_note':confidence_note,
+                'draft_observations':attributes,'draft_assumptions':sorted(assumptions),
                 'facies_label':facies_candidate.get('facies_label'), 'facies_index':facies_candidate.get('facies_index'),
                 'observations':{'color':color,'color_measurement':color_measurement,
                                 'color_is_approximate':True,'visual_hint':_band_hint(contrast)},

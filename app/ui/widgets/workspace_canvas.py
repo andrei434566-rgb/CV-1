@@ -8,7 +8,7 @@ import math
 
 from PySide6.QtCore import QPoint, QPointF, QRect, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath, QPainterPathStroker, QPen, QPixmap, QPolygonF, QTransform
-from PySide6.QtWidgets import QApplication, QFrame, QGraphicsObject, QGraphicsScene, QGraphicsView, QHBoxLayout, QLabel, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QFrame, QGraphicsObject, QGraphicsScene, QGraphicsView, QLabel, QVBoxLayout
 
 from app.domain.models import FaciesDetection, PhotoRecord
 from app.domain.facies_catalog import facies_metadata
@@ -66,11 +66,6 @@ class WorkspaceCanvas(QGraphicsView):
         self._pan_scroll = None
         self._items_by_identifier: dict[str, PhotoItem] = {}
         self._auto_placed_photo_ids: set[str] = set()
-        # In-memory visual references: no original photo is copied to disk.
-        # The strongest/verified crop for each facies is reused in confidence
-        # popovers across the current project.
-        self._facies_samples: dict[str, QPixmap] = {}
-        self._facies_sample_quality: dict[str, tuple[bool, float]] = {}
         self._stack_item: StackColumnItem | None = None
         self._correlation_items: list[StackColumnItem] = []
         self._correlation_lines: list[CorrelationCurveItem] = []
@@ -147,7 +142,6 @@ class WorkspaceCanvas(QGraphicsView):
 
     def add_photos(self, records: list[PhotoRecord]) -> None:
         for number, record in enumerate(records, start=len(self._items_by_identifier)):
-            self._register_facies_samples(record)
             item = self._create_photo_item(record)
             col, row = number % 20, number // 20
             item.setPos(col * 228, row * 330)
@@ -174,8 +168,6 @@ class WorkspaceCanvas(QGraphicsView):
         hide_facies_confidence_popup()
         self._items_by_identifier.clear()
         self._auto_placed_photo_ids.clear()
-        self._facies_samples.clear()
-        self._facies_sample_quality.clear()
         clear_stack_crop_cache()
         self.clear_generated_items()
         self._correlation_curves = []
@@ -212,7 +204,6 @@ class WorkspaceCanvas(QGraphicsView):
         return True
 
     def update_photo_detections(self, record: PhotoRecord) -> None:
-        self._register_facies_samples(record)
         item = self._items_by_identifier.get(record.identifier)
         if item:
             item.set_detections(record.detections)
@@ -242,7 +233,6 @@ class WorkspaceCanvas(QGraphicsView):
             well_name=well_name,
             interpretation_intervals=interpretation_intervals,
             description_only=description_only,
-            facies_samples=self._facies_samples,
         )
         self._stack_item.facies_selected.connect(self.facies_selected)
         self._stack_item.facies_context_requested.connect(self.facies_context_requested)
@@ -300,7 +290,6 @@ class WorkspaceCanvas(QGraphicsView):
                 well_name=well_name,
                 interpretation_intervals=(well_interpretations or {}).get(well_name, []),
                 description_only=description_only,
-                facies_samples=self._facies_samples,
             )
             item.facies_selected.connect(self.facies_selected)
             item.facies_context_requested.connect(self.facies_context_requested)
@@ -598,7 +587,7 @@ class WorkspaceCanvas(QGraphicsView):
         return created
 
     def _create_photo_item(self, record: PhotoRecord) -> "PhotoItem":
-        item = PhotoItem(record, self._facies_samples)
+        item = PhotoItem(record)
         item.photo_selected.connect(self.photo_selected)
         item.facies_selected.connect(self.facies_selected)
         item.facies_context_requested.connect(self.facies_context_requested)
@@ -607,23 +596,6 @@ class WorkspaceCanvas(QGraphicsView):
         self.scene().addItem(item)
         self._items_by_identifier[record.identifier] = item
         return item
-
-    def _register_facies_samples(self, record: PhotoRecord) -> None:
-        """Keep one small representative crop per facies in RAM only."""
-        for detection in record.detections:
-            label = str(detection.label or "").strip()
-            if not label or label in {"Новый контур", "Не определена"} or len(detection.polygon) < 3:
-                continue
-            quality = (bool(detection.training_ready), float(detection.confidence))
-            if label in self._facies_samples and quality <= self._facies_sample_quality.get(label, (False, -1.0)):
-                continue
-            bounds = QPolygonF(detection.polygon).boundingRect().toAlignedRect()
-            bounds = bounds.intersected(QRect(0, 0, record.pixmap.width(), record.pixmap.height()))
-            if bounds.width() < 4 or bounds.height() < 4:
-                continue
-            self._facies_samples[label] = record.pixmap.copy(bounds)
-            self._facies_sample_quality[label] = quality
-
 
 class FaciesOverlayItem(QGraphicsObject):
     """Renders facies masks and lets the active polygon vertices move or be added."""
@@ -639,7 +611,6 @@ class FaciesOverlayItem(QGraphicsObject):
         target_rect: QRectF,
         detections: list[FaciesDetection],
         parent=None,
-        facies_samples: dict[str, QPixmap] | None = None,
         hover_detections: list[FaciesDetection] | None = None,
     ):
         super().__init__(parent)
@@ -647,7 +618,6 @@ class FaciesOverlayItem(QGraphicsObject):
         self.target_rect = target_rect
         self.detections = detections
         self.hover_detections = hover_detections
-        self.facies_samples = facies_samples if facies_samples is not None else {}
         self._hovered = -1
         self._editing_index = -1
         self._drag_vertex = -1
@@ -765,7 +735,7 @@ class FaciesOverlayItem(QGraphicsObject):
         self.setCursor(Qt.CursorShape.PointingHandCursor if self._hovered >= 0 else Qt.CursorShape.ArrowCursor)
         if self._hovered >= 0:
             targets = self.hover_detections if self.hover_detections is not None else self.detections
-            show_facies_confidence_popup(event.screenPos(), targets[self._hovered], self.facies_samples)
+            show_facies_confidence_popup(event.screenPos(), targets[self._hovered])
         else:
             hide_facies_confidence_popup()
         self.update()
@@ -1010,7 +980,7 @@ class PhotoItem(QGraphicsObject):
     facies_created = Signal(object, object)
     photo_selected = Signal(object)
 
-    def __init__(self, record: PhotoRecord, facies_samples: dict[str, QPixmap] | None = None):
+    def __init__(self, record: PhotoRecord):
         super().__init__()
         self.record = record
         self.preview_size = record.pixmap.size().scaled(QSize(self.CARD_WIDTH - 12, 260), Qt.AspectRatioMode.KeepAspectRatio)
@@ -1019,7 +989,7 @@ class PhotoItem(QGraphicsObject):
         self.setFlags(QGraphicsObject.GraphicsItemFlag.ItemIsMovable | QGraphicsObject.GraphicsItemFlag.ItemIsSelectable)
         self.setZValue(2)
         self.overlay = FaciesOverlayItem(
-            record.pixmap.size(), self.preview_rect, record.detections, self, facies_samples,
+            record.pixmap.size(), self.preview_rect, record.detections, self,
         )
         self.overlay.facies_clicked.connect(self._on_facies_clicked)
         self.overlay.facies_context_requested.connect(self._on_facies_context_requested)
@@ -1323,7 +1293,6 @@ class StackColumnItem(QGraphicsObject):
         well_name: str | None = None,
         interpretation_intervals: list[dict] | None = None,
         description_only: bool = False,
-        facies_samples: dict[str, QPixmap] | None = None,
     ):
         super().__init__()
         self.records = list(records)
@@ -1344,10 +1313,6 @@ class StackColumnItem(QGraphicsObject):
             None,
         )
         self._placements: list[tuple[QPixmap, PhotoRecord, FaciesDetection, QRectF, FaciesOverlayItem]] = []
-        # The workspace owns these thumbnail crops and updates them only when
-        # a better reviewed example appears. Reusing them avoids recropping
-        # every source photograph whenever the assembled column is rebuilt.
-        self._facies_samples = dict(facies_samples) if facies_samples is not None else facies_visual_samples(self.records)
         self._hovered_column: tuple[PhotoRecord, FaciesDetection, str] | None = None
         self._column_draw_start: tuple[str, float] | None = None
         self._column_draw_current_y: float | None = None
@@ -1397,7 +1362,7 @@ class StackColumnItem(QGraphicsObject):
                     draw_width,
                     draw_height,
                 )
-                overlay = FaciesOverlayItem(pixmap.size(), rect, [display_detection], self, self._facies_samples,
+                overlay = FaciesOverlayItem(pixmap.size(), rect, [display_detection], self,
                                             hover_detections=[source_detection])
                 overlay.facies_clicked.connect(lambda _, rec=record, det=source_detection: self.facies_selected.emit(rec, det))
                 overlay.facies_context_requested.connect(lambda _, rec=record, det=source_detection: self.facies_context_requested.emit(rec, det))
@@ -1406,7 +1371,7 @@ class StackColumnItem(QGraphicsObject):
             for pixmap, record, source_detection, display_detection in layers:
                 x = self.core_x + (self.column_width - pixmap.width()) / 2
                 rect = QRectF(x, self._height, pixmap.width(), pixmap.height())
-                overlay = FaciesOverlayItem(pixmap.size(), rect, [display_detection], self, self._facies_samples,
+                overlay = FaciesOverlayItem(pixmap.size(), rect, [display_detection], self,
                                             hover_detections=[source_detection])
                 overlay.facies_clicked.connect(lambda _, rec=record, det=source_detection: self.facies_selected.emit(rec, det))
                 overlay.facies_context_requested.connect(lambda _, rec=record, det=source_detection: self.facies_context_requested.emit(rec, det))
@@ -1952,7 +1917,7 @@ class StackColumnItem(QGraphicsObject):
         previous = self._hovered_column
         self._hovered_column = self._column_at(event.pos())
         if self._hovered_column is not None:
-            show_facies_confidence_popup(event.screenPos(), self._hovered_column[1], self._facies_samples)
+            show_facies_confidence_popup(event.screenPos(), self._hovered_column[1])
         elif self._hovered_column is None and previous is not None:
             hide_facies_confidence_popup()
         if event.pos().y() <= self.HEADER:
@@ -2329,42 +2294,8 @@ def facies_color(label: str) -> QColor:
     return QColor(palette[index])
 
 
-def facies_confidence_rows(detection: FaciesDetection, limit: int = 6) -> list[tuple[str, float]]:
-    """Return the selected facies plus closest competing model masks.
-
-    YOLO segmentation emits a confidence for each predicted mask, rather than
-    a full softmax vector for every class. ``alternatives`` therefore contains
-    only predictions that describe the same physical interval and competed
-    with the accepted mask. This avoids inventing percentages for classes the
-    model did not actually propose.
-    """
-    scores: dict[str, float] = {str(detection.label): float(detection.confidence)}
-    for label, confidence in detection.alternatives.items():
-        try:
-            value = float(confidence)
-        except (TypeError, ValueError):
-            continue
-        scores[str(label)] = max(scores.get(str(label), 0.0), value)
-    return sorted(scores.items(), key=lambda item: (-item[1], item[0].casefold()))[:max(1, limit)]
-
-
-def facies_visual_samples(records: list[PhotoRecord]) -> dict[str, QPixmap]:
-    """Build compact real-photo references without writing duplicate files."""
-    result: dict[str, QPixmap] = {}
-    for record in records:
-        for detection in sorted(record.detections, key=lambda item: (not item.training_ready, -item.confidence)):
-            label = str(detection.label or "").strip()
-            if not label or label in {"Новый контур", "Не определена"} or label in result or len(detection.polygon) < 3:
-                continue
-            bounds = QPolygonF(detection.polygon).boundingRect().toAlignedRect()
-            bounds = bounds.intersected(QRect(0, 0, record.pixmap.width(), record.pixmap.height()))
-            if bounds.width() >= 4 and bounds.height() >= 4:
-                result[label] = record.pixmap.copy(bounds)
-    return result
-
-
 class FaciesConfidencePopup(QFrame):
-    """Small visual comparison card with in-memory facies references."""
+    """Show the chosen facies and description of the hovered interval."""
 
     def __init__(self):
         super().__init__(None, Qt.WindowType.ToolTip)
@@ -2373,8 +2304,7 @@ class FaciesConfidencePopup(QFrame):
             "QFrame#faciesConfidencePopup { background: #ffffff; border: 1px solid #e4e7ee; border-radius: 10px; } "
             "QLabel { color: #252a3b; background: transparent; } "
             "QLabel#confidenceTitle { color: #252a3b; font-weight: 700; } "
-            "QLabel#confidenceSubtle { color: #737b8e; font-size: 11px; } "
-            "QLabel#confidenceScore { color: #252a3b; font-weight: 700; }"
+            "QLabel#confidenceSubtle { color: #737b8e; font-size: 11px; }"
         )
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(10, 9, 10, 9)
@@ -2382,11 +2312,10 @@ class FaciesConfidencePopup(QFrame):
         self._content_key = None
         self._last_target = None
 
-    def show_for(self, screen_position, detection: FaciesDetection, samples: dict[str, QPixmap]) -> None:
+    def show_for(self, screen_position, detection: FaciesDetection) -> None:
         key = (id(detection), detection.label, detection.depth_from, detection.depth_to,
-               detection.confidence, detection.training_ready,
-               tuple(sorted(detection.attributes.items())), tuple(sorted(detection.alternatives.items())))
-        self._last_target = (screen_position, detection, samples)
+               detection.training_ready, tuple(sorted(detection.attributes.items())))
+        self._last_target = (screen_position, detection)
         if self.isVisible() and key == self._content_key:
             return
         self._content_key = key
@@ -2403,7 +2332,7 @@ class FaciesConfidencePopup(QFrame):
         facies_name = str(attributes.get("Название фации") or facies_metadata(
             detection.label, attributes.get("Индекс фации")
         ).get("Название фации") or "").strip()
-        subtitle = QLabel(detection.label + (f" · {facies_name}" if facies_name else ""), self)
+        subtitle = QLabel(detection.label + (f" · {facies_name}" if facies_name and facies_name != detection.label else ""), self)
         subtitle.setObjectName("confidenceSubtle")
         subtitle.setWordWrap(True)
         subtitle.setMaximumWidth(420)
@@ -2458,38 +2387,6 @@ class FaciesConfidencePopup(QFrame):
             review.setObjectName("confidenceSubtle")
             review.setWordWrap(True)
             self.layout.addWidget(review)
-        if is_vision:
-            if not detection.training_ready:
-                confidence_note = QLabel("Уверенность интерпретации: низкая", self)
-                confidence_note.setObjectName("confidenceSubtle")
-                self.layout.addWidget(confidence_note)
-            confidence_title = QLabel("Классификатор пород · среди известных классов", self)
-            confidence_title.setObjectName("confidenceTitle")
-            confidence_title.setWordWrap(True)
-            self.layout.addWidget(confidence_title)
-            try:
-                predictions = json.loads(attributes.get("__vision_predictions", "[]"))
-            except (TypeError, ValueError):
-                predictions = []
-            from app.ui.widgets.lithology_predictions import LithologyPredictionGallery
-            self.layout.addWidget(LithologyPredictionGallery(predictions,self))
-            if detection.confidence > 0:
-                geometry_score = QLabel(f"Оценка геометрии YOLO: {detection.confidence:.0%}", self)
-                geometry_score.setObjectName("confidenceSubtle")
-                self.layout.addWidget(geometry_score)
-        rows = [] if is_vision else facies_confidence_rows(detection)
-        if rows and detection.confidence > 0:
-            confidence_title = QLabel("Варианты модели", self)
-            confidence_title.setObjectName("confidenceTitle")
-            self.layout.addWidget(confidence_title)
-        for index, (label, confidence) in enumerate(rows):
-            if detection.confidence <= 0:
-                break
-            self.layout.addWidget(self._row(label, confidence, samples.get(label), primary=index == 0))
-        if len(rows) == 1 and detection.confidence > 0:
-            note = QLabel("Близких вариантов модель не предложила.", self)
-            note.setObjectName("confidenceSubtle")
-            self.layout.addWidget(note)
         self.adjustSize()
         position = screen_position + QPoint(14, 12)
         screen = QApplication.screenAt(screen_position) or QApplication.primaryScreen()
@@ -2504,51 +2401,14 @@ class FaciesConfidencePopup(QFrame):
         if self.isVisible() and self._last_target is not None:
             self.show_for(*self._last_target)
 
-    def _row(self, label: str, confidence: float, sample: QPixmap | None, primary: bool) -> QFrame:
-        row = QFrame(self)
-        layout = QHBoxLayout(row)
-        layout.setContentsMargins(1, 1, 1, 1)
-        layout.setSpacing(7)
-        preview = QLabel(row)
-        preview.setFixedSize(42, 42)
-        preview.setStyleSheet(f"background: {facies_color(label).lighter(165).name()}; border-radius: 6px;")
-        if sample is not None and not sample.isNull():
-            tile = QPixmap(42, 42)
-            tile.fill(facies_color(label).lighter(165))
-            scaled = sample.scaled(42, 42, Qt.AspectRatioMode.KeepAspectRatioByExpanding, Qt.TransformationMode.SmoothTransformation)
-            painter = QPainter(tile)
-            painter.setClipRect(0, 0, 42, 42)
-            painter.drawPixmap((42 - scaled.width()) // 2, (42 - scaled.height()) // 2, scaled)
-            painter.end()
-            preview.setPixmap(tile)
-        else:
-            preview.setText("•")
-            preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            preview.setStyleSheet(
-                f"background: {facies_color(label).lighter(165).name()}; color: {facies_color(label).darker(135).name()}; "
-                "font-size: 28px; border-radius: 6px;"
-            )
-        metadata = facies_metadata(label)
-        name = str(metadata.get("Название фации") or "")
-        text = QLabel(("★ " if primary else "") + (label if not name else f"{label} · {name}"), row)
-        text.setWordWrap(True)
-        text.setMaximumWidth(218)
-        score = QLabel(f"{confidence:.0%}", row)
-        score.setObjectName("confidenceScore")
-        layout.addWidget(preview)
-        layout.addWidget(text, 1)
-        layout.addWidget(score)
-        return row
-
-
 _confidence_popup: FaciesConfidencePopup | None = None
 
 
-def show_facies_confidence_popup(screen_position, detection: FaciesDetection, samples: dict[str, QPixmap]) -> None:
+def show_facies_confidence_popup(screen_position, detection: FaciesDetection) -> None:
     global _confidence_popup
     if _confidence_popup is None:
         _confidence_popup = FaciesConfidencePopup()
-    _confidence_popup.show_for(screen_position, detection, samples)
+    _confidence_popup.show_for(screen_position, detection)
 
 
 def hide_facies_confidence_popup() -> None:

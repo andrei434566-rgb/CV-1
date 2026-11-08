@@ -48,11 +48,11 @@ def main():
             attrs=card.selected_attributes();card.close()
         fixture=[{'class':name,'score':score} for name,score in zip(('garbage','shale','limestone','sandstone'),(.73,.22,.03,.02))]
         detection=FaciesDetection('Интервал YOLO',.8,[],attributes={'__description_engine':'vision',
-            '__vision_predictions':json.dumps(fixture),'Цвет':attrs.get('Цвет',''),'__vlm_description':'Демонстрация интерфейса. Проценты в этом снимке — пример оформления.'})
-        popup=FaciesConfidencePopup();popup.show_for(QPoint(20,20),detection,{})
-        app.processEvents();popup.grab().save(str(output/'predictions_gallery.png'));popup.hide()
+            '__vision_predictions':json.dumps(fixture),'Цвет':attrs.get('Цвет',''),'__vlm_description':'Описание цвета керна по фотографии.'})
+        popup=FaciesConfidencePopup();popup.show_for(QPoint(20,20),detection)
+        app.processEvents();popup.grab().save(str(output/'description_popup.png'));popup.hide()
     report={'real_core_crops':rows,'model_weights_changed':False,'geological_accuracy_evaluated':False,
-            'gallery_percentages_are_ui_fixture':True,'card_colour':attrs.get('Цвет')}
+            'card_colour':attrs.get('Цвет')}
     (output/'color_smoke.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps(report,ensure_ascii=False))
 

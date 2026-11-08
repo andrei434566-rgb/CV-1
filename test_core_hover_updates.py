@@ -2,6 +2,7 @@
 import os
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
+import json
 import unittest
 from types import SimpleNamespace
 from PySide6.QtCore import QPoint, QPointF, QRectF, Qt
@@ -71,6 +72,26 @@ class CoreHoverUpdatesTests(unittest.TestCase):
         overlay = ui.FaciesOverlayItem(self.record.pixmap.size(), QRectF(self.record.pixmap.rect()),
                                       [mask, self.detection])
         self.assertEqual(overlay._detection_at(QPointF(10, 10), include_core_columns=True), 0)
+
+    def test_hover_shows_selected_rock_without_scores_or_competing_labels(self):
+        self.detection.label = "Выбранная фация"
+        self.detection.confidence = .84
+        self.detection.alternatives = {"Другая фация": .25}
+        self.detection.attributes.update({
+            "Название породы": "Песчаник",
+            "Краткое описание": "Светло-серый песчаник.",
+            "__vision_predictions": json.dumps([{"class": "limestone", "score": .45}]),
+        })
+        for engine in ("vision", ""):
+            with self.subTest(engine=engine):
+                self.detection.attributes["__description_engine"] = engine
+                ui.show_facies_confidence_popup(QPoint(20, 20), self.detection)
+                text = self.popup_text()
+                self.assertIn("Светло-серый песчаник.", text)
+                self.assertIn("Выбранная фация", text)
+                self.assertNotIn("%", text)
+                self.assertNotIn("Известняк", text)
+                self.assertNotIn("Другая фация", text)
 
     def test_view_delivers_hover_to_unpainted_column_overlay(self):
         self.canvas.resize(900, 600)

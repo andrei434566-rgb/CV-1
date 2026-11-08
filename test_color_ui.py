@@ -8,10 +8,9 @@ from unittest.mock import patch
 from PIL import Image
 from PySide6.QtGui import QColor,QPixmap
 from PySide6.QtCore import QSettings
-from PySide6.QtWidgets import QApplication,QLabel,QFrame
+from PySide6.QtWidgets import QApplication,QLabel
 from app.infrastructure.core_color_hint import estimate_core_color
 from app.ui.dialogs.facies_dialog import FaciesDialog
-from app.ui.widgets.lithology_predictions import LithologyPredictionGallery
 
 APP=QApplication.instance() or QApplication([])
 
@@ -26,26 +25,18 @@ class ColorUiTests(unittest.TestCase):
         self.addCleanup(card.close)
         return card
 
-    def test_gallery_shows_rock_thumbnails_and_scores_without_background(self):
-        for background in ("garbage", "background"):
-            with self.subTest(background=background):
-                rows = [
-                    {"class": code, "score": score}
-                    for code, score in zip((background, "shale", "limestone", "sandstone"), (.73, .22, .03, .02))
-                ]
-                gallery = LithologyPredictionGallery(rows)
-                self.addCleanup(gallery.close)
-                cards = gallery.findChildren(QFrame, "lithologyPredictionCard")
-                self.assertEqual([card.property("classCode") for card in cards], ["shale", "limestone", "sandstone"])
-                for card, score in zip(cards, ("22%", "3%", "2%")):
-                    self.assertFalse(card.findChild(QLabel, "lithologyPredictionImage").pixmap().isNull())
-                    self.assertEqual(card.findChild(QLabel, "lithologyPredictionScore").text(), score)
-
-    def test_invalid_or_duplicate_probability_rows_do_not_create_fake_scores(self):
-        gallery=LithologyPredictionGallery([{'class':'shale','score':float('nan')},{'class':'unknown','score':.9},
-                                           {'class':'shale','score':.7},{'class':'shale','score':.2}])
-        self.addCleanup(gallery.close)
-        self.assertEqual(len(gallery.findChildren(QFrame,'lithologyPredictionCard')),1)
+    def test_card_keeps_selected_rock_without_showing_the_model_suggestion(self):
+        card = self.card({
+            "Название породы": "Песчаник",
+            "__source_model_class": "Известняк",
+            "__attribute_suggestions": json.dumps({"Название породы": "Известняк", "Контакт": "Резкий"}),
+        })
+        labels = "\n".join(label.text() for label in card.findChildren(QLabel))
+        self.assertEqual(card.attribute_combos["Название породы"].currentData(), "Песчаник")
+        self.assertIn("Порода: Песчаник.", card.vlm_description.toPlainText())
+        self.assertNotIn("Известняк", labels)
+        self.assertNotIn("80%", labels)
+        self.assertIn("Контакт: Резкий", labels)
 
     def test_opening_empty_card_requests_colour_and_fills_template_without_loading_cnn(self):
         card=self.card();calls=[]

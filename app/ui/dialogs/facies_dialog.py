@@ -117,30 +117,10 @@ class FaciesDialog(QDialog):
         initial_assumptions = read_assumptions(attributes)
 
         layout = QVBoxLayout(self)
-        confidence_title = (
-            "Границы найденного столбика" if is_whole_column
-            else "Оценка геометрии YOLO" if attributes.get("__geometry_only") == "1"
-            else "Оценка модели"
-        )
-        confidence_text = (
-            "Рамка целого столбика предварительная — проверьте по исходному фото."
-            if is_whole_column else f"{confidence_title}: {confidence:.0%} (не вероятность правильности фации)"
-        )
-        confidence_label = QLabel(confidence_text)
-        confidence_label.setStyleSheet("color: #687087;")
-        layout.addWidget(confidence_label)
-        source_class = str(attributes.get("__source_model_class") or "").strip()
-        if source_class:
-            source_id = str(attributes.get("__source_model_class_id") or "").strip()
-            source_text = "Предложение YOLO: " + source_class
-            if source_id:
-                source_text += " (класс " + source_id + ")"
-            if attributes.get("__geometry_only") == "1":
-                source_text += ". Модель может выделять только геометрию; фацию укажите ниже."
-            source_label = QLabel(source_text)
-            source_label.setObjectName("yoloSourceClass")
-            source_label.setWordWrap(True)
-            layout.addWidget(source_label)
+        if is_whole_column:
+            column_note = QLabel("Границы целого столбика")
+            column_note.setStyleSheet("color: #687087;")
+            layout.addWidget(column_note)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
         splitter.setChildrenCollapsible(False)
@@ -331,10 +311,6 @@ class FaciesDialog(QDialog):
                 ("Гидродинамический режим", self.hydrodynamic_regime),
             ) if field in initial_assumptions
         }
-        if attributes.get("__description_engine") == "vision" and not description_confirmed:
-            confidence_note = QLabel("Уверенность интерпретации: низкая")
-            confidence_note.setStyleSheet("color: #687087;")
-            preview_layout.addWidget(confidence_note)
         self.template_mode = QCheckBox("Описание по выбранным признакам")
         self.template_mode.setObjectName("descriptionTemplateMode")
         existing_text = display_description(
@@ -376,6 +352,8 @@ class FaciesDialog(QDialog):
             suggestions = json.loads(str(attributes.get("__attribute_suggestions") or "{}"))
         except (ValueError, TypeError):
             suggestions = {}
+        if isinstance(suggestions, dict):
+            suggestions.pop("Название породы", None)
         if isinstance(suggestions, dict) and suggestions:
             suggested = QLabel("Визуальные подсказки (не подтверждены): " + "; ".join(f"{k}: {v}" for k, v in suggestions.items()))
             suggested.setWordWrap(True)
