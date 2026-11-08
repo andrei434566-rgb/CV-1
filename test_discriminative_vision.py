@@ -51,7 +51,8 @@ class VisionContractTests(unittest.TestCase):
         self.assertEqual(attributes['Цемент'], PHOTO_UNRESOLVED)
         self.assertIn('Название фации', assumptions)
         draft = compose_description(attributes, facies_name=facies, assumptions=assumptions)
-        self.assertIn('предположительно Песчаник', draft.text)
+        self.assertIn('Порода: Песчаник.', draft.text)
+        self.assertNotIn('предположительно', draft.text.casefold())
         self.assertNotIn('проверка геологом', draft.text)
 
         blank = summarize_predictions([], card)

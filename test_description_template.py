@@ -13,7 +13,7 @@ from PySide6.QtWidgets import QApplication, QDialog
 
 from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
 from app.domain.models import FaciesDetection, PhotoRecord
-from app.infrastructure.description_template import ASSUMPTIONS_KEY, compose_description
+from app.infrastructure.description_template import ASSUMPTIONS_KEY, compose_description, display_description
 from app.infrastructure.project_storage import load_project
 from app.ui.dialogs.facies_dialog import FaciesDialog, make_interval_preview
 
@@ -32,9 +32,11 @@ class DescriptionTemplateTests(unittest.TestCase):
         draft = compose_description(attrs, 3188.98, 3189.24123, facies_name="Пойменная",
                                     assumptions=["Биотурбация", "Название фации"])
         self.assertIn("3188,98–3189,241 м", draft.text)
-        self.assertIn("Порода: предположительно Песчаник.", draft.text)
-        self.assertIn("предположительно Planolites и Chondrites", draft.text)
-        self.assertIn("Фация: предположительно Пойменная.", draft.text)
+        self.assertIn("Порода: Песчаник.", draft.text)
+        self.assertIn("Биотурбация: Planolites и Chondrites.", draft.text)
+        self.assertIn("Фация: Пойменная.", draft.text)
+        self.assertNotIn("предположительно", draft.text.casefold())
+        self.assertEqual(set(draft.assumed), {"Название породы", "Биотурбация", "Название фации"})
         self.assertIn("Крупнозернистая", draft.text)
         self.assertFalse(draft.missing)
         for field in LITHOLOGY_ATTRIBUTE_OPTIONS:
@@ -46,6 +48,14 @@ class DescriptionTemplateTests(unittest.TestCase):
         self.assertEqual("Цвет: Серый.", draft.text)
         self.assertIn("Название породы", draft.missing)
         self.assertNotIn("Интервал", draft.text)
+
+    def test_saved_template_is_rendered_without_touching_handwritten_text(self):
+        cached = "Интервал 100–101 м. Порода: предположительно Песчаник."
+        attrs = {"__description_mode": "template", "__description_template_text": cached}
+        self.assertEqual(display_description(attrs, cached), "Интервал 100–101 м. Порода: Песчаник.")
+        self.assertEqual(display_description({**attrs, "__description_mode": "manual"}, cached), cached)
+        written = "Состав: предположительно кварцевый."
+        self.assertEqual(display_description(attrs, written), written)
 
 
 class DescriptionCardTests(unittest.TestCase):
@@ -76,7 +86,7 @@ class DescriptionCardTests(unittest.TestCase):
         self.choose(dialog, "Цвет", "Серый")
         self.choose(dialog, "Зернистость", "Мелкозернистый")
         dialog.assumption_checks["Зернистость"].setChecked(True)
-        self.assertIn("Зернистость: предположительно Мелкозернистая.", dialog.vlm_description.toPlainText())
+        self.assertIn("Зернистость: Мелкозернистая.", dialog.vlm_description.toPlainText())
         self.assertIn("Название фации", dialog.missing_fields.text())
         attrs = dialog.selected_attributes()
         self.assertEqual(attrs["Краткое описание"], attrs["__vlm_description"])
@@ -173,7 +183,8 @@ class DescriptionCardTests(unittest.TestCase):
             _, records, _, missing, _ = load_project(window._project_folder)
             self.assertFalse(missing)
             attrs = records[0].detections[0].attributes
-            self.assertIn("предположительно Песчаник", attrs["Краткое описание"])
+            self.assertIn("Порода: Песчаник.", attrs["Краткое описание"])
+            self.assertEqual(json.loads(attrs[ASSUMPTIONS_KEY]), ["Название породы"])
             self.assertEqual(attrs["__description_mode"], "template")
             target = self.root / "report.xlsx"
             with patch.object(window, "_show_stack"):
@@ -182,6 +193,7 @@ class DescriptionCardTests(unittest.TestCase):
             workbook = load_workbook(target)
             try:
                 self.assertEqual(workbook.active["V4"].value, attrs["Краткое описание"])
+                self.assertIn("Низкая уверенность", workbook.active["V4"].comment.text)
                 rules = [formula for group in workbook.active.conditional_formatting._cf_rules.values()
                          for rule in group for formula in rule.formula]
                 self.assertTrue(any('SEARCH("предполож"' in formula for formula in rules))

@@ -14,6 +14,7 @@ from app.domain.models import FaciesDetection, PhotoRecord
 from app.domain.facies_catalog import facies_metadata
 from app.domain.facies_palette import normalize_facies_palette
 from app.domain.lithology import LITHOLOGY_LEGEND, normalize_lithology_palette
+from app.infrastructure.description_template import display_description
 
 
 _STACK_CROP_CACHE: OrderedDict[tuple, QPixmap] = OrderedDict()
@@ -2413,6 +2414,7 @@ class FaciesConfidencePopup(QFrame):
             self.layout.addWidget(depth)
         description = str(attributes.get("Краткое описание") or attributes.get("Литологическое описание (16 параметров)")
                           or attributes.get("__vlm_description") or "").strip()
+        description = display_description(attributes, description)
         for title, public_key, internal_key in (
             ("Порода", "Название породы", "__vlm_lithology"),
             ("Цвет", "Цвет", "__vision_color"),

@@ -14,7 +14,7 @@ from tempfile import TemporaryDirectory
 
 from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
 from app.domain.facies_catalog import facies_identity
-from app.infrastructure.description_template import PHOTO_UNRESOLVED
+from app.infrastructure.description_template import PHOTO_UNRESOLVED, display_description, read_assumptions
 from app.runtime_paths import bundled_root
 
 
@@ -92,7 +92,6 @@ def _append_unique(existing: object, added: object) -> str:
 def _merge_layer_attributes(target: dict, source: dict) -> None:
     for key, value in dict(source or {}).items():
         if key=='__description_assumptions':
-            from app.infrastructure.description_template import read_assumptions
             target[key]=json.dumps(sorted(read_assumptions(target)|read_assumptions(source)),ensure_ascii=False)
             continue
         if value in (None, ""):
@@ -397,7 +396,8 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
             vlm = dict(layer.get("vlm") or {})
             sheet[f"T{row_number}"] = _text(vlm.get("facies_association") or attributes.get("__vlm_facies_association"))
             sheet[f"U{row_number}"] = _text(vlm.get("depositional_environment") or attributes.get("__vlm_depositional_environment"))
-            sheet[f"V{row_number}"] = _text(vlm.get("description") or attributes.get("__vlm_description"))
+            sheet[f"V{row_number}"] = display_description(
+                attributes, _text(vlm.get("description") or attributes.get("__vlm_description")))
             hydrodynamic = _text(attributes.get("__vlm_hydrodynamic_regime"))
             if hydrodynamic and not (attributes.get("__description_mode") == "template" and hydrodynamic == PHOTO_UNRESOLVED):
                 note = "Гидродинамический режим: " + hydrodynamic
@@ -449,6 +449,9 @@ def _attach_description_review(sheet, row_number, attributes):
         messages=[row['message'] for row in rows if isinstance(row,dict) and isinstance(row.get('message'),str)] if isinstance(rows,list) else []
     except (ValueError,TypeError):
         messages=[]
+    assumed = sorted(read_assumptions(attributes))
+    if assumed:
+        messages.append("Низкая уверенность в полях «" + "», «".join(assumed) + "».")
     try:
         quality=json.loads(attributes.get('__image_quality') or attributes.get('__photo_quality') or '{}')
         if isinstance(quality,dict):

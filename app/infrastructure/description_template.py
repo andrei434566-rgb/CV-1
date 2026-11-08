@@ -40,6 +40,15 @@ def read_assumptions(attributes: Mapping[str, str]) -> set[str]:
     return {v for v in fields if isinstance(v, str)} if isinstance(fields, list) else set()
 
 
+def display_description(attributes: Mapping[str, str], text: str) -> str:
+    """Update the presentation of saved templates without changing stored text."""
+    if attributes.get("__description_mode") == "template":
+        cached = str(attributes.get("__description_template_text") or "").strip()
+        if not cached or cached == text.strip():
+            return re.sub(r"(?<=: )предположительно ", "", text)
+    return text
+
+
 @dataclass(frozen=True)
 class DescriptionDraft:
     text: str
@@ -101,8 +110,7 @@ def compose_description(
         if field == "Зернистость":
             value = {"Крупнозернистый": "Крупнозернистая", "Среднезернистый": "Среднезернистая",
                      "Мелкозернистый": "Мелкозернистая", "Тонкозернистый": "Тонкозернистая"}.get(value, value)
-        prefix = "предположительно " if field in assumed else ""
-        lines.append(f"{title}: {prefix}{value}.")
+        lines.append(f"{title}: {value}.")
     facies, inline_assumption = observation(facies_name)
     if facies == PHOTO_UNRESOLVED:
         unresolved = True
@@ -110,7 +118,7 @@ def compose_description(
         found["Название фации"] = facies
         if inline_assumption:
             assumed.add("Название фации")
-        lines.append("Фация: " + ("предположительно " if "Название фации" in assumed else "") + facies + ".")
+        lines.append(f"Фация: {facies}.")
     if unresolved and not found:
         lines.append("На фото признаки керна не различимы.")
     missing = tuple(field for field in (*REVIEW_FIELDS, "Название фации") if field not in found)

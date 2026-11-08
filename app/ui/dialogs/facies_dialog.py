@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QCheckBox, QComboBox, QDialog, QDialogButtonBox, Q
 from app.domain.facies_catalog import FACIES_MODEL_CLASSES, FACIES_REFERENCE_FIELDS, facies_metadata, facies_title, resolve_facies_class
 from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
 from app.infrastructure.primary_facies_catalog import resolve_catalog_class
-from app.infrastructure.description_template import ASSUMPTIONS_KEY, PHOTO_UNRESOLVED, SCHEMA, UNKNOWN_FACIES, compose_description, observation, read_assumptions
+from app.infrastructure.description_template import ASSUMPTIONS_KEY, PHOTO_UNRESOLVED, SCHEMA, UNKNOWN_FACIES, compose_description, display_description, observation, read_assumptions
 from app.infrastructure.description_review import review_description
 from app.infrastructure.attribute_examples import EVIDENCE_FIELDS, EVIDENCE_KEY, pixel_digest, png_bytes, read_evidence, valid_evidence
 from app.ui.dialogs.feature_evidence_dialog import EvidenceView, FeatureEvidenceDialog
@@ -193,7 +193,7 @@ class FaciesDialog(QDialog):
         search.textChanged.connect(self._filter_facies)
         form.addRow("Поиск фации:", search)
         form.addRow("Фация (основная метка):", self.facies)
-        self.facies_assumed = QCheckBox("Фация предположительная")
+        self.facies_assumed = QCheckBox("Низкая уверенность в фации")
         self.facies_assumed.setChecked("Название фации" in initial_assumptions)
         form.addRow("", self.facies_assumed)
         self.facies_reference = QLabel()
@@ -237,11 +237,11 @@ class FaciesDialog(QDialog):
             combo.setCurrentIndex(value_index if value_index >= 0 else 0)
             combo.activated.connect(lambda index, field=field_name, widget=combo: self._choose_custom_attribute(field, widget, index))
             self.attribute_combos[field_name] = combo
-            assumed = QCheckBox("Предположительно")
+            assumed = QCheckBox("Низкая уверенность")
             assumed.setChecked(field_name in initial_assumptions or inline_assumption
                                or (ASSUMPTIONS_KEY not in attributes and field_name == "Цвет"
                                    and attributes.get("__vision_color") == value and bool(value)))
-            assumed.setToolTip("Свойство является предположением. Эта отметка попадёт в описание.")
+            assumed.setToolTip("Отметка о низкой уверенности хранится отдельно от текста.")
             self.assumption_checks[field_name] = assumed
             row = QVBoxLayout()
             row.setContentsMargins(0, 0, 0, 0)
@@ -337,7 +337,8 @@ class FaciesDialog(QDialog):
             preview_layout.addWidget(confidence_note)
         self.template_mode = QCheckBox("Описание по выбранным признакам")
         self.template_mode.setObjectName("descriptionTemplateMode")
-        existing_text = str(attributes.get("__vlm_description") or attributes.get("Краткое описание") or "")
+        existing_text = display_description(
+            attributes, str(attributes.get("__vlm_description") or attributes.get("Краткое описание") or ""))
         mode = attributes.get("__description_mode")
         use_template = mode == "template" or (mode != "manual" and (not existing_text or (
             attributes.get("__description_engine") == "vision" and not description_confirmed
@@ -345,7 +346,7 @@ class FaciesDialog(QDialog):
         self.template_mode.setChecked(use_template)
         preview_layout.addWidget(self.template_mode)
         self._manual_description = str(attributes.get("__description_manual_text", existing_text))
-        self.vlm_description = QPlainTextEdit(str(attributes.get("__vlm_description") or attributes.get("Краткое описание") or ""))
+        self.vlm_description = QPlainTextEdit(existing_text)
         self.vlm_description.setPlaceholderText("Краткое описание по фото")
         self.vlm_description.setObjectName("intervalDescriptionPreview")
         self.vlm_description.setMinimumHeight(150)
