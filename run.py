@@ -105,8 +105,16 @@ def main() -> int:
                 or not all(row.get("ok") for row in replies)):
             error = bytes(worker.readAllStandardError()).decode("utf-8", errors="replace")
             raise RuntimeError(f"Portable Vision worker failed: {replies}\n{error}")
-        if len(requests) > 1 and replies[-1].get("model_info", {}).get("generative") is not False:
-            raise RuntimeError("Portable classifier did not report the Vision engine")
+        if len(requests) > 1:
+            photo = replies[-1]
+            info = photo.get("model_info", {})
+            if info.get("generative") is not False:
+                raise RuntimeError("Portable classifier did not report the Vision engine")
+            expected = photo["fields"]["description"]
+            if info.get("noncommercial_only"):
+                expected += " Модель для некоммерческих исследований."
+            if photo["answer"] != expected or "Порода:" not in expected or "%" in expected or "предположительно" in expected.casefold():
+                raise RuntimeError("Portable photo reply does not match the selected description")
         window.close()
         app.quit()
         if len(FACIES_MODEL_CLASSES) != 92:

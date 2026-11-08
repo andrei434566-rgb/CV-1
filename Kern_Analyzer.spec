@@ -15,6 +15,7 @@ datas = [
     ('README_PRIMARY_SOURCE_RU.md', '.'),
     ('docs/USER_GUIDE_RU.md', 'docs'),
     ('PORTABLE_README.txt', '.'),
+    ('VERSION.txt', '.'),
     ('model_blueprint', 'model_blueprint'),
     # Offline OCR used by the photo-interval agent.  Ship it beside the
     # executable so a target PC does not need a separate Tesseract install.

@@ -73,6 +73,36 @@ jobs:
           $process = Start-Process -FilePath 'dist/Kern_Analyzer/Kern_Analyzer.exe' -ArgumentList '--portable-smoke-test' -Wait -PassThru -WindowStyle Hidden
           if ($process.ExitCode -ne 0) { throw "Portable smoke test failed with exit code $($process.ExitCode)" }
 
+      - name: Audit package for generative components
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          from PyInstaller.archive.readers import CArchiveReader
+
+          package = Path("dist/Kern_Analyzer")
+          archive = CArchiveReader(str(package / "Kern_Analyzer.exe"))
+          entries = set(archive.toc)
+          for name in tuple(entries):
+              if name.endswith(".pyz"):
+                  entries.update(archive.open_embedded_archive(name).toc)
+          entries.update(path.relative_to(package).as_posix() for path in package.rglob("*") if path.is_file())
+
+          blocked = {"transformers", "peft", "accelerate", "llama_cpp", "llama_cpp_python",
+                     "bitsandbytes", "local_vlm_runner", "local_llama_runtime"}
+          matches = []
+          for name in sorted(entries):
+              normalized = name.casefold().replace("\\", "/")
+              parts = normalized.replace(".", "/").split("/")
+              if normalized.endswith((".gguf", ".safetensors")) or any(
+                      part.startswith("qwen") or part.split("-", 1)[0] in blocked for part in parts):
+                  matches.append(name)
+          if matches:
+              raise SystemExit("Generative components in portable package: " + ", ".join(matches))
+          print(f"Checked {len(entries)} package entries")
+          '@ | python -
+          if ($LASTEXITCODE -ne 0) { throw "Portable package audit failed" }
+
       - name: Upload portable application
         if: inputs.release_tag == ''
         uses: actions/upload-artifact@v4
