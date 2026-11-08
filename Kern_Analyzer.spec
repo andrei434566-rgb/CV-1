@@ -5,14 +5,15 @@ from PyInstaller.utils.hooks import collect_all
 from pathlib import Path
 
 datas = [
-    ('app', 'app'),
     ('MODEL_GUIDE.md', '.'),
     ('CV1_ARCHITECTURE_RU.md', '.'),
+    ('CV1_VISION_RU.md', '.'),
     ('README_OPEN_DATASETS_RU.md', '.'),
     ('requirements.txt', '.'),
     ('README_EXCEL_JPG_IMPORT.md', '.'),
     ('README_WORD_PHOTO_TRAINING_RU.md', '.'),
     ('README_PRIMARY_SOURCE_RU.md', '.'),
+    ('docs/USER_GUIDE_RU.md', 'docs'),
     ('PORTABLE_README.txt', '.'),
     ('model_blueprint', 'model_blueprint'),
     # Offline OCR used by the photo-interval agent.  Ship it beside the
@@ -31,8 +32,29 @@ hiddenimports = [
 ]
 binaries += collect_dynamic_libs('shiboken6')
 hiddenimports += collect_submodules('app')
-tmp_ret = collect_all('PySide6')
-datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
+# External Python training tools need the source tree, but caches and weights
+# must enter the distribution only through the explicit model allowlist below.
+for source in Path('app').rglob('*'):
+    if source.is_file() and '__pycache__' not in source.parts and source.suffix.lower() in {
+        '.py', '.json', '.md', '.txt', '.xlsx', '.png', '.jpg', '.jpeg', '.svg', '.ico', '.qss', '.ui'
+    }:
+        datas.append((str(source), source.parent.as_posix()))
+
+# Ship the selected classifier only, never training runs or pretrained caches.
+vision_root = Path('models/vision')
+if (vision_root / 'current.json').is_file():
+    import json
+    folder = json.loads((vision_root / 'current.json').read_text(encoding='utf-8'))['folder']
+    selected = (vision_root / folder).resolve()
+    if not selected.is_relative_to(vision_root.resolve()):
+        raise ValueError('Vision model path is outside models/vision')
+    # The model folder may also contain research datasets and cached features.
+    # They are neither runtime dependencies nor public application resources.
+    datas += [(str(vision_root / 'current.json'), 'models/vision')]
+    for name in ('config.json', 'model.pt'):
+        datas.append((str(selected / name), 'models/vision/' + folder))
+# The PySide hooks collect the imported Qt modules and their plugins.
+# Collecting all of PySide6 also pulls in unrelated Qt modules and tools.
 tmp_ret = collect_all('ultralytics')
 datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 # PyInstaller's official hooks already collect the required torch binaries.
@@ -66,7 +88,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=['app/qt_runtime_hook.py'],
-    excludes=[],
+    excludes=['transformers', 'peft', 'accelerate', 'llama_cpp', 'bitsandbytes'],
     noarchive=False,
     optimize=0,
 )

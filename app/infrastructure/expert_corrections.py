@@ -1,4 +1,4 @@
-"""Explicit geologist corrections for local chat memory and Qwen training."""
+"""Explicit geologist corrections for local chat memory and reviewed training datasets."""
 
 from __future__ import annotations
 
@@ -167,7 +167,7 @@ def exact_correction(question: str, *, operation: str = "chat", image_path: str 
 
 
 def related_text_corrections(question: str, *, project: str = "", well: str = "", limit: int = 3) -> list[dict[str, str]]:
-    """Show only close text examples to Qwen; photo labels never leak across images."""
+    """Show only close text examples to the assistant; photo labels never leak across images."""
     words = {word for word in _normalized(question).split() if len(word) >= 4}
     if not words:
         return []
@@ -254,6 +254,14 @@ def expert_memory_is_confirmed(detection) -> bool:
         return False
 
 
+def current_description_is_confirmed(detection) -> bool:
+    """Explicit memory withdrawal overrides a historical training confirmation."""
+    if '__expert_memory_confirmed' in (detection.attributes or {}):
+        return expert_memory_is_confirmed(detection)
+    from app.infrastructure.vlm_training_data import expert_description_is_confirmed
+    return expert_description_is_confirmed(detection)
+
+
 def save_interval_edit(record, detection, *, project: str, well: str) -> dict:
     """Append a specialist's explicit edit, preserving its review state.
 
@@ -326,7 +334,7 @@ def exact_interval_edit(record, detection, *, project: str, well: str, require_c
 
 
 def export_correction_manifest(kind: str, destination: Path) -> dict:
-    """Snapshot only explicit expert edits in the existing Qwen JSONL format."""
+    """Snapshot only explicit expert edits in the reviewed JSONL interchange format."""
     if kind not in {"text", "photo"}:
         raise ValueError("Выберите текстовые или фото-поправки.")
     operation = "chat" if kind == "text" else "photo_chat"

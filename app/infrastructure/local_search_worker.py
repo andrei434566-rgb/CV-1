@@ -1,4 +1,4 @@
-"""Run read-only local file search without freezing the Qt window or loading Qwen."""
+"""Run read-only local file search without blocking the Qt window."""
 
 from __future__ import annotations
 

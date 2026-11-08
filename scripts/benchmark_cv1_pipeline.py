@@ -1,4 +1,4 @@
-"""Uncached end-to-end core geometry, assembly and full VLM description benchmark."""
+"""Uncached end-to-end core geometry, assembly and structured non-generative description benchmark."""
 from __future__ import annotations
 
 import argparse
@@ -12,28 +12,52 @@ from uuid import uuid4
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QEventLoop, QTimer
+from app.infrastructure.local_vlm_client import LocalVlmClient
 from app.domain.models import PhotoRecord
 from app.infrastructure.image_loading import load_working_pixmap
 from app.infrastructure.cv1_analysis import (PIPELINE_MODE, IntervalJob, apply_interval_description,
                                            create_core_column_description_detections, geometry_signature, write_interval_crop)
 from app.infrastructure.ml.core_column_service import CoreColumnRecognizer, assemble_core_tape, read_bgr_image
-from app.infrastructure.local_vlm_runner import LocalModel
+from app.infrastructure.local_vision import VisionEngine, default_model_folder
 
 parser = argparse.ArgumentParser()
 parser.add_argument("photos", type=Path, nargs="+")
 parser.add_argument("--base", type=Path)
 parser.add_argument("--model", type=Path, help="An optional actual YOLO segmentation checkpoint")
 parser.add_argument("--output", type=Path, default=Path("outputs/cv1_pipeline_benchmark"))
+parser.add_argument("--in-process", action="store_true", help="Profile the CNN directly instead of the application JSON/QProcess path")
 args = parser.parse_args()
 if len(set(path.resolve() for path in args.photos)) != len(args.photos):
     parser.error("Use distinct source photographs; repeated/cache-hit inputs are not a throughput benchmark.")
 if args.base is None:
-    snapshots = Path(__file__).resolve().parents[2] / "vlm_core_v1/model_cache/hub/models--Qwen--Qwen3-VL-2B-Instruct/snapshots"
-    args.base = next(path for path in snapshots.iterdir() if (path / "config.json").is_file())
+    args.base = default_model_folder()
 args.output.mkdir(parents=True, exist_ok=True)
 application = QApplication.instance() or QApplication([])
 started = perf_counter()
-recognizer, model = CoreColumnRecognizer(), LocalModel()
+recognizer = CoreColumnRecognizer()
+model = VisionEngine() if args.in_process else LocalVlmClient()
+
+def request_description(payload):
+    if args.in_process:
+        return model.answer(payload)
+    loop = QEventLoop()
+    timer = QTimer(); timer.setSingleShot(True); timer.timeout.connect(loop.quit)
+    replies = []; request_id = None
+    def receive(result):
+        if result.get("id") == request_id:
+            replies.append(result); loop.quit()
+    model.reply.connect(receive)
+    try:
+        request_id = model.send(sys.executable, payload)
+        timer.start(120000); loop.exec()
+    finally:
+        timer.stop(); model.reply.disconnect(receive)
+    if not replies:
+        raise RuntimeError("Application worker did not reply")
+    if not replies[0].get("ok"):
+        raise RuntimeError(replies[0].get("error"))
+    return replies[0]
 segmentation = None
 if args.model is not None:
     from app.infrastructure.ml.yolo_model_service import YoloModelService
@@ -78,7 +102,7 @@ try:
             crops.append(crop)
             items.append({"id": str(index), "image": str(crop), "whole_column": job.detection.attributes.get("__core_column_description") == "1",
                           "context": "Описание отдельного найденного столбика или полигона керна."})
-        response = model.answer({"operation": "describe_batch", "base": str(args.base), "model_mode": "base", "items": items}, [])
+        response = request_description({"operation": "describe_batch", "base": str(args.base), "model_mode": "vision", "items": items})
         for index, ((record, job, report_index), crop) in enumerate(zip(selected, crops), 1):
             reply = response["items"][str(index)]
             try:
@@ -94,10 +118,11 @@ try:
         print(json.dumps({"described_objects": total, "complete_descriptions": successes,
                           "elapsed_seconds": perf_counter() - started}, ensure_ascii=False), flush=True)
 finally:
-    model.turbo.close()
+    if not args.in_process:
+        model.stop()
 summary = {"photos": len(reports), "unique_photos": len(reports), "objects": total, "complete_descriptions": successes,
            "total_seconds": perf_counter() - started, "segmentation_model": str(args.model) if args.model else None,
-           "response_cache": False, "results": reports}
+           "response_cache": False, "via_application_worker": not args.in_process, "results": reports}
 (args.output / "report.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 print(json.dumps({key: value for key, value in summary.items() if key != "results"}, ensure_ascii=False), flush=True)
 if successes != total or not total:

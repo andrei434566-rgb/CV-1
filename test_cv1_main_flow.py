@@ -22,7 +22,6 @@ from app.domain.models import FaciesDetection, PhotoRecord
 from app.infrastructure.cv1_analysis import PIPELINE_MODE, IntervalJob
 from app.infrastructure.facies_postprocess import UNRECOGNIZED_FACIES
 from app.ui.windows.main_window import MainWindow
-from app.ui.dialogs.training_center_dialog import TrainingCenterDialog
 
 
 _APP = QApplication.instance() or QApplication([])
@@ -78,22 +77,21 @@ class Cv1MainFlowTests(unittest.TestCase):
             "depositional_environment": "", "description": "Серый слоистый фрагмент керна.",
         }
 
-    def runtime_config(self, mode="base"):
+    def runtime_config(self):
         python = self.root / "python.exe"
         python.write_bytes(b"not executable; transport is mocked")
         base = self.root / "base"
         base.mkdir(exist_ok=True)
         (base / "config.json").write_text("{}", encoding="utf-8")
         return {
-            "python": str(python), "base": str(base), "model_mode": mode,
-            "adapter": "specialist", "theory_adapter": "", "folders": [],
+            "python": str(python), "base": str(base), "model_mode": "vision", "folders": [],
         }
 
-    def test_fresh_settings_use_base_without_autodiscovering_old_adapter(self):
+    def test_fresh_settings_select_the_classifier(self):
         config = self.window._local_vlm_config()
-        self.assertEqual(config["model_mode"], "base")
-        self.assertEqual(config["adapter"], "")
-        self.assertEqual(config["theory_adapter"], "")
+        self.assertEqual(config["model_mode"], "vision")
+        self.assertNotIn("adapter", config)
+        self.assertNotIn("theory_adapter", config)
 
     def test_normal_layer_click_opens_manual_depth_and_texture_form(self):
         record = self.record(interpreted=True)
@@ -113,7 +111,7 @@ class Cv1MainFlowTests(unittest.TestCase):
             self.assertGreaterEqual(dialog.attribute_combos["Текстура"].findData('Песчаные "роллы"'), 0)
             dialog.reject()
 
-    def test_cuda_batch_contains_five_intervals_from_one_photo_only(self):
+    def test_batch_contains_five_intervals_from_one_photo_only(self):
         first, second = self.record(name="first.png", interpreted=True), self.record(name="second.png", interpreted=True)
         for index in range(4):
             row = deepcopy(first.detections[0])
@@ -123,9 +121,8 @@ class Cv1MainFlowTests(unittest.TestCase):
         self.window._analysis_queue = deque(IntervalJob.create(record, row) for record in (first, second) for row in record.detections)
         self.window._analysis_active = True
         self.window._analysis_total = 6
-        config = self.runtime_config("base")
+        config = self.runtime_config()
         with (patch.object(self.window, "_local_vlm_config", return_value=config),
-              patch(_MODULE + ".available_runtime", return_value=None),
               patch(_MODULE + ".write_interval_crop"),
               patch.object(self.window._vlm_client, "send", return_value="photo-batch") as send):
             self.window._advance_cv1_description()
@@ -155,13 +152,13 @@ class Cv1MainFlowTests(unittest.TestCase):
         self.assertEqual(edited.attributes["Краткое описание"], "Описание геолога")
         self.assertEqual([(point.x(), point.y()) for point in automatic.polygon], before)
 
-    def test_old_adapter_path_is_retained_but_requires_explicit_mode_selection(self):
+    def test_legacy_adapter_setting_is_ignored(self):
         self.settings.setValue("vlm/adapter", "old-specialist")
         config = self.window._local_vlm_config()
-        self.assertEqual(config["adapter"], "old-specialist")
-        self.assertEqual(config["model_mode"], "base")
+        self.assertNotIn("adapter", config)
+        self.assertEqual(config["model_mode"], "vision")
         self.settings.setValue("vlm/model_mode", "lora")
-        self.assertEqual(self.window._local_vlm_config()["model_mode"], "lora")
+        self.assertEqual(self.window._local_vlm_config()["model_mode"], "vision")
 
     def test_selected_yolo_is_saved_to_disk_and_survives_restart_and_new_project(self):
         model = self.root / "best.pt"
@@ -452,15 +449,15 @@ class Cv1MainFlowTests(unittest.TestCase):
         with (
             patch(_MODULE + ".user_data_root", return_value=self.root),
             patch(_MODULE + ".write_interval_crop", side_effect=lambda _record, _job, path: path.parent.mkdir(parents=True, exist_ok=True) or path.write_bytes(b"crop")),
-            patch.object(self.window, "_local_vlm_config", return_value=self.runtime_config("lora")),
+            patch.object(self.window, "_local_vlm_config", return_value=self.runtime_config()),
             patch.object(self.window._vlm_client, "send", return_value="request-one") as send,
             patch.object(self.window, "_update_activity"),
         ):
             self.window._advance_cv1_description()
         payload = send.call_args.args[1]
         self.assertEqual(payload["operation"], "describe")
-        self.assertEqual(payload["model_mode"], "lora")
-        self.assertEqual(payload["adapter"], "specialist")
+        self.assertEqual(payload["model_mode"], "vision")
+        self.assertNotIn("adapter", payload)
         self.assertFalse(payload["use_knowledge"])
         self.assertEqual(payload["folders"], [])
         self.assertNotEqual(payload["image"], record.path)
@@ -469,21 +466,21 @@ class Cv1MainFlowTests(unittest.TestCase):
 
     def test_regular_vlm_request_also_carries_explicit_mode(self):
         with (
-            patch.object(self.window, "_local_vlm_config", return_value=self.runtime_config("base")),
+            patch.object(self.window, "_local_vlm_config", return_value=self.runtime_config()),
             patch.object(self.window, "_knowledge_folders", return_value=[]),
             patch(_MODULE + ".related_text_corrections", return_value=[]),
             patch.object(self.window._vlm_client, "send", return_value="ordinary") as send,
         ):
             self.window._send_vlm_request("chat", "Что такое аркоз?")
             self.window._drain_vlm_requests()
-        self.assertEqual(send.call_args.args[1]["model_mode"], "base")
+        self.assertEqual(send.call_args.args[1]["model_mode"], "vision")
         self.assertEqual(self.window._vlm_pending[0], "ordinary")
 
     def test_photo_reply_is_bound_to_original_attachment_after_selection_changes(self):
         old_photo, new_photo = self.root / "old.jpg", self.root / "new.jpg"
         self.window._chat_photo_path = old_photo
         with (
-            patch.object(self.window, "_local_vlm_config", return_value=self.runtime_config("base")),
+            patch.object(self.window, "_local_vlm_config", return_value=self.runtime_config()),
             patch.object(self.window, "_knowledge_folders", return_value=[]),
             patch.object(self.window._vlm_client, "send", return_value="photo-reply"),
         ):
@@ -510,7 +507,7 @@ class Cv1MainFlowTests(unittest.TestCase):
             patch.object(self.window.workspace, "update_photo_detections"),
             patch.object(self.window, "_schedule_vlm_dispatch"),
         ):
-            self.window._advance_turbo_descriptions(self.runtime_config("base"))
+            self.window._advance_turbo_descriptions(self.runtime_config())
             payload = send.call_args.args[1]
             self.assertEqual(payload["operation"], "describe_batch")
             self.assertEqual(len(payload["items"]), 2)
@@ -669,7 +666,7 @@ class Cv1MainFlowTests(unittest.TestCase):
             self.window._finish_cv1_descriptions()
         text = self.messages.call_args.args[1]
         self.assertIn("1 из 3", text)
-        self.assertIn("черновики", text)
+        self.assertIn("черновик классификатора", text)
         self.assertIn("Пропуски", text)
         self.assertFalse(self.window._analysis_active)
 
@@ -697,19 +694,6 @@ class Cv1MainFlowTests(unittest.TestCase):
         for record in (first, second):
             self.assertEqual(record.detections[0].attributes["__interpretation_status"], "error")
             self.assertNotIn("__vlm_description", record.detections[0].attributes)
-
-    def test_training_center_cannot_start_qwen_during_analysis_or_segmentation(self):
-        for analysis, segmentation in ((True, None), (False, Mock())):
-            with self.subTest(analysis=analysis):
-                main = SimpleNamespace(_analysis_active=analysis, _segmentation_thread=segmentation)
-                process = Mock()
-                process.state.return_value = QProcess.ProcessState.NotRunning
-                dialog = SimpleNamespace(main=main, process=process)
-                with patch("app.ui.dialogs.training_center_dialog.QMessageBox.information") as message:
-                    TrainingCenterDialog._train(dialog, "pairs")
-                message.assert_called_once()
-                process.start.assert_not_called()
-
 
 if __name__ == "__main__":
     unittest.main()

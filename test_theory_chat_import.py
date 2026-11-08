@@ -7,7 +7,6 @@ import zipfile
 
 from app.infrastructure.theory_chat_import import import_theory_document
 from app.infrastructure.local_knowledge_search import search_folders
-from app.infrastructure.local_vlm_runner import prepare_geology_reference_chat
 
 
 class TheoryChatImportTests(unittest.TestCase):
@@ -101,18 +100,6 @@ class TheoryChatImportTests(unittest.TestCase):
             writer.write(output)
         with self.assertRaisesRegex(ValueError, "OCR"):
             import_theory_document(source, self.root / "library")
-
-    def test_found_user_theory_is_not_replaced_with_generic_notes(self):
-        source = self.root / "theory.txt"
-        source.write_text("Конгломерат содержит окатанные обломки.", encoding="utf-8")
-        result = import_theory_document(source, self.root / "library")
-        hits = search_folders("Чем конгломерат отличается от брекчии?", [result["index_folder"]])
-        self.assertTrue(hits)
-        question = "Чем конгломерат отличается от брекчии?"
-        effective, preserved, notes = prepare_geology_reference_chat({"operation": "chat", "question": question}, hits)
-        self.assertEqual(effective, question)
-        self.assertEqual(preserved, hits)
-        self.assertEqual(notes, [])
 
     def test_background_import_reports_success_and_failure_individually(self):
         from PySide6.QtCore import QEventLoop, QTimer

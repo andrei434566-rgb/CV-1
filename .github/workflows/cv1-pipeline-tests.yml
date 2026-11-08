@@ -1,4 +1,4 @@
-name: CV-1 geometry and local VLM checks
+name: CV-1 geometry and local Vision checks
 
 on:
   workflow_dispatch:
@@ -36,5 +36,5 @@ jobs:
         run: >-
           python -m unittest -v test_yolo_geometry_contract test_yolo_confidence
           test_unified_model_description test_vlm_training_data test_cv1_reviewed_pairs
-          test_cv1_analysis test_cv1_exports test_cv1_main_flow test_local_vlm_modes
+          test_cv1_analysis test_cv1_exports test_cv1_main_flow test_discriminative_vision
           test_local_vlm_transport

@@ -46,7 +46,7 @@ class PrimaryDescriptionSourceDialog(QDialog):
         self.choose.clicked.connect(self._choose)
         layout.addWidget(self.choose)
         self.status = QLabel("Word, Excel, текстовый PDF, TXT, Markdown или CSV. Можно выбрать несколько файлов. "
-                             "Документы копируются в приложение и работают без интернета; веса VLM при этом не меняются.")
+                             "Документы копируются в приложение и работают без интернета; веса классификатора при этом не меняются.")
         self.status.setWordWrap(True)
         layout.addWidget(self.status)
         row = QHBoxLayout()

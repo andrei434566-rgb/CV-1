@@ -44,7 +44,7 @@ class CoreHoverUpdatesTests(unittest.TestCase):
         self.assertEqual(overlay._detection_at(rect.center()), -1)
         overlay.hoverMoveEvent(SimpleNamespace(pos=rect.center, screenPos=lambda: QPoint(20, 20)))
         self.assertTrue(ui._confidence_popup.isVisible())
-        self.assertIn("ещё готовится", self.popup_text())
+        self.assertIn("готовится локальным классификатором", self.popup_text())
 
     def test_completed_description_updates_hover_without_rebuilding_stack(self):
         stack = self.canvas._stack_item

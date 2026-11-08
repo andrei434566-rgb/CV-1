@@ -21,6 +21,7 @@ models/trained/
 models/sam/
 models/*.pt
 models/**/*.pt
+models/vision/
 _release_test_v14/
 portable_build*/
 portable_release*/
@@ -35,6 +36,11 @@ vlm_training/
 vlm_models/
 primary_reference/
 network_cache/
+training/attribute_examples/
+training/supervised/
+models/features/
+research_reports/**/*.png
+research_reports/**/*.xlsx
 logs/
 third_party/
 **/node_modules/

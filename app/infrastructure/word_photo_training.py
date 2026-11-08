@@ -20,6 +20,9 @@ _HEADER = re.compile(
     r"(?P<number>\d+)(?:\.(?:jpe?g|png|tiff?|bmp|webp))?"
     r"(?=$|[\s:;.—–-])\s*[:;.—–-]?\s*(?P<text>.*)$", re.IGNORECASE,
 )
+_BARE_HEADER = re.compile(
+    r"^\s*(?P<number>[0-9]{4,})(?:\.(?:jpe?g|png|tiff?|bmp|webp))?\s*$", re.IGNORECASE,
+)
 
 
 def _number(value: str) -> str:
@@ -35,21 +38,21 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _document_lines(container):
+def _document_lines(container, *, in_table=False):
     # Preserve Word order, including tables pasted from Excel and nested tables.
     from docx.table import Table
     from docx.text.paragraph import Paragraph
 
     for block in container.iter_inner_content():
         if isinstance(block, Paragraph):
-            yield block.text
+            yield block.text, in_table
         elif isinstance(block, Table):
             seen_cells = set()
             for row in block.rows:
                 for cell in row.cells:
                     if cell._tc not in seen_cells:  # merged cells appear repeatedly
                         seen_cells.add(cell._tc)
-                        yield from _document_lines(cell)
+                        yield from _document_lines(cell, in_table=True)
 
 
 def read_numbered_descriptions(source: Path) -> list[tuple[str, str]]:
@@ -61,10 +64,19 @@ def read_numbered_descriptions(source: Path) -> list[tuple[str, str]]:
     descriptions: list[tuple[str, str]] = []
     number = None
     paragraphs: list[str] = []
-    for paragraph in _document_lines(Document(source)):
+    for paragraph, in_table in _document_lines(Document(source)):
         # A heading can follow a manual line break within a Word paragraph.
         for line in paragraph.split("\n"):
             heading = _HEADER.fullmatch(line)
+            bare_heading = _BARE_HEADER.fullmatch(line) if not in_table and not heading else None
+            # A bare number is a section marker only as a separate line outside
+            # tables. Numeric depth/interval cells pasted from Excel stay text.
+            if bare_heading:
+                if number is not None:
+                    descriptions.append((number, "\n".join(paragraphs).strip()))
+                number = bare_heading['number']
+                paragraphs = []
+                continue
             if heading:
                 if number is not None:
                     descriptions.append((number, "\n".join(paragraphs).strip()))
@@ -75,7 +87,7 @@ def read_numbered_descriptions(source: Path) -> list[tuple[str, str]]:
     if number is not None:
         descriptions.append((number, "\n".join(paragraphs).strip()))
     if not descriptions:
-        raise ValueError("В Word не найдены разделы «Фото 0001». Пишите номер на отдельной строке перед описанием.")
+        raise ValueError("В Word не найдены разделы «0001» или «Фото 0001». Пишите номер отдельной строкой перед описанием; номер без слова «Фото» — вне таблицы.")
     return descriptions
 
 
@@ -192,7 +204,7 @@ def export_word_photo_pairs(inspection: WordPhotoInspection, destination: Path, 
         "approved_pairs": len(rows), "document_sha256": inspection.document_sha256,
         "skipped": [{"photo_id": pair.photo_id, "reason": pair.message}
                     for pair in inspection.pairs if pair.status != "ready"],
-        "note": "Полные фотографии и исходные описания без сокращений. Это пары для VLM; контуров для обучения YOLO здесь нет. Контрольные скважины подготовьте отдельно.",
+        "note": "Полные фотографии и исходные описания без сокращений. Для обучения классификатора нужны подтверждённые метки классов; контуров YOLO здесь нет. Контрольные скважины подготовьте отдельно.",
     }
     (destination / "import_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     # Publish approved rows last, after every image was checked and copied.

@@ -13,11 +13,20 @@ class LithologyAttributeService:
     """Suggest observable attributes without changing the facies segmentation.
 
     Facies boundaries remain the responsibility of YOLO.  This service works
-    only inside each accepted mask and deliberately returns suggestions (not a
-    geological conclusion) for colour, apparent grain size and bedding.
+    only inside each accepted mask. Colour is measured from original pixels;
+    untrained grain-size or bedding guesses are not added from image contrast.
     """
 
     def suggest(self, record: PhotoRecord, detection: FaciesDetection) -> dict[str, str]:
+        if detection.attributes.get("__description_engine") == "vision":
+            # Laplacian contrast is not a calibrated grain-size measurement.
+            # Never silently add untrained grain/bedding labels to CNN results.
+            import json
+            try:measurement=json.loads(detection.attributes.get('__color_measurement','{}'))
+            except (TypeError,ValueError):measurement={}
+            color=detection.attributes.get('__vision_color')
+            if isinstance(measurement,dict) and measurement.get('schema')=='cv1-core-color-v2' and color:
+                return {'Цвет':color}
         try:
             import cv2
             import numpy as np
@@ -35,34 +44,19 @@ class LithologyAttributeService:
             crop = image[top:bottom, left:right]
             if crop.size == 0:
                 return {}
-            return self._suggest_crop(crop)
+            mask=np.zeros(crop.shape[:2],dtype='uint8')
+            vertices=np.array([[round(p.x()*x_scale-left),round(p.y()*y_scale-top)] for p in detection.polygon],dtype='int32')
+            if len(vertices)<3:return {}
+            cv2.fillPoly(mask,[vertices],255)
+            return self._suggest_crop(crop,mask)
         except (ImportError, OSError):
             return {}
 
     @staticmethod
-    def _suggest_crop(crop) -> dict[str, str]:
-        import cv2
-        import numpy as np
-
-        hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
-        hue, saturation, value = [float(channel.mean()) for channel in cv2.split(hsv)]
-        if saturation > 45 and 5 <= hue <= 28:
-            colour = "Коричневый" if value < 145 else "Буроватый"
-        elif value < 55:
-            colour = "Черный"
-        elif value < 95:
-            colour = "Темно-серый"
-        elif value < 165:
-            colour = "Серый"
-        else:
-            colour = "Светло-серый"
-        gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
-        texture = float(cv2.Laplacian(gray, cv2.CV_64F).var())
-        grain = "Тонкозернистый" if texture < 35 else "Мелкозернистый" if texture < 110 else "Среднезернистый" if texture < 260 else "Крупнозернистый"
-        gx = float(np.abs(cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)).mean())
-        gy = float(np.abs(cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)).mean())
-        bedding = "Субгоризонтальная" if gy > gx * 1.35 else "Волнистая" if abs(gx - gy) / max(1.0, gx + gy) < 0.10 else ""
-        values = {"Цвет": colour, "Зернистость": grain}
-        if bedding:
-            values["Слоистость"] = bedding
-        return values
+    def _suggest_crop(crop,mask=None) -> dict[str,str]:
+        from PIL import Image
+        from app.infrastructure.core_color_hint import estimate_core_color
+        from app.infrastructure.photo_quality import label_boxes
+        image=Image.fromarray(crop[:,:,::-1].copy())
+        hint=estimate_core_color(image,mask,exclude_boxes=label_boxes(image,valid_mask=mask))
+        return {'Цвет':hint.label} if hint else {}

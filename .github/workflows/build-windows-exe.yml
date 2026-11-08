@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: >-
           python -m pip install --upgrade pip;
-          python -m pip install -r requirements.txt pyinstaller;
+          python -m pip install -r requirements.txt pyinstaller scikit-learn;
           python -m pip install --upgrade --force-reinstall torch==2.10.0 torchvision==0.25.0 --index-url https://download.pytorch.org/whl/cpu;
           python -c "import torch; print('PyTorch:', torch.__version__, 'CUDA build:', torch.version.cuda)"
 

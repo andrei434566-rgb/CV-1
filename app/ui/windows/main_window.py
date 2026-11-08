@@ -6,6 +6,7 @@ import re
 import shutil
 import hashlib
 import socket
+import sys
 from collections import deque
 from bisect import bisect_left
 from datetime import datetime
@@ -34,7 +35,7 @@ from app.infrastructure.excel_core_description import (
     workbook_import_summary,
 )
 from app.infrastructure.expert_corrections import (
-    exact_correction, exact_interval_edit, expert_memory_digest, expert_memory_is_confirmed,
+    exact_correction, exact_interval_edit, expert_memory_digest, expert_memory_is_confirmed, current_description_is_confirmed,
     reassign_project, related_text_corrections, save_correction, save_interval_edit,
 )
 from app.infrastructure.facies_mapping import facies_mapping_context, save_expert_facies_mapping
@@ -45,7 +46,8 @@ from app.infrastructure.local_chat_intents import hide_unsolicited_sources, need
 from app.infrastructure.local_search_worker import LocalSearchWorker
 from app.infrastructure.local_theory_lookup import lookup_theory_answer
 from app.infrastructure.local_vlm_client import LocalVlmClient
-from app.infrastructure.local_llama_runtime import available_runtime
+from app.infrastructure.local_vision import default_model_folder
+from app.infrastructure.description_template import read_assumptions
 from app.infrastructure.vlm_training_data import expert_description_digest, expert_description_is_confirmed
 from app.infrastructure.cv1_analysis import (
     PIPELINE_MODE, IntervalJob, apply_interval_description, create_core_column_description_detections,
@@ -69,6 +71,7 @@ from app.infrastructure.primary_facies_catalog import (
 )
 from app.infrastructure.primary_description_source import is_reference_question
 from app.infrastructure.model_hub_client import ModelHubClient
+from app.infrastructure.network_settings import network_enabled
 from app.infrastructure.project_storage import MANIFEST_NAME, load_project, save_project
 from app.infrastructure.training_dataset import MIN_TRAINING_SAMPLES, automatic_samples_count, export_training_dataset, unlabeled_manual_samples_count, verified_samples_count
 from app.infrastructure.training_quality import review_queue, training_quality
@@ -77,7 +80,7 @@ from app.runtime_paths import application_root, bundled_root, user_data_root, bu
 from app.ui.dialogs.depth_range_dialog import DepthRangeDialog
 from app.ui.dialogs.excel_report_inputs_dialog import ExcelReportInputsDialog
 from app.ui.dialogs.core_columns_dialog import CoreColumnsDialog
-from app.ui.dialogs.facies_dialog import FaciesDialog
+from app.ui.dialogs.facies_dialog import FaciesDialog, make_interval_preview
 from app.ui.dialogs.model_preparation_dialog import ModelPreparationDialog
 from app.ui.dialogs.log_editor_dialog import LogEditorDialog
 from app.ui.dialogs.lithology_palette_dialog import FaciesPaletteDialog, LithologyPaletteDialog
@@ -104,6 +107,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self._records: list[PhotoRecord] = []
+        self._review_queue_dialog = None
+        self._readiness_dialog = None
+        self._quality_pending = set()
+        self._queue_ack_save_pending = False
         self._expert_session_id = uuid4().hex
         self._edit_autosave = QTimer(self)
         self._edit_unsaved = False
@@ -267,6 +274,10 @@ class MainWindow(QMainWindow):
         self._hub_closing = True
         if hasattr(self, "_hub_client"):
             self._hub_client.stop()
+        from app.infrastructure.attribute_tasks import cancel_quality_jobs
+        cancel_quality_jobs(self._quality_pending)
+        for dialog in (self._review_queue_dialog,self._readiness_dialog):
+            if dialog is not None:dialog.close()
         super().closeEvent(event)
 
     def _connect_workspace(self, workspace: WorkspaceCanvas, source_photos: bool = False) -> None:
@@ -770,8 +781,11 @@ class MainWindow(QMainWindow):
         tools_menu.addAction("Выбрать модель сегментации…", self.select_detection_model)
         tools_menu.addAction("Обучение…", self.show_training_center)
         tools_menu.addAction("Основной источник…", self.configure_primary_source)
-        tools_menu.addAction("Общие модели и данные…", self.show_model_hub)
+        tools_menu.addAction("Серверная папка…", self.show_model_hub)
         tools_menu.addAction("Проверить границы керна…", self.configure_core_columns)
+        tools_menu.addAction("Сводка проекта и проверка разреза…",self.show_project_readiness)
+        queue_action=tools_menu.addAction("Очередь проверки керна…",self.show_interval_review_queue)
+        queue_action.setShortcut("Ctrl+Shift+R");self.addAction(queue_action)
         tools_menu.addAction("Сохранить проект как…", self.save_project_as)
         if contour_actions:
             edit_menu = tools_menu.addMenu("Правка разметки")
@@ -935,33 +949,34 @@ class MainWindow(QMainWindow):
 
     def _local_vlm_config(self) -> dict:
         root = application_root().parent / "vlm_core_v1"
-        snapshot_root = root / "model_cache" / "hub" / "models--Qwen--Qwen3-VL-2B-Instruct" / "snapshots"
-        snapshots = sorted(path for path in snapshot_root.glob("*") if (path / "config.json").is_file())
-        packaged = bundled_runtime_defaults()
+        python = Path(sys.executable)
+        if not getattr(sys, "frozen", False) and python.name.lower() == "pythonw.exe":
+            python = python.with_name("python.exe")
         defaults = {
-            "python": packaged.get("python") or root / ".venv" / "Scripts" / "python.exe",
-            "base": packaged.get("base") or (str(snapshots[-1]) if snapshots else ""),
-            "adapter": "",
-            "folders": [packaged["knowledge"]] if packaged.get("knowledge") else [str(root / "data" / "knowledge")] if (root / "data" / "knowledge").is_dir() else [],
+            "python": str(python),
+            "base": str(default_model_folder()),
+            "folders": [str(root / "data" / "knowledge")] if (root / "data" / "knowledge").is_dir() else [],
         }
         raw_folders = self._settings.value("vlm/knowledge_folders_json", "")
         try:
             folders = json.loads(str(raw_folders)) if raw_folders else defaults["folders"]
         except (ValueError, TypeError):
             folders = defaults["folders"]
+        configured_folder = str(self._settings.value("vision/model_folder", "") or "")
+        model_folder = configured_folder if configured_folder and (Path(configured_folder) / "config.json").is_file() else defaults["base"]
         return {
-            "python": str(self._settings.value("vlm/python", "") or defaults["python"]),
-            "base": str(self._settings.value("vlm/base", "") or defaults["base"]),
-            "adapter": str(self._settings.value("vlm/adapter", "") or defaults["adapter"]),
-            "theory_adapter": str(self._settings.value("vlm/theory_adapter", "") or ""),
-            "model_mode": str(self._settings.value("vlm/model_mode", "base") or "base"),
+            "python": str(python if getattr(sys, "frozen", False) else
+                          self._settings.value("vision/python", "") or defaults["python"]),
+            "base": str(model_folder),
+            "model_mode": "vision",
+            "engine": "vision",
             "primary_reference": str(self._settings.value("vlm/primary_reference", "") or ""),
             "folders": [str(folder) for folder in folders if isinstance(folder, str)],
         }
 
     def prepare_local_runtime(self) -> None:
         """Prepare CPU imports once; model weights wait until YOLO releases CUDA."""
-        if self._runtime_preparation_id or self._vlm_closing or self._qwen_training_active():
+        if self._runtime_preparation_id or self._vlm_closing or self._training_active():
             return
         config = self._local_vlm_config()
         if Path(config["python"]).is_file() and (Path(config["base"]) / "config.json").is_file():
@@ -1025,11 +1040,8 @@ class MainWindow(QMainWindow):
         if dialog.exec() != dialog.DialogCode.Accepted:
             return
         config = dialog.values()
-        self._settings.setValue("vlm/python", config["python"])
-        self._settings.setValue("vlm/base", config["base"])
-        self._settings.setValue("vlm/adapter", config["adapter"])
-        self._settings.setValue("vlm/theory_adapter", config["theory_adapter"])
-        self._settings.setValue("vlm/model_mode", config["model_mode"])
+        self._settings.setValue("vision/python", config["python"])
+        self._settings.setValue("vision/model_folder", config["base"])
         self._settings.setValue("vlm/knowledge_folders_json", json.dumps(config["folders"], ensure_ascii=False))
         self._settings.sync()
         self._vlm_client.stop()
@@ -1041,7 +1053,7 @@ class MainWindow(QMainWindow):
                     and detection.attributes.get("__interpretation_status") == "error"
                 ):
                     detection.attributes["__interpretation_status"] = "waiting"
-                    detection.attributes["Статус интерпретации"] = "ожидает описания столбика локальной VLM"
+                    detection.attributes["Статус интерпретации"] = "ожидает распознавания столбика"
         if self._has_waiting_cv1_descriptions():
             QTimer.singleShot(0, self._start_cv1_descriptions)
 
@@ -1065,7 +1077,7 @@ class MainWindow(QMainWindow):
     def configure_primary_source(self) -> None:
         if (self._analysis_active or self._vlm_pending is not None or self._analysis_pending is not None
                 or self._segmentation_thread is not None or self._vlm_chat_queue or self._pending_photo_imports
-                or self._qwen_training_active()):
+                or self._training_active()):
             QMessageBox.information(self, "Основной источник", "Дождитесь завершения текущего ответа, анализа или обучения.")
             return
         current = str(self._settings.value("vlm/primary_reference", "") or "")
@@ -1100,7 +1112,7 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def _network_startup(self) -> None:
-        if self._hub_closing:
+        if self._hub_closing or not network_enabled(self._settings):
             return
         if str(self._settings.value("network/auto_models", "true")).lower() == "true" and self._settings.value("network/hub", ""):
             self._network_action("sync")
@@ -1132,7 +1144,10 @@ class MainWindow(QMainWindow):
             return
         hub = str(self._settings.value("network/hub", "") or "")
         if not hub and operation != "rollback":
-            self.statusBar().showMessage("Выберите общую папку через ⚙ → Общие модели и данные…")
+            self.statusBar().showMessage("Выберите папку через ⚙ → Серверная папка…")
+            return
+        if operation in {'sync', 'submit'} and not network_enabled(self._settings):
+            self.statusBar().showMessage("Обмен с серверной папкой выключен. Настройка сохранена для подключения позже.")
             return
         if self._hub_client.busy:
             if operation == "submit":
@@ -1164,6 +1179,8 @@ class MainWindow(QMainWindow):
             self._settings.setValue("network/last_submitted_signature", self._network_submission_signature)
             self._settings.sync()
             self.statusBar().showMessage(f"Передано проверенных интервалов: {result.get('annotations', 0)} · ожидают центральной проверки")
+        elif operation in {'probe', 'initialize'}:
+            self.statusBar().showMessage(result.get('message', 'Проверка серверной папки завершена'))
         if self._network_submit_pending:
             self._network_submit_pending = False
             QTimer.singleShot(500, lambda: self._network_action("submit"))
@@ -1173,7 +1190,7 @@ class MainWindow(QMainWindow):
             return
         if (self._analysis_active or self._vlm_pending is not None or self._analysis_pending is not None
                 or self._segmentation_thread is not None or self._training_thread is not None
-                or self._column_training_thread is not None or self._qwen_training_active()):
+                or self._column_training_thread is not None or self._training_active()):
             QTimer.singleShot(2000, self._apply_network_models)
             return
         models = {model["role"]: model for model in self._network_active_pending["models"]}
@@ -1184,17 +1201,16 @@ class MainWindow(QMainWindow):
         if "columns" in models:
             self._selected_column_model_path = Path(models["columns"]["local_entrypoint"])
             self._settings.setValue("core_columns/model_path", str(self._selected_column_model_path))
-        if "vlm_base" in models:
-            self._settings.setValue("vlm/base", models["vlm_base"]["local_folder"])
-            adapter = models.get("vlm_adapter", {}).get("local_folder", "")
-            self._settings.setValue("vlm/adapter", adapter)
-            self._settings.setValue("vlm/theory_adapter", "")
-            self._settings.setValue("vlm/model_mode", "lora" if adapter else "base")
+        if "vision_lithology" in models:
+            from app.infrastructure.local_vision import read_model_card
+            folder = models["vision_lithology"]["local_folder"]
+            read_model_card(folder)
+            self._settings.setValue("vision/model_folder", folder)
         self._settings.sync()
         self.statusBar().showMessage("Подключены локальные модели общего набора: " + self._network_active_pending["release_id"])
         self._network_active_pending = None
 
-    def _qwen_training_active(self) -> bool:
+    def _training_active(self) -> bool:
         from PySide6.QtCore import QProcess
 
         return self._training_center is not None and self._training_center.process.state() != QProcess.ProcessState.NotRunning
@@ -1338,7 +1354,7 @@ class MainWindow(QMainWindow):
         if crop_facies and detection is not None and detection.attributes.get("__geometry_only") == "1":
             return str(write_interval_crop(record, IntervalJob.create(record, detection), path))
         if not image.save(str(path), "PNG"):
-            raise RuntimeError("Не удалось подготовить выбранное фото для локальной VLM")
+            raise RuntimeError("Не удалось подготовить фото для распознавания")
         return str(path)
 
     @staticmethod
@@ -1635,11 +1651,14 @@ class MainWindow(QMainWindow):
                 "expert_examples": related_text_corrections(
                     question, project=self._expert_project_key(), well=self._active_well_name,
                 ) if operation == "chat" and not use_image else [],
-                "base": config["base"], "adapter": config["adapter"],
-                "theory_adapter": config["theory_adapter"],
+                "base": config["base"],
                 "model_mode": config["model_mode"],
                 "primary_reference": config.get("primary_reference", ""),
             }
+            if use_image and image_override and self._chat_photo_columns and self._chat_photo_columns.get("path") == image_override:
+                payload["columns"] = self._chat_photo_columns.get("columns", [])
+            elif use_image and operation != "describe" and self._vlm_target is not None:
+                payload["columns"] = self._vlm_target[0].core_columns
             target = self._vlm_target[1] if self._vlm_target is not None else None
             selected_job = (
                 IntervalJob.create(self._vlm_target[0], target)
@@ -1687,7 +1706,7 @@ class MainWindow(QMainWindow):
         self._vlm_dispatch_scheduled = False
         if self._vlm_closing or self._vlm_pending is not None or self._analysis_pending is not None:
             return
-        if self._qwen_training_active():
+        if self._training_active():
             return
         if self._segmentation_thread is not None or self._training_thread is not None or self._column_training_thread is not None:
             return
@@ -1718,7 +1737,7 @@ class MainWindow(QMainWindow):
 
     def _send_vlm_chat(self, question: str) -> None:
         self.assistant_panel.append_message("user", question)
-        if self._qwen_training_active():
+        if self._training_active():
             self.assistant_panel.append_message("system", "Идёт локальное обучение. После его завершения можно снова задавать вопросы помощнику.")
             return
         if re.match(r"\s*(?:переопиши|повторно опиши|обнови описания)", question.casefold()):
@@ -1862,7 +1881,7 @@ class MainWindow(QMainWindow):
         self.assistant_panel.append_message(
             "system",
             "Поправка специалиста сохранена. При повторе вопроса будет использован проверенный ответ. "
-            "Для изменения весов Qwen соберите поправки в центре обучения и запустите дообучение.\n\n" + corrected,
+            "Пример сохранён для будущего обучения классификатора после проверки меток.\n\n" + corrected,
         )
 
     def _search_local_folders(self, question: str, *, display_question: bool = True) -> None:
@@ -1960,7 +1979,7 @@ class MainWindow(QMainWindow):
         selected_job, self._selected_description_job = self._selected_description_job, None
         self._cleanup_vlm_image(meta.get("temporary_image"))
         if not result.get("ok"):
-            self.assistant_panel.append_message("system", str(result.get("error") or "Локальная VLM не ответила"))
+            self.assistant_panel.append_message("system", str(result.get("error") or "Локальный классификатор не ответил"))
             return
         operation, target = pending[1], pending[2]
         hits = list(result.get("hits") or [])
@@ -1981,7 +2000,7 @@ class MainWindow(QMainWindow):
             message = (
                 "Модель не смогла завершить описание фото. Попробуйте указать один конкретный признак."
                 if incomplete else
-                "Локальная VLM завершила запрос без текста. Попробуйте короткий вопрос или уменьшите изображение."
+                "Локальный помощник завершил запрос без ответа. Проверьте выбранную модель и папки справочника."
             )
             self.assistant_panel.append_message("system", message)
             return
@@ -2002,7 +2021,7 @@ class MainWindow(QMainWindow):
             fields = result.get("fields")
             found = next(((record, layer) for record in self._records for layer in record.detections if layer is target), None)
             if not isinstance(fields, dict) or not str(fields.get("description") or "").strip() or found is None:
-                self.assistant_panel.append_message("system", "VLM не вернула корректные поля. Ответ оставлен для ручной проверки:\n" + answer)
+                self.assistant_panel.append_message("system", "Классификатор не вернул корректные поля. Ответ оставлен для ручной проверки:\n" + answer)
                 return
             record, layer = found
             if selected_job is not None:
@@ -2022,7 +2041,7 @@ class MainWindow(QMainWindow):
             })
             if self._project_folder is not None:
                 self._save_current_project(self._project_folder)
-            self.assistant_panel.append_message("assistant", "Поля VLM заполнены для выбранной фации. Проверьте перед экспортом:\n" + answer)
+            self.assistant_panel.append_message("assistant", "Поля распознавания заполнены для выбранной фации. Проверьте перед экспортом:\n" + answer)
             return
         source_note = "\n\nНайденные источники: " + "; ".join(
             f"[{i}] {hit['path']}" for i, hit in enumerate(hits, 1)
@@ -2233,7 +2252,7 @@ class MainWindow(QMainWindow):
             return
         record, detection = layer
         menu = QMenu(self)
-        edit = menu.addAction("Редактировать параметры фации")
+        edit = menu.addAction("Карточка участка и описание…")
         edit.triggered.connect(lambda: self._open_facies_editor(record, detection))
         menu.addSeparator()
         move_up = menu.addAction("↑ Переместить слой выше")
@@ -2473,7 +2492,7 @@ class MainWindow(QMainWindow):
             self._save_indicator.setText("●  Только что сохранено")
         self._refresh_project_tree()
         self.statusBar().showMessage(f"Проект сохранён: {folder.name}{feedback_warning}")
-        if (hasattr(self, "_hub_client") and not self._hub_closing and self._settings.value("network/hub", "")
+        if (hasattr(self, "_hub_client") and not self._hub_closing and network_enabled(self._settings)
                 and str(self._settings.value("network/auto_data", "false")).lower() == "true"):
             QTimer.singleShot(0, lambda: self._network_action("submit"))
         return True
@@ -2579,6 +2598,7 @@ class MainWindow(QMainWindow):
             self._chat_record_ids[str(image_path.resolve())] = record.identifier
             records.append(record)
             new_records.append(record)
+        self._audit_review_photos(records=records)
         if failed_paths:
             names = ", ".join(failed_paths[:5])
             suffix = f" и ещё {len(failed_paths) - 5}" if len(failed_paths) > 5 else ""
@@ -2614,7 +2634,7 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(
                 f"Загружено {len(records)} фото · столбиков: {columns_found} · "
                 f"интервалов для проверки: {unresolved_intervals} · "
-                f"VLM опишет целые столбики без масок: {column_rows_created}"
+                f"Классификатор опишет целые столбики без масок: {column_rows_created}"
             )
             if self._pending_photo_imports:
                 QTimer.singleShot(25, self._load_next_photo_batch)
@@ -3128,7 +3148,7 @@ class MainWindow(QMainWindow):
     def run_segmentation(self, records: list[PhotoRecord] | None = None) -> None:
         if self._vlm_closing:
             return
-        if self._qwen_training_active():
+        if self._training_active():
             QMessageBox.information(self, "Обучение", "Дождитесь окончания локального обучения перед обработкой фото.")
             return
         records = list({id(record): record for record in (records or self._records)}.values())
@@ -3152,6 +3172,7 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Фото добавлены в очередь сегментации…")
             return
 
+        self._audit_review_photos(records=records)
         model_path = self._resolve_model_path()
         if model_path is None:
             self._show_remembered_model_status()
@@ -3171,13 +3192,13 @@ class MainWindow(QMainWindow):
             missing = sum(not record.core_columns for record in records)
             self.statusBar().showMessage(
                 f"Фото подготовлены · без найденных столбиков: {missing} · "
-                f"локальная VLM опишет целые столбики без масок: {column_rows_created}"
+                f"локальная Классификатор опишет целые столбики без масок: {column_rows_created}"
             )
             if self._has_waiting_cv1_descriptions():
                 self._start_cv1_descriptions()
             return
 
-        # Sequential GPU stages avoid keeping Qwen and YOLO resident together.
+        # Run description and YOLO in separate GPU stages.
         self._vlm_client.stop()
         self._segmentation_failed = False
         self._analysis_geometry_issues = []
@@ -3208,6 +3229,7 @@ class MainWindow(QMainWindow):
         self._segmentation_worker.progress_changed.connect(self._show_segmentation_progress)
         self._segmentation_worker.image_ready.connect(self._apply_image_detections)
         self._segmentation_worker.geometry_issues_ready.connect(self._on_geometry_issues)
+        self._segmentation_worker.photo_quality_ready.connect(self._on_photo_quality_ready)
         self._segmentation_worker.failed.connect(self._segmentation_error)
         self._segmentation_worker.finished.connect(self._segmentation_thread.quit)
         self._segmentation_thread.finished.connect(self._on_segmentation_finished)
@@ -3366,8 +3388,8 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage(f"Модель столбиков выбрана: {self._selected_column_model_path.name}")
 
     def start_core_column_training(self) -> None:
-        if self._qwen_training_active():
-            QMessageBox.information(self, "Обучение", "Дождитесь окончания локального обучения Qwen.")
+        if self._training_active():
+            QMessageBox.information(self, "Обучение", "Дождитесь окончания локального обучения.")
             return
         if self._analysis_active or self._vlm_pending is not None:
             self.assistant_panel.append_message("system", "Дождитесь завершения анализа перед обучением.")
@@ -3773,23 +3795,87 @@ class MainWindow(QMainWindow):
 
     def review_uncertain_masks(self) -> None:
         """Open the highest-value automatic candidate for human verification."""
-        queue = review_queue(self._records)
-        if not queue:
-            QMessageBox.information(
-                self,
-                "Проверка масок",
-                "Нет непроверенных автоматических масок. Запустите сегментацию или добавьте новые фото.",
-            )
-            return
-        record, detection = queue[0]
-        self.workspace.focus_facies(record, detection)
-        self._open_facies_editor(record, detection)
-        QMessageBox.information(
-            self,
-            "Очередь ручной проверки",
-            f"Открыта самая сомнительная маска. Всего в очереди: {len(queue)}.\n"
-            "После сохранения откройте этот пункт снова — будет показана следующая.",
-        )
+        self.show_interval_review_queue()
+
+    def show_interval_review_queue(self):
+        from app.ui.dialogs.interval_review_queue_dialog import IntervalReviewQueueDialog
+        if self._review_queue_dialog is None:
+            self._review_queue_dialog=IntervalReviewQueueDialog(lambda:self._records,self._open_review_item,
+                self._review_queue_changed,self._audit_review_photos,self,readiness=self.show_project_readiness)
+        self._review_queue_dialog.show();self._review_queue_dialog.raise_();self._review_queue_dialog.activateWindow()
+        self._audit_review_photos()
+
+    def _open_review_item(self,item):
+        if not any(record is item.record for record in self._records):return False
+        if item.detection is not None and not any(d is item.detection for d in item.record.detections):return False
+        for dialog in self._facies_dialogs:
+            if dialog.isVisible() and dialog.has_unsaved_changes():
+                dialog.raise_();dialog.activateWindow()
+                self.statusBar().showMessage('Сохраните изменения или закройте текущую карточку перед переходом к следующей.',10000)
+                return False
+        if item.detection is None:
+            from app.ui.dialogs.photo_quality_dialog import PhotoQualityDialog
+            PhotoQualityDialog(item.record.pixmap,item.record.photo_quality,self).exec()
+        else:
+            self.workspace.focus_facies(item.record,item.detection)
+            self._open_facies_editor(item.record,item.detection)
+        return True
+
+    def _audit_review_photos(self,force=False,*,records=None):
+        from app.infrastructure.attribute_tasks import submit
+        from app.infrastructure.photo_quality import file_signature
+        for record in self._records if records is None else records:
+            if record.identifier in self._quality_pending:continue
+            try:current=file_signature(record.path)
+            except OSError:current=None
+            if record.photo_quality and not force and record.photo_quality.get('file_signature')==current and current is not None:continue
+            self._quality_pending.add(record.identifier)
+            submit('quality',{'path':record.path,'columns':list(record.core_columns),
+                             'display_size':(record.pixmap.width(),record.pixmap.height()),'record_id':record.identifier},
+                   self._on_background_photo_quality)
+
+    def _on_background_photo_quality(self,reply):
+        if reply.get('cancelled'):
+            self._quality_pending.discard(reply.get('record_id'));return
+        if self._vlm_closing:return
+        if not reply['ok']:
+            # Failed jobs must be retryable. An unreadable file is normally a
+            # successful quality result with an explicit warning.
+            self._quality_pending.discard(reply.get('record_id'))
+            self.statusBar().showMessage('Проверка качества не завершена: '+reply['error'],10000);return
+        result=reply['result'];self._quality_pending.discard(result['record_id'])
+        record=next((r for r in self._records if r.identifier==result['record_id']),None)
+        if record is not None:
+            quality=result['quality']
+            if record.path!=result['path']:
+                from app.infrastructure.photo_quality import file_signature
+                try:
+                    if file_signature(record.path)!=quality.get('file_signature'):return
+                except OSError:return
+            # A late whole-page preflight must not replace a newer audit
+            # scoped to physical core columns from the segmentation worker.
+            if quality.get('region_count',0)>0 or not record.photo_quality.get('region_count',0):
+                record.photo_quality=quality
+            if record.core_columns and quality.get('region_count')==0 and not record.photo_quality.get('region_count',0):
+                self._audit_review_photos(force=True,records=[record])
+            if self._review_queue_dialog is not None:self._review_queue_dialog.refresh()
+
+    def _on_photo_quality_ready(self,path,quality):
+        record=next((r for r in self._records if r.path==path),None)
+        if record is not None:record.photo_quality=dict(quality)
+
+    def _review_queue_changed(self):
+        if self._queue_ack_save_pending:return
+        self._queue_ack_save_pending=True
+        self._flush_queue_review_when_idle()
+
+    def _flush_queue_review_when_idle(self):
+        if not self._queue_ack_save_pending:return
+        if self._vlm_closing or not self._records:
+            self._queue_ack_save_pending=False;return
+        if self._segmentation_thread is not None or self._pending_photo_imports:
+            QTimer.singleShot(1000,self._flush_queue_review_when_idle);return
+        self._queue_ack_save_pending=False;self._schedule_edit_autosave()
 
     def suggest_lithology_attributes(self) -> None:
         """Run the independent attribute recognizer without replacing facies."""
@@ -3831,8 +3917,8 @@ class MainWindow(QMainWindow):
         return max(0.01, min(0.99, value))
 
     def start_fine_tune(self) -> None:
-        if self._qwen_training_active():
-            QMessageBox.information(self, "Обучение", "Дождитесь окончания локального обучения Qwen.")
+        if self._training_active():
+            QMessageBox.information(self, "Обучение", "Дождитесь окончания локального обучения.")
             return
         """Export reviewed contours and fine-tune a separate copy of the model."""
         if self._analysis_active or self._vlm_pending is not None:
@@ -5070,9 +5156,9 @@ class MainWindow(QMainWindow):
         else:
             self.statusBar().showMessage(f"Паспорт Excel заполнен: {well_name} · сохраните проект (Ctrl+S)")
 
-    def _core_description_report_wells(self) -> list[dict]:
+    def _core_description_report_wells(self,*,refresh_view=True) -> list[dict]:
         """Capture the exact visual and editable data of the core-description sheet."""
-        self._show_stack()
+        if refresh_view:self._show_stack()
         wells: list[dict] = []
         for well_name in self._well_names():
             # The fixed report is a table. Do not render a huge scene image or
@@ -5082,9 +5168,13 @@ class MainWindow(QMainWindow):
             for record in self._records_for_well(well_name):
                 if not record.detections:
                     layers.append({"label": "", "depth_from": record.photo_depth_from,
-                                   "depth_to": record.photo_depth_to, "attributes": {}, "vlm": {}})
+                                   "depth_to": record.photo_depth_to, "attributes": {}, "vlm": {},
+                                   "source_id":f'{record.identifier}:photo'})
+                detection_indices={id(detection):index for index,detection in enumerate(record.detections)}
                 for detection in StackColumnItem._sort_by_reading_order(record.detections):
                     attributes = dict(detection.attributes or {})
+                    if record.photo_quality and not attributes.get('__image_quality'):
+                        attributes['__photo_quality']=json.dumps(record.photo_quality,ensure_ascii=False)
                     label = detection.label
                     if label in {"", "Новый контур", UNRECOGNIZED_FACIES}:
                         label = ""
@@ -5097,6 +5187,8 @@ class MainWindow(QMainWindow):
                             "depth_from": detection.depth_from,
                             "depth_to": detection.depth_to,
                             "attributes": attributes,
+                            "source_id":f'{record.identifier}:{detection_indices[id(detection)]}',
+                            "description_confirmed":current_description_is_confirmed(detection),
                             "vlm": {
                                 "facies_association": attributes.get("__vlm_facies_association", ""),
                                 "depositional_environment": attributes.get("__vlm_depositional_environment", ""),
@@ -5117,6 +5209,29 @@ class MainWindow(QMainWindow):
                 }
             )
         return wells
+
+    def _project_readiness_snapshot(self):
+        from types import SimpleNamespace
+        from app.infrastructure.core_report_audit import audit_report_wells
+        from app.infrastructure.core_report_export import prepare_report_rows
+        wells=self._core_description_report_wells(refresh_view=False)
+        confirmations={layer.get('source_id'):layer.get('description_confirmed',False) for well in wells for layer in well['layers']}
+        prepared=[{**well,'layers':prepare_report_rows(well)[1]} for well in wells]
+        targets={}
+        for record in self._records:
+            targets[f'{record.identifier}:photo']=SimpleNamespace(record=record,detection=None)
+            for index,detection in enumerate(record.detections):
+                targets[f'{record.identifier}:{index}']=SimpleNamespace(record=record,detection=detection,
+                    description_confirmed=confirmations.get(f'{record.identifier}:{index}',False))
+        dirty=sum(dialog.isVisible() and dialog.has_unsaved_changes() for dialog in self._facies_dialogs)
+        return audit_report_wells(prepared),targets,dirty
+
+    def show_project_readiness(self):
+        from app.ui.dialogs.project_readiness_dialog import ProjectReadinessDialog
+        if self._readiness_dialog is None:
+            self._readiness_dialog=ProjectReadinessDialog(self._project_readiness_snapshot,self._open_review_item,
+                self.export_core_description_report,self)
+        self._readiness_dialog.show();self._readiness_dialog.raise_();self._readiness_dialog.activateWindow()
 
     def export_core_description_report(self) -> None:
         default = (self._project_folder or self._projects_root()) / f"{self._project_title or 'kern_analyzer'}_послойное_описание.xlsx"
@@ -5139,11 +5254,14 @@ class MainWindow(QMainWindow):
             path += f".{report_format}"
         try:
             wells = self._core_description_report_wells() or [{"name": "Послойное описание", "layers": []}]
+            from app.infrastructure.core_report_audit import audit_report_wells
+            from app.infrastructure.core_report_export import prepare_report_rows
+            audit=audit_report_wells([{**well,'layers':prepare_report_rows(well)[1]} for well in wells])
             export_core_description_report(path, self._project_title, wells, report_format)
         except Exception as exc:
             QMessageBox.critical(self, "Экспорт отчёта", str(exc))
             return
-        self.statusBar().showMessage(f"Отчёт сохранён: {Path(path).name} · скважин: {len(wells)}")
+        self.statusBar().showMessage(f"Отчёт сохранён: {Path(path).name} · скважин: {len(wells)} · замечаний: {len(audit.issues)}. Сводка доступна через ⚙.")
 
     def edit_gis(self) -> None:
         self._edit_log("gis")
@@ -5332,12 +5450,20 @@ class MainWindow(QMainWindow):
             self._schedule_vlm_dispatch()
             return
         config = self._local_vlm_config()
-        if available_runtime(config) is not None:
-            self._advance_turbo_descriptions(config)
+        if self._analysis_queue and (
+            not Path(config["python"]).is_file() or not (Path(config["base"]) / "config.json").is_file()
+        ):
+            error = "Укажите рабочую модель распознавания пород CV-1 Vision в настройках помощника."
+            for job in self._analysis_queue:
+                mark_interval_failure(job, error)
+            self._analysis_done += len(self._analysis_queue)
+            self._analysis_queue.clear()
+            self.assistant_panel.append_message("system", error)
+            self._finish_cv1_descriptions()
             return
-        if (len(self._analysis_queue) > 1
-                and self._analysis_queue[0].record_id == self._analysis_queue[1].record_id):
-            self._advance_turbo_descriptions(config, per_photo=True)
+        if len(self._analysis_queue) > 1:
+            same_photo = self._analysis_queue[0].record_id == self._analysis_queue[1].record_id
+            self._advance_turbo_descriptions(config, per_photo=same_photo)
             return
         while self._analysis_queue:
             job = self._analysis_queue.popleft()
@@ -5348,9 +5474,6 @@ class MainWindow(QMainWindow):
                     self._analysis_done += 1
                     continue
                 write_interval_crop(record, job, crop)
-                config = self._local_vlm_config()
-                if not Path(config["python"]).is_file() or not (Path(config["base"]) / "config.json").is_file():
-                    raise RuntimeError("Укажите локальную базовую Qwen и Python в настройках ИИ. Интернет для анализа не используется.")
                 whole_column = job.detection.attributes.get("__core_column_description") == "1"
                 if whole_column:
                     column_number = int(job.detection.attributes.get("__core_column_index", "0")) + 1
@@ -5367,8 +5490,7 @@ class MainWindow(QMainWindow):
                 request_id = self._vlm_client.send(config["python"], {
                     "operation": "describe", "image": str(crop), "context": context,
                     "whole_column": whole_column,
-                    "base": config["base"], "adapter": config["adapter"],
-                    "theory_adapter": config["theory_adapter"], "model_mode": config["model_mode"],
+                    "base": config["base"], "model_mode": config["model_mode"],
                     "primary_reference": config.get("primary_reference", ""),
                     "folders": [], "use_knowledge": False,
                 })
@@ -5383,8 +5505,6 @@ class MainWindow(QMainWindow):
                 if record is not None:
                     mark_interval_failure(job, str(exc))
                 self._analysis_done += 1
-                # A missing runtime affects every interval; do not loop through
-                # the same failing configuration or launch repeated processes.
                 if isinstance(exc, RuntimeError):
                     for remaining in self._analysis_queue:
                         mark_interval_failure(remaining, str(exc))
@@ -5526,7 +5646,7 @@ class MainWindow(QMainWindow):
         )
         message = (
             f"Анализ завершён. Описано объектов: {self._analysis_success} из {self._analysis_total}. "
-            "Геометрия взята из масок YOLO или рамок найденных столбиков; описания и фации — черновики локальной VLM. "
+            "Геометрия взята из масок YOLO или рамок столбиков; литология — черновик классификатора. Фации определяет геолог. "
             "Проверьте их в карточках."
         )
         if whole_columns:
@@ -5599,7 +5719,9 @@ class MainWindow(QMainWindow):
             self,
             training_ready=detection.training_ready,
             primary_catalog=self._primary_facies_catalog,
-            description_confirmed=expert_memory_is_confirmed(detection) or expert_description_is_confirmed(detection),
+            description_confirmed=current_description_is_confirmed(detection),
+            preview_pixmap=make_interval_preview(record.pixmap, detection.polygon),
+            photo_quality=record.photo_quality,
         )
         dialog.setModal(False)
         dialog.accepted.connect(lambda: self._save_lithology(record, detection, dialog))
@@ -5609,7 +5731,7 @@ class MainWindow(QMainWindow):
         dialog.finished.connect(lambda _: self._forget_facies_dialog(dialog))
         self._facies_dialogs.append(dialog)
         dialog.show()
-        self.statusBar().showMessage("Выберите фацию/параметры или переместите слой выше/ниже в колонке")
+        self.statusBar().showMessage("Карточка участка: выбирайте признаки — описание обновляется справа. Фацию можно оставить незаполненной.")
 
     def _align_layer_to_existing_curve(self, record: PhotoRecord, detection, curve: dict) -> None:
         depths = [float(value) for value in (detection.depth_from, detection.depth_to) if value is not None]
@@ -5706,10 +5828,16 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Проверьте глубины", str(exc))
             return
         selected_label = dialog.selected_facies()
-        if not selected_label:
-            QMessageBox.warning(self, "Не указана фация", "Введите или выберите основную метку фации, например DWCh.")
+        if not selected_label and dialog.training_confirmed.isChecked():
+            QMessageBox.warning(self, "Не указана фация", "Для обучения выберите фацию. Карточку без фации можно сохранить как черновик.")
             return
+        has_facies = bool(selected_label and selected_label not in {UNRECOGNIZED_FACIES, "Интервал YOLO", "Новый контур"})
+        selected_label = selected_label or UNRECOGNIZED_FACIES
         selected_attributes = dialog.selected_attributes()
+        facies_assumed = "Название фации" in read_assumptions(selected_attributes)
+        if dialog.training_confirmed.isChecked() and facies_assumed:
+            QMessageBox.warning(self, "Фация предположительная", "Для обучения нужна подтверждённая фация. Сохраните предположение без отметки об обучении.")
+            return
         if dialog.training_confirmed.isChecked() and not self._resolve_training_class(selected_label, selected_attributes.get("Индекс фации")):
             QMessageBox.warning(self, "Уточните фацию", "Для обучения финальной модели выберите точную фацию из справочника. Свою метку можно сохранить без отметки об обучении.")
             return
@@ -5741,20 +5869,57 @@ class MainWindow(QMainWindow):
             detection.attributes["__expert_memory_sha256"] = expert_memory_digest(detection)
         memory_errors = []
         try:
-            save_expert_facies_mapping(record, detection, confirmed=True)
+            save_expert_facies_mapping(record, detection, confirmed=has_facies and not facies_assumed)
         except (OSError, ValueError, TypeError) as exc:
             memory_errors.append("привязка фации: " + str(exc))
         try:
             save_interval_edit(record, detection, project=self._expert_project_key(), well=record.well_name)
         except (OSError, ValueError, TypeError) as exc:
             memory_errors.append("журнал поправок: " + str(exc))
+        self._update_attribute_examples(record, detection, dialog.description_confirmed.isChecked())
         if memory_errors:
             QMessageBox.warning(self, "Память правок", "Не всё удалось запомнить: " + "; ".join(memory_errors) + ". Проверьте доступ к фото и сохраните проект.")
         if record.core_columns:
             record.detections = postprocess_detections(record, record.detections)
         self._refresh_facies_views(record)
         suffix = " · подсветка контура обновлена" if geometry_updated else ""
-        self.statusBar().showMessage(f"Параметры фации сохранены: {detection.label}{suffix}")
+        self.statusBar().showMessage(f"Карточка участка сохранена: {detection.label}{suffix}")
+
+    def _update_attribute_examples(self, record, detection, description_reviewed):
+        """Snapshot explicit reviews; disk work is queued outside the GUI thread."""
+        from app.infrastructure.attribute_examples import default_root, pixel_digest, png_bytes, read_evidence
+        from app.infrastructure.attribute_tasks import submit
+        attributes = detection.attributes
+        if "__description_composer" not in attributes:
+            return  # Historical files are not silently promoted into this base.
+        has_targets = any(isinstance(row, dict) and row.get("reviewed") is True
+                          for row in read_evidence(attributes).values())
+        if not (attributes.get("__attribute_example_id") or description_reviewed or has_targets):
+            return
+        crop = make_interval_preview(record.pixmap, detection.polygon)
+        if crop.isNull():
+            return
+        identifier = attributes.setdefault("__attribute_example_id", uuid4().hex)
+        payload = {"id": identifier, "well": record.well_name, "project": self._expert_project_key(),
+                   "record_id": record.identifier, "source_photo": record.path,
+                   "facies": detection.label, "training_ready": detection.training_ready,
+                   "description_reviewed": bool(description_reviewed),
+                   "depth_from": detection.depth_from, "depth_to": detection.depth_to,
+                   "geometry": [[point.x()/record.pixmap.width(),point.y()/record.pixmap.height()] for point in detection.polygon],
+                   "pixel_sha256": pixel_digest(crop), "attributes": dict(attributes)}
+        submit("save", {"payload": payload, "image_png": png_bytes(crop), "root": default_root()},
+               self._attribute_examples_saved)
+
+    def _attribute_examples_saved(self, reply):
+        if not reply["ok"]:
+            self.statusBar().showMessage("Карточка сохранена, но базу учебных фрагментов обновить не удалось: " + reply["error"],15000)
+
+    def _revoke_attribute_example(self,detection):
+        identifier=detection.attributes.get("__attribute_example_id")
+        if identifier:
+            from app.infrastructure.attribute_examples import default_root
+            from app.infrastructure.attribute_tasks import submit
+            submit("revoke",{"identifier":identifier,"root":default_root()},self._attribute_examples_saved)
 
     def _open_depth_binding(self, record: PhotoRecord, detection) -> None:
         dialog = DepthRangeDialog(detection.depth_from, detection.depth_to, self)
@@ -5766,11 +5931,13 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Проверьте глубины", str(exc))
             return
         geometry_updated = self._sync_polygon_to_depth_range(record, detection)
+        self._revoke_attribute_example(detection)
         self._refresh_facies_views(record)
         suffix = " · подсветка контура обновлена" if geometry_updated else ""
         self.statusBar().showMessage(f"Привязка слоя обновлена{suffix}")
 
     def _delete_facies(self, record: PhotoRecord, detection) -> None:
+        self._revoke_attribute_example(detection)
         record.detections = [item for item in record.detections if item is not detection]
         if record.core_columns:
             record.detections = postprocess_detections(record, record.detections)
@@ -5782,6 +5949,7 @@ class MainWindow(QMainWindow):
             self._facies_dialogs.remove(dialog)
 
     def _on_facies_geometry_changed(self, record: PhotoRecord, detection) -> None:
+        self._revoke_attribute_example(detection)
         depth_updated = self._sync_depth_range_from_polygon(record, detection)
         # Editing geometry alone does not confirm the model's class choice.
         # An already reviewed sample retains its explicit confirmation.
@@ -5893,3 +6061,4 @@ class MainWindow(QMainWindow):
         self._refresh_project_tree()
         self._refresh_training_bar()
         self._schedule_edit_autosave()
+        if self._review_queue_dialog is not None and self._review_queue_dialog.isVisible():self._review_queue_dialog.refresh()

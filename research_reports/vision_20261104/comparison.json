@@ -1,0 +1,366 @@
+{
+  "winner": "convnext_tiny",
+  "selection_rule": "Highest validation macro-F1; test evaluated after checkpoint and architecture selection",
+  "models": {
+    "efficientnet_b0": {
+      "selection": {
+        "architecture": "efficientnet_b0",
+        "best_epoch": 1,
+        "validation_macro_f1": 0.9157034451623046,
+        "model_sha256": "d1fd8c4e9cbe3f81afa7c54be054051bd5fbef94f5efb67d0f77d928b9f4bae6",
+        "seconds_this_run": 1853.5
+      },
+      "test": {
+        "count": 400,
+        "accuracy": 0.905,
+        "macro_f1": 0.9049794232637783,
+        "per_class": {
+          "sandstone": {
+            "support": 100,
+            "correct": 73,
+            "recall": 0.73,
+            "f1": 0.8021978021978022
+          },
+          "limestone": {
+            "support": 100,
+            "correct": 94,
+            "recall": 0.94,
+            "f1": 0.8430493273542601
+          },
+          "shale": {
+            "support": 100,
+            "correct": 97,
+            "recall": 0.97,
+            "f1": 0.9847715736040609
+          },
+          "garbage": {
+            "support": 100,
+            "correct": 98,
+            "recall": 0.98,
+            "f1": 0.98989898989899
+          }
+        },
+        "confusion_matrix": [
+          [
+            73,
+            27,
+            0,
+            0
+          ],
+          [
+            6,
+            94,
+            0,
+            0
+          ],
+          [
+            2,
+            1,
+            97,
+            0
+          ],
+          [
+            1,
+            1,
+            0,
+            98
+          ]
+        ],
+        "labels": [
+          "sandstone",
+          "limestone",
+          "shale",
+          "garbage"
+        ]
+      },
+      "gpu_inference": {
+        "1": {
+          "p50_ms": 12.507899955380708,
+          "p95_ms": 19.122904981486496
+        },
+        "8": {
+          "p50_ms": 13.03315005498007,
+          "p95_ms": 17.553389933891594
+        }
+      }
+    },
+    "convnext_tiny": {
+      "selection": {
+        "architecture": "convnext_tiny",
+        "best_epoch": 1,
+        "validation_macro_f1": 0.9287475247222189,
+        "model_sha256": "0f980c18cbd42db9f2fb3fdf3b5b50f5ca1cc7a21df6a8573d9c564f830f1ed0",
+        "seconds_this_run": 481.1
+      },
+      "test": {
+        "count": 400,
+        "accuracy": 0.9375,
+        "macro_f1": 0.9375675779796515,
+        "per_class": {
+          "sandstone": {
+            "support": 100,
+            "correct": 84,
+            "recall": 0.84,
+            "f1": 0.8795811518324608
+          },
+          "limestone": {
+            "support": 100,
+            "correct": 93,
+            "recall": 0.93,
+            "f1": 0.8857142857142857
+          },
+          "shale": {
+            "support": 100,
+            "correct": 99,
+            "recall": 0.99,
+            "f1": 0.9949748743718593
+          },
+          "garbage": {
+            "support": 100,
+            "correct": 99,
+            "recall": 0.99,
+            "f1": 0.99
+          }
+        },
+        "confusion_matrix": [
+          [
+            84,
+            16,
+            0,
+            0
+          ],
+          [
+            7,
+            93,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            99,
+            1
+          ],
+          [
+            0,
+            1,
+            0,
+            99
+          ]
+        ],
+        "labels": [
+          "sandstone",
+          "limestone",
+          "shale",
+          "garbage"
+        ]
+      },
+      "gpu_inference": {
+        "1": {
+          "p50_ms": 9.220700012519956,
+          "p95_ms": 15.160490013659
+        },
+        "8": {
+          "p50_ms": 9.866300038993359,
+          "p95_ms": 12.843834952218458
+        }
+      }
+    }
+  },
+  "data_audit": {
+    "sources": {
+      "mendeley_lithology_4000/train.jsonl": "a79b88dc778aee45d194b1cee5c0ba8de81694a22d48bf414f333e1824c377cf",
+      "mendeley_lithology_next/train.jsonl": "2f321001e592a2f780f5f0184aee2ec52a05d9fb7b7d1fb8787bb4047cd1af96",
+      "mendeley_lithology_40000/additional_train.jsonl": "7a4d6187507119ea28f5245f56345644823592db418a493d32844f12c12b8bb2",
+      "mendeley_lithology_pretrained_holdout/val.jsonl": "bdd53ebf09ccf45193beb1d20fe534ec70d314f62b84a5bddf76081d6d984344",
+      "mendeley_lithology_pretrained_holdout/test.jsonl": "51d3da3861053ddc7e6a187646b3e2a08df017567decd275563943e87e7003a4"
+    },
+    "policy": "source_direct_folder; no synthetic or model-generated labels",
+    "facies_trained": false,
+    "facies_reason": "No genuine confirmed facies labels on this computer",
+    "test_limit": "Existing research benchmark reused; well-disjoint from these training runs, not a new sealed test",
+    "train": {
+      "count": 40000,
+      "by_class": {
+        "sandstone": 10000,
+        "limestone": 10000,
+        "shale": 10000,
+        "garbage": 10000
+      },
+      "wells": [
+        "07PD01",
+        "AS10D04",
+        "BDH 2",
+        "CDP008",
+        "COD011",
+        "GHDD2",
+        "HODD1",
+        "IHAD1",
+        "IHAD3",
+        "LB04D005",
+        "MC07RD03",
+        "MURNAROO 1",
+        "OBD 06",
+        "OBD 7",
+        "OOLDEA 1",
+        "PLAYFORD 1",
+        "PRICES BORE 1",
+        "RL 1",
+        "SH 7",
+        "WDDD2"
+      ]
+    },
+    "val": {
+      "count": 400,
+      "by_class": {
+        "sandstone": 100,
+        "limestone": 100,
+        "shale": 100,
+        "garbage": 100
+      },
+      "wells": [
+        "COD013",
+        "IHAD2",
+        "MMDD1",
+        "WC05D001"
+      ]
+    },
+    "test": {
+      "count": 400,
+      "by_class": {
+        "sandstone": 100,
+        "limestone": 100,
+        "shale": 100,
+        "garbage": 100
+      },
+      "wells": [
+        "08PD04c",
+        "COD012",
+        "HODD2",
+        "SAE 6"
+      ]
+    },
+    "all_image_files_sha256_verified": true,
+    "verification_seconds": 53.0
+  },
+  "published_folder": "C:\\Users\\Я\\Desktop\\Синтетический керн\\kern_analyzer_app\\models\\vision\\vision_20261104_143516",
+  "model_card": {
+    "schema": "cv1-discriminative-vision-v1",
+    "engine": "vision",
+    "generative": false,
+    "architecture": "convnext_tiny",
+    "classes": [
+      "sandstone",
+      "limestone",
+      "shale",
+      "garbage"
+    ],
+    "classes_ru": [
+      "Песчаник",
+      "Известняк",
+      "Глинистая порода",
+      "Фон / не керн"
+    ],
+    "image_side": 224,
+    "normalization": {
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ]
+    },
+    "temperature": 1.2190136542044754,
+    "review_threshold": 0.8,
+    "margin_threshold": 0.15,
+    "facies_trained": false,
+    "texture_trained": false,
+    "grain_size_trained": false,
+    "scope": "Four source-labelled small-crop lithology classes; not facies, grain size, mineralogy or depositional environment",
+    "source_dataset": "https://data.mendeley.com/datasets/b6rj29mrss/1",
+    "source_license": "CC BY 4.0",
+    "attribution": "Alzubaidi et al., Lithology dataset, Mendeley Data v1; see source dataset citation",
+    "selected_by": "validation_macro_f1_only",
+    "validation": {
+      "architecture": "convnext_tiny",
+      "best_epoch": 1,
+      "validation_macro_f1": 0.9287475247222189,
+      "model_sha256": "0f980c18cbd42db9f2fb3fdf3b5b50f5ca1cc7a21df6a8573d9c564f830f1ed0",
+      "seconds_this_run": 481.1
+    },
+    "test": {
+      "count": 400,
+      "accuracy": 0.9375,
+      "macro_f1": 0.9375675779796515,
+      "per_class": {
+        "sandstone": {
+          "support": 100,
+          "correct": 84,
+          "recall": 0.84,
+          "f1": 0.8795811518324608
+        },
+        "limestone": {
+          "support": 100,
+          "correct": 93,
+          "recall": 0.93,
+          "f1": 0.8857142857142857
+        },
+        "shale": {
+          "support": 100,
+          "correct": 99,
+          "recall": 0.99,
+          "f1": 0.9949748743718593
+        },
+        "garbage": {
+          "support": 100,
+          "correct": 99,
+          "recall": 0.99,
+          "f1": 0.99
+        }
+      },
+      "confusion_matrix": [
+        [
+          84,
+          16,
+          0,
+          0
+        ],
+        [
+          7,
+          93,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          99,
+          1
+        ],
+        [
+          0,
+          1,
+          0,
+          99
+        ]
+      ],
+      "labels": [
+        "sandstone",
+        "limestone",
+        "shale",
+        "garbage"
+      ]
+    },
+    "model_sha256": "0f980c18cbd42db9f2fb3fdf3b5b50f5ca1cc7a21df6a8573d9c564f830f1ed0",
+    "limitations": [
+      "Four lithology classes only. Other rocks may be out of distribution.",
+      "Softmax confidence is not proof of geological correctness.",
+      "No new independently collected blind wells; existing benchmark reused.",
+      "Synthetic facies and non-deployable facies research datasets excluded."
+    ]
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "author": "Fatimah Alzubaidi",
+  "dataset": "Lithology dataset, version 1",
+  "source": "https://data.mendeley.com/datasets/b6rj29mrss/1",
+  "doi": "10.17632/b6rj29mrss.1",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "modification": "Original labelled training crops resized to 160 x 160 pixels for illustrative class thumbnails; not nearest-neighbour matches.",
+  "examples": {
+    "sandstone": {
+      "file": "sandstone.jpg",
+      "source_member": "Lithology dataset/train/sandstone/07PD01_28_row_0_15.jpeg",
+      "source_image_sha256": "6c828ee6b3e6fa843add7caf8b6531b4ecaeb9d6de5125e669ff4d374d347603",
+      "source_label": "sandstone",
+      "label_provenance": "source_direct_folder",
+      "source_split": "train"
+    },
+    "limestone": {
+      "file": "limestone.jpg",
+      "source_member": "Lithology dataset/train/limestone/PRICES BORE 1_10b_row_0_46.jpeg",
+      "source_image_sha256": "a34d3c156852d1678fe558ab3868cb61566fdc6b1c35cd0e3ad4e10c85187944",
+      "source_label": "limestone",
+      "label_provenance": "source_direct_folder",
+      "source_split": "train"
+    },
+    "shale": {
+      "file": "shale.jpg",
+      "source_member": "Lithology dataset/train/shale/AS10D04_76b_row_1_1.jpeg",
+      "source_image_sha256": "018d68af5f7032bc35127be0353a5f418c540127555cd857a739a0f06efa0de7",
+      "source_label": "shale",
+      "label_provenance": "source_direct_folder",
+      "source_split": "train"
+    },
+    "garbage": {
+      "file": "garbage.jpg",
+      "source_member": "Lithology dataset/train/garbage/RL 1_9_row_3_0.jpg_C4_.jpeg",
+      "source_image_sha256": "f10f0cf3da25f95eeeceff0a51df34c4d670b602219123affd6c149c2b42e2ff",
+      "source_label": "garbage",
+      "label_provenance": "source_direct_folder",
+      "source_split": "train"
+    },
+    "siltstone": {
+      "source_member": "DCID/DCID-512-35/train/4.Gray siltstone/4.Gray siltstone_198.jpg",
+      "source_label": "4.Gray siltstone",
+      "source": "https://github.com/JiayuLi1120/drill-core-image-dataset",
+      "license": "CC BY-NC 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "credit": "Jiayu Li et al. · DCID · CC BY-NC 4.0",
+      "file": "siltstone.jpg",
+      "source_image_sha256": "91c6d1bbcb44eb6e0a51b17aa11197efdec5c9e1ca032e445f73a4bc19eda6cb",
+      "source_split": "train",
+      "label_provenance": "source_direct_label",
+      "modification": "Resized to 160 x 160 for illustrative thumbnail; not a nearest analogue"
+    },
+    "mudrock": {
+      "source_member": "DCID/DCID-512-35/train/20.Black Shale/20.Black Shale_215.jpg",
+      "source_label": "20.Black Shale",
+      "source": "https://github.com/JiayuLi1120/drill-core-image-dataset",
+      "license": "CC BY-NC 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "credit": "Jiayu Li et al. · DCID · CC BY-NC 4.0",
+      "file": "mudrock.jpg",
+      "source_image_sha256": "e5152594dc919211959e6fc448c7928d3cac81ff39213d4afce59307726b02b0",
+      "source_split": "train",
+      "label_provenance": "source_direct_label",
+      "modification": "Resized to 160 x 160 for illustrative thumbnail; not a nearest analogue"
+    },
+    "crystalline": {
+      "source_member": "DCID/DCID-512-35/train/10.Monzogranite/10.Monzogranite_6.jpg",
+      "source_label": "10.Monzogranite",
+      "source": "https://github.com/JiayuLi1120/drill-core-image-dataset",
+      "license": "CC BY-NC 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "credit": "Jiayu Li et al. · DCID · CC BY-NC 4.0",
+      "file": "crystalline.jpg",
+      "source_image_sha256": "4204afbc761c5445348ef6306c849d66e8c3cd2043199aa7636350e979391951",
+      "source_split": "train",
+      "label_provenance": "source_direct_label",
+      "modification": "Resized to 160 x 160 for illustrative thumbnail; not a nearest analogue"
+    },
+    "carbonaceous_siltstone": {
+      "source_member": "DCID/DCID-512-35/train/6.Carbonaceous siltstone/6.Carbonaceous siltstone_123.jpg",
+      "source_label": "6.Carbonaceous siltstone",
+      "source": "https://github.com/JiayuLi1120/drill-core-image-dataset",
+      "license": "CC BY-NC 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "credit": "Jiayu Li et al. · DCID · CC BY-NC 4.0",
+      "file": "carbonaceous_siltstone.jpg",
+      "source_image_sha256": "23c0babaa5acfe37adb4a75692660247f175ec6f2b59d76ecb621c21dc59fe67",
+      "source_split": "train",
+      "label_provenance": "source_direct_label",
+      "modification": "Resized to 160 x 160 for illustrative thumbnail; not a nearest analogue"
+    },
+    "carbonate_other": {
+      "source_member": "DCID/DCID-512-35/train/17.White marble/17.White marble_171.jpg",
+      "source_label": "17.White marble",
+      "source": "https://github.com/JiayuLi1120/drill-core-image-dataset",
+      "license": "CC BY-NC 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "credit": "Jiayu Li et al. · DCID · CC BY-NC 4.0",
+      "file": "carbonate_other.jpg",
+      "source_image_sha256": "1cedb5198ee0a76d0c99fbe0a24d56dafa0d3db583fbbbd94f1efaa2ed369bc3",
+      "source_split": "train",
+      "label_provenance": "source_direct_label",
+      "modification": "Resized to 160 x 160 for illustrative thumbnail; not a nearest analogue"
+    },
+    "breccia_other": {
+      "source_member": "DCID/DCID-512-35/train/29.Hematite breccia/29.Hematite breccia_302.jpg",
+      "source_label": "29.Hematite breccia",
+      "source": "https://github.com/JiayuLi1120/drill-core-image-dataset",
+      "license": "CC BY-NC 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "credit": "Jiayu Li et al. · DCID · CC BY-NC 4.0",
+      "file": "breccia_other.jpg",
+      "source_image_sha256": "849a1f8ba22dc8850c487c1f9e48137bccadff1bc22f3b4bb934cf68876b937d",
+      "source_split": "train",
+      "label_provenance": "source_direct_label",
+      "modification": "Resized to 160 x 160 for illustrative thumbnail; not a nearest analogue"
+    },
+    "background": {
+      "file": "background.jpg",
+      "source_member": "Lithology dataset/train/garbage/RL 1_9_row_3_0.jpg_C4_.jpeg",
+      "source_image_sha256": "f10f0cf3da25f95eeeceff0a51df34c4d670b602219123affd6c149c2b42e2ff",
+      "source_label": "garbage",
+      "label_provenance": "source_direct_label",
+      "source_split": "train",
+      "credit": "Fatimah Alzubaidi · Lithology dataset · CC BY 4.0",
+      "modification": "Resized to 160 x 160 for illustrative thumbnail; not a nearest analogue"
+    },
+    "coal": {
+      "file": "coal.jpg",
+      "source_member": "Coal/images/val/a3_5_0_1.jpg",
+      "box": [
+        0,
+        0,
+        639,
+        639
+      ],
+      "source_image_sha256": "ebb98fa55a66cbb74eb6578ba640c64c0bde957bf32f7b7aab1fe8748997fdc1",
+      "source_label": "0: coal",
+      "source": "https://zenodo.org/records/10702879",
+      "author": "Wenyu Wang",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "credit": "Wenyu Wang · Coal · CC BY 4.0",
+      "modification": "Source-labelled bounding-box crop resized to 160 x 160",
+      "source_split": "train (parent-photo grouped split)",
+      "domain": "Coal surface texture; not core-box photograph"
+    }
+  }
+}

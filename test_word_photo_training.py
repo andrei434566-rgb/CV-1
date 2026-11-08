@@ -72,6 +72,47 @@ class WordPhotoTrainingTests(unittest.TestCase):
         inspected = inspect_word_photo_pairs(self.photos, self.document)
         self.assertEqual([p.images[0].name for p in inspected.ready_pairs], ["1.JPG", "00010.png"])
 
+    def test_one_word_bare_number_sections_match_separate_multicolumn_photos(self):
+        self.word('0001', 'Столбиков: 3. Интервал фации: 3000,00–3000,45 м.',
+                  'Порода: Песчаник.\nОписание первого интервала.',
+                  'Интервал фации: 3000,45–3001,20 м.\nОписание второго интервала.',
+                  '0002.jpg', 'Столбиков: 5.\nПорода: Алевролит.')
+        self.photo('0001.jpg'); self.photo('0002.png')
+        inspection = inspect_word_photo_pairs(self.photos, self.document)
+        self.assertEqual([p.photo_id for p in inspection.ready_pairs], ['0001','0002'])
+        self.assertIn('3000,00–3000,45', inspection.ready_pairs[0].description)
+        self.assertIn('3000,45–3001,20', inspection.ready_pairs[0].description)
+        self.assertNotIn('Алевролит', inspection.ready_pairs[0].description)
+        self.assertIn('Алевролит', inspection.ready_pairs[1].description)
+
+    def test_pasted_numeric_depth_cells_and_intervals_do_not_start_bare_sections(self):
+        doc = Document(); doc.add_paragraph('0001')
+        table = doc.add_table(rows=1, cols=3)
+        for cell, value in zip(table.rows[0].cells, ('3000', '3001', 'Песчаник серый.')):
+            cell.text = value
+        doc.add_paragraph('3001,25')
+        doc.add_paragraph('3001–3002')
+        doc.add_paragraph('3')
+        doc.add_paragraph('0002'); doc.add_paragraph('Аргиллит.')
+        doc.save(self.document)
+        descriptions = read_numbered_descriptions(self.document)
+        self.assertEqual([p[0] for p in descriptions], ['0001','0002'])
+        self.assertEqual(descriptions[0][1], '3000\n3001\nПесчаник серый.\n3001,25\n3001–3002\n3')
+
+    def test_bare_and_prefixed_number_duplicates_and_missing_images_are_reported(self):
+        self.word('0001', 'Первое описание.', 'Фото 1', 'Повтор.', '0002', 'Нет изображения.')
+        self.photo('0001.jpg')
+        inspection = inspect_word_photo_pairs(self.photos, self.document)
+        self.assertFalse(inspection.ready_pairs)
+        self.assertTrue(all('повторяется' in p.message for p in inspection.pairs[:2]))
+        self.assertIn('не найдена', inspection.pairs[2].message)
+
+    def test_bare_section_can_follow_manual_break_and_leaves_description_verbatim(self):
+        self.word('0001\nФация: Продельта.\nПорода: Аргиллит.\n0002\nФация: Пойменная.')
+        descriptions = read_numbered_descriptions(self.document)
+        self.assertEqual(descriptions, [('0001','Фация: Продельта.\nПорода: Аргиллит.'),
+                                        ('0002','Фация: Пойменная.')])
+
     def test_export_requires_review_copies_originals_and_preserves_full_target(self):
         text = "Серая порода. " * 2000
         self.word("Фото 0001", text)

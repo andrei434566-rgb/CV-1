@@ -47,12 +47,18 @@ class ChatPhotoColumnWorker(QObject):
                     "right": width * 0.98, "bottom": height * 0.99,
                 }]
                 detector = "геометрическое предположение: один вытянутый столбик"
+            from app.infrastructure.photo_quality import audit_image
+            from PIL import Image
+            quality=audit_image(Image.fromarray(working[:,:,::-1]),
+                [{k:v*(working.shape[1]/width if k in {'left','right'} else working.shape[0]/height) for k,v in box.items()} for box in columns],
+                source_size=(width,height))
             self.succeeded.emit({
                 "path": str(self.image_path),
                 "width": width,
                 "height": height,
                 "columns": columns,
                 "detector": detector,
+                "quality": quality,
             })
         except Exception as exc:
             self.failed.emit(f"{type(exc).__name__}: {exc}")

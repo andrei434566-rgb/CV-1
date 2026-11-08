@@ -47,3 +47,5 @@ class PhotoRecord:
     # Strict CV-1 records retain YOLO geometry without legacy gap synthesis.
     analysis_mode: str = "legacy"
     analysis_issues: list[dict] = field(default_factory=list)
+    photo_quality: dict = field(default_factory=dict)
+    photo_review_ack: str = ""

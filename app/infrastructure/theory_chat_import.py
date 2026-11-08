@@ -132,7 +132,7 @@ def import_theory_document(source: str | Path, root: str | Path) -> dict:
             target.write_text(f"Документ: {source.name}. Фрагмент {number}/{len(chunks)}.\n\n{chunk}", encoding="utf-8")
         metadata = {"name": source.name, "sha256": digest, "chunks": len(chunks),
                     "characters": len(text), "warnings": warnings, "weights_trained": False}
-        (staged_index / ".complete.json").write_text(json.dumps({"schema": "qwen_theory_chat_index_v1", **metadata},
+        (staged_index / ".complete.json").write_text(json.dumps({"schema": "cv1_theory_chat_index_v1", **metadata},
                                                                 ensure_ascii=False), encoding="utf-8")
         index = root / "theory_index"
         originals = root / "theory_originals"

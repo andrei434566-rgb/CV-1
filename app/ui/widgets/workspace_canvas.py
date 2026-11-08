@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections import OrderedDict
 from hashlib import md5
 import re
+import json
+import math
 
 from PySide6.QtCore import QPoint, QPointF, QRect, QRectF, QSize, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QFontMetricsF, QImage, QPainter, QPainterPath, QPainterPathStroker, QPen, QPixmap, QPolygonF, QTransform
@@ -2413,6 +2415,7 @@ class FaciesConfidencePopup(QFrame):
                           or attributes.get("__vlm_description") or "").strip()
         for title, public_key, internal_key in (
             ("Порода", "Название породы", "__vlm_lithology"),
+            ("Цвет", "Цвет", "__vision_color"),
             ("Текстура", "Текстура", "__vlm_texture"),
             ("Ассоциация фаций", "Фациальная ассоциация", "__vlm_facies_association"),
             ("Обстановка", "Обстановка седиментации", "__vlm_depositional_environment"),
@@ -2426,7 +2429,7 @@ class FaciesConfidencePopup(QFrame):
         status = str(attributes.get("Статус интерпретации") or "").strip()
         if not description:
             state = attributes.get("__interpretation_status")
-            placeholder = ("Описание ещё готовится локальной VLM. Готовые интервалы доступны сразу."
+            placeholder = ("Описание готовится локальным классификатором. Готовые интервалы доступны сразу."
                            if state in {"waiting", "processing"} else "Описание для этого слоя пока не заполнено.")
             if state == "error":
                 placeholder = status or "Не удалось получить описание."
@@ -2445,14 +2448,30 @@ class FaciesConfidencePopup(QFrame):
             self.layout.addWidget(source_label)
         if not detection.training_ready:
             review_text = (
-                "Рамка охватывает целый найденный столбик; описание VLM проверьте по исходному фото."
+                "Рамка охватывает целый найденный столбик; описание классификатора проверьте по исходному фото."
                 if is_core_column else "Границы и фацию нужно проверить перед обучением."
             )
             review = QLabel(review_text, self)
             review.setObjectName("confidenceSubtle")
             review.setWordWrap(True)
             self.layout.addWidget(review)
-        rows = facies_confidence_rows(detection)
+        is_vision = attributes.get("__description_engine") == "vision"
+        if is_vision:
+            confidence_title = QLabel("Классификатор пород · среди известных классов", self)
+            confidence_title.setObjectName("confidenceTitle")
+            confidence_title.setWordWrap(True)
+            self.layout.addWidget(confidence_title)
+            try:
+                predictions = json.loads(attributes.get("__vision_predictions", "[]"))
+            except (TypeError, ValueError):
+                predictions = []
+            from app.ui.widgets.lithology_predictions import LithologyPredictionGallery
+            self.layout.addWidget(LithologyPredictionGallery(predictions,self))
+            if detection.confidence > 0:
+                geometry_score = QLabel(f"Оценка геометрии YOLO: {detection.confidence:.0%}", self)
+                geometry_score.setObjectName("confidenceSubtle")
+                self.layout.addWidget(geometry_score)
+        rows = [] if is_vision else facies_confidence_rows(detection)
         if rows and detection.confidence > 0:
             confidence_title = QLabel("Варианты модели", self)
             confidence_title.setObjectName("confidenceTitle")

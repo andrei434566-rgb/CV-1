@@ -49,6 +49,10 @@ def _enable_command_console() -> None:
 
 
 def main() -> int:
+    if sys.argv[1:] == ["--vision-worker"]:
+        from app.infrastructure.local_vision_runner import main as run_vision
+        run_vision()
+        return 0
     if len(sys.argv) == 3 and sys.argv[1] == "--hub-sync-job":
         from app.infrastructure.model_hub_worker import main as run_hub_job
         return run_hub_job(sys.argv[2])
@@ -71,6 +75,38 @@ def main() -> int:
         if datasets.table.rowCount() != 6:
             raise RuntimeError("Portable open dataset catalog is incomplete")
         datasets.close()
+        import json
+        from PySide6.QtCore import QProcess
+        from app.infrastructure.local_vision import default_model_folder
+        from app.runtime_paths import bundled_root
+
+        worker = QProcess()
+        command = ["--vision-worker"]
+        if not getattr(sys, "frozen", False):
+            command.insert(0, str(Path(__file__).resolve()))
+        worker.start(sys.executable, command)
+        if not worker.waitForStarted(5000):
+            raise RuntimeError("Portable Vision worker could not start")
+        requests = [{"id": "smoke", "operation": "chat", "question": "hello"}]
+        model = default_model_folder()
+        if (model / "model.pt").is_file():
+            requests.append({
+                "id": "photo", "operation": "describe", "base": str(model),
+                "image": str(bundled_root() / "app/resources/lithology_examples/sandstone.jpg"),
+            })
+        worker.write("".join(json.dumps(row) + "\n" for row in requests).encode("utf-8"))
+        worker.closeWriteChannel()
+        if not worker.waitForFinished(120000):
+            worker.kill()
+            worker.waitForFinished(5000)
+            raise RuntimeError("Portable Vision worker timed out")
+        replies = [json.loads(line) for line in bytes(worker.readAllStandardOutput()).decode("utf-8").splitlines()]
+        if (worker.exitCode() != 0 or [row.get("id") for row in replies] != [row["id"] for row in requests]
+                or not all(row.get("ok") for row in replies)):
+            error = bytes(worker.readAllStandardError()).decode("utf-8", errors="replace")
+            raise RuntimeError(f"Portable Vision worker failed: {replies}\n{error}")
+        if len(requests) > 1 and replies[-1].get("model_info", {}).get("generative") is not False:
+            raise RuntimeError("Portable classifier did not report the Vision engine")
         window.close()
         app.quit()
         if len(FACIES_MODEL_CLASSES) != 92:

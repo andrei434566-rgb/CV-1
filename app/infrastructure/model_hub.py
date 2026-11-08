@@ -12,7 +12,7 @@ from uuid import uuid4
 
 SCHEMA = "cv1-model-registry-v1"
 PACKET_SCHEMA = "cv1-reviewed-packet-v1"
-ROLES = {"geometry", "columns", "vlm_base", "vlm_adapter"}
+ROLES = {"geometry", "columns", "vision_lithology", "vlm_base", "vlm_adapter"}
 
 
 def utc_now():
@@ -102,10 +102,29 @@ def validate_registry(data: dict) -> dict:
 
 def initialize_hub(root: Path):
     root = Path(root)
+    if (root / 'hub.json').exists() and read_json(root / 'hub.json').get('schema') != 'cv1-network-hub-v1':
+        raise ValueError('В этой папке уже есть hub.json другого формата. Выберите отдельную папку для CV-1.')
     for folder in ("models", "registry/history", "training/incoming", "training/approved", "training/datasets", "reports/validation"):
         (root / folder).mkdir(parents=True, exist_ok=True)
     if not (root / "hub.json").exists():
         atomic_json(root / "hub.json", {"schema": "cv1-network-hub-v1", "created_at": utc_now()})
+
+
+def probe_hub(root: Path):
+    """Read-only checks belong in the cancellable worker, never the GUI."""
+    root = Path(root)
+    if not root.is_dir():
+        raise OSError('Папка недоступна. Проверьте путь, подключение к сети и права доступа на этом ПК.')
+    prepared = (root / 'hub.json').is_file()
+    if prepared and read_json(root / 'hub.json').get('schema') != 'cv1-network-hub-v1':
+        raise ValueError('Папка содержит hub.json другого формата.')
+    published = (root / 'registry/models.json').is_file() if prepared else False
+    if published:
+        validate_registry(read_json(root / 'registry/models.json'))
+    return {'prepared': prepared, 'models_published': published, 'message': (
+        'Папка доступна. Общие модели опубликованы.' if published else
+        'Папка CV-1 готова. Модели ещё не опубликованы.' if prepared else
+        'Папка доступна. Нажмите «Подготовить папку для CV-1», чтобы создать структуру обмена.')}
 
 
 def verify_files(root: Path, files: list[dict]) -> bool:
@@ -119,6 +138,8 @@ def verify_files(root: Path, files: list[dict]) -> bool:
 def sync_models(hub: Path, cache: Path) -> dict:
     hub, cache = Path(hub), Path(cache)
     registry = validate_registry(read_json(hub / "registry/models.json"))
+    if any(model['role'] in {'vlm_base','vlm_adapter'} for model in registry['models']):
+        raise ValueError('Генеративные модели отключены. Опубликуйте набор geometry/columns/vision_lithology.')
     registry_hash = hashlib.sha256(json.dumps(registry, sort_keys=True).encode()).hexdigest()
     active_path = cache / "active.json"
     previous = read_json(active_path) if active_path.is_file() else None
@@ -148,6 +169,9 @@ def sync_models(hub: Path, cache: Path) -> dict:
                 target.rename(target.with_name(f"{target.name}.damaged-{uuid4().hex[:6]}"))
             stage.rename(target)
         entry = inside(target, model["entrypoint"])
+        if model['role'] == 'vision_lithology':
+            from app.infrastructure.local_vision import read_model_card
+            read_model_card(target)
         local_models.append({**model, "local_folder": str(target.resolve()), "local_entrypoint": str(entry.resolve())})
     active = {"schema": SCHEMA, "release_id": registry["release_id"], "registry_sha256": registry_hash,
               "synced_at": utc_now(), "models": local_models}
@@ -161,6 +185,8 @@ def rollback_cache(cache: Path) -> dict:
     histories = sorted((Path(cache) / "history").glob("*.json"), key=lambda p: p.stat().st_mtime_ns, reverse=True)
     for path in histories:
         previous = read_json(path)
+        if any(model.get('role') in {'vlm_base','vlm_adapter'} for model in previous.get('models',[])):
+            continue
         if all(verify_files(Path(model["local_folder"]), model["files"]) for model in previous["models"]):
             atomic_json(Path(cache) / "active.json", previous)
             return previous
@@ -178,6 +204,8 @@ def make_registry_model(source: Path, *, model_id: str, role: str, version: str,
 
 
 def publish_model(hub: Path, source: Path, model: dict, *, baseline: bool = False):
+    if model.get("role") in {"vlm_base", "vlm_adapter"}:
+        raise ValueError("Генеративные модели не публикуются в CV-1 Vision")
     hub, source = Path(hub), Path(source)
     initialize_hub(hub)
     if not baseline:

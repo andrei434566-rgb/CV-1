@@ -2,9 +2,14 @@ name: Build CV-1 portable application
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing release containing the Vision model ZIP
+        type: string
+        required: false
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   PYTHONUTF8: '1'
@@ -17,6 +22,8 @@ jobs:
     steps:
       - name: Get source code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_tag || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -39,6 +46,18 @@ jobs:
           Copy-Item -Path 'C:\Program Files\Tesseract-OCR\*' -Destination tools/tesseract -Recurse -Force
           Invoke-WebRequest -Uri 'https://github.com/tesseract-ocr/tessdata_fast/raw/main/rus.traineddata' -OutFile tools/tesseract/tessdata/rus.traineddata
 
+      - name: Download and verify published classifier
+        if: inputs.release_tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        shell: pwsh
+        run: |
+          gh release download $env:RELEASE_TAG --pattern CV1_Vision_Model.zip
+          if ($LASTEXITCODE -ne 0) { throw "Could not download the classifier" }
+          Expand-Archive -LiteralPath CV1_Vision_Model.zip -DestinationPath .
+          python -c "from app.infrastructure.local_vision import default_model_folder, read_model_card; read_model_card(default_model_folder())"
+
       - name: Build portable Kern Analyzer
         run: python -m PyInstaller --noconfirm --clean Kern_Analyzer.spec
 
@@ -55,9 +74,23 @@ jobs:
           if ($process.ExitCode -ne 0) { throw "Portable smoke test failed with exit code $($process.ExitCode)" }
 
       - name: Upload portable application
+        if: inputs.release_tag == ''
         uses: actions/upload-artifact@v4
         with:
           name: Kern_Analyzer-Windows
           path: dist/Kern_Analyzer
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish verified portable application
+        if: inputs.release_tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/Kern_Analyzer/* -DestinationPath Kern_Analyzer-Windows.zip -CompressionLevel Optimal
+          $hash = (Get-FileHash Kern_Analyzer-Windows.zip -Algorithm SHA256).Hash.ToLower()
+          "$hash  Kern_Analyzer-Windows.zip" | Set-Content Kern_Analyzer-Windows.zip.sha256 -Encoding ascii
+          gh release upload $env:RELEASE_TAG Kern_Analyzer-Windows.zip Kern_Analyzer-Windows.zip.sha256 --clobber
+          if ($LASTEXITCODE -ne 0) { throw "Could not publish the Windows application" }

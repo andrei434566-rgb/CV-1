@@ -1,4 +1,7 @@
-"""CV-1 contract: detectors own geometry; the local VLM supplies draft text only."""
+"""CV-1 contract: geometry is fixed; the local classifier supplies draft attributes.
+
+Historical __vlm_* storage keys are retained for old project compatibility.
+"""
 
 from __future__ import annotations
 
@@ -35,7 +38,10 @@ def geometry_signature(detection: FaciesDetection) -> str:
 
 
 def _input_signature(detection: FaciesDetection) -> str:
-    payload = [detection.label, detection.depth_from, detection.depth_to, detection.attributes]
+    # Reviewing current queue warnings does not edit geological input. A later
+    # model result invalidates that review stamp through the queue fingerprint.
+    attributes={key:value for key,value in detection.attributes.items() if key!='__review_queue_ack'}
+    payload = [detection.label, detection.depth_from, detection.depth_to, attributes]
     return hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False, allow_nan=False).encode("utf-8")).hexdigest()
 
 
@@ -175,7 +181,11 @@ def write_interval_crop(record: PhotoRecord, job: IntervalJob, destination: Path
     cv2.fillPoly(mask, [contour - np.array([left, top])], 255)
     crop[mask == 0] = 255
     destination.parent.mkdir(parents=True, exist_ok=True)
-    ok, encoded = cv2.imencode(".png", crop)
+    # Alpha preserves the exact YOLO mask for photographic measurements; the
+    # existing RGB pixels (including white exterior) remain unchanged for CNN.
+    rgba=cv2.cvtColor(crop,cv2.COLOR_BGR2BGRA)
+    rgba[:,:,3]=mask
+    ok, encoded = cv2.imencode(".png", rgba)
     if not ok:
         raise ValueError("Не удалось подготовить фрагмент для локальной модели.")
     destination.write_bytes(encoded.tobytes())
@@ -237,12 +247,34 @@ def apply_interval_description(record: PhotoRecord, job: IntervalJob, response: 
             "Детектор столбиков керна: рамка целого столбика"
             if is_core_column else "YOLO masks.xy"
         ),
-        "Источник описания": "локальная VLM; черновик",
-        "Статус интерпретации": "черновик VLM, требуется проверка геолога",
+        "Источник описания": "локальный классификатор CV-1 Vision; описание по шаблону" if response.get("engine") == "vision" else "локальная VLM; черновик",
+        "Статус интерпретации": "черновик классификатора, требуется проверка геолога" if response.get("engine") == "vision" else "черновик VLM, требуется проверка геолога",
     })
     model_info = response.get("model_info")
     if isinstance(model_info, dict):
         attributes["__vlm_model_info"] = json.dumps(model_info, ensure_ascii=False, sort_keys=True)
+    if response.get("engine") == "vision":
+        attributes["__description_engine"] = "vision"
+        attributes["__attribute_suggestions"] = json.dumps(response.get("attribute_suggestions", {}), ensure_ascii=False)
+        attributes["__personal_predictions"] = json.dumps(response.get("personal_predictions", []), ensure_ascii=False)
+        attributes["__vision_predictions"] = json.dumps(response.get("predictions", []), ensure_ascii=False)
+        attributes["__vision_field_confidence"] = json.dumps(response.get("field_confidence", {}), ensure_ascii=False)
+        attributes["__vision_facies_trained"] = "0"
+        attributes["__vision_lithology_review_required"] = "1" if response.get("lithology_review_required", True) else "0"
+        if isinstance(response.get("image_quality"),dict):
+            attributes["__image_quality"] = json.dumps(response["image_quality"],ensure_ascii=False,allow_nan=False)
+        observations = response.get("observations") or {}
+        if isinstance(observations.get("visual_hint"), str):
+            attributes["__vision_visual_hint"] = observations["visual_hint"][:1000]
+        color = observations.get("color")
+        from app.infrastructure.core_color_hint import apply_photo_color,color_is_confirmed
+        previous_auto_color=attributes.get('__vision_color')
+        auto_color_matches=bool(previous_auto_color and attributes.get('Цвет')==previous_auto_color)
+        if isinstance(color,str) and color:
+            measurement=observations.get('color_measurement')
+            apply_photo_color(attributes,measurement if isinstance(measurement,dict) else {'label':color})
+        elif 'color' in observations and not color and auto_color_matches and not color_is_confirmed(attributes):
+            attributes.pop('Цвет',None);attributes.pop('__vision_color',None);attributes.pop('__color_measurement',None)
     if isinstance(response.get("timing"), dict):
         attributes["__vlm_timing"] = json.dumps(response["timing"], ensure_ascii=False, sort_keys=True)
     job.detection.label = values["facies_name"] or UNRECOGNIZED_FACIES

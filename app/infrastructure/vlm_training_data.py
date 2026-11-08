@@ -23,6 +23,7 @@ def _expert_description_fields(detection) -> dict[str, str]:
         str(key): str(value)
         for key, value in (detection.attributes or {}).items()
         if not str(key).startswith("__") or str(key).startswith("__vlm_")
+        or str(key) == "__description_assumptions"
     }
 
 

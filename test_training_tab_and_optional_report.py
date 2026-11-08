@@ -125,7 +125,7 @@ class TrainingTabAndReportTests(unittest.TestCase):
             time.sleep(.005)
         self.assertFalse(page.busy, "Background import did not finish")
 
-    def test_word_pairs_prepare_in_background_and_train_through_local_runner(self):
+    def test_word_pairs_prepare_and_open_supervised_training(self):
         self.window.show_training_center()
         center = self.window._training_center
         self.assertIs(self.window.sheets.currentWidget(), self.window.workspace)
@@ -167,30 +167,11 @@ class TrainingTabAndReportTests(unittest.TestCase):
         self.assertTrue(manifest.is_file())
         self.assertTrue(page.train_button.isEnabled())
         self.assertEqual(json.loads(manifest.read_text(encoding="utf-8"))["metadata"]["photo_id"], "0001")
-        base = self.root / "base"
-        base.mkdir()
-        (base / "config.json").write_text("{}")
-        python = self.root / "python.exe"
-        python.touch()
-        process = Mock()
-        process.state.return_value = QProcess.ProcessState.NotRunning
-        process.waitForStarted.return_value = True
-        center.process = process
-        config = {"python": str(python), "base": str(base), "adapter": "", "theory_adapter": ""}
-        with (
-            patch.object(self.window, "_local_vlm_config", return_value=config),
-            patch("app.ui.dialogs.training_center_dialog.user_data_root", return_value=self.root),
-            patch.object(self.window._vlm_client, "stop") as stop,
-        ):
-            center._train("word_pairs")
-        stop.assert_called_once()
-        args = process.start.call_args.args[1]
-        self.assertEqual(args[args.index("--manifest") + 1], str(manifest))
-        self.assertEqual(args[args.index("--model") + 1], str(base))
-        self.assertNotIn("--experimental-candidates", args)
-        self.assertNotIn("--initial-adapter", args)
-        self.assertFalse(page.train_button.isEnabled())
-        page.set_training_busy(False)
+        dialog_path = "app.ui.dialogs.supervised_learning_dialog.SupervisedLearningDialog"
+        with patch(dialog_path) as classifier:
+            page.train_button.click()
+        self.assertEqual(classifier.call_args.args[0], str(manifest))
+        classifier.return_value.exec.assert_called_once()
         page.photos.setText(str(self.root / "другая папка"))
         self.assertFalse(page.train_button.isEnabled())
         self.assertIsNone(self.settings.value("training/word_pairs_manifest"))

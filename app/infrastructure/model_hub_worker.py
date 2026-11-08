@@ -5,7 +5,7 @@ from pathlib import Path
 if not __package__:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from app.infrastructure.model_hub import atomic_json, materialize_packet, read_json, rollback_cache, submit_reviewed_packet, sync_models
+from app.infrastructure.model_hub import atomic_json, initialize_hub, materialize_packet, probe_hub, read_json, rollback_cache, submit_reviewed_packet, sync_models
 
 
 def main(job_file: str) -> int:
@@ -13,7 +13,11 @@ def main(job_file: str) -> int:
     result_path = Path(job["result"])
     try:
         operation = job["operation"]
-        if operation == "sync":
+        if operation in {'probe', 'initialize'}:
+            if operation == 'initialize':
+                initialize_hub(Path(job['hub']))
+            result = probe_hub(Path(job['hub']))
+        elif operation == "sync":
             result = sync_models(Path(job["hub"]), Path(job["cache"]))
         elif operation == "rollback":
             result = {"active": rollback_cache(Path(job["cache"])), "changed": True}

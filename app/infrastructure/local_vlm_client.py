@@ -1,8 +1,9 @@
-"""Qt transport for an offline, long-lived Qwen Python process."""
+"""Legacy-compatible Qt transport for the offline non-generative CV worker."""
 
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from uuid import uuid4
 
@@ -35,12 +36,16 @@ class LocalVlmClient(QObject):
         self._request_timeout.timeout.connect(self._timed_out)
 
     def send(self, python: str, payload: dict) -> str:
-        python_path = Path(python)
-        runner = bundled_root() / "app" / "infrastructure" / "local_vlm_runner.py"
-        if not python_path.is_file():
-            raise FileNotFoundError("Не найден локальный Python для VLM. Укажите его в настройках ИИ.")
-        if not runner.is_file():
-            raise FileNotFoundError("Не найден локальный модуль VLM в приложении.")
+        if getattr(sys, "frozen", False):
+            python = sys.executable
+            arguments = ["--vision-worker"]
+        else:
+            runner = bundled_root() / "app" / "infrastructure" / "local_vision_runner.py"
+            if not Path(python).is_file():
+                raise FileNotFoundError("Не найден Python для распознавания. Укажите его в настройках помощника.")
+            if not runner.is_file():
+                raise FileNotFoundError("Не найден локальный модуль CV-1 Vision в приложении.")
+            arguments = ["-u", str(runner)]
         if self.process.state() != QProcess.ProcessState.NotRunning and self._python != python:
             self.stop()
         if self.process.state() == QProcess.ProcessState.NotRunning:
@@ -50,16 +55,16 @@ class LocalVlmClient(QObject):
             environment.insert("PYTHONIOENCODING", "utf-8")
             environment.insert("PYTHONUTF8", "1")
             self.process.setProcessEnvironment(environment)
-            self.process.start(python, ["-u", str(runner)])
+            self.process.start(python, arguments)
             if not self.process.waitForStarted(5000):
-                raise RuntimeError("Не удалось запустить локальный Python VLM: " + self.process.errorString())
+                raise RuntimeError("Не удалось запустить локальное распознавание: " + self.process.errorString())
             self.state_changed.emit("●  Готов к работе")
         request_id = uuid4().hex
         payload = dict(payload, id=request_id)
         self._pending.add(request_id)
         self.process.write((json.dumps(payload, ensure_ascii=False) + "\n").encode("utf-8"))
         self._slow_notice.start(8000)
-        self._request_timeout.start(240000)
+        self._request_timeout.start(120000)
         return request_id
 
     def _read_output(self) -> None:
@@ -85,7 +90,7 @@ class LocalVlmClient(QObject):
         self._slow_notice.stop()
         self._request_timeout.stop()
         if self._pending:
-            error = self._stderr_tail.strip() or "Локальный процесс VLM завершился до ответа."
+            error = self._stderr_tail.strip() or "Локальный процесс распознавания завершился до ответа."
             for request_id in tuple(self._pending):
                 self.reply.emit({"id": request_id, "ok": False, "error": error})
             self._pending.clear()
@@ -101,7 +106,7 @@ class LocalVlmClient(QObject):
         for request_id in pending:
             self.reply.emit({
                 "id": request_id, "ok": False,
-                "error": "Qwen не ответила за 4 минуты. Проверьте видеопамять и локальные пути модели в ⚙ → Настроить локальную VLM.",
+                "error": "Распознавание не завершилось за 2 минуты. Проверьте модель и Python в настройках помощника.",
             })
 
     def stop(self) -> None:

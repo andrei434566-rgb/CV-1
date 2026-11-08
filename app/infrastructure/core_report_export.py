@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import copy
 from datetime import datetime
 import hashlib
+import json
 import math
 from pathlib import Path
 import re
@@ -89,6 +90,10 @@ def _append_unique(existing: object, added: object) -> str:
 
 def _merge_layer_attributes(target: dict, source: dict) -> None:
     for key, value in dict(source or {}).items():
+        if key=='__description_assumptions':
+            from app.infrastructure.description_template import read_assumptions
+            target[key]=json.dumps(sorted(read_assumptions(target)|read_assumptions(source)),ensure_ascii=False)
+            continue
         if value in (None, ""):
             continue
         if target.get(key) in (None, ""):
@@ -112,6 +117,7 @@ def _merged_layers(well: dict) -> list[dict]:
     for _, source in indexed_layers:
         layer = dict(source)
         layer["attributes"] = dict(source.get("attributes") or {})
+        layer['source_ids']=list(source.get('source_ids') or ([source['source_id']] if source.get('source_id') else []))
         start, end = _depth_or_none(layer.get("depth_from")), _depth_or_none(layer.get("depth_to"))
         if (
             merged
@@ -134,10 +140,19 @@ def _merged_layers(well: dict) -> list[dict]:
                 previous_start = _depth_or_none(previous.get("depth_from"))
                 previous["depth_from"] = min(previous_start if previous_start is not None else start, start)
                 previous["depth_to"] = max(previous_end, end)
+                previous['description_confirmed']=previous.get('description_confirmed') is True and layer.get('description_confirmed') is True
+                previous['source_ids']=list(dict.fromkeys(previous.get('source_ids',[])+layer['source_ids']))
                 _merge_layer_attributes(previous["attributes"], layer["attributes"])
                 continue
         merged.append(layer)
     return merged
+
+
+def prepare_report_rows(well: dict) -> tuple[list[dict],list[dict]]:
+    """Use the same legacy merge/drilling splits for audit and actual export."""
+    try:runs=_report_drilling_runs(dict(well.get('excel_report_inputs') or {}))
+    except ValueError:runs=[]
+    return runs,_layers_at_drilling_boundaries(_merged_layers(well),runs)
 
 
 def _layer_rows(well: dict) -> list[tuple[str, str, str]]:
@@ -324,16 +339,17 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
         used_titles.add(title.casefold())
         sheet.title = title
         report_inputs = dict(well.get("excel_report_inputs") or {})
-        try:
-            runs = _report_drilling_runs(report_inputs)
-        except ValueError:
-            # A malformed/incomplete passport must remain exportable. Missing
-            # drilling numbers and invalid numeric inputs are flagged below.
-            runs = []
+        # A malformed passport remains exportable. Audit and output use the
+        # exact same rows, including splits at drilling-run boundaries.
+        runs,layers=prepare_report_rows(well)
         if runs:
             report_inputs["core_top"] = min(run["top"] for run in runs)
             report_inputs["core_base"] = max(run["base"] for run in runs)
-        layers = _layers_at_drilling_boundaries(_merged_layers(well), runs)
+        from app.infrastructure.core_report_audit import audit_report_wells
+        row_audit=audit_report_wells([{**well,'layers':layers}])
+        row_messages={number:[] for number in range(len(layers))}
+        for issue in row_audit.issues:
+            for number in issue.rows:row_messages[number].append({'message':issue.message,'code':issue.code})
         last_row = max(sheet.max_row, len(layers) + 3)
         for row_number in range(4, last_row + 1):
             for column in range(1, 23):
@@ -387,6 +403,9 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
                 description = str(sheet[f"V{row_number}"].value or "")
                 if note not in description:
                     sheet[f"V{row_number}"] = (description + "\n" + note).strip()
+            review_attributes=dict(attributes)
+            review_attributes['__report_audit']=json.dumps(row_messages.get(row_number-4,[]),ensure_ascii=False)
+            _attach_description_review(sheet, row_number, review_attributes)
             if any(sheet[f"{letter}{row_number}"].value for letter in ("S", "T", "U", "V")):
                 lines = 1
                 for letter in ("S", "T", "U", "V"):
@@ -419,6 +438,36 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
     workbook.save(file_path)
 
 
+def _attach_description_review(sheet, row_number, attributes):
+    """Keep review questions beside the exact exported text, without rewriting it."""
+    from openpyxl.comments import Comment
+    from openpyxl.formatting.rule import FormulaRule
+    from openpyxl.styles import Font, PatternFill
+    try:
+        rows=json.loads(attributes.get("__description_review", "[]"))
+        messages=[row['message'] for row in rows if isinstance(row,dict) and isinstance(row.get('message'),str)] if isinstance(rows,list) else []
+    except (ValueError,TypeError):
+        messages=[]
+    try:
+        quality=json.loads(attributes.get('__image_quality') or attributes.get('__photo_quality') or '{}')
+        if isinstance(quality,dict):
+            messages.extend('Фото: '+row['message'] for row in (quality.get('issues') or []) if isinstance(row,dict) and isinstance(row.get('message'),str))
+    except (ValueError,TypeError):pass
+    try:
+        rows=json.loads(attributes.get('__report_audit','[]'))
+        if isinstance(rows,list):
+            messages.extend('Отчёт: '+row['message'] for row in rows if isinstance(row,dict) and isinstance(row.get('message'),str))
+    except (ValueError,TypeError):pass
+    if not messages:return
+    cell=sheet[f"V{row_number}"]
+    cell.comment=Comment("Проверить признаки в карточке CV-1:\n\n"+"\n\n".join(messages)[:6000],"CV-1")
+    literal=str(cell.value or '').replace('"','""').replace('\r','').replace('\n','"&CHAR(10)&"')
+    formula=f'EXACT(V{row_number},"{literal}")'
+    if len(formula)<7900:
+        sheet.conditional_formatting.add(cell.coordinate,FormulaRule(formula=[formula],
+            fill=PatternFill("solid",fgColor="FF0000"),font=Font(color="000000")))
+
+
 def _highlight_report_problems(sheet, first: int, last: int) -> None:
     """Excel evaluates these rules again after a specialist fixes a cell."""
     from openpyxl.formatting.rule import FormulaRule
@@ -441,7 +490,7 @@ def _highlight_report_problems(sheet, first: int, last: int) -> None:
                   'AND(ISNUMBER($D{r}),$M{r}<$D{r}),AND(ISNUMBER($E{r}),$N{r}>$E{r}))')
     mark("M N R", depth_rule)
     mark("O P", depth_rule[:-1] + ',NOT(ISNUMBER($G{r})))')
-    uncertain = ["не установ", "не определ", "уверенность низ", "низкая уверенность", "ошибка", "оборван"]
+    uncertain = ["не установ", "не определ", "уверенность низ", "низкая уверенность", "ошибка", "оборван", "предполож"]
     checks = ','.join(f'ISNUMBER(SEARCH("{term}",{{c}}{{r}}))' for term in uncertain)
     mark("S T U V", 'OR(LEN(TRIM({c}{r}&""))=0,' + checks + ')')
     # Both sides of an overlap are visible, and the warning clears if either

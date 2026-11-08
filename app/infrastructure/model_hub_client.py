@@ -47,8 +47,10 @@ class ModelHubClient(QObject):
         if not self.process.waitForStarted(2000):
             self.finished.emit(operation, {"ok": False, "error": self.process.errorString()})
             return False
-        self.timer.start(20 * 60 * 1000)
-        self.status_changed.emit("Проверка общих моделей…" if operation == "sync" else "Передача проверенных данных…")
+        self.timer.start(15000 if operation == 'probe' else 60000 if operation == 'initialize' else 20 * 60 * 1000)
+        labels = {'probe':'Проверяю доступ к серверной папке…', 'initialize':'Подготавливаю папку CV-1…',
+                  'sync':'Проверка общих моделей…', 'submit':'Передача проверенных данных…', 'rollback':'Возвращаю предыдущую версию…'}
+        self.status_changed.emit(labels.get(operation, 'Работа с общей папкой…'))
         return True
 
     def _finished(self, _code, _status):

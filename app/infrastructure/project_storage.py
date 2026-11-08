@@ -59,6 +59,8 @@ def save_project(
                 "core_columns_verified": record.core_columns_verified,
                 "analysis_mode": record.analysis_mode,
                 "analysis_issues": record.analysis_issues,
+                "photo_quality": record.photo_quality,
+                "photo_review_ack": record.photo_review_ack,
                 "display_size": [record.pixmap.width(), record.pixmap.height()],
                 "position": [positions.get(record.identifier, QPointF()).x(), positions.get(record.identifier, QPointF()).y()],
                 "detections": [
@@ -157,6 +159,8 @@ def load_project(folder: Path) -> tuple[str, list[PhotoRecord], dict[str, QPoint
                 core_columns_verified=bool(item.get("core_columns_verified", False)),
                 analysis_mode=str(item.get("analysis_mode") or "legacy"),
                 analysis_issues=[dict(issue) for issue in item.get("analysis_issues", []) if isinstance(issue, dict)],
+                photo_quality=dict(item["photo_quality"]) if isinstance(item.get("photo_quality"),dict) else {},
+                photo_review_ack=str(item.get("photo_review_ack") or ""),
             )
         )
         position = item.get("position") or [0, 0]

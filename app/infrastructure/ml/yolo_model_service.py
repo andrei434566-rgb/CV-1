@@ -353,8 +353,8 @@ class YoloModelService:
         for column_index, left, top, right, bottom in valid_columns:
             x0 = max(0, int(math.floor((left - x_origin) * scale)))
             y0 = max(0, int(math.floor((top - y_origin) * scale)))
-            x1 = min(raster_width, int(math.ceil((right - x_origin) * scale)) + 1)
-            y1 = min(raster_height, int(math.ceil((bottom - y_origin) * scale)) + 1)
+            x1 = min(raster_width, int(math.ceil((right - x_origin) * scale)))
+            y1 = min(raster_height, int(math.ceil((bottom - y_origin) * scale)))
             if x1 <= x0 or y1 <= y0:
                 continue
             column_coverage = covered[y0:y1, x0:x1]
@@ -834,6 +834,7 @@ class SegmentationWorker(QObject):
     # path, gap-free facies bands, stage-1 core-column rectangles
     image_ready = Signal(str, object, object)
     geometry_issues_ready = Signal(str, object)
+    photo_quality_ready = Signal(str, object)
     failed = Signal(str)
     finished = Signal()
 
@@ -874,6 +875,9 @@ class SegmentationWorker(QObject):
                     recognized_columns = normalize_columns(core_columns, (width, height))
                 else:
                     recognized_columns = column_recognizer.recognize_path(image_path, (width, height))
+                from app.infrastructure.photo_quality import audit_file
+                quality=audit_file(image_path,recognized_columns,(width,height))
+                self.photo_quality_ready.emit(image_path,quality)
                 stage = "полигоны YOLO" if self.geometry_only else "интервалы и фации"
                 self.progress_changed.emit(index, total, f"Этап 2/2 · {stage} · {Path(image_path).name}")
                 detections = service.predict(image_path, (width, height), recognized_columns)

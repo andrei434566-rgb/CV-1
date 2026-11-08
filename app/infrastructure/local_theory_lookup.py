@@ -128,7 +128,8 @@ def lookup_theory_answer(question: str, cards_path: Path, *, include_sources: bo
     ):
         return None
     query = _normalize(_question_without_source_suffix(question) if include_sources else question)
-    if len(query) < 12:
+    query = re.sub(r"^пожалуйста | пожалуйста$", "", query)
+    if len(query) < 5:
         return None
     corpus = _load_cards(str(cards_path))
     best_card = None

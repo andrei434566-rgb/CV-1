@@ -49,8 +49,8 @@ class WordPhotoTrainingWidget(QWidget):
         layout = QVBoxLayout(self)
         intro = QLabel(
             "1. Назовите фотографии 0001.jpg, 0002.jpg… и сложите в папку.\n"
-            "2. В одном Word перед каждым описанием напишите «Фото 0001», «Фото 0002»…\n"
-            "Текст из Excel можно вставлять абзацами или таблицей. Описания сохраняются целиком."
+            "2. В одном Word перед каждым описанием напишите отдельной строкой «0001», «0002»… или «Фото 0001»…\n"
+            "Номер без слова «Фото» ставьте вне таблицы. Текст из Excel ниже можно вставлять абзацами или таблицей. Описания сохраняются целиком."
         )
         intro.setWordWrap(True)
         layout.addWidget(intro)
@@ -116,14 +116,18 @@ class WordPhotoTrainingWidget(QWidget):
         self.manifest_label.setWordWrap(True)
         layout.addWidget(self.manifest_label)
         self.continue_adapter = QCheckBox("Продолжить с подключённой дообученной модели")
-        layout.addWidget(self.continue_adapter)
-        self.train_button = QPushButton("Начать локальное обучение на этих парах")
+        self.continue_adapter.hide()
+        self.train_button = QPushButton("Указать признаки и обучить распознавание…")
         self.train_button.setObjectName("trainingPrimary")
         self.train_button.clicked.connect(self.train_requested)
         layout.addWidget(self.train_button)
+        self.open_prepared = QPushButton("Открыть папку уже подготовленной базы…")
+        self.open_prepared.clicked.connect(self._open_prepared)
+        layout.addWidget(self.open_prepared)
         note = QLabel(
-            "Проверка и подготовка работают без видеокарты. Обучение использует локальную Qwen и NVIDIA. "
-            "Новая версия сохраняется отдельно. Для обучения границ сегментации нужны проверенные контуры на фото."
+            "После подготовки пар откройте обучение распознаванию: укажите скважины, метки пород или фаций "
+            "и соответствующие участки фото. Полные описания Word сохраняются. "
+            "Для обучения границ сегментации нужны проверенные контуры на фото."
         )
         note.setWordWrap(True)
         layout.addWidget(note)
@@ -134,6 +138,19 @@ class WordPhotoTrainingWidget(QWidget):
     @property
     def busy(self) -> bool:
         return self.job is not None
+
+    def _open_prepared(self):
+        from app.infrastructure.supervised_learning import rows_from_word_manifest
+        folder = QFileDialog.getExistingDirectory(self, "Папка подготовленной базы фото + Word")
+        if not folder: return
+        manifest = Path(folder) / "word_photo_approved.jsonl"
+        try:
+            rows = rows_from_word_manifest(manifest)
+        except Exception as exc:
+            self.status.setText("База не открыта: " + str(exc)); return
+        self.settings.setValue("training/word_pairs_manifest", str(manifest)); self.settings.sync()
+        self.status.setText(f"Открыто пар: {len(rows)}. Можно продолжить проверку меток и обучение.")
+        self._refresh_buttons()
 
     def _choose_photos(self) -> None:
         folder = QFileDialog.getExistingDirectory(self, "Папка фотографий для обучения", self.photos.text())
@@ -247,7 +264,7 @@ class WordPhotoTrainingWidget(QWidget):
     def _refresh_buttons(self, *_args) -> None:
         busy = self.busy or self._training_busy
         for control in (self.photos, self.document, self.choose_photos, self.choose_document, self.choose_word_folder,
-                        self.check_button, self.approval, self.continue_adapter):
+                        self.check_button, self.approval, self.continue_adapter, self.open_prepared):
             control.setEnabled(not busy)
         self.export_button.setEnabled(not busy and bool(self.inspection and self.inspection.ready_pairs) and self.approval.isChecked())
         manifest = str(self.settings.value("training/word_pairs_manifest", "") or "")

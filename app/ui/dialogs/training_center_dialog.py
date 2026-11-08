@@ -7,10 +7,10 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
-from PySide6.QtCore import QProcess, QProcessEnvironment, QSettings
-from PySide6.QtGui import QColor, QPalette
+from PySide6.QtCore import QProcess, QProcessEnvironment, QSettings, QUrl
+from PySide6.QtGui import QColor, QPalette, QDesktopServices
 from PySide6.QtWidgets import (
-    QCheckBox, QDialog, QFileDialog, QFrame, QGroupBox, QHBoxLayout, QLabel,
+    QDialog, QFileDialog, QFrame, QGroupBox, QHBoxLayout, QLabel,
     QMessageBox, QPushButton, QScrollArea, QTabWidget, QTextEdit, QVBoxLayout, QWidget,
 )
 
@@ -33,6 +33,7 @@ class TrainingCenterDialog(QDialog):
         self.process.finished.connect(self._finished)
         self._track = ""
         self._output_dir: Path | None = None
+        self._personal_dialog = None
         self.resize(940, 840)
         self.setWindowTitle("Обучение · Kern Analyzer")
         layout = QVBoxLayout(self)
@@ -41,13 +42,30 @@ class TrainingCenterDialog(QDialog):
         title = QLabel("Обучение модели", self)
         title.setObjectName("trainingTitle")
         layout.addWidget(title)
+        from app.infrastructure.local_vision import default_model_folder, read_model_card
+        try:
+            folder=str(self.settings.value('vision/model_folder','') or '') or default_model_folder()
+            card = read_model_card(folder)
+            status = f"Базовое распознавание: {card['architecture']} · {len(card['classes'])} исходных групп, включая фон. Ваши признаки и фации обучаются отдельно как подсказки."
+            if card.get('noncommercial_only'):status+=' Только некоммерческие исследования.'
+        except (OSError, ValueError):
+            status = "Классификатор пород ещё не опубликован. Подготовка учебных пар и справочника доступна."
+        model_status = QLabel(status)
+        model_status.setWordWrap(True)
+        layout.addWidget(model_status)
+        rock_types=QPushButton('10 типов пород: признаки и состояние обучения…')
+        rock_types.clicked.connect(self._show_rock_types);layout.addWidget(rock_types)
+        report_button = QPushButton("Отчёт сравнения моделей")
+        report_button.clicked.connect(lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(
+            str(bundled_root() / "research_reports" / "vision_20261104" / "comparison.json"))))
+        layout.addWidget(report_button)
         tabs = QTabWidget(self)
         layout.addWidget(tabs, 1)
         word_scroll = QScrollArea(self)
         word_scroll.setWidgetResizable(True)
         word_scroll.setFrameShape(QFrame.Shape.NoFrame)
         self.word_pairs = WordPhotoTrainingWidget(self.settings, word_scroll)
-        self.word_pairs.train_requested.connect(lambda: self._train("word_pairs"))
+        self.word_pairs.train_requested.connect(self._train_personal_classifier)
         self.word_pairs.dataset_ready.connect(lambda path: self.log.append(f"Фото + Word: {path}"))
         word_scroll.setWidget(self.word_pairs)
         tabs.addTab(word_scroll, "Фото + Word")
@@ -60,8 +78,8 @@ class TrainingCenterDialog(QDialog):
         tabs.addTab(scroll, "Другие способы обучения")
 
         intro = QLabel(
-            "Три независимых потока. Фото + Excel обучают Qwen описывать видимые признаки; "
-            "теория пополняет локальный поиск или отдельный текстовый LoRA; "
+            "Фото + Excel и Word формируют проверенную учебную базу; "
+            "теория пополняет локальный справочник; "
             "проверенные контуры обучают YOLO сегментации."
         )
         intro.setWordWrap(True)
@@ -80,7 +98,7 @@ class TrainingCenterDialog(QDialog):
         catalog_layout.addWidget(choose_catalog)
         content_layout.addWidget(catalog_box)
 
-        pairs = QGroupBox("1. Проверенные пары фото + Excel → Qwen3-VL")
+        pairs = QGroupBox("1. Проверенные пары фото + Excel")
         p = QVBoxLayout(pairs)
         self.pair_status = QLabel()
         p.addWidget(self.pair_status)
@@ -102,20 +120,14 @@ class TrainingCenterDialog(QDialog):
         self.pair_manifest = QLabel("Манифест: —")
         self.pair_manifest.setWordWrap(True)
         p.addWidget(self.pair_manifest)
-        self.continue_adapter = QCheckBox("Продолжить с активного LoRA описаний")
-        self.continue_adapter.setChecked(True)
-        p.addWidget(self.continue_adapter)
-        self.train_pairs = QPushButton("Дообучить Qwen на парах")
-        self.train_pairs.clicked.connect(lambda: self._train("pairs"))
-        p.addWidget(self.train_pairs)
         content_layout.addWidget(pairs)
 
-        theory = QGroupBox("2. Теория → локальный поиск или отдельный текстовый LoRA")
+        theory = QGroupBox("2. Теория → локальный справочник")
         t = QVBoxLayout(theory)
         explanation = QLabel(
             "PDF/DOCX/TXT/Excel можно добавить в папки знаний для поиска по источникам. "
-            "Для дообучения используйте проверенную .xlsx/.csv таблицу с колонками «Вопрос» и «Ответ». "
-            "Свободный текст не превращается автоматически в выдуманные ответы."
+            "Проверенные вопросы и ответы можно загрузить отдельно. "
+            "Теория используется для справки. Распознавание пород и фаций обучается на фото с подтверждёнными метками."
         )
         explanation.setWordWrap(True)
         t.addWidget(explanation)
@@ -135,13 +147,6 @@ class TrainingCenterDialog(QDialog):
         self.theory_manifest = QLabel("Текстовый манифест: —")
         self.theory_manifest.setWordWrap(True)
         t.addWidget(self.theory_manifest)
-        self.continue_theory_adapter = QCheckBox("Продолжить с активного текстового LoRA")
-        theory_adapter = Path(self.main._local_vlm_config()["theory_adapter"])
-        self.continue_theory_adapter.setChecked((theory_adapter / "adapter_config.json").is_file())
-        t.addWidget(self.continue_theory_adapter)
-        self.train_theory = QPushButton("Дообучить отдельный текстовый LoRA")
-        self.train_theory.clicked.connect(lambda: self._train("theory"))
-        t.addWidget(self.train_theory)
         content_layout.addWidget(theory)
 
         yolo = QGroupBox("3. Предобученная .pt → YOLO сегментации")
@@ -224,7 +229,8 @@ class TrainingCenterDialog(QDialog):
 
     @property
     def busy(self) -> bool:
-        return self.word_pairs.busy or self.process.state() != QProcess.ProcessState.NotRunning
+        return (self.word_pairs.busy or self.process.state() != QProcess.ProcessState.NotRunning
+                or bool(self._personal_dialog and self._personal_dialog.job))
 
     def refresh(self) -> None:
         catalog = self.main._primary_facies_catalog
@@ -251,6 +257,14 @@ class TrainingCenterDialog(QDialog):
     def _import_pairs(self) -> None:
         self.main.import_excel_photo_batch()
         self.refresh()
+
+    def _show_rock_types(self):
+        from app.infrastructure.local_vision import default_model_folder,read_model_card
+        from app.ui.dialogs.rock_types_dialog import RockTypesDialog
+        folder=str(self.settings.value('vision/model_folder','') or '') or default_model_folder()
+        try:card=read_model_card(folder)
+        except (OSError,ValueError):card={}
+        RockTypesDialog(self,card=card).exec()
 
     def _open_sources(self) -> None:
         self.main.show_open_datasets()
@@ -302,6 +316,19 @@ class TrainingCenterDialog(QDialog):
             return
         self.settings.setValue("training/theory_manifest", str(result["manifest"]))
         self.settings.remove("training/theory_additional_manifest")
+        # Make supplied QA available as literal source text, without text training.
+        passages = []
+        for line in destination.read_text(encoding="utf-8").splitlines():
+            record = json.loads(line)
+            turns = record.get("conversations", [])
+            if len(turns) == 2 and all(isinstance(t.get("value"), str) for t in turns):
+                passages.append("Вопрос: " + turns[0]["value"] + "\nОтвет: " + turns[1]["value"])
+        if passages:
+            destination.with_suffix(".txt").write_text("\n\n".join(passages), encoding="utf-8")
+            folders = list(self.main._local_vlm_config()["folders"])
+            if str(destination.parent) not in folders:
+                folders.append(str(destination.parent))
+            self.settings.setValue("vlm/knowledge_folders_json", json.dumps(folders, ensure_ascii=False))
         self.settings.sync()
         self.log.append(f"Сохранено проверяемых текстовых пар: {result['count']}. {destination}")
         self.refresh()
@@ -333,68 +360,18 @@ class TrainingCenterDialog(QDialog):
         self.main.start_fine_tune()
         self.refresh()
 
-    def _train(self, track: str) -> None:
-        if self.process.state() != QProcess.ProcessState.NotRunning:
-            QMessageBox.information(self, "Обучение", "Дождитесь завершения текущего обучения Qwen.")
-            return
-        if self.main._analysis_active or self.main._segmentation_thread is not None:
-            QMessageBox.information(self, "Обучение", "Дождитесь завершения анализа керна перед обучением Qwen.")
-            return
-        if (
-            getattr(self.main, "_training_thread", None) is not None
-            or getattr(self.main, "_column_training_thread", None) is not None
-            or getattr(self.main, "_analysis_pending", None) is not None
-            or getattr(self.main, "_vlm_chat_queue", None)
-            or getattr(self.main, "_chat_photo_thread", None) is not None
-            or self.word_pairs.busy
-        ):
-            QMessageBox.information(self, "Обучение", "Дождитесь окончания обработки, ответов в очереди или подготовки пар.")
-            return
-        manifest = Path(str(self.settings.value(f"training/{track}_manifest", "") or ""))
-        config = self.main._local_vlm_config()
-        python = Path(config["python"])
-        base = Path(config["base"])
-        script = bundled_root() / "app" / "infrastructure" / "ml" / "qwen_train.py"
-        if not manifest.is_file() or not python.is_file() or not (base / "config.json").is_file() or not script.is_file():
-            QMessageBox.warning(self, "Обучение Qwen", "Проверьте манифест, локальный Python и папку базовой Qwen в настройках ИИ.")
-            return
-        self._output_dir = user_data_root() / "vlm_models" / track / f"{datetime.now():%Y%m%d_%H%M%S}_{uuid4().hex[:6]}"
-        args = ["-u", str(script), "--model", str(base), "--manifest", str(manifest), "--output-dir", str(self._output_dir)]
-        additional = Path(str(self.settings.value(f"training/{track}_additional_manifest", "") or ""))
-        if additional.is_file() and additional != manifest:
-            args += ["--additional-manifest", str(additional)]
-        continue_adapter = self.word_pairs.continue_adapter if track == "word_pairs" else self.continue_adapter
-        if track in {"pairs", "word_pairs"} and continue_adapter.isChecked():
-            adapter = Path(config["adapter"])
-            if not (adapter / "adapter_config.json").is_file():
-                QMessageBox.warning(self, "Начальный LoRA", "Текущий адаптер не найден. Укажите его в настройках ИИ или снимите галочку продолжения.")
-                return
-            args += ["--initial-adapter", str(adapter)]
-        if track == "theory" and self.continue_theory_adapter.isChecked():
-            adapter = Path(config["theory_adapter"])
-            if not (adapter / "adapter_config.json").is_file():
-                QMessageBox.warning(self, "Начальный LoRA", "Текущий текстовый адаптер не найден. Укажите его в настройках ИИ или снимите галочку продолжения.")
-                return
-            args += ["--initial-adapter", str(adapter)]
-        if self.main._vlm_pending is not None:
-            QMessageBox.information(self, "Обучение Qwen", "Дождитесь текущего ответа ассистента и повторите запуск обучения.")
-            return
-        self.main._vlm_client.stop()
-        self._track = track
-        environment = QProcessEnvironment.systemEnvironment()
-        environment.insert("HF_HUB_OFFLINE", "1")
-        environment.insert("TRANSFORMERS_OFFLINE", "1")
-        environment.insert("PYTHONIOENCODING", "utf-8")
-        self.process.setProcessEnvironment(environment)
-        self.process.start(str(python), args)
-        if not self.process.waitForStarted(5000):
-            QMessageBox.critical(self, "Обучение Qwen", self.process.errorString())
-            return
-        self.train_pairs.setEnabled(False)
-        self.train_theory.setEnabled(False)
-        self.word_pairs.set_training_busy(True)
-        self.close_button.setEnabled(False)
-        self.log.append(f"Запущено локальное обучение {track}: {manifest}")
+    def _train_personal_classifier(self) -> None:
+        from app.infrastructure.local_vision import default_model_folder
+        from app.ui.dialogs.supervised_learning_dialog import SupervisedLearningDialog
+        manifest = str(self.settings.value("training/word_pairs_manifest", "") or "")
+        try:
+            dialog = SupervisedLearningDialog(manifest, default_model_folder(), self)
+            self._personal_dialog = dialog
+            dialog.exec()
+        except Exception as exc:
+            QMessageBox.warning(self, "Учебная база", str(exc))
+        finally:
+            self._personal_dialog = None
 
     def _read_output(self) -> None:
         data = bytes(self.process.readAllStandardOutput()).decode("utf-8", errors="replace")
@@ -403,30 +380,19 @@ class TrainingCenterDialog(QDialog):
 
     def _finished(self, code: int, _status) -> None:
         self._read_output()
-        self.train_pairs.setEnabled(True)
-        self.train_theory.setEnabled(True)
         self.word_pairs.set_training_busy(False)
         self.close_button.setEnabled(True)
-        output = self._output_dir
-        if code == 0 and output and (output / "adapter_config.json").is_file():
-            self.settings.setValue(f"training/{self._track}_candidate_adapter", str(output))
-            self.settings.sync()
-            self.log.append(f"Кандидат LoRA готов: {output}. Проверьте на независимых данных перед включением.")
-            QMessageBox.information(self, "Кандидат LoRA готов", f"{output}\n\nПроверьте ответы на отдельных скважинах. Затем выберите адаптер в настройках ИИ.")
-        else:
-            self.log.append(f"Обучение завершилось с кодом {code}. Проверьте журнал и локальную CUDA-память.")
-        if hasattr(self.main, "_schedule_vlm_dispatch"):
-            self.main._schedule_vlm_dispatch()
+        self.log.append(f"Локальная задача завершена: {code}.")
 
     def closeEvent(self, event) -> None:
         if self.busy:
-            QMessageBox.information(self, "Обучение идёт", "Дождитесь окончания подготовки пар или обучения Qwen, прежде чем закрывать окно.")
+            QMessageBox.information(self, "Обучение идёт", "Дождитесь окончания подготовки учебной базы, прежде чем закрывать окно.")
             event.ignore()
             return
         super().closeEvent(event)
 
     def reject(self) -> None:
         if self.busy:
-            QMessageBox.information(self, "Обучение идёт", "Дождитесь окончания подготовки пар или обучения Qwen, прежде чем закрывать окно.")
+            QMessageBox.information(self, "Обучение идёт", "Дождитесь окончания подготовки учебной базы, прежде чем закрывать окно.")
             return
         super().reject()

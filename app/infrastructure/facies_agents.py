@@ -7,7 +7,7 @@ make the Excel-to-image transformation repeatable and reviewable:
 * :class:`PhotoIntervalAgent` establishes the depth interval of a photograph;
 * :class:`ExcelFaciesMaskAgent` overlays verified Excel intervals as rectangles.
 
-The orchestration layer (including a local Qwen assistant) can call these
+The application can call these
 agents, inspect their messages and request manual correction.  The generated
 ``FaciesBand`` objects are suitable both for preview masks and for export to a
 YOLO-seg training dataset.

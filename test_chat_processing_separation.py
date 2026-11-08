@@ -24,6 +24,7 @@ class ChatProcessingSeparationTests(unittest.TestCase):
         window = SimpleNamespace(
             _vlm_dispatch_scheduled=True, _vlm_closing=False, _vlm_pending=None, _analysis_pending=pending,
             _segmentation_thread=None, _training_thread=None, _column_training_thread=None,
+            _training_active=lambda: False,
             _vlm_chat_queue=deque([request]), _analysis_active=True, _queued_records=[],
             _vlm_history=[], _chat_photo_histories={},
             _vlm_client=SimpleNamespace(send=lambda *args: sent.append(args) or "request-id"),
