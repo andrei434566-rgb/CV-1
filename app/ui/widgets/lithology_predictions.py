@@ -7,12 +7,15 @@ from PySide6.QtWidgets import QFrame, QGridLayout, QHBoxLayout, QLabel, QVBoxLay
 from app.runtime_paths import bundled_root
 from app.infrastructure.vision_models import LABELS, LABELS_RU
 from app.domain.rock_types import NATIVE_NAMES
-ALL_NAMES=dict(zip(LABELS,LABELS_RU))|NATIVE_NAMES
+ROCK_NAMES = {
+    code: name for code, name in (dict(zip(LABELS, LABELS_RU)) | NATIVE_NAMES).items()
+    if code not in {"garbage", "background"}
+}
 
 
 @lru_cache(maxsize=16)
 def reference_thumbnail(code):
-    if code not in ALL_NAMES:return QPixmap()
+    if code not in ROCK_NAMES:return QPixmap()
     return QPixmap(str(bundled_root()/'app/resources/lithology_examples'/f'{code}.jpg'))
 
 
@@ -39,7 +42,7 @@ class LithologyPredictionGallery(QFrame):
         for row in predictions if isinstance(predictions,list) else []:
             if not isinstance(row,dict):continue
             code=row.get('class');score=row.get('score')
-            if code not in ALL_NAMES or code in seen or isinstance(score,bool) or not isinstance(score,(int,float)) or not math.isfinite(score) or not 0<=score<=1:continue
+            if code not in ROCK_NAMES or code in seen or isinstance(score,bool) or not isinstance(score,(int,float)) or not math.isfinite(score) or not 0<=score<=1:continue
             seen.add(code);rows.append((code,float(score)))
         rows.sort(key=lambda row:-row[1])
         total=len(rows);rows=rows[:4]
@@ -55,12 +58,13 @@ class LithologyPredictionGallery(QFrame):
                              'Это не найденный ближайший аналог текущего интервала.')
             row.addWidget(image)
             text=QVBoxLayout();text.setSpacing(1)
-            name=QLabel(ALL_NAMES[code]);name.setWordWrap(True);name.setMaximumWidth(126)
+            name=QLabel(ROCK_NAMES[code]);name.setWordWrap(True);name.setMaximumWidth(126)
             text.addWidget(name)
             percentage=QLabel(f'{score:.0%}');percentage.setObjectName('lithologyPredictionScore');text.addWidget(percentage)
             row.addLayout(text,1);grid.addWidget(card,i//2,i%2)
         if not rows:
-            layout.addWidget(QLabel('Оценки классификатора ещё не получены.'))
+            layout.addWidget(QLabel('Оценки пород недоступны.'))
+            return
         note=QLabel('Фото — примеры классов. Проценты — оценки модели для выбранного участка.')
         note.setWordWrap(True);note.setMaximumWidth(420);note.setStyleSheet('font-size:11px;color:#596b83;');layout.addWidget(note)
         if total>4:

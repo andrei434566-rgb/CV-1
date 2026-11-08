@@ -26,14 +26,20 @@ class ColorUiTests(unittest.TestCase):
         self.addCleanup(card.close)
         return card
 
-    def test_all_four_classes_have_real_thumbnail_and_adjacent_model_score(self):
-        rows=[{'class':c,'score':s} for c,s in zip(('garbage','shale','limestone','sandstone'),(.73,.22,.03,.02))]
-        gallery=LithologyPredictionGallery(rows);self.addCleanup(gallery.close)
-        cards=gallery.findChildren(QFrame,'lithologyPredictionCard')
-        self.assertEqual(len(cards),4)
-        for card,score in zip(cards,('73%','22%','3%','2%')):
-            self.assertFalse(card.findChild(QLabel,'lithologyPredictionImage').pixmap().isNull())
-            self.assertEqual(card.findChild(QLabel,'lithologyPredictionScore').text(),score)
+    def test_gallery_shows_rock_thumbnails_and_scores_without_background(self):
+        for background in ("garbage", "background"):
+            with self.subTest(background=background):
+                rows = [
+                    {"class": code, "score": score}
+                    for code, score in zip((background, "shale", "limestone", "sandstone"), (.73, .22, .03, .02))
+                ]
+                gallery = LithologyPredictionGallery(rows)
+                self.addCleanup(gallery.close)
+                cards = gallery.findChildren(QFrame, "lithologyPredictionCard")
+                self.assertEqual([card.property("classCode") for card in cards], ["shale", "limestone", "sandstone"])
+                for card, score in zip(cards, ("22%", "3%", "2%")):
+                    self.assertFalse(card.findChild(QLabel, "lithologyPredictionImage").pixmap().isNull())
+                    self.assertEqual(card.findChild(QLabel, "lithologyPredictionScore").text(), score)
 
     def test_invalid_or_duplicate_probability_rows_do_not_create_fake_scores(self):
         gallery=LithologyPredictionGallery([{'class':'shale','score':float('nan')},{'class':'unknown','score':.9},
