@@ -3799,15 +3799,15 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Дождитесь завершения обработки фото, затем повторите правку.", 7000)
             return False
         moved = columns is not None and columns != record.core_columns
-        brushed = exclusions is not None and exclusions != record.manual_exclusions
-        if not moved and not brushed:
+        exclusions_changed = exclusions is not None and exclusions != record.manual_exclusions
+        if not moved and not exclusions_changed:
             return False
         previous = record.core_columns
         if moved:
             record.core_columns = [dict(column) for column in columns]
             record.core_columns_edited = True
             self._update_depth_segments_for_columns(record)
-        if brushed:
+        if exclusions_changed:
             record.manual_exclusions = exclusions
         record.photo_quality = {}
         record.photo_review_ack = ""
@@ -3849,7 +3849,7 @@ class MainWindow(QMainWindow):
 
     def _edit_core_photo(self, record, detection=None, parent=None):
         from app.ui.dialogs.photo_quality_dialog import PhotoQualityDialog
-        from app.infrastructure.photo_quality import normalize_exclusion_strokes
+        from app.infrastructure.photo_quality import normalize_manual_exclusions
 
         focus = None
         report = dict(record.photo_quality)
@@ -3872,7 +3872,7 @@ class MainWindow(QMainWindow):
         if dialog.exec() != QDialog.DialogCode.Accepted:
             return
         if not self._apply_core_photo_edits(
-                record, dialog.edited_columns(), normalize_exclusion_strokes(dialog.view.exclusions)):
+                record, dialog.edited_columns(), normalize_manual_exclusions(dialog.view.exclusions)):
             return
         if detection is not None and isinstance(parent, FaciesDialog):
             changed = before != tuple((p.x(), p.y()) for p in detection.polygon)

@@ -1,9 +1,9 @@
 """Inspect photographic warnings and the exact candidate label exclusions."""
 from PySide6.QtCore import QRectF, Qt
-from PySide6.QtGui import QColor, QPainterPath, QPen
+from PySide6.QtGui import QBrush, QColor, QPainterPath, QPen
 from PySide6.QtWidgets import (QCheckBox, QDialog, QDialogButtonBox, QHBoxLayout,
     QLabel, QPushButton, QSpinBox, QVBoxLayout)
-from app.infrastructure.photo_quality import MAX_EXCLUSION_POINTS, MAX_EXCLUSION_STROKES, normalize_exclusion_strokes
+from app.infrastructure.photo_quality import MAX_EXCLUSION_POINTS, MAX_MANUAL_EXCLUSIONS, normalize_manual_exclusions
 from app.ui.dialogs.feature_evidence_dialog import EvidenceView
 from app.ui.widgets.core_column_edges import CoreColumnEdges
 
@@ -18,11 +18,15 @@ QPushButton:checked { background: #dceeff; border-color: #087fca; }
 '''
 
 
-def exclusion_path(stroke, width, height):
-    """Draw the same round strokes on zoomed previews and colour crops."""
-    points = stroke["points"]
-    x, y = points[0]
+def exclusion_path(area, width, height):
+    """Project a manual exclusion to the original photo coordinates."""
     path = QPainterPath()
+    if "rect" in area:
+        l, t, r, b = area["rect"]
+        path.addRect(QRectF(l * width, t * height, (r - l) * width, (b - t) * height))
+        return path
+    points = area["points"]
+    x, y = points[0]
     path.moveTo(x * width, y * height)
     if len(points) == 1:
         path.lineTo(x * width + .001, y * height)
@@ -37,19 +41,26 @@ class _ExclusionView(EvidenceView):
         super().__init__(pixmap)
         self.selection_mode = False
         self.setDragMode(self.DragMode.ScrollHandDrag)
-        self.exclusions = normalize_exclusion_strokes(exclusions)
-        self.marks = [self._add_mark(stroke) for stroke in self.exclusions]
-        self.brush = False
+        self.exclusions = normalize_manual_exclusions(exclusions)
+        self.marks = [self._add_mark(area) for area in self.exclusions]
+        self.tool = None
         self.brush_size = 18
-        self.painting = False
         self.show_marks = True
+        self._anchor = None
+        self._draft = None
+        self._draft_mark = None
 
-    def _add_mark(self, stroke):
+    def _add_mark(self, area):
         width, height = self.photo.width(), self.photo.height()
-        pen = QPen(QColor(224, 55, 80, 110), 2 * stroke["radius"] * min(width, height))
-        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-        pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
-        mark = self.scene_data.addPath(exclusion_path(stroke, width, height), pen)
+        colour = QColor(224, 55, 80, 110)
+        path = exclusion_path(area, width, height)
+        if "rect" in area:
+            mark = self.scene_data.addPath(path, QPen(Qt.PenStyle.NoPen), QBrush(colour))
+        else:
+            pen = QPen(colour, 2 * area["radius"] * min(width, height))
+            pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+            pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+            mark = self.scene_data.addPath(path, pen)
         mark.setZValue(4)
         mark.setAcceptedMouseButtons(Qt.MouseButton.NoButton)
         return mark
@@ -58,46 +69,75 @@ class _ExclusionView(EvidenceView):
         return [round(max(0., min(1., point.x() / self.photo.width())), 5),
                 round(max(0., min(1., point.y() / self.photo.height())), 5)]
 
-    def set_brush(self, active):
-        self.brush = active
-        self.setDragMode(self.DragMode.NoDrag if active else self.DragMode.ScrollHandDrag)
-        self.viewport().setCursor(Qt.CursorShape.CrossCursor if active else Qt.CursorShape.OpenHandCursor)
+    def set_tool(self, tool):
+        if tool == self.tool:
+            return
+        self._finish_exclusion(keep=False)
+        self.tool = tool
+        self.setDragMode(self.DragMode.NoDrag if tool else self.DragMode.ScrollHandDrag)
+        self.viewport().setCursor(Qt.CursorShape.CrossCursor if tool else Qt.CursorShape.OpenHandCursor)
+
+    def set_marks_visible(self, visible):
+        self.show_marks = visible
+        for mark in self.marks:
+            mark.setVisible(visible)
+        if self._draft_mark is not None:
+            self._draft_mark.setVisible(visible)
 
     def mousePressEvent(self, event):
-        if self.brush and event.button() == Qt.MouseButton.LeftButton:
+        if self.tool and event.button() == Qt.MouseButton.LeftButton:
             point = self.mapToScene(event.position().toPoint())
-            if self.sceneRect().contains(point) and len(self.exclusions) < MAX_EXCLUSION_STROKES:
-                radius = self.brush_size / (2 * self.transform().m11() * min(self.photo.width(), self.photo.height()))
-                stroke = {"radius": round(min(.25, max(.00001, radius)), 6), "points": [self._point(point)]}
-                self.exclusions.append(stroke)
-                self.marks.append(self._add_mark(stroke))
-                self.marks[-1].setVisible(self.show_marks)
-                self.painting = True
+            if self.sceneRect().contains(point) and len(self.exclusions) < MAX_MANUAL_EXCLUSIONS:
+                self._anchor = self._point(point)
+                if self.tool == "rect":
+                    self._draft = {"rect": self._anchor * 2}
+                else:
+                    radius = self.brush_size / (2 * self.transform().m11() * min(self.photo.width(), self.photo.height()))
+                    self._draft = {"radius": round(min(.25, max(.00001, radius)), 6), "points": [self._anchor]}
+                self._draft_mark = self._add_mark(self._draft)
+                self._draft_mark.setVisible(self.show_marks)
             event.accept()
             return
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        if self.painting:
-            stroke = self.exclusions[-1]
+        if self._draft is not None:
             point = self._point(self.mapToScene(event.position().toPoint()))
-            if point != stroke["points"][-1]:
-                if len(stroke["points"]) == MAX_EXCLUSION_POINTS:
-                    stroke["points"][:] = stroke["points"][::2]
-                stroke["points"].append(point)
-                self.marks[-1].setPath(exclusion_path(stroke, self.photo.width(), self.photo.height()))
+            if "rect" in self._draft:
+                x, y = self._anchor
+                self._draft["rect"] = [min(x, point[0]), min(y, point[1]), max(x, point[0]), max(y, point[1])]
+            else:
+                points = self._draft["points"]
+                if point != points[-1]:
+                    if len(points) == MAX_EXCLUSION_POINTS:
+                        points[:] = points[::2]
+                    points.append(point)
+            self._draft_mark.setPath(exclusion_path(self._draft, self.photo.width(), self.photo.height()))
             event.accept()
             return
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        if self.painting and event.button() == Qt.MouseButton.LeftButton:
-            self.mouseMoveEvent(event)
-            self.painting = False
+        if self.tool and event.button() == Qt.MouseButton.LeftButton:
+            if self._draft is not None:
+                self.mouseMoveEvent(event)
+                self._finish_exclusion(keep=True)
+            event.accept()
             return
         super().mouseReleaseEvent(event)
 
-    def undo_stroke(self):
+    def _finish_exclusion(self, *, keep):
+        if self._draft_mark is None:
+            return
+        valid = normalize_manual_exclusions([self._draft]) if keep else []
+        if valid:
+            self.exclusions.append(valid[0])
+            self.marks.append(self._draft_mark)
+        else:
+            self.scene_data.removeItem(self._draft_mark)
+        self._draft_mark = self._draft = self._anchor = None
+
+    def undo_exclusion(self):
         if self.exclusions:
             self.exclusions.pop()
             self.scene_data.removeItem(self.marks.pop())
@@ -126,7 +166,7 @@ class PhotoQualityDialog(QDialog):
             item.setZValue(3)
             item.setAcceptedMouseButtons(Qt.MouseButton.NoButton)
             self.boxes.append(item)
-        info = QLabel(f'Автоматически выделено этикеток: {len(self.boxes)}. Оранжевые рамки — автоисключения, красные мазки — ручные.')
+        info = QLabel(f'Автоматически выделено этикеток: {len(self.boxes)}. Оранжевые области — автоисключения, красные — ручные.')
         info.setWordWrap(True);layout.addWidget(info)
         controls=QHBoxLayout()
         toggle=QCheckBox('Показать области исключения');toggle.setChecked(True)
@@ -137,23 +177,39 @@ class PhotoQualityDialog(QDialog):
             tools = QHBoxLayout()
             brush = QPushButton("Кисть исключения")
             brush.setCheckable(True)
-            brush.toggled.connect(self.view.set_brush)
-            brush.toggled.connect(lambda active: toggle.setChecked(True) if active else None)
             tools.addWidget(brush)
             size = QSpinBox()
             size.setRange(4, 100)
             size.setValue(self.view.brush_size)
             size.setSuffix(" пикс.")
+            size.setToolTip("Размер кисти")
+            size.setMaximumWidth(105)
             size.valueChanged.connect(lambda value: setattr(self.view, "brush_size", value))
             tools.addWidget(size)
-            undo = QPushButton("Отменить мазок")
-            undo.clicked.connect(self.view.undo_stroke)
+            rectangle = QPushButton("Прямоугольник")
+            rectangle.setCheckable(True)
+            rectangle.setToolTip("Выделить прямоугольную область для исключения из анализа")
+            tools.addWidget(rectangle)
+
+            def choose_tool(tool, other, active):
+                if active:
+                    other.setChecked(False)
+                    toggle.setChecked(True)
+                self.view.set_tool(tool if active else None)
+                if self.column_edges is not None:
+                    self.column_edges.setEnabled(not active)
+
+            brush.toggled.connect(lambda active: choose_tool("brush", rectangle, active))
+            rectangle.toggled.connect(lambda active: choose_tool("rect", brush, active))
+            undo = QPushButton("Отменить выделение")
+            undo.clicked.connect(self.view.undo_exclusion)
             tools.addWidget(undo)
             clear = QPushButton("Убрать ручные исключения")
             clear.clicked.connect(self._clear_exclusions)
             tools.addWidget(clear)
             layout.addLayout(tools)
-            hint = QLabel("Потяните за край голубой рамки. Колесо мыши меняет масштаб. При включённой кисти левая кнопка рисует исключения.")
+            hint = QLabel("Кисть закрашивает область. Для прямоугольника протяните от одного угла к другому. "
+                          "Выключите инструмент, чтобы двигать голубые рамки. Колесо мыши меняет масштаб.")
             hint.setWordWrap(True)
             layout.addWidget(hint)
             buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
@@ -169,11 +225,11 @@ class PhotoQualityDialog(QDialog):
 
     def _clear_exclusions(self):
         while self.view.exclusions:
-            self.view.undo_stroke()
+            self.view.undo_exclusion()
 
     def _show_exclusions(self, visible):
-        self.view.show_marks = visible
-        for item in self.boxes + self.view.marks:
+        self.view.set_marks_visible(visible)
+        for item in self.boxes:
             item.setVisible(visible)
 
     def edited_columns(self):

@@ -9,7 +9,7 @@ from PIL import Image
 from PySide6.QtCore import QEvent, QPoint, QPointF, Qt
 from PySide6.QtGui import QColor, QPixmap
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QPushButton
 
 from app.domain.models import FaciesDetection, PhotoRecord
 from app.infrastructure.cv1_analysis import IntervalJob, write_interval_crop
@@ -66,7 +66,7 @@ class CorePhotoEditsTests(unittest.TestCase):
         self.assertEqual(second, self.columns[1])
         self.assertEqual(photo.pos(), QPointF())
 
-    def test_large_preview_resizes_and_brush_is_additive_and_undoable(self):
+    def test_large_preview_supports_resizing_and_both_exclusion_tools(self):
         dialog = PhotoQualityDialog(self.pixmap, {"label_boxes": [[.2, .2, .25, .25]]},
                                     columns=self.columns, exclusions=[])
         self.addCleanup(self.close_widget, dialog)
@@ -74,13 +74,27 @@ class CorePhotoEditsTests(unittest.TestCase):
         self.app.processEvents()
         self.drag(dialog.view, QPointF(70, 20), QPointF(70, 42))
         self.assertAlmostEqual(dialog.edited_columns()[0]["top"], 42, delta=1)
-        dialog.view.set_brush(True)
+        buttons = {button.text(): button for button in dialog.findChildren(QPushButton)}
+        brush, rectangle = (buttons[name] for name in ("Кисть исключения", "Прямоугольник"))
+        brush.click()
         self.drag(dialog.view, QPointF(65, 80), QPointF(90, 90))
         self.assertEqual(len(dialog.boxes), 1)
         self.assertEqual(len(dialog.view.exclusions), 1)
         self.assertGreaterEqual(len(dialog.view.exclusions[0]["points"]), 2)
         self.assertAlmostEqual(dialog.edited_columns()[0]["top"], 42, delta=1)
-        dialog.view.undo_stroke()
+        rectangle.click()
+        self.assertFalse(brush.isChecked())
+        self.assertTrue(rectangle.isChecked())
+        self.drag(dialog.view, QPointF(90, 180), QPointF(65, 135))
+        self.assertEqual(len(dialog.view.exclusions), 2)
+        bounds = dialog.view.exclusions[-1]["rect"]
+        for actual, expected in zip(bounds, (65 / 300, 135 / 400, 90 / 300, 180 / 400)):
+            self.assertAlmostEqual(actual, expected, delta=.003)
+        self.drag(dialog.view, QPointF(70, 210), QPointF(70, 210))
+        self.assertEqual(len(dialog.view.exclusions), 2)
+        buttons["Отменить выделение"].click()
+        self.assertIn("points", dialog.view.exclusions[0])
+        buttons["Отменить выделение"].click()
         self.assertEqual(dialog.view.exclusions, [])
         self.assertTrue(dialog.boxes[0].isVisible())
 
@@ -170,22 +184,28 @@ class CorePhotoEditsTests(unittest.TestCase):
             Image.new("RGB", (600, 800), "gray").save(source)
             polygon = [QPointF(40, 20), QPointF(100, 20), QPointF(100, 370), QPointF(40, 370)]
             row = FaciesDetection("Слой", .8, polygon, {"__geometry_only": "1", "__geometry_id": "test"})
-            strokes = [{"radius": .018, "points": [[70 / 300, .25], [80 / 300, .25]]}]
+            exclusions = [{"radius": .018, "points": [[70 / 300, .25], [80 / 300, .25]]},
+                          {"rect": [55 / 300, .4, 80 / 300, .5]}]
             record = PhotoRecord("photo", str(source), self.pixmap, [row], core_columns=self.columns,
-                                 manual_exclusions=strokes, core_columns_edited=True)
+                                 manual_exclusions=exclusions, core_columns_edited=True)
             source_bytes = source.read_bytes()
             save_project(folder / "project", "test", [record], {})
             _, records, _, missing, _ = load_project(folder / "project")
             self.assertFalse(missing)
             restored = records[0]
-            self.assertEqual(restored.manual_exclusions, strokes)
+            self.assertEqual(restored.manual_exclusions, exclusions)
             self.assertTrue(restored.core_columns_edited)
             self.assertFalse(restored.core_columns_verified)
             crop = write_interval_crop(record, IntervalJob.create(record, row), folder / "crop.png")
             with Image.open(crop) as image:
                 self.assertEqual(image.getpixel((60, 160))[3], 0)
                 self.assertEqual(image.getpixel((60, 120))[3], 255)
-            preview = make_interval_preview(self.pixmap, polygon, strokes).toImage()
+                self.assertEqual(image.getpixel((30, 280))[3], 0)
+                self.assertEqual(image.getpixel((29, 280))[3], 255)
+                self.assertEqual(image.getpixel((80, 280))[3], 255)
+            preview = make_interval_preview(self.pixmap, polygon, exclusions).toImage()
             self.assertEqual(preview.pixelColor(30, 80).alpha(), 0)
             self.assertEqual(preview.pixelColor(30, 60).alpha(), 255)
+            self.assertEqual(preview.pixelColor(25, 160).alpha(), 0)
+            self.assertEqual(preview.pixelColor(10, 160).alpha(), 255)
             self.assertEqual(source.read_bytes(), source_bytes)

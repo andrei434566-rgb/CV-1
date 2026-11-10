@@ -12,7 +12,7 @@ from PySide6.QtGui import QPixmap
 
 from app.domain.models import FaciesDetection, PhotoRecord
 from app.infrastructure.image_loading import load_working_pixmap, source_image_size
-from app.infrastructure.photo_quality import normalize_exclusion_strokes
+from app.infrastructure.photo_quality import normalize_manual_exclusions
 
 MANIFEST_NAME = "project.json"
 
@@ -164,7 +164,7 @@ def load_project(folder: Path) -> tuple[str, list[PhotoRecord], dict[str, QPoint
                 analysis_issues=[dict(issue) for issue in item.get("analysis_issues", []) if isinstance(issue, dict)],
                 photo_quality=dict(item["photo_quality"]) if isinstance(item.get("photo_quality"),dict) else {},
                 photo_review_ack=str(item.get("photo_review_ack") or ""),
-                manual_exclusions=normalize_exclusion_strokes(item.get("manual_exclusions")),
+                manual_exclusions=normalize_manual_exclusions(item.get("manual_exclusions")),
                 core_columns_edited=bool(item.get("core_columns_edited", False)),
             )
         )

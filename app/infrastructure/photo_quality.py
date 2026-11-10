@@ -13,19 +13,34 @@ import time
 SCHEMA = "cv1-photo-quality-v1"
 MAX_EDGE = 1400
 _cache = {}
-MAX_EXCLUSION_STROKES = 128
+MAX_MANUAL_EXCLUSIONS = 128
 MAX_EXCLUSION_POINTS = 256
 
 
-def normalize_exclusion_strokes(strokes):
+def normalize_manual_exclusions(exclusions):
     result = []
-    for stroke in strokes[:MAX_EXCLUSION_STROKES] if isinstance(strokes, list) else []:
+    for area in exclusions[:MAX_MANUAL_EXCLUSIONS] if isinstance(exclusions, list) else []:
+        if not isinstance(area, dict):
+            continue
         try:
-            radius = float(stroke["radius"])
+            if "rect" in area:
+                rect = area["rect"]
+                if not isinstance(rect, (list, tuple)) or len(rect) != 4:
+                    continue
+                coords = tuple(map(float, rect))
+                if not all(map(math.isfinite, coords)):
+                    continue
+                x1, y1, x2, y2 = (max(0., min(1., value)) for value in coords)
+                l, r = sorted((x1, x2))
+                t, b = sorted((y1, y2))
+                if l < r and t < b:
+                    result.append({"rect": [l, t, r, b]})
+                continue
+            radius = float(area["radius"])
             if not 0 < radius <= .25:
                 continue
             points = []
-            for x, y in stroke["points"][:MAX_EXCLUSION_POINTS]:
+            for x, y in area["points"][:MAX_EXCLUSION_POINTS]:
                 x, y = float(x), float(y)
                 if math.isfinite(x) and math.isfinite(y):
                     points.append([max(0., min(1., x)), max(0., min(1., y))])
@@ -36,17 +51,24 @@ def normalize_exclusion_strokes(strokes):
     return result
 
 
-def manual_exclusion_mask(size, strokes, window=None):
-    """Rasterize photo-relative brush strokes onto the photo or a crop."""
+def manual_exclusion_mask(size, exclusions, window=None):
+    """Rasterize photo-relative exclusions onto the photo or a crop."""
     import cv2
     import numpy as np
 
     width, height = size
     left, top, right, bottom = window or (0, 0, width, height)
     mask = np.zeros((bottom - top, right - left), dtype=np.uint8)
-    for stroke in normalize_exclusion_strokes(strokes):
-        radius = max(1, round(stroke["radius"] * min(width, height)))
-        points = [(round(x * width) - left, round(y * height) - top) for x, y in stroke["points"]]
+    for area in normalize_manual_exclusions(exclusions):
+        if "rect" in area:
+            l, t, r, b = area["rect"]
+            x1, x2 = round(l * width) - left, round(r * width) - left
+            y1, y2 = round(t * height) - top, round(b * height) - top
+            if x1 < x2 and y1 < y2:
+                cv2.rectangle(mask, (x1, y1), (x2 - 1, y2 - 1), 1, -1)
+            continue
+        radius = max(1, round(area["radius"] * min(width, height)))
+        points = [(round(x * width) - left, round(y * height) - top) for x, y in area["points"]]
         cv2.circle(mask, points[0], radius, 1, -1)
         for start, end in zip(points, points[1:]):
             cv2.line(mask, start, end, 1, 2 * radius)

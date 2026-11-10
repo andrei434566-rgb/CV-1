@@ -38,12 +38,16 @@ def make_interval_preview(pixmap: QPixmap, polygon, exclusions=None) -> QPixmap:
     if exclusions:
         from app.ui.dialogs.photo_quality_dialog import exclusion_path
         painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Clear)
-        for stroke in exclusions:
-            pen = QPen(Qt.GlobalColor.black, 2 * stroke["radius"] * min(pixmap.width(), pixmap.height()))
+        for area in exclusions:
+            path = exclusion_path(area, pixmap.width(), pixmap.height())
+            if "rect" in area:
+                painter.fillPath(path, Qt.GlobalColor.black)
+                continue
+            pen = QPen(Qt.GlobalColor.black, 2 * area["radius"] * min(pixmap.width(), pixmap.height()))
             pen.setCapStyle(Qt.PenCapStyle.RoundCap)
             pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
             painter.setPen(pen)
-            painter.drawPath(exclusion_path(stroke, pixmap.width(), pixmap.height()))
+            painter.drawPath(path)
     painter.end()
     return result
 
