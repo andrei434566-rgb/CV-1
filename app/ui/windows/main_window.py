@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
-from PySide6.QtCore import QDir, QPointF, QSettings, QThread, QTimer, Qt
+from PySide6.QtCore import QDir, QPointF, QRectF, QSettings, QThread, QTimer, Qt
 from PySide6.QtGui import QAction, QColor, QCursor, QImage, QPolygonF
 from PySide6.QtWidgets import QApplication, QCheckBox, QColorDialog, QComboBox, QDialog, QDialogButtonBox, QFileDialog, QDockWidget, QFrame, QHBoxLayout, QInputDialog, QLabel, QMainWindow, QMenu, QMessageBox, QPlainTextEdit, QProgressBar, QProgressDialog, QPushButton, QSizePolicy, QSpinBox, QStatusBar, QTabWidget, QTextBrowser, QToolBar, QToolButton, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 
@@ -294,6 +294,7 @@ class MainWindow(QMainWindow):
         if source_photos:
             workspace.photo_deleted.connect(self._remove_photo)
             workspace.photo_selected.connect(self._select_photo_for_assistant)
+            workspace.core_columns_changed.connect(self._move_core_column_edges)
 
     def _select_photo_for_assistant(self, record: PhotoRecord) -> None:
         self._vlm_target = (record, None)
@@ -1370,6 +1371,8 @@ class MainWindow(QMainWindow):
         path = temporary / f"selected_core_{uuid4().hex}.png"
         if crop_facies and detection is not None and detection.attributes.get("__geometry_only") == "1":
             return str(write_interval_crop(record, IntervalJob.create(record, detection), path))
+        if crop_facies and detection is not None and record.manual_exclusions:
+            image = make_interval_preview(record.pixmap, detection.polygon, record.manual_exclusions).toImage()
         if not image.save(str(path), "PNG"):
             raise RuntimeError("Не удалось подготовить фото для распознавания")
         return str(path)
@@ -1676,9 +1679,16 @@ class MainWindow(QMainWindow):
                 payload["columns"] = self._chat_photo_columns.get("columns", [])
             elif use_image and operation != "describe" and self._vlm_target is not None:
                 payload["columns"] = self._vlm_target[0].core_columns
+            if use_image and operation != "describe":
+                source_record = (self._record_for_chat_photo(Path(image_override)) if image_override else
+                                 self._vlm_target[0] if self._vlm_target is not None else None)
+                if source_record is not None and source_record.manual_exclusions:
+                    payload["manual_exclusions"] = source_record.manual_exclusions
             target = self._vlm_target[1] if self._vlm_target is not None else None
             if operation == "describe" and target is not None:
                 payload["facies_candidate"] = self._vision_facies_candidate(target)
+                if self._vlm_target[0].manual_exclusions:
+                    payload["masked_crop"] = True
             selected_job = (
                 IntervalJob.create(self._vlm_target[0], target)
                 if operation == "describe" and target is not None and target.attributes.get("__geometry_only") == "1"
@@ -3207,7 +3217,7 @@ class MainWindow(QMainWindow):
             column_rows_created = 0
             for record in records:
                 record.analysis_mode = PIPELINE_MODE
-                if not record.core_columns_verified:
+                if not (record.core_columns_verified or record.core_columns_edited):
                     record.core_columns = self._suggest_core_columns(record)
                 self._update_depth_segments_for_columns(record)
                 column_rows_created += self._ensure_core_column_description_rows(record)
@@ -3242,7 +3252,7 @@ class MainWindow(QMainWindow):
                     record.pixmap.width(),
                     record.pixmap.height(),
                     record.core_columns or None,
-                    record.core_columns_verified,
+                    record.core_columns_verified or record.core_columns_edited,
                 )
                 for record in records
             ],
@@ -3782,6 +3792,93 @@ class MainWindow(QMainWindow):
         except (ImportError, OSError, ValueError):
             return []
 
+    def _apply_core_photo_edits(self, record, columns=None, exclusions=None):
+        if (self._analysis_active or self._vlm_pending is not None or self._segmentation_thread is not None
+                or self._training_thread is not None or self._column_training_thread is not None):
+            self.workspace.update_photo_detections(record)
+            self.statusBar().showMessage("Дождитесь завершения обработки фото, затем повторите правку.", 7000)
+            return False
+        moved = columns is not None and columns != record.core_columns
+        brushed = exclusions is not None and exclusions != record.manual_exclusions
+        if not moved and not brushed:
+            return False
+        previous = record.core_columns
+        if moved:
+            record.core_columns = [dict(column) for column in columns]
+            record.core_columns_edited = True
+            self._update_depth_segments_for_columns(record)
+        if brushed:
+            record.manual_exclusions = exclusions
+        record.photo_quality = {}
+        record.photo_review_ack = ""
+        for layer in record.detections:
+            attrs = layer.attributes
+            attrs.pop("__image_quality", None)
+            index = str(attrs.get("__core_column_index", ""))
+            if not moved or attrs.get("__core_column_description") != "1" or not index.isdigit():
+                continue
+            index = int(index)
+            if index >= len(columns):
+                continue
+            box = columns[index]
+            if index >= len(previous) or previous[index] != box:
+                l, t, r, b = (box[key] for key in ("left", "top", "right", "bottom"))
+                layer.polygon = [QPointF(l, t), QPointF(r, t), QPointF(r, b), QPointF(l, b)]
+                layer.training_ready = False
+                self._revoke_attribute_example(layer)
+                for key in ("__expert_description_confirmed", "__expert_description_sha256",
+                            "__expert_memory_confirmed", "__expert_memory_sha256"):
+                    attrs.pop(key, None)
+            segment = record.depth_segments[index]
+            if not layer.training_ready and attrs.get("__manual_interval_edited") != "1" and "depth_from" in segment:
+                layer.depth_from, layer.depth_to = segment["depth_from"], segment["depth_to"]
+        self._refresh_facies_views(record)
+        self._audit_review_photos(force=True, records=[record])
+        self.statusBar().showMessage("Правки фото применены. Для пересчёта описания напишите «переопиши».", 10000)
+        return True
+
+    def _move_core_column_edges(self, record, columns):
+        editor = next((dialog for dialog in self._facies_dialogs if dialog.isVisible()), None)
+        if editor is not None and self._vlm_target and self._vlm_target[0] is record:
+            if editor.has_unsaved_changes():
+                self.workspace.update_photo_detections(record)
+                self.statusBar().showMessage("Сохраните правки в открытой карточке, затем передвиньте рамку.", 7000)
+                return
+            editor.close()
+        self._apply_core_photo_edits(record, columns)
+
+    def _edit_core_photo(self, record, detection=None, parent=None):
+        from app.ui.dialogs.photo_quality_dialog import PhotoQualityDialog
+        from app.infrastructure.photo_quality import normalize_exclusion_strokes
+
+        focus = None
+        report = dict(record.photo_quality)
+        before = tuple((p.x(), p.y()) for p in detection.polygon) if detection is not None else ()
+        if detection is not None:
+            bounds = QPolygonF(detection.polygon).boundingRect().toAlignedRect().intersected(record.pixmap.rect())
+            margin = max(10, round(bounds.width() * .6))
+            focus = QRectF(bounds.adjusted(-margin, -margin, margin, margin).intersected(record.pixmap.rect()))
+            interval_report = getattr(parent, "_quality_report", {})
+            if interval_report.get("scope") == "interval" and not bounds.isEmpty():
+                width, height = record.pixmap.width(), record.pixmap.height()
+                report = dict(interval_report)
+                report["label_boxes"] = [
+                    [(bounds.x() + l * bounds.width()) / width, (bounds.y() + t * bounds.height()) / height,
+                     (bounds.x() + r * bounds.width()) / width, (bounds.y() + b * bounds.height()) / height]
+                    for l, t, r, b in interval_report.get("label_boxes", [])
+                ]
+        dialog = PhotoQualityDialog(record.pixmap, report, parent or self, columns=record.core_columns,
+                                    exclusions=record.manual_exclusions, focus=focus)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+        if not self._apply_core_photo_edits(
+                record, dialog.edited_columns(), normalize_exclusion_strokes(dialog.view.exclusions)):
+            return
+        if detection is not None and isinstance(parent, FaciesDialog):
+            changed = before != tuple((p.x(), p.y()) for p in detection.polygon)
+            parent.update_photo_preview(make_interval_preview(record.pixmap, detection.polygon),
+                                        (detection.depth_from, detection.depth_to), changed)
+
     def _ensure_core_column_description_rows(self, record: PhotoRecord) -> int:
         """Represent detected physical columns when no facies masks exist."""
         if record.analysis_mode != PIPELINE_MODE or not record.core_columns:
@@ -3842,8 +3939,7 @@ class MainWindow(QMainWindow):
                 self.statusBar().showMessage('Сохраните изменения или закройте текущую карточку перед переходом к следующей.',10000)
                 return False
         if item.detection is None:
-            from app.ui.dialogs.photo_quality_dialog import PhotoQualityDialog
-            PhotoQualityDialog(item.record.pixmap,item.record.photo_quality,self).exec()
+            self._edit_core_photo(item.record)
         else:
             self.workspace.focus_facies(item.record,item.detection)
             self._open_facies_editor(item.record,item.detection)
@@ -3859,6 +3955,7 @@ class MainWindow(QMainWindow):
             if record.photo_quality and not force and record.photo_quality.get('file_signature')==current and current is not None:continue
             self._quality_pending.add(record.identifier)
             submit('quality',{'path':record.path,'columns':list(record.core_columns),
+                             'manual_exclusions':record.manual_exclusions,
                              'display_size':(record.pixmap.width(),record.pixmap.height()),'record_id':record.identifier},
                    self._on_background_photo_quality)
 
@@ -3874,6 +3971,9 @@ class MainWindow(QMainWindow):
         result=reply['result'];self._quality_pending.discard(result['record_id'])
         record=next((r for r in self._records if r.identifier==result['record_id']),None)
         if record is not None:
+            if 'regions' in result and result['regions'] != (record.core_columns, record.manual_exclusions):
+                self._audit_review_photos(force=True, records=[record])
+                return
             quality=result['quality']
             if record.path!=result['path']:
                 from app.infrastructure.photo_quality import file_signature
@@ -3890,7 +3990,7 @@ class MainWindow(QMainWindow):
 
     def _on_photo_quality_ready(self,path,quality):
         record=next((r for r in self._records if r.path==path),None)
-        if record is not None:record.photo_quality=dict(quality)
+        if record is not None and not record.manual_exclusions:record.photo_quality=dict(quality)
 
     def _review_queue_changed(self):
         if self._queue_ack_save_pending:return
@@ -4633,7 +4733,7 @@ class MainWindow(QMainWindow):
                 # Display the actual masks and gaps; never redraw geometry as
                 # a side effect of opening the assembled column.
                 continue
-            if record.core_columns and not record.core_columns_verified:
+            if record.core_columns and not (record.core_columns_verified or record.core_columns_edited):
                 cleaned = normalize_columns(
                     record.core_columns, (record.pixmap.width(), record.pixmap.height()),
                     suppress_narrow_shadows=True,
@@ -5376,6 +5476,8 @@ class MainWindow(QMainWindow):
         record.analysis_mode = PIPELINE_MODE
         record.core_columns = [dict(column) for column in core_columns]
         self._update_depth_segments_for_columns(record)
+        if record.manual_exclusions:
+            self._audit_review_photos(force=True, records=[record])
         preserved = [
             item for item in record.detections
             if item.training_ready or item.attributes.get("__manual_contour") == "1"
@@ -5518,6 +5620,7 @@ class MainWindow(QMainWindow):
                 request_id = self._vlm_client.send(config["python"], {
                     "operation": "describe", "image": str(crop), "context": context,
                     "whole_column": whole_column,
+                    "masked_crop": bool(record.manual_exclusions),
                     "facies_candidate": self._vision_facies_candidate(job.detection),
                     "base": config["base"], "model_mode": config["model_mode"],
                     "primary_reference": config.get("primary_reference", ""),
@@ -5571,6 +5674,7 @@ class MainWindow(QMainWindow):
                 jobs.append(job)
                 crops.append(crop)
                 items.append({"id": str(len(jobs)), "image": str(crop), "context": context, "whole_column": whole_column,
+                              "masked_crop": bool(record.manual_exclusions),
                               "facies_candidate": self._vision_facies_candidate(job.detection)})
             except Exception as exc:
                 crop.unlink(missing_ok=True)
@@ -5751,6 +5855,8 @@ class MainWindow(QMainWindow):
             description_confirmed=current_description_is_confirmed(detection),
             preview_pixmap=make_interval_preview(record.pixmap, detection.polygon),
             photo_quality=record.photo_quality,
+            photo_editor=lambda editor: self._edit_core_photo(record, detection, editor),
+            colour_preview=lambda: make_interval_preview(record.pixmap, detection.polygon, record.manual_exclusions),
         )
         dialog.setModal(False)
         dialog.accepted.connect(lambda: self._save_lithology(record, detection, dialog))

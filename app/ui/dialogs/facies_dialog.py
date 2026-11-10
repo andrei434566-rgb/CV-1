@@ -4,7 +4,7 @@ import json
 import math
 
 from PySide6.QtCore import QSettings, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QIcon, QPainter, QPainterPath, QPixmap, QPolygonF
+from PySide6.QtGui import QColor, QIcon, QPainter, QPainterPath, QPen, QPixmap, QPolygonF
 from PySide6.QtWidgets import QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFileDialog, QFormLayout, QHBoxLayout, QInputDialog, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMessageBox, QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy, QSplitter, QTabWidget, QVBoxLayout, QWidget
 
 from app.domain.facies_catalog import FACIES_MODEL_CLASSES, FACIES_REFERENCE_FIELDS, facies_metadata, facies_title, resolve_facies_class
@@ -20,7 +20,7 @@ CUSTOM_VALUE = "__kern_analyzer_custom_value__"
 FACIES_METADATA_ROLE = Qt.ItemDataRole.UserRole + 1
 
 
-def make_interval_preview(pixmap: QPixmap, polygon) -> QPixmap:
+def make_interval_preview(pixmap: QPixmap, polygon, exclusions=None) -> QPixmap:
     """Show the selected geometry only, using the already loaded photo."""
     if pixmap.isNull() or len(polygon) < 3:
         return QPixmap()
@@ -28,13 +28,22 @@ def make_interval_preview(pixmap: QPixmap, polygon) -> QPixmap:
     if bounds.isEmpty():
         return QPixmap()
     result = QPixmap(bounds.size())
-    result.fill(Qt.GlobalColor.white)
+    result.fill(Qt.GlobalColor.transparent if exclusions else Qt.GlobalColor.white)
     painter = QPainter(result)
     painter.translate(-bounds.left(), -bounds.top())
     path = QPainterPath()
     path.addPolygon(QPolygonF(polygon))
     painter.setClipPath(path)
     painter.drawPixmap(0, 0, pixmap)
+    if exclusions:
+        from app.ui.dialogs.photo_quality_dialog import exclusion_path
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Clear)
+        for stroke in exclusions:
+            pen = QPen(Qt.GlobalColor.black, 2 * stroke["radius"] * min(pixmap.width(), pixmap.height()))
+            pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+            pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+            painter.setPen(pen)
+            painter.drawPath(exclusion_path(stroke, pixmap.width(), pixmap.height()))
     painter.end()
     return result
 
@@ -58,6 +67,8 @@ class FaciesDialog(QDialog):
         description_confirmed: bool = False,
         preview_pixmap: QPixmap | None = None,
         photo_quality: dict | None = None,
+        photo_editor=None,
+        colour_preview=None,
     ):
         super().__init__(parent)
         self.setObjectName("intervalDescriptionCard")
@@ -82,6 +93,9 @@ class FaciesDialog(QDialog):
                 and str(attributes.get("Текстура", "")).startswith(("На фото заметны контрастные полосы", "Текстура и слоистость требуют"))):
             auto_hint = str(attributes.pop("Текстура"))
         self._preview_pixmap = preview_pixmap or QPixmap()
+        self._photo_editor = photo_editor
+        self._colour_preview = colour_preview
+        self._photo_preview_label = None
         self._preview_digest = pixel_digest(self._preview_pixmap) if not self._preview_pixmap.isNull() else ""
         self._evidence = read_evidence(attributes)
         self._evidence_buttons = {}
@@ -280,6 +294,7 @@ class FaciesDialog(QDialog):
         splitter.setSizes([510, 420])
         if preview_pixmap is not None and not preview_pixmap.isNull():
             photo_label = QLabel()
+            self._photo_preview_label = photo_label
             photo_label.setObjectName("intervalPhotoPreview")
             photo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             photo_label.setPixmap(preview_pixmap.scaled(340, 170, Qt.AspectRatioMode.KeepAspectRatio,
@@ -447,7 +462,8 @@ class FaciesDialog(QDialog):
         if not force and (self._color_user_touched or not self._color_auto_allowed):return
         from app.infrastructure.attribute_tasks import submit
         self.color_button.setEnabled(False);self.color_note.setText('Определяю цвет по пикселям породы…')
-        submit('color',{'image_png':png_bytes(self._preview_pixmap),'signature':self._color_revision},self._photo_color_ready)
+        pixmap = self._colour_preview() if self._colour_preview is not None else self._preview_pixmap
+        submit('color',{'image_png':png_bytes(pixmap),'signature':self._color_revision},self._photo_color_ready)
 
     def _photo_color_ready(self,reply):
         if not self.isVisible():return
@@ -678,6 +694,9 @@ class FaciesDialog(QDialog):
             self._refresh_description()
 
     def _show_zoom(self):
+        if self._photo_editor is not None:
+            self._photo_editor(self)
+            return
         dialog = QDialog(self)
         dialog.setWindowTitle("Выбранный участок керна · колесо — масштаб, перетаскивание — перемещение")
         dialog.resize(800,700)
@@ -694,8 +713,9 @@ class FaciesDialog(QDialog):
         quality_messages=[str(row.get('message','')) for row in self._quality_report.get('issues',[]) if isinstance(row,dict)]
         self.quality_summary=QLabel('\n'.join(quality_messages) or ('Фотографических предупреждений не найдено (эвристическая оценка).' if self._quality_report else 'Качество фото ещё не проверено. Проверку можно запустить из очереди проверки керна.'))
         self.quality_summary.setWordWrap(True);layout.addWidget(self.quality_summary)
-        if self._quality_report.get('scope')=='interval' and not self._preview_pixmap.isNull():
-            labels=QPushButton(f"Показать исключённые этикетки ({len(self._quality_report.get('label_boxes',[]))})…")
+        if (self._photo_editor is not None or self._quality_report.get('scope') == 'interval') and not self._preview_pixmap.isNull():
+            labels=QPushButton("Этикетки и ручные исключения…" if self._photo_editor is not None else
+                               f"Показать исключённые этикетки ({len(self._quality_report.get('label_boxes',[]))})…")
             labels.clicked.connect(self._show_quality_exclusions);layout.addWidget(labels)
         self.review_notes = QPlainTextEdit(); self.review_notes.setReadOnly(True)
         self.review_notes.setObjectName("descriptionReviewNotes")
@@ -721,8 +741,36 @@ class FaciesDialog(QDialog):
         reminder.setWordWrap(True);layout.addWidget(reminder)
 
     def _show_quality_exclusions(self):
+        if self._photo_editor is not None:
+            self._photo_editor(self)
+            return
         from app.ui.dialogs.photo_quality_dialog import PhotoQualityDialog
         PhotoQualityDialog(self._preview_pixmap,self._quality_report,self).exec()
+
+    def update_photo_preview(self, preview, depth_range, geometry_changed):
+        had_edits = self.has_unsaved_changes()
+        self._preview_pixmap = preview
+        self._preview_digest = pixel_digest(preview) if not preview.isNull() else ""
+        self._color_revision += 1
+        if self._photo_preview_label is not None:
+            self._photo_preview_label.setPixmap(preview.scaled(
+                340, 170, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+        self.color_button.setEnabled(not preview.isNull())
+        self.color_note.clear()
+        if geometry_changed:
+            self._quality_report = {}
+            self.quality_summary.setText("Границы изменены. Проверка качества обновится при повторном описании.")
+            if (self.depth_from.text(), self.depth_to.text()) == self._initial_depth_texts:
+                self._original_depths = depth_range
+                for edit, value in zip((self.depth_from, self.depth_to), depth_range):
+                    edit.setText("" if value is None else self._format_depth(value))
+                self._initial_depth_texts = (self.depth_from.text(), self.depth_to.text())
+            self.training_confirmed.setChecked(False)
+            self.description_confirmed.setChecked(False)
+        self._preserved_attributes.pop("__image_quality", None)
+        self._refresh_description()
+        if not had_edits:
+            self._opening_signature = self._editor_signature()
 
     def _editor_signature(self):
         return json.dumps([self._observations(),self._assumed_fields(),self.selected_facies(),
@@ -883,6 +931,9 @@ class FaciesDialog(QDialog):
         return f"{float(value):.3f}".rstrip("0").rstrip(".")
 
     def _open_photo_zoom(self):
+        if self._photo_editor is not None:
+            self._photo_editor(self)
+            return
         from app.ui.dialogs.feature_evidence_dialog import EvidenceView
         from app.ui.dialog_theme import apply_light_card
         dialog = QDialog(self); dialog.setWindowTitle("Фото породы · колесо — увеличение, мышь — перемещение")

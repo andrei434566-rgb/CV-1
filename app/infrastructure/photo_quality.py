@@ -13,6 +13,44 @@ import time
 SCHEMA = "cv1-photo-quality-v1"
 MAX_EDGE = 1400
 _cache = {}
+MAX_EXCLUSION_STROKES = 128
+MAX_EXCLUSION_POINTS = 256
+
+
+def normalize_exclusion_strokes(strokes):
+    result = []
+    for stroke in strokes[:MAX_EXCLUSION_STROKES] if isinstance(strokes, list) else []:
+        try:
+            radius = float(stroke["radius"])
+            if not 0 < radius <= .25:
+                continue
+            points = []
+            for x, y in stroke["points"][:MAX_EXCLUSION_POINTS]:
+                x, y = float(x), float(y)
+                if math.isfinite(x) and math.isfinite(y):
+                    points.append([max(0., min(1., x)), max(0., min(1., y))])
+            if points:
+                result.append({"radius": radius, "points": points})
+        except (KeyError, TypeError, ValueError, OverflowError):
+            continue
+    return result
+
+
+def manual_exclusion_mask(size, strokes, window=None):
+    """Rasterize photo-relative brush strokes onto the photo or a crop."""
+    import cv2
+    import numpy as np
+
+    width, height = size
+    left, top, right, bottom = window or (0, 0, width, height)
+    mask = np.zeros((bottom - top, right - left), dtype=np.uint8)
+    for stroke in normalize_exclusion_strokes(strokes):
+        radius = max(1, round(stroke["radius"] * min(width, height)))
+        points = [(round(x * width) - left, round(y * height) - top) for x, y in stroke["points"]]
+        cv2.circle(mask, points[0], radius, 1, -1)
+        for start, end in zip(points, points[1:]):
+            cv2.line(mask, start, end, 1, 2 * radius)
+    return mask.astype(bool)
 
 
 def file_signature(path):
@@ -159,12 +197,12 @@ def audit_image(image, regions=None, *, source_size=None, scope='photo', valid_m
             'issues':issues,'heuristic':True,'seconds':round(time.perf_counter()-started,4)}
 
 
-def audit_file(path, columns=None, display_size=None):
+def audit_file(path, columns=None, display_size=None, manual_exclusions=None):
     from PIL import Image,ImageOps
     path=Path(path)
     try:
         signature=file_signature(path)
-        key=(str(path.resolve()),tuple(signature.values()),repr(columns),repr(display_size),SCHEMA)
+        key=(str(path.resolve()),tuple(signature.values()),repr(columns),repr(display_size),repr(manual_exclusions),SCHEMA)
         if key in _cache:return copy.deepcopy(_cache[key])
         with Image.open(path) as source:
             source_size=source.size
@@ -177,7 +215,8 @@ def audit_file(path, columns=None, display_size=None):
             for box in columns:
                 regions.append([float(box[k])*image.width/display_size[0] if k in ('left','right') else float(box[k])*image.height/display_size[1]
                                 for k in ('left','top','right','bottom')])
-        result=audit_image(image,regions,source_size=source_size)
+        valid = ~manual_exclusion_mask(image.size, manual_exclusions) if manual_exclusions else None
+        result=audit_image(image,regions,source_size=source_size,valid_mask=valid)
         result['file_signature']=signature
         if file_signature(path)!=signature:raise ValueError('Файл изменился во время проверки; повторите проверку фото.')
         if len(_cache)>128:_cache.clear()

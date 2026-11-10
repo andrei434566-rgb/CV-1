@@ -93,6 +93,25 @@ class Cv1MainFlowTests(unittest.TestCase):
         self.assertNotIn("adapter", config)
         self.assertNotIn("theory_adapter", config)
 
+    def test_resizing_column_updates_whole_column_description_but_not_yolo_mask(self):
+        record = self.record(name="Р-31_3002,00-3004,96.jpg", interpreted=True)
+        mask = record.detections[0]
+        original_polygon = list(mask.polygon)
+        column = FaciesDetection(UNRECOGNIZED_FACIES, 0, list(mask.polygon),
+                                 {"__geometry_only": "1", "__core_column_description": "1", "__core_column_index": "0"})
+        record.detections.append(column)
+        self.window._records = [record]
+        self.window.workspace.add_photos([record])
+        columns = [dict(record.core_columns[0], right=27, bottom=91)]
+        with patch.object(self.window, "_audit_review_photos"), patch.object(self.window, "_schedule_edit_autosave") as autosave:
+            self.window.workspace.core_columns_changed.emit(record, columns)
+            autosave.assert_called_once()
+        self.assertEqual(record.core_columns, columns)
+        self.assertTrue(record.core_columns_edited)
+        self.assertFalse(record.core_columns_verified)
+        self.assertEqual(column.polygon[2], QPointF(27, 91))
+        self.assertEqual(mask.polygon, original_polygon)
+
     def test_normal_layer_click_opens_manual_depth_and_texture_form(self):
         record = self.record(interpreted=True)
         row = record.detections[0]

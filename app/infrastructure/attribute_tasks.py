@@ -43,15 +43,18 @@ class _Job(QRunnable):
             elif self.operation == "quality":
                 from app.infrastructure.photo_quality import audit_file
                 payload=dict(self.payload);record_id=payload.pop('record_id')
-                result={'record_id':record_id,'path':str(payload['path']),'quality':audit_file(**payload)}
+                result={'record_id':record_id,'path':str(payload['path']),'quality':audit_file(**payload),
+                        'regions':(payload.get('columns', []), payload.get('manual_exclusions', []))}
             elif self.operation == 'color':
                 from io import BytesIO
                 from PIL import Image
                 from app.infrastructure.core_color_hint import estimate_core_color
                 from app.infrastructure.photo_quality import label_boxes
                 with Image.open(BytesIO(self.payload['image_png'])) as image:
-                    boxes=label_boxes(image)
-                    measurement=estimate_core_color(image,exclude_boxes=boxes)
+                    import numpy as np
+                    valid = np.asarray(image.getchannel('A')) > 0 if 'A' in image.getbands() else None
+                    boxes=label_boxes(image,valid_mask=valid)
+                    measurement=estimate_core_color(image,valid,exclude_boxes=boxes)
                 result={'measurement':measurement.to_dict() if measurement else None,
                         'signature':self.payload['signature']}
             else:

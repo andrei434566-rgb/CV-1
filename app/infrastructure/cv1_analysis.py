@@ -181,6 +181,11 @@ def write_interval_crop(record: PhotoRecord, job: IntervalJob, destination: Path
     crop = source[top:top + crop_height, left:left + crop_width].copy()
     mask = np.zeros(crop.shape[:2], dtype=np.uint8)
     cv2.fillPoly(mask, [contour - np.array([left, top])], 255)
+    if record.manual_exclusions:
+        from app.infrastructure.photo_quality import manual_exclusion_mask
+        excluded = manual_exclusion_mask(
+            (width, height), record.manual_exclusions, (left, top, left + crop_width, top + crop_height))
+        mask[excluded] = 0
     crop[mask == 0] = 255
     destination.parent.mkdir(parents=True, exist_ok=True)
     # Alpha preserves the exact YOLO mask for photographic measurements; the

@@ -15,6 +15,7 @@ from app.domain.facies_catalog import facies_metadata
 from app.domain.facies_palette import normalize_facies_palette
 from app.domain.lithology import LITHOLOGY_LEGEND, normalize_lithology_palette
 from app.infrastructure.description_template import display_description
+from app.ui.widgets.core_column_edges import CoreColumnEdges
 
 
 _STACK_CROP_CACHE: OrderedDict[tuple, QPixmap] = OrderedDict()
@@ -46,6 +47,7 @@ class WorkspaceCanvas(QGraphicsView):
     well_order_changed = Signal(object)
     photo_deleted = Signal(str, object)
     photo_selected = Signal(object)
+    core_columns_changed = Signal(object, object)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -589,6 +591,7 @@ class WorkspaceCanvas(QGraphicsView):
     def _create_photo_item(self, record: PhotoRecord) -> "PhotoItem":
         item = PhotoItem(record)
         item.photo_selected.connect(self.photo_selected)
+        item.core_columns_changed.connect(self.core_columns_changed)
         item.facies_selected.connect(self.facies_selected)
         item.facies_context_requested.connect(self.facies_context_requested)
         item.facies_geometry_changed.connect(self.facies_geometry_changed)
@@ -979,6 +982,7 @@ class PhotoItem(QGraphicsObject):
     facies_geometry_changed = Signal(object, object)
     facies_created = Signal(object, object)
     photo_selected = Signal(object)
+    core_columns_changed = Signal(object, object)
 
     def __init__(self, record: PhotoRecord):
         super().__init__()
@@ -995,12 +999,17 @@ class PhotoItem(QGraphicsObject):
         self.overlay.facies_context_requested.connect(self._on_facies_context_requested)
         self.overlay.facies_geometry_changed.connect(self._on_facies_geometry_changed)
         self.overlay.facies_created.connect(self._on_facies_created)
+        self.column_edges = CoreColumnEdges(
+            self.preview_rect, (record.pixmap.width(), record.pixmap.height()),
+            record.core_columns, self, verified=record.core_columns_verified)
+        self.column_edges.changed.connect(lambda columns: self.core_columns_changed.emit(record, columns))
 
     def boundingRect(self) -> QRectF:
         return self._rect.adjusted(-2, -2, 2, 2)
 
     def set_detections(self, detections: list[FaciesDetection]) -> None:
         self.overlay.set_detections(detections)
+        self.column_edges.set_columns(self.record.core_columns, self.record.core_columns_verified)
         self.update()
 
     def mousePressEvent(self, event) -> None:
@@ -1008,10 +1017,14 @@ class PhotoItem(QGraphicsObject):
         super().mousePressEvent(event)
 
     def begin_polygon_edit(self, detection: FaciesDetection) -> bool:
-        return self.overlay.begin_polygon_edit(detection)
+        started = self.overlay.begin_polygon_edit(detection)
+        if started:
+            self.column_edges.setEnabled(False)
+        return started
 
     def end_polygon_edit(self) -> None:
         self.overlay.end_polygon_edit()
+        self.column_edges.setEnabled(True)
 
     def prepare_polygon_vertex_insert(self) -> bool:
         return self.overlay.prepare_vertex_insert()
@@ -1021,6 +1034,7 @@ class PhotoItem(QGraphicsObject):
 
     def set_new_contour_mode(self, active: bool) -> None:
         self.overlay.set_new_contour_mode(active)
+        self.column_edges.setEnabled(not active)
 
     def finish_new_contour(self) -> bool:
         return self.overlay.finish_new_contour()
@@ -1035,6 +1049,7 @@ class PhotoItem(QGraphicsObject):
         self.facies_geometry_changed.emit(self.record, detection)
 
     def _on_facies_created(self, detection: FaciesDetection) -> None:
+        self.column_edges.setEnabled(True)
         self.facies_created.emit(self.record, detection)
 
     def paint(self, painter: QPainter, option, widget=None) -> None:
@@ -1048,24 +1063,6 @@ class PhotoItem(QGraphicsObject):
         painter.setPen(QColor("#34394c"))
         painter.drawText(QRectF(8, 20, self.CARD_WIDTH - 16, 20), Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft, self.record.path.split("/")[-1].split("\\")[-1])
         painter.drawPixmap(self.preview_rect.toRect(), self.record.pixmap)
-        if self.record.core_columns:
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            pen = QPen(QColor("#12b8d9"), 2)
-            if not self.record.core_columns_verified:
-                pen.setStyle(Qt.PenStyle.DashLine)
-            painter.setPen(pen)
-            x_scale = self.preview_rect.width() / max(1, self.record.pixmap.width())
-            y_scale = self.preview_rect.height() / max(1, self.record.pixmap.height())
-            for index, box in enumerate(self.record.core_columns, start=1):
-                rect = QRectF(
-                    self.preview_rect.left() + box["left"] * x_scale,
-                    self.preview_rect.top() + box["top"] * y_scale,
-                    (box["right"] - box["left"]) * x_scale,
-                    (box["bottom"] - box["top"]) * y_scale,
-                )
-                painter.drawRect(rect)
-                painter.drawText(QRectF(rect.left(), rect.top(), max(12, rect.width()), 14),
-                                 Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop, str(index))
 
 
 class CorePhotoStripItem(QGraphicsObject):

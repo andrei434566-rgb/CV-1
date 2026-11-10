@@ -204,6 +204,10 @@ class VisionEngine:
         image=Image.fromarray(pixels[:,:,::-1])
         if geometry_mask is not None and geometry_mask.shape!=(image.height,image.width):geometry_mask=None
         del pixels
+        if request.get('manual_exclusions'):
+            from app.infrastructure.photo_quality import manual_exclusion_mask
+            manual_valid = ~manual_exclusion_mask(image.size, request['manual_exclusions'])
+            geometry_mask = manual_valid if geometry_mask is None else geometry_mask & manual_valid
         columns=request.get('columns')
         if request.get('operation') in {'describe','describe_batch','describe_photo'} and not columns:
             # These inputs are already masked interval/column crops from YOLO.
@@ -216,6 +220,21 @@ class VisionEngine:
         usable_masks=[tile_usable_mask(tile.size,window,image.size,quality['label_boxes']) for tile,window in zip(tiles,windows)]
         if geometry_mask is not None:
             usable_masks=[mask & geometry_mask[top:bottom,left:right] for mask,(left,top,right,bottom) in zip(usable_masks,windows)]
+        if geometry_mask is not None and (request.get('masked_crop') or request.get('manual_exclusions')):
+            # The CNN receives only tiles with enough visible rock. Paint
+            # excluded pixels with the local median to avoid artificial edges.
+            visible = []
+            for tile, mask, window in zip(tiles, usable_masks, windows):
+                if mask.mean() < .25:
+                    continue
+                if not mask.all():
+                    pixels = np.array(tile)
+                    pixels[~mask] = np.median(pixels[mask], axis=0).astype(pixels.dtype)
+                    tile = Image.fromarray(pixels)
+                visible.append((tile, mask, window))
+            tiles = [tile for tile, _, _ in visible]
+            usable_masks = [mask for _, mask, _ in visible]
+            windows = [window for _, _, window in visible]
         from app.infrastructure.photo_quality import _regions_mask
         colour_started=time.perf_counter()
         colour_mask=_regions_mask((image.height,image.width),boxes)

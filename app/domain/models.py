@@ -49,3 +49,6 @@ class PhotoRecord:
     analysis_issues: list[dict] = field(default_factory=list)
     photo_quality: dict = field(default_factory=dict)
     photo_review_ack: str = ""
+    # Strokes are stored in normalized photo coordinates, independent of zoom.
+    manual_exclusions: list[dict] = field(default_factory=list)
+    core_columns_edited: bool = False
