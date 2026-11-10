@@ -6,7 +6,7 @@ import unittest
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PIL import Image
-from PySide6.QtCore import QPointF, Qt
+from PySide6.QtCore import QEvent, QPoint, QPointF, Qt
 from PySide6.QtGui import QColor, QPixmap
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
@@ -38,9 +38,14 @@ class CorePhotoEditsTests(unittest.TestCase):
         QTest.mouseRelease(view.viewport(), Qt.MouseButton.LeftButton, pos=last)
         self.app.processEvents()
 
+    def close_widget(self, widget):
+        widget.close()
+        widget.deleteLater()
+        self.app.sendPostedEvents(widget, QEvent.Type.DeferredDelete)
+
     def test_board_drags_only_the_picked_edge(self):
         board = WorkspaceCanvas()
-        self.addCleanup(board.close)
+        self.addCleanup(self.close_widget, board)
         board.resize(800, 600)
         record = PhotoRecord("photo", "sample.png", self.pixmap, [], core_columns=self.columns)
         board.add_photos([record])
@@ -64,7 +69,7 @@ class CorePhotoEditsTests(unittest.TestCase):
     def test_large_preview_resizes_and_brush_is_additive_and_undoable(self):
         dialog = PhotoQualityDialog(self.pixmap, {"label_boxes": [[.2, .2, .25, .25]]},
                                     columns=self.columns, exclusions=[])
-        self.addCleanup(dialog.close)
+        self.addCleanup(self.close_widget, dialog)
         dialog.show()
         self.app.processEvents()
         self.drag(dialog.view, QPointF(70, 20), QPointF(70, 42))
@@ -78,6 +83,85 @@ class CorePhotoEditsTests(unittest.TestCase):
         dialog.view.undo_stroke()
         self.assertEqual(dialog.view.exclusions, [])
         self.assertTrue(dialog.boxes[0].isVisible())
+
+    def test_assembled_frame_resizes_the_original_column_from_a_scaled_crop(self):
+        board = WorkspaceCanvas()
+        self.addCleanup(self.close_widget, board)
+        board.resize(800, 600)
+        first = FaciesDetection("Песчаник", .9, [QPointF(45, 10), QPointF(95, 10),
+                                                QPointF(95, 170), QPointF(45, 170)], depth_from=0., depth_to=10.)
+        second = FaciesDetection("Алевролит", .9, [QPointF(45, 170), QPointF(95, 170),
+                                                  QPointF(95, 385), QPointF(45, 385)], depth_from=10., depth_to=20.)
+        record = PhotoRecord("photo", "sample.png", self.pixmap, [first, second], core_columns=self.columns)
+        board.show_correlation({"Р-31": [record]}, {"Р-31": ({"depth_range": (0., 40.)}, None)},
+                               description_only=True)
+        board.show()
+        self.app.processEvents()
+        stack = board._correlation_items[0]
+        top, base = (placement[3] for placement in stack._placements)
+        board.centerOn(stack.mapToScene(top.center()))
+        changed = []
+        board.core_columns_changed.connect(lambda item, boxes: changed.append((item, boxes)))
+        seam = stack.mapToScene(QPointF(top.center().x(), base.top()))
+        self.drag(board, seam, seam + QPointF(0, 20))
+        self.assertEqual(changed, [])
+        edge = stack.mapToScene(QPointF(top.center().x(), top.top()))
+        self.drag(board, edge, edge + QPointF(0, 20))
+        self.assertEqual(len(changed), 1)
+        self.assertIs(changed[0][0], record)
+        expected = 20 + 20 * (170 - 20) / top.height()
+        self.assertAlmostEqual(changed[0][1][0]["top"], expected, delta=1.)
+        self.assertEqual(changed[0][1][1], self.columns[1])
+        self.assertEqual(first.polygon[0], QPointF(45, 10))
+        record.core_columns = changed[0][1]
+        record.core_columns_edited = True
+        board.show_correlation({"Р-31": [record]}, {"Р-31": ({"depth_range": (0., 40.)}, None)},
+                               description_only=True)
+        rebuilt = board._correlation_items[0]
+        new_top = rebuilt._placements[0][3]
+        self.assertGreater(new_top.top(), top.top() + 20)
+        self.assertAlmostEqual(new_top.bottom(), top.bottom())
+        self.assertEqual(first.depth_from, 0.)
+
+    def test_board_reaches_deep_well_end_and_expands_during_pan(self):
+        board = WorkspaceCanvas()
+        self.addCleanup(self.close_widget, board)
+        board.resize(800, 600)
+        board.show()
+        self.app.processEvents()
+        row = FaciesDetection("Алевролит", .9, [QPointF(40, 20), QPointF(100, 20),
+                                              QPointF(100, 370), QPointF(40, 370)],
+                              {"__core_column_description": "1", "__core_column_index": "0"},
+                              depth_from=79_950., depth_to=79_990.)
+        record = PhotoRecord("photo", "sample.png", self.pixmap, [row], core_columns=self.columns)
+        board.show_stack([record], gis_preview={"depth_range": (0., 80_000.)}, description_only=True)
+        stack = board._stack_item
+        well = stack.sceneBoundingRect()
+        self.assertGreater(well.bottom(), 30_000)
+        self.assertTrue(board.sceneRect().contains(well))
+        board.centerOn(well.center().x(), well.bottom())
+        self.assertTrue(board.viewport().rect().contains(board.mapFromScene(well.center().x(), well.bottom())))
+        crop = stack.mapToScene(stack._placements[0][3].center())
+        board.centerOn(crop)
+        self.app.processEvents()
+        screenshot = board.viewport().grab().toImage()
+        point = board.mapFromScene(crop) * screenshot.devicePixelRatio()
+        self.assertEqual(screenshot.pixelColor(point), QColor("#888888"))
+        rect = stack._placements[0][3]
+        edge = board.mapFromScene(stack.mapToScene(QPointF(rect.left(), rect.center().y())))
+        edge *= screenshot.devicePixelRatio()
+        colours = [screenshot.pixelColor(edge + QPoint(dx, dy)) for dx in range(-1, 3) for dy in range(-8, 9)]
+        self.assertTrue(any(colour.green() > colour.red() + 30 and colour.blue() > colour.green() for colour in colours))
+        bar = board.verticalScrollBar()
+        old_end = board.sceneRect().bottom()
+        bar.setValue(bar.maximum())
+        before = bar.value()
+        start = board.viewport().rect().center()
+        QTest.mousePress(board.viewport(), Qt.MouseButton.MiddleButton, pos=start)
+        QTest.mouseMove(board.viewport(), start - QPoint(0, 70))
+        QTest.mouseRelease(board.viewport(), Qt.MouseButton.MiddleButton, pos=start - QPoint(0, 70))
+        self.assertGreater(board.sceneRect().bottom(), old_end)
+        self.assertGreaterEqual(bar.value(), before + 69)
 
     def test_exclusions_round_trip_and_mask_native_pixels_in_both_crops(self):
         with TemporaryDirectory() as folder:

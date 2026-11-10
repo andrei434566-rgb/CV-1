@@ -8,10 +8,13 @@ from PySide6.QtWidgets import QGraphicsObject
 class CoreColumnEdges(QGraphicsObject):
     changed = Signal(object)
 
-    def __init__(self, area, image_size, columns, parent=None, *, verified=False):
+    def __init__(self, area, image_size, columns, parent=None, *, verified=False, source_window=None, first_number=1):
         super().__init__(parent)
         self.area = QRectF(area)
         self.width, self.height = image_size
+        self.on_screen_only = source_window is not None
+        self.source_window = QRectF(source_window) if source_window is not None else QRectF(0, 0, self.width, self.height)
+        self.first_number = first_number
         self.drag = None
         self.hover = None
         self.setAcceptHoverEvents(True)
@@ -28,8 +31,10 @@ class CoreColumnEdges(QGraphicsObject):
         return self.area
 
     def _rect(self, box):
-        sx, sy = self.area.width() / self.width, self.area.height() / self.height
-        return QRectF(self.area.left() + box["left"] * sx, self.area.top() + box["top"] * sy,
+        sx = self.area.width() / self.source_window.width()
+        sy = self.area.height() / self.source_window.height()
+        return QRectF(self.area.left() + (box["left"] - self.source_window.left()) * sx,
+                      self.area.top() + (box["top"] - self.source_window.top()) * sy,
                       (box["right"] - box["left"]) * sx, (box["bottom"] - box["top"]) * sy)
 
     def _tolerance(self):
@@ -57,8 +62,11 @@ class CoreColumnEdges(QGraphicsObject):
                 continue
             side = "left" if abs(point.x() - rect.left()) < abs(point.x() - rect.right()) else "right"
             end = "top" if abs(point.y() - rect.top()) < abs(point.y() - rect.bottom()) else "bottom"
-            dx = abs(point.x() - getattr(rect, side)())
-            dy = abs(point.y() - getattr(rect, end)())
+            x, y = getattr(rect, side)(), getattr(rect, end)()
+            # An internal crop seam can sit close to an edge outside this view.
+            # Only let the user pick source edges that are actually visible.
+            dx = abs(point.x() - x) if self.area.left() - 1e-6 <= x <= self.area.right() + 1e-6 else float("inf")
+            dy = abs(point.y() - y) if self.area.top() - 1e-6 <= y <= self.area.bottom() + 1e-6 else float("inf")
             if min(dx, dy) <= tolerance:
                 candidate = (min(dx, dy), index, side if dx <= tolerance else "", end if dy <= tolerance else "")
                 if best is None or candidate < best:
@@ -100,10 +108,10 @@ class CoreColumnEdges(QGraphicsObject):
         box = dict(original)
         if side:
             low, high = (0, box["right"] - 2) if side == "left" else (box["left"] + 2, self.width)
-            box[side] = max(low, min(high, original[side] + delta.x() * self.width / self.area.width()))
+            box[side] = max(low, min(high, original[side] + delta.x() * self.source_window.width() / self.area.width()))
         if end:
             low, high = (0, box["bottom"] - 2) if end == "top" else (box["top"] + 2, self.height)
-            box[end] = max(low, min(high, original[end] + delta.y() * self.height / self.area.height()))
+            box[end] = max(low, min(high, original[end] + delta.y() * self.source_window.height() / self.area.height()))
         self.columns[index] = box
         self.update()
         event.accept()
@@ -118,6 +126,10 @@ class CoreColumnEdges(QGraphicsObject):
             self.changed.emit([dict(box) for box in self.columns])
 
     def paint(self, painter, option, widget=None):
+        if self.on_screen_only and widget is None:
+            return  # The assembled view's resize handles are interactive controls.
+        painter.save()
+        painter.setClipRect(self.area, Qt.ClipOperation.IntersectClip)
         painter.setBrush(Qt.BrushStyle.NoBrush)
         for index, box in enumerate(self.columns):
             active = self.drag or self.hover
@@ -129,4 +141,5 @@ class CoreColumnEdges(QGraphicsObject):
             rect = self._rect(box)
             painter.drawRect(rect)
             painter.drawText(QRectF(rect.left(), rect.top(), max(12, rect.width()), 14),
-                             Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop, str(index + 1))
+                             Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop, str(self.first_number + index))
+        painter.restore()

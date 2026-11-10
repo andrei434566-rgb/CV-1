@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from dataclasses import dataclass
 from hashlib import md5
 import re
 import json
@@ -34,6 +35,7 @@ def clear_stack_crop_cache() -> None:
 class WorkspaceCanvas(QGraphicsView):
     """Infinite Miro-like board with movable photos and editable facies masks."""
 
+    INITIAL_BOARD = QRectF(-30_000, -30_000, 60_000, 60_000)
     facies_selected = Signal(object, object)
     facies_context_requested = Signal(object, object)
     facies_geometry_changed = Signal(object, object)
@@ -52,7 +54,7 @@ class WorkspaceCanvas(QGraphicsView):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setScene(QGraphicsScene(self))
-        self.scene().setSceneRect(-30_000, -30_000, 60_000, 60_000)
+        self.scene().setSceneRect(self.INITIAL_BOARD)
         self.setRenderHints(QPainter.RenderHint.Antialiasing | QPainter.RenderHint.SmoothPixmapTransform)
         # Repainting only changed item bounds is markedly smoother than
         # redrawing every source photo and every log track on each mouse event.
@@ -65,7 +67,6 @@ class WorkspaceCanvas(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self._scale = 1.0
         self._pan_start = None
-        self._pan_scroll = None
         self._items_by_identifier: dict[str, PhotoItem] = {}
         self._auto_placed_photo_ids: set[str] = set()
         self._stack_item: StackColumnItem | None = None
@@ -75,7 +76,7 @@ class WorkspaceCanvas(QGraphicsView):
 
     def drawBackground(self, painter: QPainter, rect: QRectF) -> None:
         painter.fillRect(rect, QColor("#ffffff" if self.property("clean_background") else "#fbfcfe"))
-        if self.property("clean_background"):
+        if self.property("clean_background") or self.transform().m11() < .1:
             return
         minor_step, major_step = 28, 140
         left = int(rect.left()) - int(rect.left()) % minor_step - minor_step
@@ -94,25 +95,37 @@ class WorkspaceCanvas(QGraphicsView):
 
     def wheelEvent(self, event) -> None:
         factor = 1.14 if event.angleDelta().y() > 0 else 1 / 1.14
-        new_scale = max(0.15, min(12.0, self._scale * factor))
+        new_scale = max(min(1e-6, self._scale), min(12.0, self._scale * factor))
         self.scale(new_scale / self._scale, new_scale / self._scale)
         self._scale = new_scale
+
+    def _expand_board(self, bounds: QRectF) -> None:
+        scene = self.scene()
+        available = scene.sceneRect()
+        if not available.contains(bounds):
+            margin = max(1000., self.viewport().height() / self.transform().m22(),
+                         self.viewport().width() / self.transform().m11())
+            scene.setSceneRect(available.united(bounds.adjusted(-margin, -margin, margin, margin)))
 
     def mousePressEvent(self, event) -> None:
         self.setFocus()
         if event.button() == Qt.MouseButton.MiddleButton:
-            self._pan_start = event.pos()
-            self._pan_scroll = (self.horizontalScrollBar().value(), self.verticalScrollBar().value())
+            self._pan_start = event.position().toPoint()
             self.setCursor(Qt.CursorShape.ClosedHandCursor)
             event.accept()
             return
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event) -> None:
-        if self._pan_start is not None and self._pan_scroll is not None:
-            delta = event.pos() - self._pan_start
-            self.horizontalScrollBar().setValue(self._pan_scroll[0] - delta.x())
-            self.verticalScrollBar().setValue(self._pan_scroll[1] - delta.y())
+        if self._pan_start is not None:
+            point = event.position().toPoint()
+            delta = point - self._pan_start
+            visible = self.mapToScene(self.viewport().rect()).boundingRect()
+            self._expand_board(visible.translated(-delta.x() / self.transform().m11(),
+                                                  -delta.y() / self.transform().m22()))
+            self.horizontalScrollBar().setValue(self.horizontalScrollBar().value() - delta.x())
+            self.verticalScrollBar().setValue(self.verticalScrollBar().value() - delta.y())
+            self._pan_start = point
             event.accept()
             return
         super().mouseMoveEvent(event)
@@ -120,7 +133,6 @@ class WorkspaceCanvas(QGraphicsView):
     def mouseReleaseEvent(self, event) -> None:
         if event.button() == Qt.MouseButton.MiddleButton and self._pan_start is not None:
             self._pan_start = None
-            self._pan_scroll = None
             self.setCursor(Qt.CursorShape.ArrowCursor)
             event.accept()
             return
@@ -147,10 +159,12 @@ class WorkspaceCanvas(QGraphicsView):
             item = self._create_photo_item(record)
             col, row = number % 20, number // 20
             item.setPos(col * 228, row * 330)
+            self._expand_board(item.sceneBoundingRect())
 
     def restore_photo(self, record: PhotoRecord, position: QPointF) -> None:
         item = self._create_photo_item(record)
         item.setPos(position)
+        self._expand_board(item.sceneBoundingRect())
         self._auto_placed_photo_ids.add(record.identifier)
 
     def delete_selected_photos(self) -> None:
@@ -176,6 +190,7 @@ class WorkspaceCanvas(QGraphicsView):
         self._gis_preview = None
         self._rigis_preview = None
         self.scene().clear()
+        self.scene().setSceneRect(self.INITIAL_BOARD)
 
     def clear_generated_items(self) -> None:
         """Remove assembled-core and correlation views while retaining source photos."""
@@ -187,7 +202,9 @@ class WorkspaceCanvas(QGraphicsView):
     def fit_content(self) -> None:
         bounds = self.scene().itemsBoundingRect()
         if not bounds.isEmpty():
-            self.fitInView(bounds.adjusted(-80, -80, 80, 80), Qt.AspectRatioMode.KeepAspectRatio)
+            bounds = bounds.adjusted(-80, -80, 80, 80)
+            self._expand_board(bounds)
+            self.fitInView(bounds, Qt.AspectRatioMode.KeepAspectRatio)
             self._scale = self.transform().m11()
 
     def focus_photos(self) -> bool:
@@ -200,7 +217,9 @@ class WorkspaceCanvas(QGraphicsView):
             bounds = bounds.united(item.sceneBoundingRect())
         for selected in self.scene().selectedItems():
             selected.setSelected(False)
-        self.fitInView(bounds.adjusted(-48, -48, 48, 48), Qt.AspectRatioMode.KeepAspectRatio)
+        bounds = bounds.adjusted(-48, -48, 48, 48)
+        self._expand_board(bounds)
+        self.fitInView(bounds, Qt.AspectRatioMode.KeepAspectRatio)
         self._scale = self.transform().m11()
         self.setFocus()
         return True
@@ -238,6 +257,7 @@ class WorkspaceCanvas(QGraphicsView):
         )
         self._stack_item.facies_selected.connect(self.facies_selected)
         self._stack_item.facies_context_requested.connect(self.facies_context_requested)
+        self._stack_item.core_columns_changed.connect(self.core_columns_changed)
         self._stack_item.depth_binding_requested.connect(self.depth_binding_requested)
         self._stack_item.column_paint_requested.connect(self.column_paint_requested)
         self._stack_item.interpretation_interval_created.connect(self.interpretation_interval_created)
@@ -250,6 +270,7 @@ class WorkspaceCanvas(QGraphicsView):
             default=0,
         )
         self._stack_item.setPos(saved_position if saved_position is not None else QPointF(photo_right_edge + 72, 0))
+        self._expand_board(self._stack_item.sceneBoundingRect().adjusted(-80, -80, 80, 80))
 
     def show_correlation(
         self,
@@ -282,6 +303,7 @@ class WorkspaceCanvas(QGraphicsView):
                 for photo_item in photo_items:
                     if photo_item.record.identifier not in self._auto_placed_photo_ids:
                         photo_item.setPos(cursor, photo_y)
+                        self._expand_board(photo_item.sceneBoundingRect())
                         self._auto_placed_photo_ids.add(photo_item.record.identifier)
                     photo_y += photo_item.boundingRect().height() + 12
                 cursor += photo_width + 18
@@ -295,6 +317,7 @@ class WorkspaceCanvas(QGraphicsView):
             )
             item.facies_selected.connect(self.facies_selected)
             item.facies_context_requested.connect(self.facies_context_requested)
+            item.core_columns_changed.connect(self.core_columns_changed)
             item.depth_binding_requested.connect(self.depth_binding_requested)
             item.column_paint_requested.connect(self.column_paint_requested)
             item.interpretation_interval_created.connect(self.interpretation_interval_created)
@@ -304,6 +327,7 @@ class WorkspaceCanvas(QGraphicsView):
             item.setTransform(QTransform.fromScale(1.0, max(0.2, vertical_scale)))
             item.setPos(saved_positions.get(well_name, QPointF(cursor, 0)))
             self.scene().addItem(item)
+            self._expand_board(item.sceneBoundingRect().adjusted(-80, -80, 80, 80))
             self._correlation_items.append(item)
             cursor += item.boundingRect().width() + max(20.0, spacing)
         if connect_layers:
@@ -1256,6 +1280,15 @@ class CorrelationCurveItem(QGraphicsObject):
         event.ignore()
 
 
+@dataclass
+class _CoreCrop:
+    pixmap: QPixmap
+    detection: FaciesDetection
+    bounds: QRect
+    interval_bounds: QRect
+    column_index: int | None
+
+
 class StackColumnItem(QGraphicsObject):
     HEADER = 52
     # Stage-1 columns form one physical tape.  Visual spacer pixels would look
@@ -1275,6 +1308,7 @@ class StackColumnItem(QGraphicsObject):
     _facies_palette: list[dict[str, str]] = []
     facies_selected = Signal(object, object)
     facies_context_requested = Signal(object, object)
+    core_columns_changed = Signal(object, object)
     depth_binding_requested = Signal(object, object)
     column_paint_requested = Signal(object, object, str)
     interpretation_interval_created = Signal(str, str, float, float)
@@ -1310,6 +1344,7 @@ class StackColumnItem(QGraphicsObject):
             None,
         )
         self._placements: list[tuple[QPixmap, PhotoRecord, FaciesDetection, QRectF, FaciesOverlayItem]] = []
+        self._column_edges: list[tuple[PhotoRecord, int, CoreColumnEdges]] = []
         self._hovered_column: tuple[PhotoRecord, FaciesDetection, str] | None = None
         self._column_draw_start: tuple[str, float] | None = None
         self._column_draw_current_y: float | None = None
@@ -1317,7 +1352,7 @@ class StackColumnItem(QGraphicsObject):
         self._well_drag_start: QPointF | None = None
         self._well_drag_origin: QPointF | None = None
         layers = self._build_layers()
-        max_crop_width = max((pixmap.width() for pixmap, _, _, _ in layers), default=140)
+        max_crop_width = max((crop.pixmap.width() for crop, _, _ in layers), default=140)
         self.column_width = max(160, max_crop_width + 16)
         # Petrel-like layout: depth | assembled core | lithology | facies |
         # GIS | saturation | RIGIS. Both interpretations stay visible in the
@@ -1337,21 +1372,25 @@ class StackColumnItem(QGraphicsObject):
         self._height = self.HEADER + 10
         full_well_layout = bool(self.depth_range) and bool(layers) and all(
             source_detection.depth_from is not None and source_detection.depth_to is not None
-            for _, _, source_detection, _ in layers
+            for _, _, source_detection in layers
         )
         if full_well_layout:
             top, base = (float(value) for value in self.depth_range)
             self._height = self.HEADER + 10 + self._body_height_for_depth_range()
             body_top, body_bottom = self.HEADER + 10, self._height - 8
-            for pixmap, record, source_detection, display_detection in layers:
+            for crop, record, source_detection in layers:
                 depth_from, depth_to = float(source_detection.depth_from), float(source_detection.depth_to)
                 y1 = body_top + (depth_from - top) / max(base - top, 1e-9) * (body_bottom - body_top)
                 y2 = body_top + (depth_to - top) / max(base - top, 1e-9) * (body_bottom - body_top)
+                if record.core_columns_edited and crop.bounds.height() < crop.interval_bounds.height():
+                    # Trim the visible rock inside its original depth span.
+                    # Stretching the crop back would hide the effect of the edit.
+                    scale_y = (y2 - y1) / crop.interval_bounds.height()
+                    y1 += (crop.bounds.top() - crop.interval_bounds.top()) * scale_y
+                    y2 -= (crop.interval_bounds.bottom() - crop.bounds.bottom()) * scale_y
                 interval_height = max(2.0, abs(y2 - y1))
-                # The measured-depth interval owns the entire vertical span.
-                # Letterboxing the photograph left white gaps in both the
-                # assembled core and its facies track.
-                draw_width = min(self.column_width - 16, max(2.0, float(pixmap.width())))
+                # Each visible core fragment owns its full vertical span.
+                draw_width = min(self.column_width - 16, max(2.0, float(crop.pixmap.width())))
                 draw_height = interval_height
                 rect = QRectF(
                     self.core_x + (self.column_width - draw_width) / 2,
@@ -1359,27 +1398,40 @@ class StackColumnItem(QGraphicsObject):
                     draw_width,
                     draw_height,
                 )
-                overlay = FaciesOverlayItem(pixmap.size(), rect, [display_detection], self,
-                                            hover_detections=[source_detection])
-                overlay.facies_clicked.connect(lambda _, rec=record, det=source_detection: self.facies_selected.emit(rec, det))
-                overlay.facies_context_requested.connect(lambda _, rec=record, det=source_detection: self.facies_context_requested.emit(rec, det))
-                self._placements.append((pixmap, record, source_detection, rect, overlay))
+                self._add_placement(crop, record, source_detection, rect)
         else:
-            for pixmap, record, source_detection, display_detection in layers:
+            for crop, record, source_detection in layers:
+                pixmap = crop.pixmap
                 x = self.core_x + (self.column_width - pixmap.width()) / 2
                 rect = QRectF(x, self._height, pixmap.width(), pixmap.height())
-                overlay = FaciesOverlayItem(pixmap.size(), rect, [display_detection], self,
-                                            hover_detections=[source_detection])
-                overlay.facies_clicked.connect(lambda _, rec=record, det=source_detection: self.facies_selected.emit(rec, det))
-                overlay.facies_context_requested.connect(lambda _, rec=record, det=source_detection: self.facies_context_requested.emit(rec, det))
-                self._placements.append((pixmap, record, source_detection, rect, overlay))
+                self._add_placement(crop, record, source_detection, rect)
                 self._height += pixmap.height() + self.GAP
         if not self._placements and self.depth_range is not None:
             self._height = max(self._height, self.HEADER + 10 + self._body_height_for_depth_range())
         self._height += 4
         self.setZValue(1)
+        self.setFlag(QGraphicsObject.GraphicsItemFlag.ItemUsesExtendedStyleOption)
         self.setAcceptedMouseButtons(Qt.MouseButton.LeftButton | Qt.MouseButton.RightButton)
         self.setAcceptHoverEvents(True)
+
+    def _add_placement(self, crop, record, source, rect) -> None:
+        overlay = FaciesOverlayItem(crop.pixmap.size(), rect, [crop.detection], self, hover_detections=[source])
+        overlay.facies_clicked.connect(lambda _: self.facies_selected.emit(record, source))
+        overlay.facies_context_requested.connect(lambda _: self.facies_context_requested.emit(record, source))
+        self._placements.append((crop.pixmap, record, source, rect, overlay))
+        index = crop.column_index
+        if index is not None:
+            edges = CoreColumnEdges(rect, (record.pixmap.width(), record.pixmap.height()),
+                                    [record.core_columns[index]], self, verified=record.core_columns_verified,
+                                    source_window=crop.bounds, first_number=index + 1)
+            edges.changed.connect(lambda boxes: self._resize_source_column(record, index, boxes[0]))
+            self._column_edges.append((record, index, edges))
+
+    def _resize_source_column(self, record, index, box) -> None:
+        columns = list(record.core_columns)
+        if index < len(columns):
+            columns[index] = box
+            self.core_columns_changed.emit(record, columns)
 
     def _body_height_for_depth_range(self) -> float:
         if self.depth_range is None:
@@ -1395,6 +1447,9 @@ class StackColumnItem(QGraphicsObject):
 
     def refresh_record_descriptions(self, record: PhotoRecord) -> None:
         """Refresh text in place without recropping images or moving the board."""
+        for source_record, index, edges in self._column_edges:
+            if source_record is record:
+                edges.set_columns(record.core_columns[index:index + 1], record.core_columns_verified)
         changed = False
         for _, source_record, source, _, overlay in self._placements:
             if source_record is not record or not any(item is source for item in record.detections):
@@ -1454,7 +1509,10 @@ class StackColumnItem(QGraphicsObject):
         )
         for x in separators:
             painter.drawLine(x, self.HEADER, x, self._height - 6)
+        visible = option.exposedRect if widget is not None and option is not None else self.boundingRect()
         for pixmap, record, source_detection, rect, overlay in self._placements:
+            if rect.bottom() + 2 < visible.top() or rect.top() - 2 > visible.bottom():
+                continue
             painter.drawPixmap(rect.toRect(), pixmap)
             self._draw_lithology_badge(painter, rect, source_detection)
             self._draw_facies_badge(painter, rect, source_detection)
@@ -2101,13 +2159,12 @@ class StackColumnItem(QGraphicsObject):
         base = "?" if depth_to is None else f"{depth_to:g}"
         return f"{top}\n—\n{base}"
 
-    def _build_layers(self) -> list[tuple[QPixmap, PhotoRecord, FaciesDetection, FaciesDetection]]:
-        layers: list[tuple[QPixmap, PhotoRecord, FaciesDetection, FaciesDetection]] = []
+    def _build_layers(self) -> list[tuple[_CoreCrop, PhotoRecord, FaciesDetection]]:
+        layers = []
         for record, detection in self.ordered_layer_entries(self.records):
             crop = self._crop_detection(record, detection)
             if crop is not None:
-                pixmap, translated = crop
-                layers.append((pixmap, record, detection, translated))
+                layers.append((crop, record, detection))
         return layers
 
     @classmethod
@@ -2199,13 +2256,14 @@ class StackColumnItem(QGraphicsObject):
         return ordered
 
     @staticmethod
-    def _crop_detection(record: PhotoRecord, detection: FaciesDetection) -> tuple[QPixmap, FaciesDetection] | None:
+    def _crop_detection(record: PhotoRecord, detection: FaciesDetection) -> _CoreCrop | None:
         global _STACK_CROP_CACHE_PIXELS
 
         bounds = QPolygonF(detection.polygon).boundingRect().toAlignedRect()
         bounds = bounds.intersected(QRect(0, 0, record.pixmap.width(), record.pixmap.height()))
         if bounds.width() <= 0 or bounds.height() <= 0:
             return None
+        interval_bounds = bounds
         # The source photo keeps the interpreter's exact mask.  The assembled
         # log displays the complete physical column for that vertical interval,
         # so an irregular mask cannot leave transparent holes in the core tape.
@@ -2216,9 +2274,14 @@ class StackColumnItem(QGraphicsObject):
             overlap_y = max(0.0, min(bounds.bottom(), bottom) - max(bounds.top(), top))
             return overlap_x * overlap_y, right - left
 
-        overlapping_columns = [item for item in record.core_columns if column_overlap(item)[0] > 0]
-        column = max(overlapping_columns, key=column_overlap, default=None)
-        if column is not None:
+        index = str(detection.attributes.get("__core_column_index", ""))
+        if detection.attributes.get("__core_column_description") == "1" and index.isdigit() and int(index) < len(record.core_columns):
+            column_index = int(index)
+        else:
+            overlapping_columns = [i for i, item in enumerate(record.core_columns) if column_overlap(item)[0] > 0]
+            column_index = max(overlapping_columns, key=lambda i: column_overlap(record.core_columns[i]), default=None)
+        if column_index is not None:
+            column = record.core_columns[column_index]
             column_rect = QRectF(
                 float(column["left"]), float(column["top"]),
                 float(column["right"]) - float(column["left"]),
@@ -2280,7 +2343,7 @@ class StackColumnItem(QGraphicsObject):
             alternatives=dict(detection.alternatives),
             stack_order=detection.stack_order,
         )
-        return pixmap, translated
+        return _CoreCrop(pixmap, translated, bounds, interval_bounds, column_index)
 
 
 def facies_color(label: str) -> QColor:
