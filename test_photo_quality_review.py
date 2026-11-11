@@ -175,8 +175,8 @@ class ReviewQueueTests(unittest.TestCase):
         export_core_description_report(target,'Проверка',[{'name':'А','layers':[{'label':'F1','attributes':attrs}]}],'xlsx')
         book=load_workbook(target)
         try:
-            self.assertEqual(book.active['V4'].value,'Серый керн.')
-            self.assertIn('Фото: Проверьте резкость.',book.active['V4'].comment.text)
+            self.assertEqual(book.active['AD4'].value,'Серый керн.')
+            self.assertIn('Фото: Проверьте резкость.',book.active['AD4'].comment.text)
         finally:book.close()
 
     def test_recomputed_color_updates_only_previous_automatic_color(self):

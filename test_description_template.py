@@ -192,8 +192,8 @@ class DescriptionCardTests(unittest.TestCase):
             export_core_description_report(target, "Проверка", wells, "xlsx")
             workbook = load_workbook(target)
             try:
-                self.assertEqual(workbook.active["V4"].value, attrs["Краткое описание"])
-                self.assertIn("Низкая уверенность", workbook.active["V4"].comment.text)
+                self.assertEqual(workbook.active["AD4"].value, attrs["Краткое описание"])
+                self.assertIn("Низкая уверенность", workbook.active["AD4"].comment.text)
                 rules = [formula for group in workbook.active.conditional_formatting._cf_rules.values()
                          for rule in group for formula in rule.formula]
                 self.assertTrue(any('SEARCH("предполож"' in formula for formula in rules))
