@@ -801,7 +801,8 @@ class FaciesDialog(QDialog):
     def _build_report_tab(self, attributes):
         page = QWidget()
         form = QFormLayout(page)
-        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)
+        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapAllRows)
+        form.setVerticalSpacing(5)
         form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
         self.report_facies = {field: QLabel() for field in ("Индекс фации", "Код фации")}
         for field, label in self.report_facies.items():
