@@ -62,7 +62,7 @@ def main() -> int:
 
         os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
         import cv2  # noqa: F401 - verifies bundled runtime
-        import openpyxl  # noqa: F401 - verifies Excel import runtime
+        from openpyxl import load_workbook
         import torch  # noqa: F401 - verifies model runtime
         from PySide6.QtWidgets import QApplication
         from app.domain.facies_catalog import FACIES_MODEL_CLASSES
@@ -78,7 +78,26 @@ def main() -> int:
         import json
         from PySide6.QtCore import QProcess
         from app.infrastructure.local_vision import default_model_folder
+        from app.infrastructure.core_report_export import export_core_description_report
         from app.runtime_paths import bundled_root
+        from tempfile import TemporaryDirectory
+
+        guide = (bundled_root() / "docs/USER_GUIDE_RU.md").read_text(encoding="utf-8")
+        if "31 столбец" not in guide or "Поля отчёта" not in guide:
+            raise RuntimeError("Portable user guide is missing the current report instructions")
+        with TemporaryDirectory() as folder:
+            path = Path(folder) / "report.xlsx"
+            export_core_description_report(path, "CV-1", [{"name": "Р-31", "layers": [{
+                "label": "Проверка", "depth_from": 100, "depth_to": 101,
+                "attributes": {"Код макрофации": "M1", "Примечания": "Проверено"},
+            }]}], "xlsx")
+            report = load_workbook(path, read_only=True)
+            try:
+                sheet = report.active
+                if (sheet.max_column, sheet["Y4"].value, sheet["AE4"].value) != (31, "M1", "Проверено"):
+                    raise RuntimeError("Portable Excel report does not match the current template")
+            finally:
+                report.close()
 
         worker = QProcess()
         command = ["--vision-worker"]

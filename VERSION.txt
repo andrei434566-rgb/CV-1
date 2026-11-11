@@ -1,4 +1,4 @@
-CV-1 Kern Analyzer 2.2.2 Vision
+CV-1 Kern Analyzer 2.2.3 Vision
 
 Негенеративное распознавание: YOLO для геометрии, ConvNeXt-Tiny для литологии,
 описания по шаблонам и локальный справочник. LLM/VLM не запускаются.
