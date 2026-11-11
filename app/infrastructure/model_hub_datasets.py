@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 from PIL import Image, ImageDraw
+from app.domain.core_report_fields import layer_report_fields
 from app.infrastructure.model_hub import digest, inside, read_json, verify_files, atomic_json
 
 
@@ -88,7 +89,8 @@ def prepare_datasets(hub: Path, output: Path) -> dict:
                     {"from": "gpt", "value": answer}],
                     "metadata": {"training_approved": True, "geology_approved": True, "source_well": row.get("well"),
                                  "source_photo_sha256": row["source_photo_sha256"], "group": group, "split": split}})
-            exported.append({"key": row["key"], "group": group, "split": split, "label": row["label"]})
+            exported.append({"key": row["key"], "group": group, "split": split, "label": row["label"],
+                             "report_fields": layer_report_fields(attrs) if row.get("text_approved") is True else {}})
     for split, samples in vlm.items():
         destination = output / "vlm" / (split + ".jsonl")
         destination.parent.mkdir(parents=True, exist_ok=True)

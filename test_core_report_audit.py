@@ -95,7 +95,7 @@ class CoreReportAuditTests(unittest.TestCase):
         _,merged=prepare_report_rows({'layers':[first,second]})
         self.assertEqual(set(json.loads(merged[0]['attributes']['__description_assumptions'])),{'Цвет','Зернистость'})
 
-    def test_excel_keeps_22_columns_and_adds_gaps_to_both_related_rows(self):
+    def test_excel_keeps_31_columns_and_adds_gaps_to_both_related_rows(self):
         from openpyxl import load_workbook
         well={'name':'А','layers':[layer(100,101),layer(102,103)]}
         original=copy.deepcopy(well)
@@ -103,10 +103,10 @@ class CoreReportAuditTests(unittest.TestCase):
             path=Path(folder)/'report.xlsx';export_core_description_report(path,'Проверка',[well],'xlsx')
             book=load_workbook(path)
             try:
-                self.assertEqual(book.active.max_column,22)
-                self.assertIn('101–102',book.active['V4'].comment.text)
-                self.assertIn('101–102',book.active['V5'].comment.text)
-                self.assertEqual(book.active['V4'].value,'Серый песчаник.')
+                self.assertEqual(book.active.max_column,31)
+                self.assertIn('101–102',book.active['AD4'].comment.text)
+                self.assertIn('101–102',book.active['AD5'].comment.text)
+                self.assertEqual(book.active['AD4'].value,'Серый песчаник.')
             finally:book.close()
         self.assertEqual(well,original)
 
@@ -171,7 +171,7 @@ class ProjectReadinessUiTests(unittest.TestCase):
         self.assertEqual(detection.attributes,original)
         self.assertIn('замечаний:',window.statusBar().currentMessage())
         book=load_workbook(target)
-        try:self.assertEqual(book.active.max_column,22)
+        try:self.assertEqual(book.active.max_column,31)
         finally:book.close()
 
     def test_summary_closes_with_main_window_and_stops_its_refresh_timer(self):

@@ -119,10 +119,30 @@ class AttributeLibraryTests(unittest.TestCase):
         export_core_description_report(target,'Проверка',[{'name':'А','layers':[{'label':'F1','attributes':attrs}]}],'xlsx')
         book=load_workbook(target)
         try:
-            cell=book.active['V4'];self.assertEqual(cell.value,attrs['__vlm_description'])
+            cell=book.active['AD4'];self.assertEqual(cell.value,attrs['__vlm_description'])
             self.assertIn('разным прослоям',cell.comment.text)
-            self.assertTrue(any(rule.formula[0].startswith('EXACT(V4,') for group in book.active.conditional_formatting._cf_rules.values() for rule in group))
+            self.assertTrue(any(rule.formula[0].startswith('EXACT(AD4,') for group in book.active.conditional_formatting._cf_rules.values() for rule in group))
         finally:book.close()
+
+    def test_report_choices_reopen_and_enter_reviewed_examples(self):
+        settings = QSettings(str(Path(self.temp.name) / 'report-settings.ini'), QSettings.Format.IniFormat)
+        with patch('app.ui.dialogs.facies_dialog.QSettings', return_value=settings):
+            dialog = FaciesDialog('', .8, {'Индексс ассоциации фаций': 'AA1'}, preview_pixmap=self.photo)
+            self.addCleanup(dialog.close)
+            self.assertEqual(dialog.report_combos['Индекс ассоциации фаций'].currentText(), 'AA1')
+            dialog.report_combos['Код макрофации'].setEditText('LG-01')
+            dialog.report_note.setPlainText('Комментарий эксперта')
+            self.assertTrue(dialog.has_unsaved_changes())
+            attrs = dialog.selected_attributes()
+            reopened = FaciesDialog('', .8, {}, preview_pixmap=self.photo)
+            self.addCleanup(reopened.close)
+            self.assertGreater(reopened.report_combos['Код макрофации'].findText('LG-01'), 0)
+            self.assertEqual(reopened.report_combos['Код макрофации'].currentText(), '')
+        self.assertEqual(attrs['Код макрофации'], 'LG-01')
+        self.assertEqual(attrs['Примечания'], 'Комментарий эксперта')
+        sample = write_example({**self.payload, 'attributes': attrs}, self.data, root=self.root)
+        self.assertEqual(sample['report_fields']['Код макрофации'], 'LG-01')
+        self.assertNotIn('Код макрофации', sample['observations'])
 
     def test_card_invalidates_old_evidence_and_shows_contradiction_without_overwriting(self):
         settings=QSettings(str(Path(self.temp.name)/'settings.ini'),QSettings.Format.IniFormat)

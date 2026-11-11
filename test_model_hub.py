@@ -1,5 +1,6 @@
 """Real file transport: atomic versions, offline fallback and expert-only datasets."""
 from copy import deepcopy
+from concurrent.futures import ThreadPoolExecutor
 import json
 from pathlib import Path
 import tempfile
@@ -43,6 +44,26 @@ class ModelHubTests(unittest.TestCase):
         receipt = submit_reviewed_packet(self.hub, packet)
         approve_packet(self.hub, receipt["batch_id"])
         return packet, receipt
+
+    def test_ten_computers_send_in_parallel_and_repeat_upload_is_idempotent(self):
+        packets = []
+        for index in range(10):
+            snapshot = self.snapshot(well=f"Well {index}")
+            snapshot["computer"] = f"PC-{index}"
+            Image.new("RGB", (100, 100), (80 + index, 100, 120)).save(snapshot["photos"][0]["source"])
+            attrs = snapshot["photos"][0]["annotations"][0]["attributes"]
+            attrs["Код макрофации"] = f"M{index}"
+            packets.append(materialize_packet(snapshot, self.root / "outbox"))
+        with ThreadPoolExecutor(max_workers=12) as executor:
+            receipts = list(executor.map(lambda packet: submit_reviewed_packet(self.hub, packet), [*packets, packets[0], packets[0]]))
+        self.assertEqual(len({row["batch_id"] for row in receipts}), 10)
+        self.assertEqual(sum(row["duplicate"] for row in receipts), 2)
+        self.assertEqual(len(list((self.hub / "training/incoming").iterdir())), 10)
+        for row in receipts[:10]:
+            approve_packet(self.hub, row["batch_id"])
+        dataset = prepare_datasets(self.hub, self.root / "dataset")
+        self.assertEqual({sample["report_fields"]["Код макрофации"] for sample in dataset["samples"]},
+                         {f"M{index}" for index in range(10)})
 
     def test_copies_locally_and_keeps_active_state_when_server_disappears(self):
         self.publish()

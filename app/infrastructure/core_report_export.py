@@ -14,6 +14,7 @@ from tempfile import TemporaryDirectory
 
 from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
 from app.domain.facies_catalog import facies_identity
+from app.domain.core_report_fields import INTERVAL_SHIFT_FIELD, REPORT_CHOICE_FIELDS, REPORT_NOTE_FIELD, layer_report_fields
 from app.infrastructure.description_template import PHOTO_UNRESOLVED, display_description, read_assumptions
 from app.runtime_paths import bundled_root
 
@@ -133,6 +134,7 @@ def _merged_layers(well: dict) -> list[dict]:
             and dict(merged[-1].get("vlm") or {}) == dict(layer.get("vlm") or {})
             and all(str(merged[-1]["attributes"].get(field) or "") == str(layer["attributes"].get(field) or "")
                     for field in LITHOLOGY_ATTRIBUTE_OPTIONS)
+            and layer_report_fields(merged[-1]["attributes"]) == layer_report_fields(layer["attributes"])
         ):
             previous = merged[-1]
             previous_end = _depth_or_none(previous.get("depth_to"))
@@ -194,10 +196,13 @@ OFFICIAL_HEADERS = (
     "Краткое описание", "Примечание", "Литологическое описание (16 параметров)",
 )
 
-# The user's 22-column workbook is the only Excel export layout. Its example
+# The user's 31-column workbook is the Excel export layout. Its example
 # row is cleared on export; the original merged headers and formatting remain.
 FINAL_XLSX_TEMPLATE = "core_description_final_template.xlsx"
-FINAL_XLSX_TEMPLATE_SHA256 = "cae3ef85741960ea2af7186e4d1fcae4bae8a777d3c335818b07022fb91884c9"
+FINAL_XLSX_TEMPLATE_SHA256 = "c56e648c9143ece6b55462f4251bfbb430a026bfb2f16c4f580adbe6b62d464c"
+XLSX_REPORT_COLUMNS = 31
+XLSX_DESCRIPTION_COLUMN = "AD"
+XLSX_REPORT_CHOICE_COLUMNS = ("W", "X", "Y", "Z", "AC")
 
 
 def _text(value: object, default: str = "") -> str:
@@ -319,6 +324,7 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
     if hashlib.sha256(template.read_bytes()).hexdigest() != FINAL_XLSX_TEMPLATE_SHA256:
         raise RuntimeError("Шаблон итогового Excel изменён; экспорт остановлен")
     workbook = load_workbook(template)
+    wells = wells or [{"name": "Послойное описание"}]
     source_sheet = workbook.active
     sheets = [source_sheet]
     for _ in wells[1:]:
@@ -352,7 +358,7 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
             for number in issue.rows:row_messages[number].append({'message':issue.message,'code':issue.code})
         last_row = max(sheet.max_row, len(layers) + 3)
         for row_number in range(4, last_row + 1):
-            for column in range(1, 23):
+            for column in range(1, XLSX_REPORT_COLUMNS + 1):
                 cell = sheet.cell(row_number, column)
                 cell.value = None  # Remove the supplied example, not its header.
                 if row_number > 4:
@@ -360,56 +366,81 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
             sheet.row_dimensions[row_number].height = sheet.row_dimensions[4].height
 
             # These formulas remain blank until the specialist enters inputs.
-            sheet[f"H{row_number}"] = f'=IF(COUNT(D{row_number},G{row_number})=2,D{row_number}+G{row_number},"")'
-            sheet[f"I{row_number}"] = f'=IF(COUNT(E{row_number},G{row_number})=2,E{row_number}+G{row_number},"")'
-            sheet[f"L{row_number}"] = f'=IF(AND(ISNUMBER(J{row_number}),J{row_number}>0,ISNUMBER(K{row_number})),K{row_number}/J{row_number}*100,"")'
-            sheet[f"O{row_number}"] = f'=IF(COUNT(M{row_number},G{row_number})=2,M{row_number}+G{row_number},"")'
-            sheet[f"P{row_number}"] = f'=IF(COUNT(N{row_number},G{row_number})=2,N{row_number}+G{row_number},"")'
-            sheet[f"R{row_number}"] = f'=IF(COUNT(M{row_number}:N{row_number})=2,N{row_number}-M{row_number},"")'
-            for letter in ("H", "I", "M", "N", "O", "P", "R"):
+            r = row_number
+            sheet[f"I{r}"] = f'=IF(COUNT(D{r},G{r})=2,D{r}+G{r},"")'
+            sheet[f"J{r}"] = f'=IF(COUNT(E{r},G{r})=2,E{r}+G{r},"")'
+            sheet[f"M{r}"] = f'=IF(AND(ISNUMBER(K{r}),K{r}>0,ISNUMBER(L{r})),L{r}/K{r}*100,"")'
+            for target, depth in (("P", "N"), ("Q", "O")):
+                sheet[f"{target}{r}"] = (f'=IF(AND(COUNT({depth}{r},G{r})=2,OR(H{r}="",ISNUMBER(H{r}))),'
+                                         f'{depth}{r}+G{r}+SUM(H{r}),"")')
+            sheet[f"S{r}"] = f'=IF(COUNT(N{r}:O{r})=2,O{r}-N{r},"")'
+            for letter in ("I", "J", "N", "O", "P", "Q", "S"):
                 sheet[f"{letter}{row_number}"].number_format = "0.00"
-            sheet[f"L{row_number}"].number_format = "0.0"
+            sheet[f"M{row_number}"].number_format = "0.0"
 
         for row_number in range(4, max(5, len(layers) + 4)):
             for column, key in (
                 ("A", "field"), ("B", "well_number"),
                 ("D", "core_top"), ("E", "core_base"), ("F", "stratigraphy"),
-                ("G", "gis_shift"), ("J", "penetration"), ("K", "core_recovered"),
+                ("G", "gis_shift"), ("K", "penetration"), ("L", "core_recovered"),
             ):
-                sheet[f"{column}{row_number}"] = report_inputs.get(key)
+                cell = sheet[f"{column}{row_number}"]
+                value = report_inputs.get(key)
+                cell.value = str(value) if column in {"A", "B", "F"} and value is not None else value
+                if isinstance(cell.value, str):
+                    cell.data_type = "s"
 
         for layer_index, layer in enumerate(layers, 1):
             row_number = layer_index + 3
             attributes = dict(layer.get("attributes") or {})
+            report_fields = layer_report_fields(attributes)
             top = _depth_or_none(layer.get("depth_from"))
             base = _depth_or_none(layer.get("depth_to"))
             if top is not None and math.isfinite(top):
-                sheet[f"M{row_number}"] = top
+                sheet[f"N{row_number}"] = top
             if base is not None and math.isfinite(base):
-                sheet[f"N{row_number}"] = base
-            sheet[f"Q{row_number}"] = layer_index
-            sheet[f"C{row_number}"] = layer.get("__report_drilling_number")
-            sheet[f"S{row_number}"] = _text(attributes.get("Название фации"), _text(layer.get("label")))
-
-            # Reference metadata and the old best.pt text head are not VLM
-            # observations. Only explicit VLM output may fill T:V.
+                sheet[f"O{row_number}"] = base
+            sheet[f"R{row_number}"] = layer_index
+            offset = report_fields.get(INTERVAL_SHIFT_FIELD, "")
+            if offset:
+                numeric = _depth_or_none(offset.replace(",", ".").replace("−", "-"))
+                cell = sheet[f"H{row_number}"]
+                cell.value = numeric if numeric is not None and math.isfinite(numeric) else offset
+                if isinstance(cell.value, str):
+                    cell.data_type = "s"
             vlm = dict(layer.get("vlm") or {})
-            sheet[f"T{row_number}"] = _text(vlm.get("facies_association") or attributes.get("__vlm_facies_association"))
-            sheet[f"U{row_number}"] = _text(vlm.get("depositional_environment") or attributes.get("__vlm_depositional_environment"))
-            sheet[f"V{row_number}"] = display_description(
+            description = display_description(
                 attributes, _text(vlm.get("description") or attributes.get("__vlm_description")))
             hydrodynamic = _text(attributes.get("__vlm_hydrodynamic_regime"))
             if hydrodynamic and not (attributes.get("__description_mode") == "template" and hydrodynamic == PHOTO_UNRESOLVED):
                 note = "Гидродинамический режим: " + hydrodynamic
-                description = str(sheet[f"V{row_number}"].value or "")
                 if "Гидродинамический режим:" not in description:
-                    sheet[f"V{row_number}"] = (description + "\n" + note).strip()
+                    description = (description + "\n" + note).strip()
+            text_columns = {
+                "C": layer.get("__report_drilling_number"),
+                "T": attributes.get("Индекс фации"),
+                "U": _text(attributes.get("Название фации"), _text(layer.get("label"))),
+                "V": attributes.get("Код фации"),
+                "AA": vlm.get("facies_association") or attributes.get("__vlm_facies_association"),
+                "AB": vlm.get("depositional_environment") or attributes.get("__vlm_depositional_environment"),
+                XLSX_DESCRIPTION_COLUMN: description,
+                "AE": report_fields.get(REPORT_NOTE_FIELD),
+            }
+            text_columns.update((column, report_fields.get(field))
+                                for column, field in zip(XLSX_REPORT_CHOICE_COLUMNS, REPORT_CHOICE_FIELDS))
+            for column, value in text_columns.items():
+                if value is not None and value != "":
+                    cell = sheet[f"{column}{row_number}"]
+                    cell.value = str(value)
+                    cell.data_type = "s"
             review_attributes=dict(attributes)
             review_attributes['__report_audit']=json.dumps(row_messages.get(row_number-4,[]),ensure_ascii=False)
             _attach_description_review(sheet, row_number, review_attributes)
-            if any(sheet[f"{letter}{row_number}"].value for letter in ("S", "T", "U", "V")):
+            if any(text_columns.values()):
                 lines = 1
-                for letter in ("S", "T", "U", "V"):
+                for letter in text_columns:
+                    if letter == "C":
+                        continue
                     cell = sheet[f"{letter}{row_number}"]
                     alignment = copy(cell.alignment)
                     alignment.wrap_text, alignment.vertical = True, "top"
@@ -422,15 +453,10 @@ def _export_xlsx(file_path: Path, project_title: str, wells: list[dict]) -> None
         if layers or any(value is not None and value != "" for value in report_inputs.values()):
             _highlight_report_problems(sheet, 4, max(4, len(layers) + 3))
 
-    if not wells:
-        source_sheet.title = "Послойное описание"
-        for row in source_sheet.iter_rows(min_row=4, max_col=22):
-            for cell in row:
-                cell.value = None
     from openpyxl.styles import Border, Side
     grid = Side(style="thin", color="000000")
     for sheet in workbook.worksheets:
-        for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=1, max_col=22):
+        for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=1, max_col=XLSX_REPORT_COLUMNS):
             for cell in row:
                 cell.border = Border(left=grid, right=grid, top=grid, bottom=grid)
                 text_font = copy(cell.font)
@@ -463,10 +489,17 @@ def _attach_description_review(sheet, row_number, attributes):
             messages.extend('Отчёт: '+row['message'] for row in rows if isinstance(row,dict) and isinstance(row.get('message'),str))
     except (ValueError,TypeError):pass
     if not messages:return
-    cell=sheet[f"V{row_number}"]
+    cell=sheet[f"{XLSX_DESCRIPTION_COLUMN}{row_number}"]
     cell.comment=Comment("Проверить признаки в карточке CV-1:\n\n"+"\n\n".join(messages)[:6000],"CV-1")
-    literal=str(cell.value or '').replace('"','""').replace('\r','').replace('\n','"&CHAR(10)&"')
-    formula=f'EXACT(V{row_number},"{literal}")'
+    parts = []
+    for index, line in enumerate(str(cell.value or '').replace('\r', '').split('\n')):
+        if index:
+            parts.append('CHAR(10)')
+        for start in range(0, len(line), 120):
+            chunk = line[start:start + 120].replace('"', '""')
+            parts.append(f'"{chunk}"')
+    literal = '&'.join(parts) or '""'
+    formula=f'EXACT({cell.coordinate},{literal})'
     if len(formula)<7900:
         sheet.conditional_formatting.add(cell.coordinate,FormulaRule(formula=[formula],
             fill=PatternFill("solid",fgColor="FF0000"),font=Font(color="000000")))
@@ -486,23 +519,24 @@ def _highlight_report_problems(sheet, first: int, last: int) -> None:
     mark("A B C F", 'LEN(TRIM({c}{r}&""))=0')
     mark("D E", 'OR(COUNT($D{r}:$E{r})<>2,$E{r}<=$D{r})')
     mark("G", 'NOT(ISNUMBER(G{r}))')
-    mark("H I", 'OR(COUNT($D{r}:$E{r})<>2,NOT(ISNUMBER($G{r})),$E{r}<=$D{r})')
-    mark("J", 'OR(NOT(ISNUMBER(J{r})),J{r}<=0)')
-    mark("K", 'OR(NOT(ISNUMBER(K{r})),K{r}<0,AND(ISNUMBER(J{r}),K{r}>J{r}))')
-    mark("L", 'OR(COUNT($J{r}:$K{r})<>2,$J{r}<=0,$K{r}<0,$K{r}>$J{r})')
-    depth_rule = ('OR(COUNT($M{r}:$N{r})<>2,$N{r}<=$M{r},'
-                  'AND(ISNUMBER($D{r}),$M{r}<$D{r}),AND(ISNUMBER($E{r}),$N{r}>$E{r}))')
-    mark("M N R", depth_rule)
-    mark("O P", depth_rule[:-1] + ',NOT(ISNUMBER($G{r})))')
+    mark("H", 'AND(H{r}<>"",NOT(ISNUMBER(H{r})))')
+    mark("I J", 'OR(COUNT($D{r}:$E{r})<>2,NOT(ISNUMBER($G{r})),$E{r}<=$D{r})')
+    mark("K", 'OR(NOT(ISNUMBER(K{r})),K{r}<=0)')
+    mark("L", 'OR(NOT(ISNUMBER(L{r})),L{r}<0,AND(ISNUMBER(K{r}),L{r}>K{r}))')
+    mark("M", 'OR(COUNT($K{r}:$L{r})<>2,$K{r}<=0,$L{r}<0,$L{r}>$K{r})')
+    depth_rule = ('OR(COUNT($N{r}:$O{r})<>2,$O{r}<=$N{r},'
+                  'AND(ISNUMBER($D{r}),$N{r}<$D{r}),AND(ISNUMBER($E{r}),$O{r}>$E{r}))')
+    mark("N O S", depth_rule)
+    mark("P Q", depth_rule[:-1] + ',NOT(ISNUMBER($G{r})),AND($H{r}<>"",NOT(ISNUMBER($H{r}))))')
     uncertain = ["не установ", "не определ", "не различим", "уверенность низ", "низкая уверенность", "ошибка", "оборван", "предполож"]
     checks = ','.join(f'ISNUMBER(SEARCH("{term}",{{c}}{{r}}))' for term in uncertain)
-    mark("S T U V", 'OR(LEN(TRIM({c}{r}&""))=0,' + checks + ')')
+    mark("U AA AB AD", 'OR(LEN(TRIM({c}{r}&""))=0,' + checks + ')')
     # Both sides of an overlap are visible, and the warning clears if either
     # contact is corrected directly in the exported workbook.
     for row in range(first, last):
-        for address in (f"N{row}", f"M{row + 1}"):
+        for address in (f"O{row}", f"N{row + 1}"):
             sheet.conditional_formatting.add(address, FormulaRule(
-                formula=[f'AND(COUNT($N${row},$M${row + 1})=2,$N${row}>$M${row + 1})'], fill=fill, font=font))
+                formula=[f'AND(COUNT($O${row},$N${row + 1})=2,$O${row}>$N${row + 1})'], fill=fill, font=font))
 
 
 def _set_cell_shading(cell, color: str) -> None:

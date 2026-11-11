@@ -17,21 +17,21 @@ class ReportProblemHighlightTests(unittest.TestCase):
             book = load_workbook(target)
             try:
                 sheet = book.active
-                self.assertEqual(sheet.max_column, 22)
+                self.assertEqual(sheet.max_column, 31)
                 self.assertEqual(sheet["G4"].value, 0)
-                self.assertIn("Гидродинамический режим: Предположительно: спокойный", sheet["V4"].value)
-                self.assertEqual(sheet["M4"].value, 100)
+                self.assertIn("Гидродинамический режим: Предположительно: спокойный", sheet["AD4"].value)
+                self.assertEqual(sheet["N4"].value, 100)
                 rules = {str(key.sqref): value for key, value in sheet.conditional_formatting._cf_rules.items()}
-                self.assertIn("S4", rules)
-                self.assertIn("L4", rules)
+                self.assertIn("U4", rules)
+                self.assertIn("M4", rules)
                 self.assertIn("G4", rules)
-                for rule in rules["S4"]:
+                for rule in rules["U4"]:
                     self.assertEqual(rule.type, "expression")
                     self.assertEqual(rule.dxf.fill.fgColor.rgb, "00FF0000")
                     self.assertEqual(rule.dxf.font.color.rgb, "00000000")
                     self.assertIn("SEARCH", rule.formula[0])
                 self.assertEqual(rules["G4"][0].formula, ['NOT(ISNUMBER(G4))'])
-                for address in ("A1", "M4", "V4", "B4"):
+                for address in ("A1", "N4", "AD4", "AE4", "B4"):
                     self.assertEqual(sheet[address].border.left.style, "thin")
                     self.assertEqual(sheet[address].border.bottom.style, "thin")
             finally:
@@ -46,7 +46,7 @@ class ReportProblemHighlightTests(unittest.TestCase):
             export_core_description_report(target, "Test", [well], "xlsx")
             book = load_workbook(target)
             try:
-                self.assertEqual(book.active["M4"].value, 100)
+                self.assertEqual(book.active["N4"].value, 100)
                 self.assertIsNone(book.active["C4"].value)
                 self.assertTrue(book.active.conditional_formatting)
             finally:
@@ -69,10 +69,10 @@ class ReportProblemHighlightTests(unittest.TestCase):
                 {"label": "Русловая", "depth_from": 101, "depth_to": 100}]}], "xlsx")
             book = load_workbook(target)
             try:
-                self.assertEqual((book.active["M4"].value, book.active["N4"].value), (101, 100))
-                self.assertTrue(any("$N4<=$M4" in rule.formula[0]
+                self.assertEqual((book.active["N4"].value, book.active["O4"].value), (101, 100))
+                self.assertTrue(any("$O4<=$N4" in rule.formula[0]
                     for key, rules in book.active.conditional_formatting._cf_rules.items()
-                    if str(key.sqref) == "M4" for rule in rules))
+                    if str(key.sqref) == "N4" for rule in rules))
             finally:
                 book.close()
 

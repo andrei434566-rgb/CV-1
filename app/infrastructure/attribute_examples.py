@@ -83,6 +83,7 @@ def _descriptor(image):
 def write_example(payload, image_png, *, root=None):
     """Replace this interval's latest review; unchecked edits revoke approval."""
     from PIL import Image
+    from app.domain.core_report_fields import LAYER_REPORT_FIELDS, layer_report_fields
     from app.infrastructure.description_template import PHOTO_UNRESOLVED, observation, read_assumptions, UNKNOWN_FACIES
     root = Path(root or default_root())
     identifier = str(payload["id"])
@@ -118,7 +119,7 @@ def write_example(payload, image_png, *, root=None):
                              "source":"expert_selected_reviewed_roi", "roi":entry["roi"]})
     reviewed = payload.get("description_reviewed") is True
     observations = {key: observation(value)[0] for key,value in attrs.items()
-                    if not key.startswith("__") and key not in assumed and observation(value)[0]
+                    if not key.startswith("__") and key not in LAYER_REPORT_FIELDS and key not in assumed and observation(value)[0]
                     and not observation(value)[1] and observation(value)[0] != PHOTO_UNRESOLVED}
     if attrs.get("__description_mode") != "template":
         # Reviewing free text does not approve unrelated, unmentioned form fields.
@@ -137,6 +138,7 @@ def write_example(payload, image_png, *, root=None):
            "image":file, "sha256":image_sha, "pixel_sha256":image_digest,
            "description_reviewed":reviewed, "description":attrs.get("Краткое описание", "") if reviewed else "",
            "observations":observations if reviewed else {}, "targets":examples,
+           "report_fields":layer_report_fields(attrs) if reviewed else {},
            "facies":payload.get("facies", ""), "facies_name":attrs.get("Название фации", ""),
            "facies_index":attrs.get("Индекс фации", ""),
            "facies_reviewed":bool(payload.get("training_ready") is True and "Название фации" not in assumed

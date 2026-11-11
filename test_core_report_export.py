@@ -1,4 +1,4 @@
-"""Regression test for the fixed 22-column client Excel export."""
+"""Regression test for the 31-column client Excel export."""
 
 from __future__ import annotations
 
@@ -30,24 +30,36 @@ class CoreReportExportTests(unittest.TestCase):
                     "Название породы": "Песчаник",
                     "Цвет": "Серый",
                     "Цемент": "Карбонатный",
+                    "Индекс фации": "07", "Код фации": "L",
+                    "Смещение внутри интервала, м": "−0,25",
+                    "Индекс макрофации": "M1", "Название макрофации": "Лагунная",
+                    "Код макрофации": "Lg", "Индекс ассоциации фаций": "A1",
+                    "Комплекс осадконакопления": "Прибрежный", "Примечания": "=Текст специалиста",
                 },
             }],
         }]
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "report.xlsx"
             export_core_description_report(path, "Тест", wells, "xlsx")
-            sheet = load_workbook(path, data_only=True).active
+            book = load_workbook(path)
+            self.addCleanup(book.close)
+            sheet = book.active
 
-            self.assertEqual("Краткое описание", sheet["V1"].value)
-            self.assertEqual(22, sheet.max_column)
+            self.assertEqual("Краткое описание", sheet["AD1"].value)
+            self.assertEqual(31, sheet.max_column)
             self.assertEqual("Уренгойское", sheet["A4"].value)
             self.assertEqual("Р-31", sheet["B4"].value)
             self.assertEqual(-1.0, sheet["G4"].value)
-            self.assertEqual(3002.0, sheet["M4"].value)
-            self.assertEqual(3002.5, sheet["N4"].value)
-            self.assertEqual(1, sheet["Q4"].value)
-            self.assertEqual("Лагуна", sheet["S4"].value)
-            self.assertIsNone(sheet["V4"].value)
+            self.assertEqual((sheet["N4"].value, sheet["O4"].value), (3002.0, 3002.5))
+            self.assertEqual(1, sheet["R4"].value)
+            self.assertEqual([sheet.cell(4, column).value for column in range(20, 27)],
+                             ["07", "Лагуна", "L", "M1", "Лагунная", "Lg", "A1"])
+            self.assertEqual(sheet["AC4"].value, "Прибрежный")
+            self.assertIsNone(sheet["AD4"].value)
+            self.assertEqual((sheet["AE4"].value, sheet["AE4"].data_type), ("=Текст специалиста", "s"))
+            self.assertEqual(sheet["H4"].value, -.25)
+            self.assertIn("N4+G4+SUM(H4)", sheet["P4"].value)
+            self.assertIn("O4+G4+SUM(H4)", sheet["Q4"].value)
 
 
 if __name__ == "__main__":

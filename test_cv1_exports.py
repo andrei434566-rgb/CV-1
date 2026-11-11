@@ -69,14 +69,14 @@ class Cv1ExportTests(unittest.TestCase):
             workbook = load_workbook(target, data_only=False)
             try:
                 sheet = workbook.active
-                self.assertEqual(sheet.max_column, 22)
-                self.assertEqual([(sheet[f"M{r}"].value, sheet[f"N{r}"].value) for r in (4, 5)],
+                self.assertEqual(sheet.max_column, 31)
+                self.assertEqual([(sheet[f"N{r}"].value, sheet[f"O{r}"].value) for r in (4, 5)],
                                  [(100, 101), (101, 102)])
-                self.assertEqual([sheet[f"Q{r}"].value for r in (4, 5)], [1, 2])
-                self.assertEqual([sheet[f"V{r}"].value for r in (4, 5)],
+                self.assertEqual([sheet[f"R{r}"].value for r in (4, 5)], [1, 2])
+                self.assertEqual([sheet[f"AD{r}"].value for r in (4, 5)],
                                  ["Серая порода с тонкой слоистостью."] * 2)
-                self.assertEqual(sheet["R4"].value, '=IF(COUNT(M4:N4)=2,N4-M4,"")')
-                self.assertEqual(sheet["R5"].value, '=IF(COUNT(M5:N5)=2,N5-M5,"")')
+                self.assertEqual(sheet["S4"].value, '=IF(COUNT(N4:O4)=2,O4-N4,"")')
+                self.assertEqual(sheet["S5"].value, '=IF(COUNT(N5:O5)=2,O5-N5,"")')
             finally:
                 workbook.close()
 

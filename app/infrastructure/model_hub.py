@@ -252,22 +252,33 @@ def submit_reviewed_packet(hub: Path, packet: Path) -> dict:
              for path in sorted(packet.rglob("*")) if path.is_file() and not path.is_symlink()]
     batch_id = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()
     destination = hub / "training/incoming" / batch_id
-    if destination.exists():
+    def existing_receipt():
         receipt = read_json(destination / "receipt.json")
         if receipt.get("files") != files or not verify_files(destination, files):
             raise ValueError("Повреждён ранее отправленный пакет")
         return {"batch_id": batch_id, "duplicate": True, "annotations": len(metadata["annotations"])}
+    if destination.exists():
+        return existing_receipt()
     stage = destination.with_name(".upload-" + uuid4().hex)
     stage.mkdir(parents=True)
-    for item in files:
-        source, copied = inside(packet, item["path"]), inside(stage, item["path"])
-        copied.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(source, copied)
-    if not verify_files(stage, files):
-        raise ValueError("Не удалось проверить переданные файлы")
-    atomic_json(stage / "receipt.json", {"schema": PACKET_SCHEMA, "batch_id": batch_id, "files": files,
-                "received_at": utc_now(), "central_approved": False})
-    stage.rename(destination)
+    try:
+        for item in files:
+            source, copied = inside(packet, item["path"]), inside(stage, item["path"])
+            copied.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, copied)
+        if not verify_files(stage, files):
+            raise ValueError("Не удалось проверить переданные файлы")
+        atomic_json(stage / "receipt.json", {"schema": PACKET_SCHEMA, "batch_id": batch_id, "files": files,
+                    "received_at": utc_now(), "central_approved": False})
+        try:
+            stage.rename(destination)
+        except OSError:
+            if not destination.exists():
+                raise
+            return existing_receipt()
+    finally:
+        if stage.exists():
+            shutil.rmtree(stage, ignore_errors=True)
     return {"batch_id": batch_id, "duplicate": False, "annotations": len(metadata["annotations"])}
 
 

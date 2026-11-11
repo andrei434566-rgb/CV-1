@@ -53,11 +53,11 @@ class TrainingTabAndReportTests(unittest.TestCase):
         book = load_workbook(path)
         self.addCleanup(book.close)
         sheet = book.active
-        self.assertEqual(sheet.max_column, 22)
-        self.assertEqual(sheet["V1"].value, "Краткое описание")
+        self.assertEqual(sheet.max_column, 31)
+        self.assertEqual(sheet["AD1"].value, "Краткое описание")
         self.assertIsNone(sheet["A4"].value)
-        self.assertIsNone(sheet["S4"].value)
-        self.assertEqual(sheet["R4"].value, '=IF(COUNT(M4:N4)=2,N4-M4,"")')
+        self.assertIsNone(sheet["U4"].value)
+        self.assertEqual(sheet["S4"].value, '=IF(COUNT(N4:O4)=2,O4-N4,"")')
 
     def test_unresolved_facies_and_missing_columns_keep_depth_and_description(self):
         pixmap = QPixmap(30, 70)
@@ -83,9 +83,9 @@ class TrainingTabAndReportTests(unittest.TestCase):
         book = load_workbook(path)
         self.addCleanup(book.close)
         sheet = book.active
-        self.assertEqual((sheet["M4"].value, sheet["N4"].value), (100, 101))
-        self.assertIsNone(sheet["S4"].value)
-        self.assertEqual(sheet["V4"].value, "Алевролит серый.")
+        self.assertEqual((sheet["N4"].value, sheet["O4"].value), (100, 101))
+        self.assertIsNone(sheet["U4"].value)
+        self.assertEqual(sheet["AD4"].value, "Алевролит серый.")
         self.assertEqual(detection.label, UNRECOGNIZED_FACIES)
         self.assertEqual(detection.attributes["Название фации"], UNRECOGNIZED_FACIES)
 

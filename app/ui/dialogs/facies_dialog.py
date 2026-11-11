@@ -8,6 +8,7 @@ from PySide6.QtGui import QColor, QIcon, QPainter, QPainterPath, QPen, QPixmap, 
 from PySide6.QtWidgets import QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFileDialog, QFormLayout, QHBoxLayout, QInputDialog, QLabel, QLineEdit, QListWidget, QListWidgetItem, QMessageBox, QPlainTextEdit, QPushButton, QScrollArea, QSizePolicy, QSplitter, QTabWidget, QVBoxLayout, QWidget
 
 from app.domain.facies_catalog import FACIES_MODEL_CLASSES, FACIES_REFERENCE_FIELDS, facies_metadata, facies_title, resolve_facies_class
+from app.domain.core_report_fields import INTERVAL_SHIFT_FIELD, REPORT_CHOICE_FIELDS, REPORT_NOTE_FIELD, report_field_value
 from app.domain.lithology_attributes import LITHOLOGY_ATTRIBUTE_OPTIONS
 from app.infrastructure.primary_facies_catalog import resolve_catalog_class
 from app.infrastructure.description_template import ASSUMPTIONS_KEY, PHOTO_UNRESOLVED, SCHEMA, UNKNOWN_FACIES, compose_description, display_description, observation, read_assumptions
@@ -356,6 +357,7 @@ class FaciesDialog(QDialog):
         preview_layout.addWidget(self.missing_fields)
         self._build_review_tab()
         self._build_examples_tab()
+        self._build_report_tab(attributes)
 
         self.training_confirmed = QCheckBox("Фация и границы проверены — использовать в обучении")
         self.training_confirmed.setChecked(training_ready)
@@ -412,6 +414,11 @@ class FaciesDialog(QDialog):
                      self.vlm_association, self.vlm_environment):
             edit.textChanged.connect(self._description_inputs_changed)
         self.facies.currentIndexChanged.connect(self._description_inputs_changed)
+        self.facies.currentIndexChanged.connect(self._update_report_facies)
+        self.report_shift.textChanged.connect(self._report_fields_changed)
+        self.report_note.textChanged.connect(self._report_fields_changed)
+        for combo in self.report_combos.values():
+            combo.currentTextChanged.connect(self._report_fields_changed)
         self.facies.currentIndexChanged.connect(lambda: self.training_confirmed.setChecked(False))
         self.facies_assumed.toggled.connect(lambda checked: self.training_confirmed.setChecked(False) if checked else None)
         self.depth_from.textChanged.connect(lambda: self.training_confirmed.setChecked(False))
@@ -656,6 +663,11 @@ class FaciesDialog(QDialog):
         values["__vlm_texture"] = values.get("Текстура", "")
         values["Название фации"] = str((selected_reference or {}).get("Название фации") or self.selected_facies() or "Не определена")
         values["__vlm_facies_name"] = values["Название фации"]
+        report_values = self._report_values()
+        for field, value in report_values.items():
+            if value or report_field_value(values, field):
+                values[field] = value
+        self._remember_report_choices(report_values)
         values[ASSUMPTIONS_KEY] = json.dumps(self._assumed_fields(), ensure_ascii=False)
         if values.get('Цвет') and values['Цвет'] != PHOTO_UNRESOLVED:
             values['__color_expert_confirmed']='0' if 'Цвет' in self._assumed_fields() else '1'
@@ -781,10 +793,77 @@ class FaciesDialog(QDialog):
                            self.facies.currentIndex(),self.depth_from.text(),self.depth_to.text(),
                            self.vlm_description.toPlainText(),self.template_mode.isChecked(),
                            self.training_confirmed.isChecked(),self.description_confirmed.isChecked(),
-                           self._current_evidence()],ensure_ascii=False,sort_keys=True)
+                           self._current_evidence(), self._report_values()],ensure_ascii=False,sort_keys=True)
 
     def has_unsaved_changes(self):
         return self._editor_signature()!=self._opening_signature
+
+    def _build_report_tab(self, attributes):
+        page = QWidget()
+        form = QFormLayout(page)
+        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)
+        form.setFieldGrowthPolicy(QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow)
+        self.report_facies = {field: QLabel() for field in ("Индекс фации", "Код фации")}
+        for field, label in self.report_facies.items():
+            form.addRow(field, label)
+        self._update_report_facies()
+
+        self.report_shift = QLineEdit(report_field_value(attributes, INTERVAL_SHIFT_FIELD))
+        self.report_shift.setPlaceholderText("Например, −0,10")
+        self.report_shift.setToolTip("Прибавляется к глубинам фации по ГИС. Пустое поле означает нулевую поправку.")
+        form.addRow(INTERVAL_SHIFT_FIELD, self.report_shift)
+
+        self.report_combos = {}
+        metadata = [item["metadata"] for item in self._catalog_classes]
+        for item in self._catalog_classes:
+            metadata.extend(variant.get("metadata", variant) for variant in item.get("source_variants", []))
+        for field in REPORT_CHOICE_FIELDS:
+            options = [report_field_value(row, field) for row in metadata]
+            options.extend(self._report_history(field))
+            combo = QComboBox()
+            combo.setEditable(True)
+            combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+            combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+            combo.setMinimumContentsLength(14)
+            combo.addItem("")
+            combo.addItems(list(dict.fromkeys(value for value in options if value)))
+            combo.setCurrentText(report_field_value(attributes, field))
+            combo.lineEdit().setPlaceholderText("Выберите или введите значение")
+            self.report_combos[field] = combo
+            form.addRow(field, combo)
+
+        self.report_note = QPlainTextEdit(report_field_value(attributes, REPORT_NOTE_FIELD))
+        self.report_note.setPlaceholderText("Примечания к слою")
+        self.report_note.setMaximumHeight(100)
+        form.addRow(REPORT_NOTE_FIELD, self.report_note)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(page)
+        self.preview_tabs.addTab(scroll, "Поля отчёта")
+
+    def _update_report_facies(self, *_args):
+        metadata = self.facies.currentData(FACIES_METADATA_ROLE) or {}
+        self.report_facies["Индекс фации"].setText(str(metadata.get("Индекс фации") or "—"))
+        self.report_facies["Код фации"].setText(str(metadata.get("Код фации") or self.selected_facies() or "—"))
+
+    def _report_fields_changed(self, *_args):
+        self.description_confirmed.setChecked(False)
+
+    def _report_values(self):
+        values = {field: combo.currentText().strip() for field, combo in self.report_combos.items()}
+        values[INTERVAL_SHIFT_FIELD] = self.report_shift.text().strip()
+        values[REPORT_NOTE_FIELD] = self.report_note.toPlainText().strip()
+        return values
+
+    def _report_history(self, field):
+        return self.settings.value(f"report_choices/{field}", [], type=list)
+
+    def _remember_report_choices(self, values):
+        for field in REPORT_CHOICE_FIELDS:
+            value = values[field]
+            if value:
+                history = [value, *[item for item in self._report_history(field) if item != value]]
+                self.settings.setValue(f"report_choices/{field}", history[:50])
 
     def _build_examples_tab(self):
         page=QWidget();layout=QVBoxLayout(page);self.preview_tabs.addTab(page,"Примеры")
@@ -832,7 +911,12 @@ class FaciesDialog(QDialog):
         else:self.example_description.clear()
 
     def _show_example(self,index):
-        self.example_description.setPlainText(self._similar_rows[index]['description'] if 0<=index<len(self._similar_rows) else "")
+        if not 0 <= index < len(self._similar_rows):
+            self.example_description.clear()
+            return
+        example = self._similar_rows[index]
+        fields = example.get("report_fields", {})
+        self.example_description.setPlainText("\n".join([example['description'], *[f"{field} — {value}" for field, value in fields.items()]]))
 
     def _export_examples(self):
         from datetime import datetime
@@ -921,6 +1005,11 @@ class FaciesDialog(QDialog):
             self.selected_depth_range()
         except ValueError as exc:
             QMessageBox.warning(self, "Проверьте глубины", str(exc))
+            return
+        try:
+            self._parse_depth(self.report_shift.text().replace("−", "-"))
+        except ValueError:
+            QMessageBox.warning(self, "Проверьте смещение", "Смещение внутри интервала должно быть числом в метрах.")
             return
         if self.training_confirmed.isChecked() and not self.selected_facies():
             QMessageBox.warning(self, "Не указана фация", "Для обучения выберите фацию. Карточку без фации можно сохранить как черновик.")
